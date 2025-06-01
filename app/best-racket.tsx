@@ -1,10 +1,10 @@
 // Import React library and hooks for creating components
 import React, { useState } from "react";
+import { RacketImage } from "../src/components/ui/racket-image";
 // Import React Native components for UI
 import {
   Alert,
   Dimensions,
-  Image,
   Modal,
   ScrollView,
   StyleSheet,
@@ -18,9 +18,10 @@ import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { Button } from "../src/components/ui/button";
 import { Input } from "../src/components/ui/input";
-// Import Gemini API function
+// Import Gemini API functions
 import {
-  getRacketRecommendation,
+  getRacketRecommendations,
+  MultipleRacketRecommendations,
   RacketRecommendation,
 } from "../src/utils/gemini";
 
@@ -45,19 +46,22 @@ interface FormData {
 // Interface for recommendation response
 interface RecommendationResponse {
   success: boolean;
-  recommendation?: RacketRecommendation;
+  recommendations?: MultipleRacketRecommendations;
   error?: string;
 }
 
-// Wider Best Racket Finder screen component (60% screen width)
+// Enhanced Best Racket Finder screen component with multiple recommendations
 export default function BestRacketScreen() {
   // State for loading during form submission
   const [isLoading, setIsLoading] = useState(false);
   // State for showing recommendation modal
   const [showRecommendation, setShowRecommendation] = useState(false);
-  // State for storing the AI recommendation
-  const [recommendation, setRecommendation] =
-    useState<RacketRecommendation | null>(null);
+  // State for storing the AI recommendations
+  const [recommendations, setRecommendations] =
+    useState<MultipleRacketRecommendations | null>(null);
+  // State for tracking which recommendation is currently selected (0, 1, or 2)
+  const [selectedRecommendationIndex, setSelectedRecommendationIndex] =
+    useState(0);
 
   // State for simplified form data
   const [formData, setFormData] = useState<FormData>({
@@ -103,7 +107,7 @@ export default function BestRacketScreen() {
     return true;
   };
 
-  // Form submission handler with Gemini AI integration
+  // Form submission handler with Gemini AI integration for multiple recommendations
   const handleSubmit = async () => {
     // Validate form before submission
     if (!validateForm()) {
@@ -115,23 +119,24 @@ export default function BestRacketScreen() {
     try {
       console.log("Enviando datos del formulario:", formData);
 
-      // Call Gemini API for racket recommendation
-      const result: RecommendationResponse = await getRacketRecommendation(
+      // Call Gemini API for multiple racket recommendations
+      const result: RecommendationResponse = await getRacketRecommendations(
         formData
       );
 
       console.log("Resultado recibido:", result);
 
-      if (result.success && result.recommendation) {
-        // Show recommendation in modal
-        setRecommendation(result.recommendation);
+      if (result.success && result.recommendations) {
+        // Show recommendations in modal
+        setRecommendations(result.recommendations);
+        setSelectedRecommendationIndex(0); // Start with the most recommended option
         setShowRecommendation(true);
       } else {
         // Show specific error message
         Alert.alert(
           "Error",
           result.error ||
-            "No se pudo obtener una recomendación. Inténtalo de nuevo."
+            "No se pudo obtener recomendaciones. Inténtalo de nuevo."
         );
       }
     } catch (error: any) {
@@ -148,8 +153,70 @@ export default function BestRacketScreen() {
   // Function to close recommendation modal
   const closeRecommendation = () => {
     setShowRecommendation(false);
-    setRecommendation(null);
+    setRecommendations(null);
+    setSelectedRecommendationIndex(0);
   };
+
+  // Get the currently selected recommendation
+  const selectedRecommendation =
+    recommendations?.recommendations[selectedRecommendationIndex];
+
+  // Component for recommendation selector tabs
+  const RecommendationTabs = () => (
+    <View style={styles.tabsContainer}>
+      {recommendations?.recommendations.map((rec, index) => (
+        <TouchableOpacity
+          key={index}
+          style={[
+            styles.tab,
+            selectedRecommendationIndex === index && styles.activeTab,
+          ]}
+          onPress={() => setSelectedRecommendationIndex(index)}
+        >
+          <View style={styles.tabContent}>
+            <Text
+              style={[
+                styles.tabNumber,
+                selectedRecommendationIndex === index && styles.activeTabNumber,
+              ]}
+            >
+              {index + 1}
+            </Text>
+            <Text
+              style={[
+                styles.tabLabel,
+                selectedRecommendationIndex === index && styles.activeTabLabel,
+              ]}
+            >
+              {index === 0 ? "Recomendada" : `Opción ${index + 1}`}
+            </Text>
+            <View
+              style={[
+                styles.matchBadge,
+                selectedRecommendationIndex === index &&
+                  styles.activeMatchBadge,
+              ]}
+            >
+              <Text
+                style={[
+                  styles.matchText,
+                  selectedRecommendationIndex === index &&
+                    styles.activeMatchText,
+                ]}
+              >
+                {rec.matchPercentage}%
+              </Text>
+            </View>
+          </View>
+          {index === 0 && (
+            <View style={styles.recommendedBadge}>
+              <Text style={styles.recommendedText}>TOP</Text>
+            </View>
+          )}
+        </TouchableOpacity>
+      ))}
+    </View>
+  );
 
   // Wider component for radio button selection with better spacing
   const RadioButton = ({
@@ -212,7 +279,7 @@ export default function BestRacketScreen() {
           <Text style={styles.specValue}>{specs.weight}</Text>
         </View>
         <View style={styles.specItem}>
-          <Ionicons name="balance-scale" size={20} color="#16a34a" />
+          <Ionicons name="scale" size={20} color="#16a34a" />
           <Text style={styles.specLabel}>Balance</Text>
           <Text style={styles.specValue}>{specs.balance}</Text>
         </View>
@@ -274,8 +341,8 @@ export default function BestRacketScreen() {
             Encuentra tu <Text style={styles.highlightText}>Pala Ideal</Text>
           </Text>
           <Text style={styles.subtitle}>
-            Completa nuestro formulario y obtén una recomendación personalizada
-            generada por IA
+            Completa nuestro formulario y obtén 3 recomendaciones personalizadas
+            generadas por IA
           </Text>
         </View>
 
@@ -289,7 +356,8 @@ export default function BestRacketScreen() {
               </View>
               <Text style={styles.formTitle}>Cuéntanos sobre tu juego</Text>
               <Text style={styles.formSubtitle}>
-                Nuestra IA analizará tu perfil y te recomendará la pala perfecta
+                Nuestra IA analizará tu perfil y te recomendará las 3 mejores
+                palas
               </Text>
             </View>
 
@@ -348,7 +416,7 @@ export default function BestRacketScreen() {
                   onChangeText={(value) => updateFormData("budget", value)}
                 />
                 <Text style={styles.inputHelper}>
-                  Te mostraremos opciones dentro de tu rango de precio
+                  Te mostraremos 3 opciones dentro de tu rango de precio
                 </Text>
               </View>
 
@@ -372,7 +440,7 @@ export default function BestRacketScreen() {
                   title={
                     isLoading
                       ? "Analizando tu perfil..."
-                      : "Obtener Recomendación con IA"
+                      : "Obtener 3 Recomendaciones con IA"
                   }
                   onPress={handleSubmit}
                   loading={isLoading}
@@ -383,7 +451,7 @@ export default function BestRacketScreen() {
         </View>
       </ScrollView>
 
-      {/* Professional Recommendation Modal */}
+      {/* Enhanced Recommendation Modal with Multiple Options */}
       <Modal
         visible={showRecommendation}
         animationType="slide"
@@ -404,12 +472,22 @@ export default function BestRacketScreen() {
               <View style={styles.modalIconContainer}>
                 <Ionicons name="sparkles" size={32} color="#16a34a" />
               </View>
-              <Text style={styles.modalTitle}>Tu Pala Ideal</Text>
+              <Text style={styles.modalTitle}>Tus Palas Ideales</Text>
               <Text style={styles.modalSubtitle}>
-                Recomendación personalizada generada por IA
+                3 recomendaciones personalizadas generadas por IA
               </Text>
             </View>
           </View>
+
+          {/* Recommendation Tabs */}
+          {recommendations && <RecommendationTabs />}
+
+          {/* Summary Section */}
+          {recommendations && (
+            <View style={styles.summaryContainer}>
+              <Text style={styles.summaryText}>{recommendations.summary}</Text>
+            </View>
+          )}
 
           {/* Modal Content */}
           <ScrollView
@@ -417,38 +495,42 @@ export default function BestRacketScreen() {
             showsVerticalScrollIndicator={false}
             contentContainerStyle={styles.modalContentContainer}
           >
-            {recommendation && (
+            {selectedRecommendation && (
               <>
                 {/* Racket Card */}
                 <View style={styles.racketCard}>
                   <View style={styles.racketHeader}>
                     <View style={styles.racketImageContainer}>
-                      <Image
-                        source={{ uri: recommendation.imageUrl }}
-                        style={styles.racketImage}
-                        resizeMode="contain"
-                        onError={(error) => {
-                          console.log("Error loading image:", error);
-                          // You could set a default image here
-                        }}
+                      <RacketImage
+                        imageUrl={selectedRecommendation.imageUrl}
+                        brand={selectedRecommendation.brand}
+                        model={selectedRecommendation.model}
+                        style={styles.racketImageStyle}
+                        showLoadingIndicator={true}
+                        showErrorState={true}
                       />
                       <View style={styles.priceTag}>
                         <Text style={styles.priceText}>
-                          {recommendation.price}
+                          {selectedRecommendation.price}
                         </Text>
                       </View>
                     </View>
 
                     <View style={styles.racketInfo}>
                       <Text style={styles.brandText}>
-                        {recommendation.brand}
+                        {selectedRecommendation.brand}
                       </Text>
                       <Text style={styles.modelText}>
-                        {recommendation.model}
+                        {selectedRecommendation.model}
                       </Text>
                       <View style={styles.levelBadge}>
                         <Text style={styles.levelText}>
-                          {recommendation.technicalSpecs.level}
+                          {selectedRecommendation.technicalSpecs.level}
+                        </Text>
+                      </View>
+                      <View style={styles.compatibilityBadge}>
+                        <Text style={styles.compatibilityText}>
+                          {selectedRecommendation.matchPercentage}% Compatible
                         </Text>
                       </View>
                     </View>
@@ -462,39 +544,23 @@ export default function BestRacketScreen() {
                     esta pala?
                   </Text>
                   <Text style={styles.descriptionText}>
-                    {recommendation.whyThisRacket}
+                    {selectedRecommendation.whyThisRacket}
                   </Text>
                 </View>
 
                 {/* Technical Specifications */}
                 <View style={styles.sectionCard}>
-                  <TechnicalSpecs specs={recommendation.technicalSpecs} />
+                  <TechnicalSpecs
+                    specs={selectedRecommendation.technicalSpecs}
+                  />
                 </View>
 
                 {/* Pros and Cons */}
                 <View style={styles.sectionCard}>
                   <ProsAndCons
-                    pros={recommendation.pros}
-                    cons={recommendation.cons}
+                    pros={selectedRecommendation.pros}
+                    cons={selectedRecommendation.cons}
                   />
-                </View>
-
-                {/* Alternatives */}
-                <View style={styles.sectionCard}>
-                  <Text style={styles.cardTitle}>
-                    <Ionicons name="list" size={20} color="#16a34a" />{" "}
-                    Alternativas
-                  </Text>
-                  {recommendation.alternatives.map((alternative, index) => (
-                    <View key={index} style={styles.alternativeItem}>
-                      <Ionicons
-                        name="arrow-forward"
-                        size={16}
-                        color="#6b7280"
-                      />
-                      <Text style={styles.alternativeText}>{alternative}</Text>
-                    </View>
-                  ))}
                 </View>
               </>
             )}
@@ -521,7 +587,7 @@ export default function BestRacketScreen() {
   );
 }
 
-// Enhanced StyleSheet with professional design
+// Enhanced StyleSheet with new styles for multiple recommendations
 const styles = StyleSheet.create({
   // Main container
   container: {
@@ -575,12 +641,12 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
 
-  // Wider main form card (60% of screen width)
+  // ✅ CORRECCIÓN: Eliminar sintaxis CSS y usar solo números
   formCard: {
     backgroundColor: "white",
     borderRadius: 20,
     padding: 32,
-    width: `${Math.min(screenWidth * 0.6, 600)}px`,
+    width: Math.min(screenWidth * 0.6, 600),
     minWidth: screenWidth > 768 ? 480 : screenWidth * 0.9,
     alignSelf: "center",
     shadowColor: "#000",
@@ -837,6 +903,129 @@ const styles = StyleSheet.create({
     zIndex: 1,
   },
 
+  // Tabs Container
+  tabsContainer: {
+    flexDirection: "row",
+    backgroundColor: "white",
+    paddingHorizontal: 24,
+    paddingVertical: 16,
+    gap: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: "#f3f4f6",
+  },
+
+  // Individual Tab
+  tab: {
+    flex: 1,
+    backgroundColor: "#f9fafb",
+    borderRadius: 12,
+    padding: 16,
+    borderWidth: 2,
+    borderColor: "transparent",
+    position: "relative",
+  },
+
+  // Active Tab
+  activeTab: {
+    backgroundColor: "#f0f9ff",
+    borderColor: "#16a34a",
+  },
+
+  // Tab Content
+  tabContent: {
+    alignItems: "center",
+    gap: 4,
+  },
+
+  // Tab Number
+  tabNumber: {
+    fontSize: 18,
+    fontWeight: "700",
+    color: "#6b7280",
+  },
+
+  // Active Tab Number
+  activeTabNumber: {
+    color: "#16a34a",
+  },
+
+  // Tab Label
+  tabLabel: {
+    fontSize: 12,
+    fontWeight: "500",
+    color: "#6b7280",
+    textAlign: "center",
+  },
+
+  // Active Tab Label
+  activeTabLabel: {
+    color: "#16a34a",
+    fontWeight: "600",
+  },
+
+  // Match Badge
+  matchBadge: {
+    backgroundColor: "#e5e7eb",
+    borderRadius: 8,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    marginTop: 4,
+  },
+
+  // Active Match Badge
+  activeMatchBadge: {
+    backgroundColor: "#dcfce7",
+  },
+
+  // Match Text
+  matchText: {
+    fontSize: 10,
+    fontWeight: "600",
+    color: "#6b7280",
+  },
+
+  // Active Match Text
+  activeMatchText: {
+    color: "#16a34a",
+  },
+
+  // Recommended Badge (only for first option)
+  recommendedBadge: {
+    position: "absolute",
+    top: -8,
+    right: -8,
+    backgroundColor: "#16a34a",
+    borderRadius: 10,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+  },
+
+  // Recommended Text
+  recommendedText: {
+    color: "white",
+    fontSize: 8,
+    fontWeight: "700",
+  },
+
+  // Summary Container
+  summaryContainer: {
+    backgroundColor: "#f0f9ff",
+    margin: 24,
+    marginBottom: 0,
+    padding: 16,
+    borderRadius: 12,
+    borderLeftWidth: 4,
+    borderLeftColor: "#16a34a",
+  },
+
+  // Summary Text
+  summaryText: {
+    fontSize: 14,
+    color: "#374151",
+    lineHeight: 20,
+    fontStyle: "italic",
+  },
+
   // Modal Content
   modalContent: {
     flex: 1,
@@ -881,10 +1070,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
 
-  // Racket Image
-  racketImage: {
+  // ✅ NUEVO: Estilo para RacketImage
+  racketImageStyle: {
     width: 100,
     height: 140,
+    borderRadius: 8,
   },
 
   // Price Tag
@@ -909,6 +1099,7 @@ const styles = StyleSheet.create({
   racketInfo: {
     flex: 1,
     justifyContent: "center",
+    gap: 8,
   },
 
   // Brand Text
@@ -923,7 +1114,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "700",
     color: "#1f2937",
-    marginBottom: 12,
+    marginBottom: 8,
   },
 
   // Level Badge
@@ -940,6 +1131,22 @@ const styles = StyleSheet.create({
     color: "#16a34a",
     fontSize: 12,
     fontWeight: "600",
+  },
+
+  // Compatibility Badge
+  compatibilityBadge: {
+    backgroundColor: "#dcfce7",
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    alignSelf: "flex-start",
+  },
+
+  // Compatibility Text
+  compatibilityText: {
+    color: "#16a34a",
+    fontSize: 12,
+    fontWeight: "700",
   },
 
   // Section Card
@@ -1083,22 +1290,6 @@ const styles = StyleSheet.create({
     color: "#374151",
     flex: 1,
     lineHeight: 20,
-  },
-
-  // Alternative Item
-  alternativeItem: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
-    marginBottom: 8,
-    paddingLeft: 8,
-  },
-
-  // Alternative Text
-  alternativeText: {
-    fontSize: 14,
-    color: "#374151",
-    flex: 1,
   },
 
   // Modal Footer
