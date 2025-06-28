@@ -1,2 +1,0 @@
-requests
-from bs4

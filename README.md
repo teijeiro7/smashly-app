@@ -1,26 +1,43 @@
 # 🏓 Smashly - Tu Asistente Inteligente para Palas de Pádel
 
-**Smashly** es una aplicación móvil innovadora que utiliza **Inteligencia Artificial** para ayudar a los jugadores de pádel a encontrar la pala perfecta según su perfil, comparar múltiples modelos y acceder a información actualizada del mercado.
+**Smashly** es una plataforma completa que utiliza **Inteligencia Artificial** para ayudar a los jugadores de pádel a encontrar la pala perfecta. Disponible en **móvil (React Native)** y **web (React + Vite)** con funcionalidades completas de comparación y recomendaciones personalizadas.
 
 ![React Native](https://img.shields.io/badge/React_Native-61DAFB?style=for-the-badge&logo=react&logoColor=black)
+![React](https://img.shields.io/badge/React-61DAFB?style=for-the-badge&logo=react&logoColor=black)
 ![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)
+![Vite](https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white)
 ![Expo](https://img.shields.io/badge/Expo-000020?style=for-the-badge&logo=expo&logoColor=white)
 ![Google AI](https://img.shields.io/badge/Google_AI-4285F4?style=for-the-badge&logo=google&logoColor=white)
+
+## 🚀 Plataformas Disponibles
+
+### 📱 **Aplicación Móvil (React Native + Expo)**
+
+- Experiencia nativa optimizada para iOS y Android
+- Ubicación: `/app/` y `/src/`
+
+### 🌐 **Aplicación Web (React + Vite)**
+
+- Experiencia web moderna y responsive
+- Ubicación: `/web/`
+- **¡Nuevas funcionalidades migradas!**
 
 ## 🌟 Características Principales
 
 ### 🤖 **Recomendaciones con IA (Gemini)**
 
-- Análisis personalizado basado en nivel de juego, estilo y características físicas
-- Recomendaciones múltiples con porcentajes de compatibilidad
-- Explicaciones detalladas de por qué cada pala es recomendada
+- ✅ **Móvil & Web**: Análisis personalizado basado en nivel de juego, estilo y características físicas
+- ✅ **Móvil & Web**: Recomendaciones múltiples con porcentajes de compatibilidad
+- ✅ **Móvil & Web**: Explicaciones detalladas de por qué cada pala es recomendada
+- ✅ **Web**: Modal interactivo con navegación entre 3 recomendaciones
 
 ### ⚖️ **Comparador Inteligente de Palas**
 
-- Selección de 2-3 palas para comparación detallada
-- Análisis comparativo generado por IA
-- Pros y contras de cada modelo
-- Recomendación final personalizada
+- ✅ **Móvil & Web**: Selección de 2-3 palas para comparación detallada
+- ✅ **Móvil & Web**: Análisis comparativo generado por IA
+- ✅ **Móvil & Web**: Pros y contras de cada modelo
+- ✅ **Web**: Panel flotante de comparación global
+- ✅ **Web**: Sistema de contexto para gestión de selecciones
 
 ### 🔍 **Base de Datos Actualizada**
 
@@ -31,26 +48,29 @@
 
 ### 📱 **Interfaz Moderna y Responsive**
 
-- Diseño adaptativo para móviles, tablets y desktop
-- Grid optimizado con 2-4 palas por fila según el dispositivo
-- Animaciones suaves y feedback visual
-- Modo oscuro/claro (próximamente)
-
-### 💬 **Sistema de Soporte**
-
-- Modal de contacto integrado
-- Envío de emails automático con EmailJS
-- FAQ con preguntas frecuentes
-- Soporte técnico dedicado
+- ✅ **Web**: Diseño adaptativo para móviles, tablets y desktop
+- ✅ **Web**: Grid optimizado con 2-4 palas por fila según el dispositivo
+- ✅ **Web**: Animaciones suaves con Framer Motion
+- ✅ **Web**: Toast notifications para feedback inmediato
 
 ## 🛠️ Tecnologías Utilizadas
 
-### **Frontend & Framework**
+### **Frontend Móvil**
 
 - **React Native** - Framework principal para desarrollo móvil
 - **Expo** - Plataforma de desarrollo y deployment
 - **TypeScript** - Tipado estático para mayor robustez
 - **Expo Router** - Navegación basada en archivos
+
+### **Frontend Web**
+
+- **React** - Biblioteca para interfaces de usuario
+- **Vite** - Build tool moderno y rápido
+- **TypeScript** - Tipado estático
+- **Styled Components** - CSS-in-JS para estilos
+- **Framer Motion** - Animaciones fluidas
+- **React Router** - Navegación SPA
+- **React Hot Toast** - Notificaciones
 
 ### **Inteligencia Artificial**
 
@@ -100,6 +120,12 @@
 │   │   └── email.service.tsx # Servicio de emails
 │   ├── types/            # Definiciones TypeScript
 │   └── styles/           # Estilos globales
+├── web/                   # Código fuente de la aplicación web
+│   ├── index.html         # Archivo HTML principal
+│   ├── src/               # Código fuente React
+│   │   ├── App.tsx        # Componente principal
+│   │   ├── main.tsx       # Punto de entrada
+│   │   └── styles.css     # Estilos globales
 └── palas_padel.json      # Base de datos de palas
 ```
 

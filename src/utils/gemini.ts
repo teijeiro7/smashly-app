@@ -1,428 +1,479 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
-// ✅ CORRECCIÓN: Comentar hasta crear el archivo
-// import { getMultipleRacketImages, testImageService } from './racket-image-service';
+import {
+  FormData,
+  MultipleRacketRecommendations,
+  Racket,
+  RacketComparison,
+  RacketRecommendation,
+} from "../types/racket";
 
-const API_KEY = process.env.EXPO_PUBLIC_GEMINI_API_KEY;
+// Safe access to Vite environment variables
+const getEnvVar = (key: string): string | undefined => {
+  try {
+    // In Vite, environment variables are available on import.meta.env
+    const env = (import.meta as any).env;
+    return env?.[key];
+  } catch (error) {
+    console.warn(`Error accessing environment variable ${key}:`, error);
+    return undefined;
+  }
+};
 
-console.log("🔧 Gemini API Configuration:");
+const API_KEY = getEnvVar("VITE_GEMINI_API_KEY");
+
+console.log("🔧 Gemini AI Configuration:");
 console.log("API_KEY exists:", !!API_KEY);
+console.log("Environment:", getEnvVar("MODE") || "unknown");
 if (API_KEY) {
   console.log("API_KEY preview:", API_KEY.substring(0, 10) + "...");
 }
 
 if (!API_KEY) {
-  console.error("⚠️ GEMINI API KEY no encontrada. Verifica tu archivo .env");
-  console.log(
-    "Variables disponibles:",
-    Object.keys(process.env).filter((key) => key.startsWith("EXPO_PUBLIC"))
+  console.error(
+    "⚠️ VITE_GEMINI_API_KEY no encontrada. Verifica tu archivo .env"
   );
+  console.log("💡 La variable debe llamarse: VITE_GEMINI_API_KEY");
+  try {
+    const env = (import.meta as any).env;
+    if (env) {
+      const availableVars = Object.keys(env).filter(
+        (key) => key.startsWith("VITE_") || key.startsWith("EXPO_")
+      );
+      console.log("Variables disponibles:", availableVars);
+    }
+  } catch {
+    console.log("No se pudieron leer las variables de entorno");
+  }
 }
 
 const genAI = API_KEY ? new GoogleGenerativeAI(API_KEY) : null;
 
-export interface RacketRecommendation {
-  racketName: string;
-  brand: string;
-  model: string;
-  price: string;
-  imageUrl: string;
-  whyThisRacket: string;
-  technicalSpecs: {
-    weight: string;
-    balance: string;
-    shape: string;
-    material: string;
-    level: string;
-  };
-  pros: string[];
-  cons: string[];
-  matchPercentage: number;
-}
+// Available models to try in order of preference
+const AVAILABLE_MODELS = [
+  "gemini-1.5-flash",
+  "gemini-1.5-pro",
+  "gemini-pro",
+  "models/gemini-1.5-flash",
+  "models/gemini-1.5-pro",
+];
 
-export interface MultipleRacketRecommendations {
-  recommendations: RacketRecommendation[];
-  summary: string;
-}
-
-// New interfaces for racket comparison
-export interface RacketAnalysis {
-  name: string;
-  keyAttributes: string;
-  recommendedFor: string;
-  whyThisRacket: string;
-  pros: string[];
-  cons: string[];
-}
-
-export interface RacketComparison {
-  generalAnalysis: string;
-  racketAnalysis: RacketAnalysis[];
-  finalRecommendation: string;
-}
-
-// Interface for racket data from JSON
-export interface Racket {
-  nombre: string;
-  marca: string;
-  modelo: string;
-  precio_actual: number;
-  precio_original: number | null;
-  descuento_porcentaje: number;
-  enlace: string;
-  imagen: string;
-  es_bestseller: boolean;
-  en_oferta: boolean;
-  scrapeado_en?: string;
-  fuente?: string;
-}
-
-export async function getRacketRecommendations(formData: {
-  gameLevel: string;
-  playingStyle: string;
-  weight: string;
-  height: string;
-  budget: string;
-  shape: string;
-}) {
-  try {
-    console.log("🤖 Starting Gemini recommendations...");
-
-    if (!API_KEY || !genAI) {
-      throw new Error("API Key de Gemini no configurada correctamente");
-    }
-
-    // ✅ CORRECCIÓN: Comentar hasta crear el servicio de imágenes
-    // await testImageService();
-
-    const model = genAI.getGenerativeModel({
-      model: "gemini-1.5-flash",
-      generationConfig: {
-        temperature: 0.7,
-        topK: 1,
-        topP: 1,
-        maxOutputTokens: 4096,
-      },
-    });
-
-    const prompt = `
-    Eres un experto en pádel con 20 años de experiencia recomendando palas. Analiza el siguiente perfil de jugador y recomienda las 3 mejores palas específicas del mercado, ordenadas por compatibilidad:
-
-    PERFIL DEL JUGADOR:
-    - Nivel de juego: ${formData.gameLevel}
-    - Estilo de juego: ${formData.playingStyle}
-    - Peso corporal: ${formData.weight} kg
-    - Altura: ${formData.height} cm
-    - Presupuesto máximo: ${formData.budget}€
-    - Forma preferida: ${formData.shape}
-
-    Responde ÚNICAMENTE con un JSON válido con esta estructura exacta (sin texto adicional antes o después):
-
-    {
-      "summary": "Resumen breve de por qué estas 3 palas son las mejores opciones para este perfil",
-      "recommendations": [
-        {
-          "racketName": "Marca Modelo completo",
-          "brand": "Marca",
-          "model": "Modelo",
-          "price": "XXX€",
-          "imageUrl": "https://images.unsplash.com/photo-1551698618-1dfe5d97d256?w=400&h=600&fit=crop&crop=center",
-          "whyThisRacket": "Explicación detallada de por qué esta pala es perfecta para este perfil",
-          "technicalSpecs": {
-            "weight": "XXXg",
-            "balance": "Alto/Medio/Bajo",
-            "shape": "Redonda/Lágrima/Diamante",
-            "material": "Material principal",
-            "level": "Nivel recomendado"
-          },
-          "pros": ["Ventaja 1", "Ventaja 2", "Ventaja 3"],
-          "cons": ["Desventaja 1", "Desventaja 2"],
-          "matchPercentage": 95
-        },
-        {
-          "racketName": "Marca Modelo completo 2",
-          "brand": "Marca",
-          "model": "Modelo",
-          "price": "XXX€",
-          "imageUrl": "https://images.unsplash.com/photo-1551698618-1dfe5d97d256?w=400&h=600&fit=crop&crop=center",
-          "whyThisRacket": "Explicación de por qué esta es una buena segunda opción",
-          "technicalSpecs": {
-            "weight": "XXXg",
-            "balance": "Alto/Medio/Bajo",
-            "shape": "Redonda/Lágrima/Diamante",
-            "material": "Material principal",
-            "level": "Nivel recomendado"
-          },
-          "pros": ["Ventaja 1", "Ventaja 2", "Ventaja 3"],
-          "cons": ["Desventaja 1", "Desventaja 2"],
-          "matchPercentage": 85
-        },
-        {
-          "racketName": "Marca Modelo completo 3",
-          "brand": "Marca",
-          "model": "Modelo",
-          "price": "XXX€",
-          "imageUrl": "https://images.unsplash.com/photo-1551698618-1dfe5d97d256?w=400&h=600&fit=crop&crop=center",
-          "whyThisRacket": "Explicación de por qué esta es una buena tercera opción",
-          "technicalSpecs": {
-            "weight": "XXXg",
-            "balance": "Alto/Medio/Bajo",
-            "shape": "Redonda/Lágrima/Diamante",
-            "material": "Material principal",
-            "level": "Nivel recomendado"
-          },
-          "pros": ["Ventaja 1", "Ventaja 2", "Ventaja 3"],
-          "cons": ["Desventaja 1", "Desventaja 2"],
-          "matchPercentage": 75
-        }
-      ]
-    }
-
-    IMPORTANTE:
-    - La primera recomendación DEBE ser la que mejor se adapte al perfil (matchPercentage más alto)
-    - Asegúrate de recomendar palas reales de marcas como Bullpadel, Head, Nox, Adidas, Babolat, Wilson
-    - Todas las palas deben estar dentro del presupuesto indicado
-    - Ordena por compatibilidad: la primera es la más recomendada, la segunda una buena alternativa, la tercera otra opción válida
-    - Varía los tipos de palas para dar opciones diversas pero todas apropiadas para el perfil
-    - USA NOMBRES DE MARCA Y MODELO EXACTOS que existan realmente en el mercado
-    `;
-
-    console.log("📤 Enviando petición a Gemini para 3 recomendaciones...");
-
-    const result = await Promise.race([
-      model.generateContent(prompt),
-      new Promise((_, reject) =>
-        setTimeout(
-          () => reject(new Error("Timeout después de 45 segundos")),
-          45000
-        )
-      ),
-    ]);
-
-    const response = await (result as any).response;
-    const text = response.text();
-
-    console.log("📥 Respuesta recibida de Gemini");
-
-    try {
-      const cleanedText = text
-        .replace(/```json\n?/g, "")
-        .replace(/```\n?/g, "")
-        .trim();
-      const rawRecommendations: MultipleRacketRecommendations =
-        JSON.parse(cleanedText);
-
-      if (
-        !rawRecommendations.recommendations ||
-        rawRecommendations.recommendations.length !== 3
-      ) {
-        throw new Error("No se recibieron 3 recomendaciones válidas");
-      }
-
-      console.log("✅ Recomendaciones procesadas correctamente");
-
-      return {
-        success: true,
-        recommendations: rawRecommendations,
-      };
-    } catch (parseError) {
-      console.error("❌ Error parsing JSON:", parseError);
-      return {
-        success: false,
-        error: "Error al procesar las recomendaciones. Inténtalo de nuevo.",
-      };
-    }
-  } catch (error: any) {
-    console.error("❌ Error detallado al obtener recomendaciones:", error);
-
-    if (error.message?.includes("API_KEY")) {
-      return {
-        success: false,
-        error: "Clave de API no configurada. Verifica tu configuración.",
-      };
-    } else if (error.message?.includes("fetch")) {
-      return {
-        success: false,
-        error: "Error de conexión. Verifica tu conexión a internet.",
-      };
-    } else if (error.message?.includes("Timeout")) {
-      return {
-        success: false,
-        error: "La petición tardó demasiado. Inténtalo de nuevo.",
-      };
-    } else {
-      return {
-        success: false,
-        error: "Error al procesar la solicitud. Inténtalo de nuevo.",
-      };
-    }
-  }
-}
-
-// ✅ Función mantenida para compatibilidad
-export async function getRacketRecommendation(formData: {
-  gameLevel: string;
-  playingStyle: string;
-  weight: string;
-  height: string;
-  budget: string;
-  shape: string;
-}) {
-  const result = await getRacketRecommendations(formData);
-
-  if (result.success && result.recommendations) {
-    return {
-      success: true,
-      recommendation: result.recommendations.recommendations[0],
-    };
-  }
-
-  return result;
-}
-
-// New function to compare rackets using Gemini AI
-export async function compareRackets(
-  rackets: Racket[]
-): Promise<RacketComparison> {
+// Function to get a working model
+async function getWorkingModel() {
   if (!genAI) {
     throw new Error("Gemini AI no está configurado. Verifica tu API key.");
   }
 
-  if (rackets.length < 2 || rackets.length > 3) {
-    throw new Error("Debes proporcionar entre 2 y 3 palas para comparar.");
+  for (const modelName of AVAILABLE_MODELS) {
+    try {
+      const model = genAI.getGenerativeModel({ model: modelName });
+      // Test the model with a simple request
+      console.log(`� Testing model: ${modelName}`);
+      return { model, modelName };
+    } catch (error) {
+      console.warn(`⚠️ Model ${modelName} failed:`, error);
+      continue;
+    }
+  }
+
+  throw new Error(
+    "Ningún modelo de Gemini está disponible. Verifica tu configuración."
+  );
+}
+
+// Function to test API connectivity
+export async function testGeminiConnection(): Promise<boolean> {
+  if (!genAI) {
+    console.error("❌ Gemini AI no está configurado");
+    return false;
   }
 
   try {
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const { model, modelName } = await getWorkingModel();
+    console.log(`✅ Conectado a Gemini usando modelo: ${modelName}`);
 
-    // Prepare racket data for analysis
-    const racketData = rackets.map((racket, index) => ({
-      id: index + 1,
-      nombre: racket.nombre,
-      marca: racket.marca,
-      modelo: racket.modelo,
-      precio: racket.precio_actual,
-      precioOriginal: racket.precio_original,
-      descuento: racket.descuento_porcentaje,
-      esOferta: racket.en_oferta,
-      esBestseller: racket.es_bestseller,
-    }));
+    // Test with a simple prompt
+    const result = await model.generateContent("Test connection");
+    const response = await result.response;
+    console.log("🧪 Test de conexión exitoso");
+    return true;
+  } catch (error) {
+    console.error("❌ Error de conexión con Gemini:", error);
+    return false;
+  }
+}
+
+// Main function to get racket recommendations based on user profile
+export async function getRacketRecommendations(
+  formData: FormData,
+  racketDatabase: Racket[]
+): Promise<MultipleRacketRecommendations> {
+  if (!genAI) {
+    throw new Error("Gemini AI no está configurado. Verifica tu API key.");
+  }
+
+  try {
+    const { model, modelName } = await getWorkingModel();
+    console.log(`✅ Using model: ${modelName}`);
+
+    // Filter rackets by budget if specified
+    let filteredRackets = racketDatabase;
+    if (formData.budget && !isNaN(parseFloat(formData.budget))) {
+      const budgetLimit = parseFloat(formData.budget);
+      filteredRackets = racketDatabase.filter(
+        (racket) => racket.precio_actual <= budgetLimit
+      );
+    }
+
+    const racketsList = filteredRackets
+      .slice(0, 50) // Limit to first 50 rackets for prompt efficiency
+      .map(
+        (racket) =>
+          `${racket.nombre} - ${racket.marca} ${racket.modelo} - €${
+            racket.precio_actual
+          }${racket.en_oferta ? " (En oferta)" : ""}${
+            racket.es_bestseller ? " (Bestseller)" : ""
+          }`
+      )
+      .join("\n");
 
     const prompt = `
-Eres un experto en palas de pádel con más de 20 años de experiencia ayudando a jugadores de todos los niveles. 
+Eres un experto en pádel especializado en recomendaciones de palas. Basándote en el perfil del usuario y esta base de datos de palas, proporciona exactamente 3 recomendaciones personalizadas.
 
-Analiza estas ${
-      rackets.length
-    } palas de pádel y proporciona una comparación detallada:
+PERFIL DEL USUARIO:
+- Nivel de juego: ${formData.gameLevel}
+- Estilo de juego: ${formData.playingStyle}
+- Peso corporal: ${formData.weight} kg
+- Altura: ${formData.height} cm
+- Presupuesto máximo: €${formData.budget}
+- Forma preferida: ${formData.preferredShape || "Sin preferencia"}
 
-${racketData
-  .map(
-    (racket) => `
-PALA ${racket.id}: ${racket.nombre}
-- Marca: ${racket.marca}
-- Modelo: ${racket.modelo}
-- Precio actual: €${racket.precio}
-${racket.precioOriginal ? `- Precio original: €${racket.precioOriginal}` : ""}
-${
-  racket.esOferta
-    ? `- En oferta: Sí (${racket.descuento}% descuento)`
-    : "- En oferta: No"
-}
-${racket.esBestseller ? "- Bestseller: Sí" : "- Bestseller: No"}
-`
-  )
-  .join("\n")}
+BASE DE DATOS DE PALAS DISPONIBLES:
+${racketsList}
 
 INSTRUCCIONES:
-1. Proporciona un análisis general comparativo de todas las palas en 150-200 palabras
-2. Para cada pala, analiza:
-   - Atributos clave (forma, peso estimado, balance, nivel recomendado)
-   - A qué tipo de jugador está dirigida (principiante, intermedio, avanzado, estilo de juego)
-   - Por qué alguien elegiría esta pala específica
-   - 3-4 pros principales
-   - 2-3 contras principales
-3. Proporciona una recomendación final sobre cuál elegir según diferentes perfiles de jugador
+1. Selecciona exactamente 3 palas de la base de datos que mejor se adapten al perfil
+2. Ordénalas por relevancia (la mejor primera)
+3. Para cada pala, proporciona análisis detallado
 
-FORMATO DE RESPUESTA (JSON):
+Responde ÚNICAMENTE con un JSON válido en este formato exacto:
 {
-  "generalAnalysis": "Análisis comparativo general de las palas...",
-  "racketAnalysis": [
+  "recommendations": [
     {
-      "name": "Nombre de la pala 1",
-      "keyAttributes": "Forma redonda/lágrima/diamante, peso X gramos, balance bajo/medio/alto, nivel principiante/intermedio/avanzado",
-      "recommendedFor": "Tipo de jugador específico (nivel y estilo)",
-      "whyThisRacket": "Razones específicas para elegir esta pala",
-      "pros": ["Pro 1", "Pro 2", "Pro 3", "Pro 4"],
-      "cons": ["Contra 1", "Contra 2", "Contra 3"]
+      "racketName": "Nombre exacto de la pala de la base de datos",
+      "brand": "Marca",
+      "model": "Modelo",
+      "price": "€XXX",
+      "imageUrl": "URL_de_imagen_si_disponible",
+      "whyThisRacket": "Explicación detallada de por qué esta pala es perfecta para este usuario (150-200 palabras)",
+      "technicalSpecs": {
+        "weight": "XXX-XXX gramos",
+        "balance": "Medio/Alto/Bajo",
+        "shape": "Redonda/Lágrima/Diamante",
+        "material": "Fibra de vidrio/Carbono/etc",
+        "level": "Principiante/Intermedio/Avanzado"
+      },
+      "pros": ["Ventaja 1", "Ventaja 2", "Ventaja 3"],
+      "cons": ["Consideración 1", "Consideración 2"],
+      "matchPercentage": 95
     }
   ],
-  "finalRecommendation": "Recomendación final detallada según diferentes perfiles de jugador..."
+  "summary": "Resumen general de las recomendaciones y por qué estas 3 palas son las mejores opciones para este usuario (100-150 palabras)"
 }
 
 IMPORTANTE: 
-- Sé específico y técnico pero accesible
-- Considera el precio en la recomendación 
-- Menciona si las ofertas hacen que alguna pala sea especialmente atractiva
-- Responde SOLO con el JSON válido, sin texto adicional
+- Usa SOLO palas que existan en la base de datos proporcionada
+- Los nombres deben coincidir exactamente
+- Proporciona información técnica realista para cada tipo de pala
+- El porcentaje de match debe reflejar qué tan bien se adapta cada pala al usuario (85-98%)
+- No incluyas texto adicional fuera del JSON
 `;
-
-    console.log("🔍 Enviando prompt de comparación a Gemini...");
 
     const result = await model.generateContent(prompt);
     const response = await result.response;
     const text = response.text();
 
-    console.log("✅ Respuesta de Gemini recibida");
+    console.log("🤖 Respuesta cruda de Gemini:", text);
 
-    // Parse the JSON response
-    let comparisonData: RacketComparison;
+    // Clean the response to ensure it's valid JSON
+    const cleanedText = text
+      .replace(/```json\n?/g, "")
+      .replace(/\n?```/g, "")
+      .trim();
+
     try {
-      // Clean the response text
-      const cleanText = text
-        .replace(/```json\n?/, "")
-        .replace(/```\n?$/, "")
-        .trim();
-      comparisonData = JSON.parse(cleanText);
+      const recommendations: MultipleRacketRecommendations =
+        JSON.parse(cleanedText);
+
+      // Validate that we have 3 recommendations
+      if (
+        !recommendations.recommendations ||
+        recommendations.recommendations.length !== 3
+      ) {
+        throw new Error("El AI no proporcionó exactamente 3 recomendaciones");
+      }
+
+      // Enhance with actual racket data
+      const enhancedRecommendations = recommendations.recommendations.map(
+        (rec) => {
+          const actualRacket = filteredRackets.find(
+            (r) =>
+              r.nombre.toLowerCase().includes(rec.racketName.toLowerCase()) ||
+              rec.racketName.toLowerCase().includes(r.nombre.toLowerCase())
+          );
+
+          if (actualRacket) {
+            return {
+              ...rec,
+              imageUrl: actualRacket.imagen,
+              price: `€${actualRacket.precio_actual}`,
+            };
+          }
+          return rec;
+        }
+      );
+
+      return {
+        ...recommendations,
+        recommendations: enhancedRecommendations,
+      };
     } catch (parseError) {
-      console.error("❌ Error parsing Gemini response:", parseError);
-      console.log("Raw response:", text);
+      console.error("❌ Error parsing JSON:", parseError);
+      console.error("Texto recibido:", cleanedText);
       throw new Error(
-        "Error al procesar la respuesta de la IA. Inténtalo de nuevo."
+        "Error al procesar la respuesta del AI. Inténtalo de nuevo."
       );
     }
+  } catch (error) {
+    console.error("❌ Error en getRacketRecommendations:", error);
 
-    // Validate the response structure
-    if (
-      !comparisonData.generalAnalysis ||
-      !comparisonData.racketAnalysis ||
-      !comparisonData.finalRecommendation
-    ) {
-      throw new Error("La respuesta de la IA no tiene el formato esperado.");
+    // Provide more specific error messages
+    if (error instanceof Error) {
+      if (
+        error.message.includes("404") ||
+        error.message.includes("not found")
+      ) {
+        throw new Error(
+          "Modelo de IA no disponible. Reintentando con un modelo diferente..."
+        );
+      } else if (error.message.includes("API key")) {
+        throw new Error(
+          "API key de Gemini inválida. Verifica tu configuración."
+        );
+      } else if (
+        error.message.includes("quota") ||
+        error.message.includes("rate limit")
+      ) {
+        throw new Error(
+          "Límite de uso de la API alcanzado. Intenta de nuevo más tarde."
+        );
+      }
+      throw new Error(`Error del AI: ${error.message}`);
     }
 
-    if (comparisonData.racketAnalysis.length !== rackets.length) {
-      throw new Error("La IA no analizó todas las palas correctamente.");
-    }
-
-    console.log("✅ Comparación de palas generada exitosamente");
-    return comparisonData;
-  } catch (error: any) {
-    console.error("❌ Error en compareRackets:", error);
-
-    if (error.message?.includes("API key")) {
-      throw new Error("Error de configuración: API key de Gemini no válida.");
-    } else if (error.message?.includes("quota")) {
-      throw new Error("Cuota de API excedida. Inténtalo más tarde.");
-    } else if (
-      error.message?.includes("network") ||
-      error.message?.includes("fetch")
-    ) {
-      throw new Error("Error de conexión. Verifica tu conexión a internet.");
-    } else if (error.message?.includes("timeout")) {
-      throw new Error("La petición tardó demasiado. Inténtalo de nuevo.");
-    } else {
-      throw new Error(
-        error.message || "Error al comparar las palas. Inténtalo de nuevo."
-      );
-    }
+    throw new Error("Error desconocido del AI");
   }
 }
+
+// Function to compare rackets using AI
+export async function compareRackets(
+  selectedRackets: Racket[]
+): Promise<RacketComparison> {
+  if (!genAI) {
+    throw new Error("Gemini AI no está configurado. Verifica tu API key.");
+  }
+
+  if (selectedRackets.length < 2 || selectedRackets.length > 3) {
+    throw new Error("Debes seleccionar entre 2 y 3 palas para comparar");
+  }
+
+  try {
+    const { model, modelName } = await getWorkingModel();
+    console.log(`✅ Using model for comparison: ${modelName}`);
+
+    const racketsInfo = selectedRackets
+      .map(
+        (racket, index) =>
+          `PALA ${index + 1}: ${racket.nombre}
+- Marca: ${racket.marca}
+- Modelo: ${racket.modelo}
+- Precio: €${racket.precio_actual}
+- En oferta: ${racket.en_oferta ? "Sí" : "No"}
+- Bestseller: ${racket.es_bestseller ? "Sí" : "No"}
+- Descuento: ${racket.en_oferta ? `${racket.descuento_porcentaje}%` : "No"}`
+      )
+      .join("\n\n");
+
+    const prompt = `
+Eres un experto en pádel con más de 20 años de experiencia. Analiza estas ${selectedRackets.length} palas de pádel y proporciona una comparación profesional:
+
+${racketsInfo}
+
+Proporciona un análisis completo que incluya:
+1. Análisis general comparativo
+2. Análisis individual de cada pala
+3. Recomendación final
+
+Responde ÚNICAMENTE con un JSON válido en este formato exacto:
+{
+  "generalAnalysis": "Análisis general comparativo de todas las palas (200-250 palabras). Explica las diferencias principales, relación calidad-precio y a qué tipo de jugadores se dirige cada una.",
+  "racketAnalysis": [
+    {
+      "name": "Nombre exacto de la pala",
+      "keyAttributes": "Forma, peso estimado, balance, nivel recomendado y características principales",
+      "recommendedFor": "Tipo específico de jugador (nivel y estilo de juego)",
+      "whyThisRacket": "Razones específicas para elegir esta pala sobre las otras",
+      "pros": ["Ventaja específica 1", "Ventaja específica 2", "Ventaja específica 3", "Ventaja específica 4"],
+      "cons": ["Consideración o limitación 1", "Consideración o limitación 2", "Consideración o limitación 3"]
+    }
+  ],
+  "finalRecommendation": "Recomendación final detallada sobre cuál elegir según diferentes perfiles de jugador y por qué. Incluye aspectos como relación calidad-precio, ofertas actuales si las hay, y casos específicos de uso (200-250 palabras)."
+}
+
+IMPORTANTE: 
+- Usa los nombres exactos de las palas proporcionadas
+- Sé específico sobre las características técnicas de cada pala
+- Considera el precio y las ofertas en tu análisis
+- Proporciona consejos prácticos y realistas
+- No incluyas texto adicional fuera del JSON
+`;
+
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    const text = response.text();
+
+    console.log("🤖 Respuesta de comparación de Gemini:", text);
+
+    // Clean the response to ensure it's valid JSON
+    const cleanedText = text
+      .replace(/```json\n?/g, "")
+      .replace(/\n?```/g, "")
+      .trim();
+
+    try {
+      const comparison: RacketComparison = JSON.parse(cleanedText);
+
+      // Validate the response structure
+      if (
+        !comparison.generalAnalysis ||
+        !comparison.racketAnalysis ||
+        !comparison.finalRecommendation
+      ) {
+        throw new Error("Respuesta del AI incompleta");
+      }
+
+      if (comparison.racketAnalysis.length !== selectedRackets.length) {
+        throw new Error("El AI no analizó todas las palas seleccionadas");
+      }
+
+      return comparison;
+    } catch (parseError) {
+      console.error("❌ Error parsing comparison JSON:", parseError);
+      console.error("Texto recibido:", cleanedText);
+      throw new Error(
+        "Error al procesar la comparación del AI. Inténtalo de nuevo."
+      );
+    }
+  } catch (error) {
+    console.error("❌ Error en compareRackets:", error);
+
+    if (error instanceof Error) {
+      if (
+        error.message.includes("404") ||
+        error.message.includes("not found")
+      ) {
+        throw new Error(
+          "Modelo de IA no disponible para comparación. Reintentando..."
+        );
+      } else if (error.message.includes("API key")) {
+        throw new Error(
+          "API key de Gemini inválida. Verifica tu configuración."
+        );
+      }
+      throw new Error(`Error del AI: ${error.message}`);
+    }
+
+    throw new Error("Error desconocido del AI");
+  }
+}
+
+// Function to get AI analysis for a single racket
+export async function getSimpleRacketRecommendation(
+  userProfile: FormData
+): Promise<RacketRecommendation> {
+  if (!genAI) {
+    throw new Error("Gemini AI no está configurado. Verifica tu API key.");
+  }
+
+  try {
+    const { model, modelName } = await getWorkingModel();
+    console.log(`✅ Using model for simple recommendation: ${modelName}`);
+
+    const prompt = `
+Basándote en este perfil de jugador de pádel, recomienda el tipo de pala ideal:
+
+PERFIL DEL USUARIO:
+- Nivel: ${userProfile.gameLevel}
+- Estilo: ${userProfile.playingStyle}
+- Peso: ${userProfile.weight} kg
+- Altura: ${userProfile.height} cm
+- Presupuesto: €${userProfile.budget}
+- Forma preferida: ${userProfile.preferredShape || "Sin preferencia"}
+
+Proporciona una recomendación general sobre qué tipo de pala buscar.
+
+Responde con un JSON en este formato:
+{
+  "racketName": "Tipo de pala recomendada",
+  "brand": "Recomendación de marca",
+  "model": "Características del modelo",
+  "price": "Rango de precio",
+  "imageUrl": "",
+  "whyThisRacket": "Explicación detallada",
+  "technicalSpecs": {
+    "weight": "Peso recomendado",
+    "balance": "Balance recomendado",
+    "shape": "Forma recomendada",
+    "material": "Material recomendado",
+    "level": "Nivel apropiado"
+  },
+  "pros": ["Ventaja 1", "Ventaja 2", "Ventaja 3"],
+  "cons": ["Consideración 1", "Consideración 2"],
+  "matchPercentage": 90
+}
+`;
+
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    const text = response.text();
+
+    const cleanedText = text
+      .replace(/```json\n?/g, "")
+      .replace(/\n?```/g, "")
+      .trim();
+
+    return JSON.parse(cleanedText);
+  } catch (error) {
+    console.error("❌ Error en getSimpleRacketRecommendation:", error);
+
+    if (error instanceof Error) {
+      if (
+        error.message.includes("404") ||
+        error.message.includes("not found")
+      ) {
+        throw new Error(
+          "Modelo de IA no disponible. Verifica la configuración."
+        );
+      }
+      throw new Error(`Error del AI: ${error.message}`);
+    }
+
+    throw new Error("Error al obtener recomendación del AI");
+  }
+}
+
+export {
+  type MultipleRacketRecommendations,
+  type Racket,
+  type RacketComparison,
+  type RacketRecommendation,
+};
