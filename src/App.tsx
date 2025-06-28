@@ -13,7 +13,7 @@ function App() {
   return (
     <Layout>
       <Routes>
-        <Route path="/" element={<HomePage />} />
+        <Route path="./" element={<HomePage />} />
         <Route path="/rackets" element={<RacketsPage />} />
         <Route path="/best-racket" element={<BestRacketPage />} />
         <Route path="/compare-rackets" element={<CompareRacketsPage />} />

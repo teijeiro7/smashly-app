@@ -80,28 +80,6 @@ async function getWorkingModel() {
   );
 }
 
-// Function to test API connectivity
-export async function testGeminiConnection(): Promise<boolean> {
-  if (!genAI) {
-    console.error("❌ Gemini AI no está configurado");
-    return false;
-  }
-
-  try {
-    const { model, modelName } = await getWorkingModel();
-    console.log(`✅ Conectado a Gemini usando modelo: ${modelName}`);
-
-    // Test with a simple prompt
-    const result = await model.generateContent("Test connection");
-    const response = await result.response;
-    console.log("🧪 Test de conexión exitoso");
-    return true;
-  } catch (error) {
-    console.error("❌ Error de conexión con Gemini:", error);
-    return false;
-  }
-}
-
 // Main function to get racket recommendations based on user profile
 export async function getRacketRecommendations(
   formData: FormData,

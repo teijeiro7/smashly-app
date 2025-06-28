@@ -175,26 +175,6 @@ const LoginButton = styled.button<{ loading?: boolean }>`
   }
 `;
 
-const Divider = styled.div`
-  display: flex;
-  align-items: center;
-  margin: 1.5rem 0;
-
-  &::before,
-  &::after {
-    content: "";
-    flex: 1;
-    height: 1px;
-    background: #e5e7eb;
-  }
-
-  span {
-    padding: 0 1rem;
-    color: #6b7280;
-    font-size: 0.875rem;
-  }
-`;
-
 const RegisterLink = styled.div`
   text-align: center;
   margin-top: 1.5rem;

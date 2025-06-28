@@ -9,7 +9,6 @@ import {
   FiX,
   FiZap,
 } from "react-icons/fi";
-import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { useComparison } from "../../contexts/ComparisonContext";
 import { Racket, RacketComparison } from "../../types/racket";
@@ -387,7 +386,6 @@ const FloatingComparisonPanel: React.FC<FloatingComparisonPanelProps> = ({
   onClose,
 }) => {
   const { rackets, count, removeRacket, clearComparison } = useComparison();
-  const navigate = useNavigate();
 
   // Estados para la comparación con IA
   const [isComparing, setIsComparing] = useState(false);

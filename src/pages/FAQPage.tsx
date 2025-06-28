@@ -66,20 +66,6 @@ const CategoryContainer = styled.div`
   padding: 0 1.5rem;
 `;
 
-const CategoryLabel = styled.h3`
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: #374151;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  margin-bottom: 1rem;
-  text-align: center;
-
-  @media (min-width: 768px) {
-    text-align: left;
-  }
-`;
-
 const CategoryScrollContainer = styled.div`
   display: flex;
   gap: 0.75rem;

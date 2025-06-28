@@ -14,7 +14,6 @@ import {
 import styled from "styled-components";
 import { useComparison } from "../contexts/ComparisonContext";
 import { Racket, RacketComparison } from "../types/racket";
-import { compareRackets } from "../utils/gemini";
 
 const Container = styled.div`
   min-height: 100vh;
@@ -116,96 +115,6 @@ const SearchIcon = styled(FiSearch)`
 
 const FilterContainer = styled.div`
   position: relative;
-`;
-
-const ComparisonActions = styled.div`
-  display: flex;
-  gap: 1rem;
-  align-items: center;
-  margin-top: 1rem;
-  padding: 1rem;
-  background: white;
-  border-radius: 12px;
-  border: 2px solid #e5e7eb;
-`;
-
-const SelectedRacketsIndicator = styled.div`
-  display: flex;
-  gap: 0.5rem;
-  align-items: center;
-  flex: 1;
-  font-weight: 600;
-  color: #374151;
-`;
-
-const SelectedRacketCard = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  background: #f3f4f6;
-  padding: 0.5rem;
-  border-radius: 8px;
-  font-size: 0.875rem;
-
-  img {
-    width: 32px;
-    height: 32px;
-    object-fit: cover;
-    border-radius: 4px;
-  }
-`;
-
-const RemoveButton = styled.button`
-  color: #ef4444;
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 0.25rem;
-  border-radius: 4px;
-
-  &:hover {
-    background: #fee2e2;
-  }
-`;
-
-const ActionButton = styled.button<{
-  disabled?: boolean;
-  variant?: "primary" | "secondary";
-}>`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  padding: 0.75rem 1.5rem;
-  min-width: 140px;
-  background: ${(props) =>
-    props.disabled
-      ? "#9ca3af"
-      : props.variant === "secondary"
-      ? "white"
-      : "#16a34a"};
-  color: ${(props) =>
-    props.disabled
-      ? "white"
-      : props.variant === "secondary"
-      ? "#6b7280"
-      : "white"};
-  border: ${(props) =>
-    props.variant === "secondary" ? "1px solid #d1d5db" : "none"};
-  border-radius: 8px;
-  font-weight: 500;
-  font-size: 0.875rem;
-  cursor: ${(props) => (props.disabled ? "not-allowed" : "pointer")};
-  transition: all 0.2s ease;
-
-  &:hover {
-    background: ${(props) =>
-      props.disabled
-        ? "#9ca3af"
-        : props.variant === "secondary"
-        ? "#f9fafb"
-        : "#059669"};
-  }
 `;
 
 const FilterButton = styled.button<{ active: boolean }>`
@@ -590,13 +499,11 @@ const CompareRacketsPage: React.FC = () => {
   const [showComparison, setShowComparison] = useState(false);
   const [comparisonResults, setComparisonResults] =
     useState<RacketComparison | null>(null);
-  const [isComparing, setIsComparing] = useState(false);
 
   const {
     rackets: selectedRackets,
     addRacket,
     removeRacket,
-    clearComparison,
     isRacketInComparison,
   } = useComparison();
 
@@ -676,28 +583,6 @@ const CompareRacketsPage: React.FC = () => {
       removeRacket(racket.nombre);
     } else {
       addRacket(racket);
-    }
-  };
-
-  // Handle comparison
-  const handleCompare = async () => {
-    if (selectedRackets.length < 2) {
-      toast.error("Selecciona al menos 2 palas para comparar");
-      return;
-    }
-
-    try {
-      setIsComparing(true);
-      const results = await compareRackets(selectedRackets);
-      setComparisonResults(results);
-      setShowComparison(true);
-    } catch (error: any) {
-      console.error("Error comparing rackets:", error);
-      toast.error(
-        error.message || "Error al comparar las palas. Inténtalo de nuevo."
-      );
-    } finally {
-      setIsComparing(false);
     }
   };
 
