@@ -11,6 +11,8 @@ import {
 } from "react-native";
 // Import Ionicons for vector icons
 import { Ionicons } from "@expo/vector-icons";
+// Import the ContactModal component
+import { ContactModal } from "../src/components/feature/contact-modal";
 
 // Get screen dimensions for responsive design
 const { width: screenWidth } = Dimensions.get("window");
@@ -29,6 +31,8 @@ export default function FAQScreen() {
   const [expandedItem, setExpandedItem] = useState<number | null>(null);
   // State to track active category filter
   const [activeCategory, setActiveCategory] = useState<string>("Todas");
+  // State to control contact modal visibility
+  const [showContactModal, setShowContactModal] = useState(false);
 
   // Array of FAQ data with different categories
   const faqData: FAQItem[] = [
@@ -128,111 +132,122 @@ export default function FAQScreen() {
   };
 
   return (
-    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-      {/* Hero section */}
-      <View style={styles.heroSection}>
-        {/* Main title */}
-        <Text style={styles.mainTitle}>
-          Preguntas <Text style={styles.highlightText}>Frecuentes</Text>
-        </Text>
-
-        {/* Subtitle description */}
-        <Text style={styles.subtitle}>
-          Encuentra respuestas a las preguntas más comunes sobre Smashly
-        </Text>
-      </View>
-
-      {/* Category filter section */}
-      <View style={styles.categorySection}>
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.categoryScrollContainer}
-        >
-          {categories.map((category) => (
-            <TouchableOpacity
-              key={category}
-              style={[
-                styles.categoryButton,
-                activeCategory === category && styles.activeCategoryButton,
-              ]}
-              onPress={() => setActiveCategory(category)}
-            >
-              <Text
-                style={[
-                  styles.categoryButtonText,
-                  activeCategory === category &&
-                    styles.activeCategoryButtonText,
-                ]}
-              >
-                {category}
-              </Text>
-            </TouchableOpacity>
-          ))}
-        </ScrollView>
-      </View>
-
-      {/* FAQ items section */}
-      <View style={styles.faqSection}>
-        {filteredFAQ.map((item) => (
-          <View key={item.id} style={styles.faqItem}>
-            {/* Question header - clickable to expand/collapse */}
-            <TouchableOpacity
-              style={styles.questionHeader}
-              onPress={() => toggleExpansion(item.id)}
-              activeOpacity={0.7}
-            >
-              {/* Question text */}
-              <Text style={styles.questionText}>{item.question}</Text>
-
-              {/* Expand/collapse icon */}
-              <Ionicons
-                name={expandedItem === item.id ? "chevron-up" : "chevron-down"}
-                size={24}
-                color="#16a34a"
-                style={styles.chevronIcon}
-              />
-            </TouchableOpacity>
-
-            {/* Answer section - only visible when expanded */}
-            {expandedItem === item.id && (
-              <View style={styles.answerContainer}>
-                {/* Category badge */}
-                <View style={styles.categoryBadge}>
-                  <Text style={styles.categoryBadgeText}>{item.category}</Text>
-                </View>
-
-                {/* Answer text */}
-                <Text style={styles.answerText}>{item.answer}</Text>
-              </View>
-            )}
-          </View>
-        ))}
-      </View>
-
-      {/* Contact section */}
-      <View style={styles.contactSection}>
-        <View style={styles.contactCard}>
-          {/* Contact icon */}
-          <View style={styles.contactIconContainer}>
-            <Ionicons name="help-circle" size={32} color="#16a34a" />
-          </View>
-
-          {/* Contact content */}
-          <Text style={styles.contactTitle}>¿No encuentras lo que buscas?</Text>
-          <Text style={styles.contactDescription}>
-            Nuestro equipo de soporte está aquí para ayudarte con cualquier
-            pregunta adicional
+    <>
+      <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+        {/* Hero section */}
+        <View style={styles.heroSection}>
+          {/* Main title */}
+          <Text style={styles.mainTitle}>
+            Preguntas <Text style={styles.highlightText}>Frecuentes</Text>
           </Text>
 
-          {/* Contact button */}
-          <TouchableOpacity style={styles.contactButton}>
-            <Ionicons name="mail" size={16} color="white" />
-            <Text style={styles.contactButtonText}>Contactar soporte</Text>
-          </TouchableOpacity>
+          {/* Subtitle description */}
+          <Text style={styles.subtitle}>
+            Encuentra respuestas a las preguntas más comunes sobre Smashly
+          </Text>
         </View>
-      </View>
-    </ScrollView>
+
+        {/* Category filter section */}
+        <View style={styles.categorySection}>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.categoryScrollContainer}
+          >
+            {categories.map((category) => (
+              <TouchableOpacity
+                key={category}
+                style={[
+                  styles.categoryButton,
+                  activeCategory === category && styles.activeCategoryButton,
+                ]}
+                onPress={() => setActiveCategory(category)}
+              >
+                <Text
+                  style={[
+                    styles.categoryButtonText,
+                    activeCategory === category &&
+                      styles.activeCategoryButtonText,
+                  ]}
+                >
+                  {category}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+        </View>
+
+        {/* FAQ items section */}
+        <View style={styles.faqSection}>
+          {filteredFAQ.map((item) => (
+            <View key={item.id} style={styles.faqItem}>
+              {/* Question header - clickable to expand/collapse */}
+              <TouchableOpacity
+                style={styles.questionHeader}
+                onPress={() => toggleExpansion(item.id)}
+                activeOpacity={0.7}
+              >
+                {/* Question text */}
+                <Text style={styles.questionText}>{item.question}</Text>
+
+                {/* Expand/collapse icon */}
+                <Ionicons
+                  name={expandedItem === item.id ? "chevron-up" : "chevron-down"}
+                  size={24}
+                  color="#16a34a"
+                  style={styles.chevronIcon}
+                />
+              </TouchableOpacity>
+
+              {/* Answer section - only visible when expanded */}
+              {expandedItem === item.id && (
+                <View style={styles.answerContainer}>
+                  {/* Category badge */}
+                  <View style={styles.categoryBadge}>
+                    <Text style={styles.categoryBadgeText}>{item.category}</Text>
+                  </View>
+
+                  {/* Answer text */}
+                  <Text style={styles.answerText}>{item.answer}</Text>
+                </View>
+              )}
+            </View>
+          ))}
+        </View>
+
+        {/* Contact section */}
+        <View style={styles.contactSection}>
+          <View style={styles.contactCard}>
+            {/* Contact icon */}
+            <View style={styles.contactIconContainer}>
+              <Ionicons name="help-circle" size={32} color="#16a34a" />
+            </View>
+
+            {/* Contact content */}
+            <Text style={styles.contactTitle}>¿No encuentras lo que buscas?</Text>
+            <Text style={styles.contactDescription}>
+              Nuestro equipo de soporte está aquí para ayudarte con cualquier
+              pregunta adicional
+            </Text>
+
+            {/* Contact button - Updated to show modal */}
+            <TouchableOpacity 
+              style={styles.contactButton}
+              onPress={() => setShowContactModal(true)}
+            >
+              <Ionicons name="mail" size={16} color="white" />
+              <Text style={styles.contactButtonText}>Contactar soporte</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </ScrollView>
+
+      {/* Contact Modal */}
+      <ContactModal
+        visible={showContactModal}
+        onClose={() => setShowContactModal(false)}
+      />
+    </>
   );
 }
 

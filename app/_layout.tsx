@@ -9,11 +9,22 @@ import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 // Import usePathname to detect current route
 import { usePathname } from "expo-router";
+// Import GlobalSearch component
+import { GlobalSearch } from "../src/components/feature/global-search";
+// Import ComparisonProvider
+import { ComparisonProvider } from "../src/contexts/comparison-context";
 
 // Custom header component with modern design and navigation buttons
 function CustomHeader() {
   // Get current pathname to determine active navigation item
   const pathname = usePathname();
+  // State to track search visibility
+  const [isSearchOpen, setIsSearchOpen] = React.useState(false);
+
+  // Handle search toggle
+  const handleSearchToggle = (isOpen: boolean) => {
+    setIsSearchOpen(isOpen);
+  };
 
   return (
     // Main container for the custom header
@@ -25,56 +36,66 @@ function CustomHeader() {
 
       {/* Center navigation menu */}
       <View style={styles.headerCenter}>
-        <TouchableOpacity
-          style={[
-            styles.navMenuItem,
-            pathname === "/" && styles.activeMenuItem, // Active only when on home page
-          ]}
-          onPress={() => router.push("/")}
-        >
-          <Text
-            style={[
-              styles.navMenuText,
-              pathname === "/" && styles.activeMenuText, // Active text styling for home
-            ]}
-          >
-            Inicio
-          </Text>
-        </TouchableOpacity>
+        {/* Search section - moved to center, appears first */}
+        <View style={styles.centerSearch}>
+          <GlobalSearch onSearchToggle={handleSearchToggle} />
+        </View>
 
-        <TouchableOpacity
-          style={[
-            styles.navMenuItem,
-            pathname === "/rackets" && styles.activeMenuItem, // Active only when on rackets page
-          ]}
-          onPress={() => router.push("/rackets")}
-        >
-          <Text
-            style={[
-              styles.navMenuText,
-              pathname === "/rackets" && styles.activeMenuText, // Active text styling for rackets
-            ]}
-          >
-            Comparador de Palas
-          </Text>
-        </TouchableOpacity>
+        {/* Navigation menu items - hidden when search is open */}
+        {!isSearchOpen && (
+          <View style={styles.navMenuContainer}>
+            <TouchableOpacity
+              style={[
+                styles.navMenuItem,
+                pathname === "/" && styles.activeMenuItem, // Active only when on home page
+              ]}
+              onPress={() => router.push("/")}
+            >
+              <Text
+                style={[
+                  styles.navMenuText,
+                  pathname === "/" && styles.activeMenuText, // Active text styling for home
+                ]}
+              >
+                Inicio
+              </Text>
+            </TouchableOpacity>
 
-        <TouchableOpacity
-          style={[
-            styles.navMenuItem,
-            pathname === "/faq" && styles.activeMenuItem, // Active only when on FAQ page
-          ]}
-          onPress={() => router.push("/faq")}
-        >
-          <Text
-            style={[
-              styles.navMenuText,
-              pathname === "/faq" && styles.activeMenuText, // Active text styling for FAQ
-            ]}
-          >
-            FAQ
-          </Text>
-        </TouchableOpacity>
+            <TouchableOpacity
+              style={[
+                styles.navMenuItem,
+                pathname === "/compare-rackets" && styles.activeMenuItem,
+              ]}
+              onPress={() => router.push("/rackets")}
+            >
+              <Text
+                style={[
+                  styles.navMenuText,
+                  pathname === "/compare-rackets" && styles.activeMenuText,
+                ]}
+              >
+                Comparar Palas
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[
+                styles.navMenuItem,
+                pathname === "/faq" && styles.activeMenuItem, // Active only when on FAQ page
+              ]}
+              onPress={() => router.push("/faq")}
+            >
+              <Text
+                style={[
+                  styles.navMenuText,
+                  pathname === "/faq" && styles.activeMenuText, // Active text styling for FAQ
+                ]}
+              >
+                FAQ
+              </Text>
+            </TouchableOpacity>
+          </View>
+        )}
       </View>
 
       {/* Right side - Authentication buttons */}
@@ -106,7 +127,7 @@ function CustomHeader() {
 // Main layout component that wraps all screens in the app
 export default function RootLayout() {
   return (
-    <>
+    <ComparisonProvider>
       {/* Stack navigator component that manages screen navigation */}
       <Stack>
         {/* Configure the home screen (index.tsx) with custom header */}
@@ -174,9 +195,31 @@ export default function RootLayout() {
             headerShown: true,
           }}
         />
+
+        {/* Configure the compare-rackets screen with custom header */}
+        <Stack.Screen
+          name="compare-rackets" // This matches the filename compare-rackets.tsx
+          options={{
+            // Custom header component instead of default header
+            header: () => <CustomHeader />,
+            // Remove default header styling since we're using custom header
+            headerShown: true,
+          }}
+        />
+
+        {/* Configure the racket-detail screen with custom header */}
+        <Stack.Screen
+          name="racket-detail" // This matches the filename racket-detail.tsx
+          options={{
+            // Custom header component instead of default header
+            header: () => <CustomHeader />,
+            // Remove default header styling since we're using custom header
+            headerShown: true,
+          }}
+        />
       </Stack>
       <StatusBar style="light" />
-    </>
+    </ComparisonProvider>
   );
 }
 
@@ -217,6 +260,26 @@ const styles = StyleSheet.create({
     gap: 24, // Space between menu items
     flex: 2, // Take up more space than left/right sections
     justifyContent: "center", // Center the menu items
+  },
+
+  // Center search section styling
+  centerSearch: {
+    alignItems: "center", // Center align vertically
+    justifyContent: "center", // Center align horizontally
+    marginRight: 16, // Space between search and navigation items
+  },
+
+  // Navigation menu container
+  navMenuContainer: {
+    flexDirection: "row", // Arrange menu items horizontally
+    alignItems: "center", // Center align vertically
+    gap: 24, // Space between menu items
+  },
+
+  // Search section of header (legacy - can be removed)
+  headerSearch: {
+    alignItems: "center", // Center align vertically
+    justifyContent: "center", // Center align horizontally
   },
 
   // Individual navigation menu item

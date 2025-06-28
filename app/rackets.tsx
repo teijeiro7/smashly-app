@@ -120,7 +120,12 @@ export default function ComparadorScreen() {
           </Text>
 
           {/* Action button */}
-          <TouchableOpacity style={styles.actionButton}>
+          <TouchableOpacity
+            style={styles.actionButton}
+            onPress={() => {
+              router.push("/compare-rackets");
+            }}
+          >
             <Text style={styles.actionButtonText}>Comparar palas</Text>
             <Ionicons name="chevron-forward" size={16} color="white" />
           </TouchableOpacity>
