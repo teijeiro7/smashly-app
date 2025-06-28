@@ -1,6 +1,6 @@
-import { Racket } from "@types/racket";
 import React, { createContext, ReactNode, useContext, useState } from "react";
 import toast from "react-hot-toast";
+import { Racket } from "../types/racket";
 
 // Interface for comparison context
 interface ComparisonContextType {
