@@ -345,8 +345,6 @@ const HomePage: React.FC = () => {
           </StatItem>
         </StatsGrid>
       </StatsSection>
-
-      <AiBanner />
     </Container>
   );
 };
