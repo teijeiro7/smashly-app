@@ -13,6 +13,7 @@ import {
 } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
+import { useRackets } from "../contexts/RacketsContext";
 import { Racket } from "../types/racket";
 
 const Container = styled.div`
@@ -407,51 +408,20 @@ const NoResults = styled.div`
 
 const RacketsPage: React.FC = () => {
   const navigate = useNavigate();
+  const { rackets, loading: contextLoading } = useRackets();
 
   // State for rackets catalog
-  const [rackets, setRackets] = useState<Racket[]>([]);
   const [filteredRackets, setFilteredRackets] = useState<Racket[]>([]);
   const [displayedRackets, setDisplayedRackets] = useState<Racket[]>([]);
-  const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [brandFilter, setBrandFilter] = useState("");
   const [sortBy, setSortBy] = useState("name");
   const [displayCount, setDisplayCount] = useState(12);
 
-  // Load rackets data
+  // Update filtered rackets when rackets change
   useEffect(() => {
-    const loadRackets = async () => {
-      try {
-        setLoading(true);
-        const response = await fetch("/palas_padel.json");
-        const data = await response.json();
-
-        const mappedRackets: Racket[] = data.palas.map((racket: any) => ({
-          nombre: racket.nombre,
-          marca: racket.marca,
-          modelo: racket.modelo,
-          precio_actual: racket.precio_actual,
-          precio_original: racket.precio_original || null,
-          descuento_porcentaje: racket.descuento_porcentaje,
-          enlace: racket.enlace,
-          imagen: racket.imagen,
-          es_bestseller: racket.es_bestseller,
-          en_oferta: racket.en_oferta,
-          scrapeado_en: racket.scrapeado_en,
-          fuente: racket.fuente,
-        }));
-
-        setRackets(mappedRackets);
-        setFilteredRackets(mappedRackets);
-      } catch (error) {
-        console.error("Error loading rackets:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadRackets();
-  }, []);
+    setFilteredRackets(rackets);
+  }, [rackets]);
 
   // Filter and search effect
   useEffect(() => {
@@ -500,7 +470,9 @@ const RacketsPage: React.FC = () => {
   }, [filteredRackets, displayCount]);
 
   // Get unique brands for filter
-  const uniqueBrands = Array.from(new Set(rackets.map((r) => r.marca))).sort();
+  const uniqueBrands: string[] = Array.from(
+    new Set(rackets.map((r: Racket) => r.marca))
+  ).sort() as string[];
 
   const handleNavigate = (path: string) => {
     navigate(path);
@@ -713,7 +685,7 @@ const RacketsPage: React.FC = () => {
             </SearchAndFilters>
           </CatalogHeader>
 
-          {loading ? (
+          {contextLoading ? (
             <NoResults>Cargando palas...</NoResults>
           ) : filteredRackets.length === 0 ? (
             <NoResults>

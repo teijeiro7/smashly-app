@@ -1,5 +1,6 @@
 // Base interface for racket data
 export interface Racket {
+  id?: number;
   nombre: string;
   marca: string;
   modelo: string;
@@ -12,6 +13,8 @@ export interface Racket {
   en_oferta: boolean;
   scrapeado_en: string;
   fuente: string;
+  created_at?: string;
+  updated_at?: string;
 }
 
 // Interface for racket recommendations from AI

@@ -1,31 +1,9 @@
 import React, { useState } from "react";
-import {
-  FiArrowRight,
-  FiEye,
-  FiEyeOff,
-  FiLock,
-  FiMail,
-  FiUser,
-} from "react-icons/fi";
-import { Link } from "react-router-dom";
+import toast from "react-hot-toast";
+import { FiEye, FiEyeOff, FiLock, FiMail, FiUser } from "react-icons/fi";
+import { Link, useNavigate } from "react-router-dom";
 import styled from "styled-components";
-
-interface FormData {
-  name: string;
-  email: string;
-  password: string;
-  confirmPassword: string;
-  acceptTerms: boolean;
-}
-
-interface FormErrors {
-  name?: string;
-  email?: string;
-  password?: string;
-  confirmPassword?: string;
-  acceptTerms?: string;
-  general?: string;
-}
+import { useAuth } from "../contexts/AuthContext.tsx";
 
 const Container = styled.div`
   min-height: 100vh;
@@ -36,28 +14,17 @@ const Container = styled.div`
   padding: 2rem 1rem;
 `;
 
-const Card = styled.div`
+const RegisterCard = styled.div`
   background: white;
-  padding: 3rem;
+  padding: 3rem 2rem;
   border-radius: 24px;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
-  max-width: 480px;
+  max-width: 450px;
   width: 100%;
-  position: relative;
-  overflow: hidden;
+  border: 1px solid rgba(22, 163, 74, 0.1);
 
-  &::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 4px;
-    background: linear-gradient(90deg, #16a34a, #059669, #047857);
-  }
-
-  @media (max-width: 640px) {
-    padding: 2rem;
+  @media (max-width: 768px) {
+    padding: 2rem 1.5rem;
     margin: 1rem;
   }
 `;
@@ -67,17 +34,29 @@ const Header = styled.div`
   margin-bottom: 2.5rem;
 `;
 
+const Logo = styled.div`
+  width: 80px;
+  height: 80px;
+  background: linear-gradient(135deg, #16a34a 0%, #059669 100%);
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1.5rem;
+  box-shadow: 0 8px 24px rgba(22, 163, 74, 0.3);
+`;
+
 const Title = styled.h1`
   font-size: 2rem;
   font-weight: 700;
-  color: #1f2937;
-  margin-bottom: 0.5rem;
+  color: #1a1a1a;
+  margin: 0 0 0.5rem;
 `;
 
 const Subtitle = styled.p`
   color: #6b7280;
   font-size: 1rem;
-  line-height: 1.5;
+  margin: 0;
 `;
 
 const Form = styled.form`
@@ -86,334 +65,224 @@ const Form = styled.form`
   gap: 1.5rem;
 `;
 
-const FormGroup = styled.div`
-  position: relative;
+const InputGroup = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 `;
 
 const Label = styled.label`
-  display: block;
-  font-size: 0.875rem;
   font-weight: 600;
   color: #374151;
-  margin-bottom: 0.5rem;
+  font-size: 0.875rem;
+  margin-bottom: 0.25rem;
 `;
 
 const InputContainer = styled.div`
   position: relative;
+  display: flex;
+  align-items: center;
 `;
 
-const Input = styled.input<{ hasError?: boolean }>`
+const Input = styled.input`
   width: 100%;
-  padding: 0.875rem 1rem 0.875rem 3rem;
-  border: 2px solid ${(props) => (props.hasError ? "#ef4444" : "#e5e7eb")};
+  padding: 1rem 1rem 1rem 3rem;
+  border: 2px solid #e5e7eb;
   border-radius: 12px;
   font-size: 1rem;
-  transition: all 0.2s ease;
   background: #fafafa;
+  transition: all 0.2s ease;
 
   &:focus {
     outline: none;
-    border-color: ${(props) => (props.hasError ? "#ef4444" : "#16a34a")};
+    border-color: #16a34a;
     background: white;
-    box-shadow: 0 0 0 3px
-      ${(props) =>
-        props.hasError ? "rgba(239, 68, 68, 0.1)" : "rgba(22, 163, 74, 0.1)"};
+    box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.1);
   }
 
   &::placeholder {
     color: #9ca3af;
+  }
+
+  &[type="password"] {
+    padding-right: 3rem;
   }
 `;
 
 const InputIcon = styled.div`
   position: absolute;
   left: 1rem;
-  top: 50%;
-  transform: translateY(-50%);
   color: #6b7280;
   z-index: 1;
+  pointer-events: none;
 `;
 
 const PasswordToggle = styled.button`
   position: absolute;
   right: 1rem;
-  top: 50%;
-  transform: translateY(-50%);
   background: none;
   border: none;
   color: #6b7280;
   cursor: pointer;
   padding: 0.25rem;
   border-radius: 4px;
+  transition: color 0.2s ease;
 
   &:hover {
     color: #16a34a;
-    background: #f3f4f6;
   }
 `;
 
 const ErrorMessage = styled.span`
-  display: block;
   color: #ef4444;
   font-size: 0.875rem;
-  margin-top: 0.5rem;
-`;
-
-const SuccessMessage = styled.span`
-  display: block;
-  color: #16a34a;
-  font-size: 0.875rem;
-  margin-top: 0.5rem;
-`;
-
-const PasswordStrengthIndicator = styled.div`
-  margin-top: 0.5rem;
-`;
-
-const StrengthBar = styled.div<{ strength: number }>`
-  height: 4px;
-  border-radius: 2px;
-  background: #e5e7eb;
-  overflow: hidden;
-
-  &::after {
-    content: "";
-    display: block;
-    height: 100%;
-    width: ${(props) => props.strength * 25}%;
-    background: ${(props) => {
-      if (props.strength <= 1) return "#ef4444";
-      if (props.strength <= 2) return "#f59e0b";
-      if (props.strength <= 3) return "#eab308";
-      return "#16a34a";
-    }};
-    transition: all 0.3s ease;
-  }
-`;
-
-const StrengthText = styled.div<{ strength: number }>`
-  font-size: 0.75rem;
   margin-top: 0.25rem;
-  color: ${(props) => {
-    if (props.strength <= 1) return "#ef4444";
-    if (props.strength <= 2) return "#f59e0b";
-    if (props.strength <= 3) return "#eab308";
-    return "#16a34a";
-  }};
 `;
 
-const CheckboxContainer = styled.div`
-  display: flex;
-  align-items: flex-start;
-  gap: 0.75rem;
-`;
-
-const CheckboxInput = styled.input`
-  width: 1.25rem;
-  height: 1.25rem;
-  margin: 0;
-  cursor: pointer;
-  accent-color: #16a34a;
-
-  &:focus {
-    outline: 2px solid #16a34a;
-    outline-offset: 2px;
-  }
-`;
-
-const CheckboxLabel = styled.label`
-  font-size: 0.875rem;
-  color: #4b5563;
-  line-height: 1.5;
-  cursor: pointer;
-
-  a {
-    color: #16a34a;
-    text-decoration: none;
-    font-weight: 500;
-
-    &:hover {
-      text-decoration: underline;
-    }
-  }
-`;
-
-const SubmitButton = styled.button<{ disabled?: boolean }>`
-  width: 100%;
-  padding: 1rem;
-  background: ${(props) =>
-    props.disabled
-      ? "linear-gradient(135deg, #9ca3af 0%, #6b7280 100%)"
-      : "linear-gradient(135deg, #16a34a 0%, #059669 100%)"};
+const RegisterButton = styled.button<{ loading?: boolean }>`
+  background: linear-gradient(135deg, #16a34a 0%, #059669 100%);
   color: white;
   border: none;
+  padding: 1rem;
   border-radius: 12px;
   font-size: 1rem;
   font-weight: 600;
-  cursor: ${(props) => (props.disabled ? "not-allowed" : "pointer")};
-  transition: all 0.3s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  margin-top: 1rem;
+  cursor: ${(props) => (props.loading ? "not-allowed" : "pointer")};
+  transition: all 0.2s ease;
+  opacity: ${(props) => (props.loading ? 0.7 : 1)};
+  margin-top: 0.5rem;
 
-  &:hover {
-    background: ${(props) =>
-      props.disabled
-        ? "linear-gradient(135deg, #9ca3af 0%, #6b7280 100%)"
-        : "linear-gradient(135deg, #059669 0%, #047857 100%)"};
-    transform: ${(props) => (props.disabled ? "none" : "translateY(-2px)")};
-    box-shadow: ${(props) =>
-      props.disabled ? "none" : "0 8px 25px rgba(22, 163, 74, 0.3)"};
+  &:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(22, 163, 74, 0.3);
   }
 
-  &:active {
-    transform: ${(props) => (props.disabled ? "none" : "translateY(0)")};
-  }
-`;
-
-const Divider = styled.div`
-  display: flex;
-  align-items: center;
-  margin: 2rem 0;
-
-  &::before,
-  &::after {
-    content: "";
-    flex: 1;
-    height: 1px;
-    background: #e5e7eb;
-  }
-
-  span {
-    padding: 0 1rem;
-    color: #6b7280;
-    font-size: 0.875rem;
+  &:active:not(:disabled) {
+    transform: translateY(0);
   }
 `;
 
 const LoginLink = styled.div`
   text-align: center;
-  font-size: 0.875rem;
+  margin-top: 2rem;
+  padding-top: 2rem;
+  border-top: 1px solid #e5e7eb;
+`;
+
+const LoginText = styled.p`
   color: #6b7280;
+  margin: 0;
 
   a {
     color: #16a34a;
     text-decoration: none;
     font-weight: 600;
+    transition: color 0.2s ease;
 
     &:hover {
+      color: #059669;
       text-decoration: underline;
     }
   }
 `;
 
-const LoadingSpinner = styled.div`
-  width: 20px;
-  height: 20px;
-  border: 2px solid transparent;
-  border-top: 2px solid white;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-
-  @keyframes spin {
-    0% {
-      transform: rotate(0deg);
-    }
-    100% {
-      transform: rotate(360deg);
-    }
-  }
+const PasswordRequirements = styled.div`
+  background: #f8f9fa;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-top: 0.5rem;
+  border-left: 4px solid #16a34a;
 `;
 
+const RequirementsList = styled.ul`
+  margin: 0;
+  padding-left: 1.5rem;
+  color: #6b7280;
+  font-size: 0.875rem;
+`;
+
+const RequirementItem = styled.li<{ met: boolean }>`
+  color: ${(props) => (props.met ? "#16a34a" : "#6b7280")};
+  margin: 0.25rem 0;
+`;
+
+interface FormData {
+  fullName: string;
+  nickname: string;
+  email: string;
+  password: string;
+  confirmPassword: string;
+}
+
+interface FormErrors {
+  fullName?: string;
+  nickname?: string;
+  email?: string;
+  password?: string;
+  confirmPassword?: string;
+}
+
 const RegisterPage: React.FC = () => {
+  const navigate = useNavigate();
+  const { signUp } = useAuth();
+  const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [formData, setFormData] = useState<FormData>({
-    name: "",
+    fullName: "",
+    nickname: "",
     email: "",
     password: "",
     confirmPassword: "",
-    acceptTerms: false,
   });
-
   const [errors, setErrors] = useState<FormErrors>({});
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [passwordStrength, setPasswordStrength] = useState(0);
 
-  // Calcular fuerza de la contraseña
-  const calculatePasswordStrength = (password: string): number => {
-    let strength = 0;
-    if (password.length >= 8) strength++;
-    if (/[a-z]/.test(password)) strength++;
-    if (/[A-Z]/.test(password)) strength++;
-    if (/[0-9]/.test(password)) strength++;
-    if (/[^A-Za-z0-9]/.test(password)) strength++;
-    return Math.min(strength, 4);
+  const validatePassword = (password: string) => {
+    const requirements = {
+      length: password.length >= 8,
+      uppercase: /[A-Z]/.test(password),
+      lowercase: /[a-z]/.test(password),
+      number: /\d/.test(password),
+      special: /[!@#$%^&*(),.?":{}|<>]/.test(password),
+    };
+    return requirements;
   };
 
-  const getPasswordStrengthText = (strength: number): string => {
-    switch (strength) {
-      case 0:
-      case 1:
-        return "Muy débil";
-      case 2:
-        return "Débil";
-      case 3:
-        return "Fuerte";
-      case 4:
-        return "Muy fuerte";
-      default:
-        return "";
-    }
-  };
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value, type, checked } = e.target;
-
-    setFormData((prev) => ({
-      ...prev,
-      [name]: type === "checkbox" ? checked : value,
-    }));
-
-    // Limpiar errores al escribir
-    if (errors[name as keyof FormErrors]) {
-      setErrors((prev) => ({
-        ...prev,
-        [name]: undefined,
-      }));
-    }
-
-    // Calcular fuerza de contraseña
-    if (name === "password") {
-      setPasswordStrength(calculatePasswordStrength(value));
-    }
-  };
+  const passwordRequirements = validatePassword(formData.password);
+  const isPasswordValid = Object.values(passwordRequirements).every(Boolean);
 
   const validateForm = (): boolean => {
     const newErrors: FormErrors = {};
 
-    // Validar nombre
-    if (!formData.name.trim()) {
-      newErrors.name = "El nombre es obligatorio";
-    } else if (formData.name.trim().length < 2) {
-      newErrors.name = "El nombre debe tener al menos 2 caracteres";
+    // Validar nombre completo
+    if (!formData.fullName.trim()) {
+      newErrors.fullName = "El nombre completo es requerido";
+    } else if (formData.fullName.trim().length < 2) {
+      newErrors.fullName = "El nombre debe tener al menos 2 caracteres";
+    }
+
+    // Validar nickname
+    if (!formData.nickname.trim()) {
+      newErrors.nickname = "El nickname es requerido";
+    } else if (formData.nickname.trim().length < 3) {
+      newErrors.nickname = "El nickname debe tener al menos 3 caracteres";
+    } else if (!/^[a-zA-Z0-9_]+$/.test(formData.nickname)) {
+      newErrors.nickname =
+        "El nickname solo puede contener letras, números y guiones bajos";
     }
 
     // Validar email
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!formData.email) {
-      newErrors.email = "El email es obligatorio";
-    } else if (!emailRegex.test(formData.email)) {
-      newErrors.email = "El email no es válido";
+    if (!formData.email.trim()) {
+      newErrors.email = "El email es requerido";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      newErrors.email = "Ingresa un email válido";
     }
 
     // Validar contraseña
     if (!formData.password) {
-      newErrors.password = "La contraseña es obligatoria";
-    } else if (formData.password.length < 8) {
-      newErrors.password = "La contraseña debe tener al menos 8 caracteres";
+      newErrors.password = "La contraseña es requerida";
+    } else if (!isPasswordValid) {
+      newErrors.password = "La contraseña no cumple con los requisitos";
     }
 
     // Validar confirmación de contraseña
@@ -423,13 +292,24 @@ const RegisterPage: React.FC = () => {
       newErrors.confirmPassword = "Las contraseñas no coinciden";
     }
 
-    // Validar términos
-    if (!formData.acceptTerms) {
-      newErrors.acceptTerms = "Debes aceptar los términos y condiciones";
-    }
-
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+
+    // Limpiar errores cuando el usuario empiece a escribir
+    if (errors[name as keyof FormErrors]) {
+      setErrors((prev) => ({
+        ...prev,
+        [name]: undefined,
+      }));
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -439,77 +319,90 @@ const RegisterPage: React.FC = () => {
       return;
     }
 
-    setIsLoading(true);
-    setErrors({});
+    setLoading(true);
 
     try {
-      // Simular registro (aquí integrarías con tu API)
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+      const { data, error } = await signUp(
+        formData.email.trim(),
+        formData.password,
+        formData.nickname.trim(),
+        formData.fullName.trim() || undefined
+      );
 
-      // Éxito - aquí podrías redirigir al usuario
-      console.log("Usuario registrado:", {
-        name: formData.name,
-        email: formData.email,
-        // No loguear la contraseña por seguridad
-      });
+      if (error) {
+        toast.error(error.message || "Error al crear la cuenta");
+        return;
+      }
 
-      // Resetear formulario
-      setFormData({
-        name: "",
-        email: "",
-        password: "",
-        confirmPassword: "",
-        acceptTerms: false,
-      });
-      setPasswordStrength(0);
-
-      alert("¡Registro exitoso! Bienvenido a Smashly.");
+      if (data?.user) {
+        toast.success(
+          "¡Cuenta creada exitosamente! Revisa tu email para confirmar tu cuenta."
+        );
+        navigate("/login");
+      }
     } catch (error) {
-      setErrors({
-        general: "Error al crear la cuenta. Por favor, inténtalo de nuevo.",
-      });
+      toast.error("Error inesperado. Inténtalo de nuevo.");
+      console.error("Registration error:", error);
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
 
   return (
     <Container>
-      <Card>
+      <RegisterCard>
         <Header>
-          <Title>Crear cuenta</Title>
-          <Subtitle>
-            Únete a Smashly y descubre tu pala ideal con inteligencia artificial
-          </Subtitle>
+          <Logo>
+            <FiUser size={36} color="white" />
+          </Logo>
+          <Title>Crear Cuenta</Title>
+          <Subtitle>Únete a la comunidad de Smashly</Subtitle>
         </Header>
 
         <Form onSubmit={handleSubmit}>
-          {/* Nombre completo */}
-          <FormGroup>
-            <Label htmlFor="name">Nombre completo</Label>
+          <InputGroup>
+            <Label htmlFor="fullName">Nombre Completo</Label>
             <InputContainer>
               <InputIcon>
-                <FiUser size={18} />
+                <FiUser size={20} />
               </InputIcon>
               <Input
-                id="name"
-                name="name"
+                id="fullName"
+                name="fullName"
                 type="text"
-                placeholder="Tu nombre completo"
-                value={formData.name}
+                placeholder="Ingresa tu nombre completo"
+                value={formData.fullName}
                 onChange={handleInputChange}
-                hasError={!!errors.name}
+                autoComplete="name"
               />
             </InputContainer>
-            {errors.name && <ErrorMessage>{errors.name}</ErrorMessage>}
-          </FormGroup>
+            {errors.fullName && <ErrorMessage>{errors.fullName}</ErrorMessage>}
+          </InputGroup>
 
-          {/* Email */}
-          <FormGroup>
+          <InputGroup>
+            <Label htmlFor="nickname">Nickname</Label>
+            <InputContainer>
+              <InputIcon>
+                <FiUser size={20} />
+              </InputIcon>
+              <Input
+                id="nickname"
+                name="nickname"
+                type="text"
+                placeholder="Elige un nickname único"
+                value={formData.nickname}
+                onChange={handleInputChange}
+                autoComplete="username"
+              />
+            </InputContainer>
+            {errors.nickname && <ErrorMessage>{errors.nickname}</ErrorMessage>}
+          </InputGroup>
+
+          <InputGroup>
             <Label htmlFor="email">Email</Label>
             <InputContainer>
               <InputIcon>
-                <FiMail size={18} />
+                <FiMail size={20} />
               </InputIcon>
               <Input
                 id="email"
@@ -518,52 +411,64 @@ const RegisterPage: React.FC = () => {
                 placeholder="tu@email.com"
                 value={formData.email}
                 onChange={handleInputChange}
-                hasError={!!errors.email}
+                autoComplete="email"
               />
             </InputContainer>
             {errors.email && <ErrorMessage>{errors.email}</ErrorMessage>}
-          </FormGroup>
+          </InputGroup>
 
-          {/* Contraseña */}
-          <FormGroup>
+          <InputGroup>
             <Label htmlFor="password">Contraseña</Label>
             <InputContainer>
               <InputIcon>
-                <FiLock size={18} />
+                <FiLock size={20} />
               </InputIcon>
               <Input
                 id="password"
                 name="password"
                 type={showPassword ? "text" : "password"}
-                placeholder="Mínimo 8 caracteres"
+                placeholder="Crea una contraseña segura"
                 value={formData.password}
                 onChange={handleInputChange}
-                hasError={!!errors.password}
+                autoComplete="new-password"
               />
               <PasswordToggle
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
               >
-                {showPassword ? <FiEyeOff size={18} /> : <FiEye size={18} />}
+                {showPassword ? <FiEyeOff size={20} /> : <FiEye size={20} />}
               </PasswordToggle>
             </InputContainer>
-            {formData.password && (
-              <PasswordStrengthIndicator>
-                <StrengthBar strength={passwordStrength} />
-                <StrengthText strength={passwordStrength}>
-                  {getPasswordStrengthText(passwordStrength)}
-                </StrengthText>
-              </PasswordStrengthIndicator>
-            )}
             {errors.password && <ErrorMessage>{errors.password}</ErrorMessage>}
-          </FormGroup>
 
-          {/* Confirmar contraseña */}
-          <FormGroup>
-            <Label htmlFor="confirmPassword">Confirmar contraseña</Label>
+            {formData.password && (
+              <PasswordRequirements>
+                <RequirementsList>
+                  <RequirementItem met={passwordRequirements.length}>
+                    Al menos 8 caracteres
+                  </RequirementItem>
+                  <RequirementItem met={passwordRequirements.uppercase}>
+                    Una letra mayúscula
+                  </RequirementItem>
+                  <RequirementItem met={passwordRequirements.lowercase}>
+                    Una letra minúscula
+                  </RequirementItem>
+                  <RequirementItem met={passwordRequirements.number}>
+                    Un número
+                  </RequirementItem>
+                  <RequirementItem met={passwordRequirements.special}>
+                    Un carácter especial
+                  </RequirementItem>
+                </RequirementsList>
+              </PasswordRequirements>
+            )}
+          </InputGroup>
+
+          <InputGroup>
+            <Label htmlFor="confirmPassword">Confirmar Contraseña</Label>
             <InputContainer>
               <InputIcon>
-                <FiLock size={18} />
+                <FiLock size={20} />
               </InputIcon>
               <Input
                 id="confirmPassword"
@@ -572,81 +477,35 @@ const RegisterPage: React.FC = () => {
                 placeholder="Repite tu contraseña"
                 value={formData.confirmPassword}
                 onChange={handleInputChange}
-                hasError={!!errors.confirmPassword}
+                autoComplete="new-password"
               />
               <PasswordToggle
                 type="button"
                 onClick={() => setShowConfirmPassword(!showConfirmPassword)}
               >
                 {showConfirmPassword ? (
-                  <FiEyeOff size={18} />
+                  <FiEyeOff size={20} />
                 ) : (
-                  <FiEye size={18} />
+                  <FiEye size={20} />
                 )}
               </PasswordToggle>
             </InputContainer>
             {errors.confirmPassword && (
               <ErrorMessage>{errors.confirmPassword}</ErrorMessage>
             )}
-            {formData.confirmPassword &&
-              formData.password === formData.confirmPassword && (
-                <SuccessMessage>✓ Las contraseñas coinciden</SuccessMessage>
-              )}
-          </FormGroup>
+          </InputGroup>
 
-          {/* Términos y condiciones */}
-          <FormGroup>
-            <CheckboxContainer>
-              <CheckboxInput
-                id="acceptTerms"
-                name="acceptTerms"
-                type="checkbox"
-                checked={formData.acceptTerms}
-                onChange={handleInputChange}
-              />
-              <CheckboxLabel htmlFor="acceptTerms">
-                Acepto los{" "}
-                <a href="/terms" target="_blank">
-                  términos y condiciones
-                </a>{" "}
-                y la{" "}
-                <a href="/privacy" target="_blank">
-                  política de privacidad
-                </a>
-              </CheckboxLabel>
-            </CheckboxContainer>
-            {errors.acceptTerms && (
-              <ErrorMessage>{errors.acceptTerms}</ErrorMessage>
-            )}
-          </FormGroup>
-
-          {/* Error general */}
-          {errors.general && <ErrorMessage>{errors.general}</ErrorMessage>}
-
-          {/* Botón de registro */}
-          <SubmitButton type="submit" disabled={isLoading}>
-            {isLoading ? (
-              <>
-                <LoadingSpinner />
-                Creando cuenta...
-              </>
-            ) : (
-              <>
-                Crear cuenta
-                <FiArrowRight size={18} />
-              </>
-            )}
-          </SubmitButton>
+          <RegisterButton type="submit" loading={loading} disabled={loading}>
+            {loading ? "Creando cuenta..." : "Crear Cuenta"}
+          </RegisterButton>
         </Form>
 
-        <Divider>
-          <span>¿Ya tienes cuenta?</span>
-        </Divider>
-
         <LoginLink>
-          <Link to="/login">Iniciar sesión</Link>
+          <LoginText>
+            ¿Ya tienes cuenta? <Link to="/login">Inicia sesión</Link>
+          </LoginText>
         </LoginLink>
-      </Card>
+      </RegisterCard>
     </Container>
   );
 };

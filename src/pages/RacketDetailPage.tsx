@@ -1,4 +1,5 @@
 import { useComparison } from "@/contexts/ComparisonContext";
+import { useRackets } from "@/contexts/RacketsContext";
 import { Racket } from "@/types/racket";
 import { motion } from "framer-motion";
 import React, { useEffect, useState } from "react";
@@ -387,10 +388,10 @@ const RacketDetailPage: React.FC = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { addRacket, isRacketInComparison, count } = useComparison();
+  const { rackets, loading } = useRackets();
 
   // State
   const [racket, setRacket] = useState<Racket | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   // Get racket ID from URL params
@@ -398,63 +399,22 @@ const RacketDetailPage: React.FC = () => {
 
   // Load racket data
   useEffect(() => {
-    const loadRacketData = async () => {
-      if (!racketId) {
-        setError("No se especificó el ID de la pala");
-        setIsLoading(false);
-        return;
-      }
+    if (!racketId) {
+      setError("No se especificó el ID de la pala");
+      return;
+    }
 
-      try {
-        setIsLoading(true);
-        setError(null);
+    // Find racket by name (for backward compatibility with existing URLs)
+    const decodedRacketId = decodeURIComponent(racketId);
+    const foundRacket = rackets.find((pala) => pala.nombre === decodedRacketId);
 
-        // Load rackets data
-        const response = await fetch("/palas_padel.json");
-        if (!response.ok) {
-          throw new Error("Error al cargar los datos de las palas");
-        }
+    if (!foundRacket) {
+      setError("No se encontró la pala solicitada");
+      return;
+    }
 
-        const data = await response.json();
-
-        // Find racket by ID (name)
-        const foundRacket = data.palas.find(
-          (pala: any) => pala.nombre === decodeURIComponent(racketId)
-        );
-
-        if (!foundRacket) {
-          setError("No se encontró la pala solicitada");
-          setIsLoading(false);
-          return;
-        }
-
-        // Map to Racket interface
-        const racketObject: Racket = {
-          nombre: foundRacket.nombre,
-          marca: foundRacket.marca,
-          modelo: foundRacket.modelo,
-          precio_actual: foundRacket.precio_actual,
-          precio_original: foundRacket.precio_original || null,
-          descuento_porcentaje: foundRacket.descuento_porcentaje,
-          enlace: foundRacket.enlace,
-          imagen: foundRacket.imagen,
-          es_bestseller: foundRacket.es_bestseller,
-          en_oferta: foundRacket.en_oferta,
-          scrapeado_en: foundRacket.scrapeado_en,
-          fuente: foundRacket.fuente,
-        };
-
-        setRacket(racketObject);
-      } catch (error) {
-        console.error("Error loading racket data:", error);
-        setError("Error al cargar los datos de la pala");
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    loadRacketData();
-  }, [racketId]);
+    setRacket(foundRacket);
+  }, [racketId, rackets]);
 
   // Handle add to comparison
   const handleAddToComparison = () => {
@@ -489,8 +449,8 @@ const RacketDetailPage: React.FC = () => {
     navigate("/compare-rackets");
   };
 
-  // Loading state
-  if (isLoading) {
+  // Loading state (check if rackets are still loading from context)
+  if (loading) {
     return (
       <Container>
         <LoadingContainer>

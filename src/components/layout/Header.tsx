@@ -1,7 +1,8 @@
 import React, { useState } from "react";
-import { FiMenu, FiSearch, FiX } from "react-icons/fi";
-import { Link, useLocation } from "react-router-dom";
+import { FiLogOut, FiMenu, FiSearch, FiUser, FiX } from "react-icons/fi";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import styled from "styled-components";
+import { useAuth } from "../../contexts/AuthContext.tsx";
 import GlobalSearch from "../features/GlobalSearch";
 
 const HeaderContainer = styled.header`
@@ -196,14 +197,121 @@ const MobileMenuButton = styled.button`
   }
 `;
 
+const UserMenu = styled.div`
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    width: 100%;
+  }
+`;
+
+const UserButton = styled(Link)`
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  text-decoration: none;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.15);
+    color: white;
+    text-decoration: none;
+  }
+`;
+
+const LogoutButton = styled.button<{ disabled?: boolean }>`
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: ${(props) => (props.disabled ? "not-allowed" : "pointer")};
+  font-weight: 500;
+  transition: all 0.2s ease;
+  opacity: ${(props) => (props.disabled ? 0.6 : 1)};
+
+  &:hover {
+    background: ${(props) =>
+      props.disabled ? "transparent" : "rgba(255, 255, 255, 0.1)"};
+  }
+`;
+
 const Header: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
+  const { user, userProfile, signOut } = useAuth();
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
   const toggleSearch = () => setIsSearchOpen(!isSearchOpen);
   const isActive = (path: string) => location.pathname === path;
+
+  const handleLogout = async () => {
+    // Confirmación opcional
+    const confirmLogout = window.confirm(
+      "¿Estás seguro de que quieres cerrar sesión?"
+    );
+    if (!confirmLogout) return;
+
+    setIsLoggingOut(true);
+    try {
+      const { error } = await signOut();
+
+      // Siempre navegar a la página de inicio después del logout,
+      // independientemente de si hubo error (porque el estado local se limpia)
+      navigate("/");
+
+      if (error) {
+        console.warn(
+          "Error during logout, but proceeding with navigation:",
+          error
+        );
+        // No mostrar error al usuario si el estado local se limpió correctamente
+        // toast o console log en lugar de alert molesto
+        console.log("Sesión cerrada localmente (con advertencias)");
+      } else {
+        console.log("Sesión cerrada exitosamente");
+      }
+
+      // Forzar reload de la página para asegurar limpieza completa del estado
+      setTimeout(() => {
+        window.location.reload();
+      }, 100);
+    } catch (error) {
+      console.error("Unexpected error during logout:", error);
+
+      // Aún con error, navegar al inicio y limpiar estado
+      navigate("/");
+
+      // Reload para asegurar limpieza
+      setTimeout(() => {
+        window.location.reload();
+      }, 100);
+
+      // Solo mostrar error si es algo crítico
+      console.warn(
+        "Error inesperado al cerrar sesión, pero sesión limpiada localmente."
+      );
+    } finally {
+      setIsLoggingOut(false);
+    }
+  };
 
   return (
     <HeaderContainer>
@@ -240,12 +348,29 @@ const Header: React.FC = () => {
         </Nav>
 
         <AuthButtons>
-          <AuthButton to="/login" variant="secondary">
-            Iniciar sesión
-          </AuthButton>
-          <AuthButton to="/register" variant="primary">
-            Registrarse
-          </AuthButton>
+          {user ? (
+            <UserMenu>
+              <UserButton to="/profile">
+                <FiUser />
+                {userProfile?.nickname ||
+                  user.email?.split("@")[0] ||
+                  "Usuario"}
+              </UserButton>
+              <LogoutButton onClick={handleLogout} disabled={isLoggingOut}>
+                <FiLogOut />
+                {isLoggingOut ? "Cerrando..." : "Cerrar sesión"}
+              </LogoutButton>
+            </UserMenu>
+          ) : (
+            <>
+              <AuthButton to="/login" variant="secondary">
+                Iniciar sesión
+              </AuthButton>
+              <AuthButton to="/register" variant="primary">
+                Registrarse
+              </AuthButton>
+            </>
+          )}
           <MobileMenuButton onClick={toggleMenu}>
             {isMenuOpen ? <FiX /> : <FiMenu />}
           </MobileMenuButton>

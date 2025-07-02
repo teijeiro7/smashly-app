@@ -233,8 +233,8 @@ export const GlobalSearch: React.FC<GlobalSearchProps> = ({
   const [isSearchOpen, setIsSearchOpen] = useState(isInHeader);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<Racket[]>([]);
-  const [rackets, setRackets] = useState<Racket[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [rackets, setRackets] = useState<Racket[]>([]);
 
   // Refs
   const searchInputRef = useRef<HTMLInputElement>(null);
@@ -242,26 +242,18 @@ export const GlobalSearch: React.FC<GlobalSearchProps> = ({
   // Navigation
   const navigate = useNavigate();
 
-  // Effect for header mode - auto focus when mounted
-  useEffect(() => {
-    if (isInHeader && searchInputRef.current) {
-      setTimeout(() => {
-        searchInputRef.current?.focus();
-      }, 100);
-    }
-  }, [isInHeader]);
-
-  // Load rackets data on component mount
+  // Load rackets from JSON fallback for now
   useEffect(() => {
     const loadRackets = async () => {
       try {
         const response = await fetch("/palas_padel.json");
         const data = await response.json();
+        const palas = data.palas || data;
 
-        // Map the data to Racket interface format
-        const mappedRackets: Racket[] = data.palas
+        const mappedRackets: Racket[] = palas
           .slice(0, 500)
           .map((racket: any) => ({
+            id: undefined,
             nombre: racket.nombre,
             marca: racket.marca,
             modelo: racket.modelo,
@@ -278,12 +270,21 @@ export const GlobalSearch: React.FC<GlobalSearchProps> = ({
 
         setRackets(mappedRackets);
       } catch (error) {
-        console.error("Error loading rackets data:", error);
+        console.error("Error loading rackets:", error);
       }
     };
 
     loadRackets();
   }, []);
+
+  // Effect for header mode - auto focus when mounted
+  useEffect(() => {
+    if (isInHeader && searchInputRef.current) {
+      setTimeout(() => {
+        searchInputRef.current?.focus();
+      }, 100);
+    }
+  }, [isInHeader]);
 
   // Handle search functionality
   useEffect(() => {
@@ -296,7 +297,7 @@ export const GlobalSearch: React.FC<GlobalSearchProps> = ({
 
     // Debounce search
     const timeoutId = setTimeout(() => {
-      const filteredRackets = rackets.filter((racket) => {
+      const filteredRackets = rackets.filter((racket: Racket) => {
         const searchLower = searchQuery.toLowerCase();
         return (
           racket.nombre.toLowerCase().includes(searchLower) ||

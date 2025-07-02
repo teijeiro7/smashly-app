@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from "framer-motion";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import {
   FiAlertCircle,
@@ -12,6 +12,8 @@ import {
   FiZap,
 } from "react-icons/fi";
 import styled from "styled-components";
+import { useAuth } from "../contexts/AuthContext";
+import { useRackets } from "../contexts/RacketsContext";
 import { FormData, MultipleRacketRecommendations } from "../types/racket";
 import { getRacketRecommendations } from "../utils/gemini";
 
@@ -441,6 +443,9 @@ const ProsConsItem = styled.li`
 `;
 
 const BestRacketPage: React.FC = () => {
+  const { rackets } = useRackets();
+  const { user, userProfile } = useAuth();
+
   const [formData, setFormData] = useState<FormData>({
     gameLevel: "",
     playingStyle: "",
@@ -449,6 +454,18 @@ const BestRacketPage: React.FC = () => {
     budget: "",
     preferredShape: "",
   });
+
+  // Cargar datos del perfil del usuario si está disponible
+  useEffect(() => {
+    if (userProfile) {
+      setFormData((prev) => ({
+        ...prev,
+        gameLevel: userProfile.nivel_juego || prev.gameLevel,
+        weight: userProfile.peso?.toString() || prev.weight,
+        height: userProfile.altura?.toString() || prev.height,
+      }));
+    }
+  }, [userProfile]);
 
   const [isLoading, setIsLoading] = useState(false);
   const [showRecommendations, setShowRecommendations] = useState(false);
@@ -490,23 +507,9 @@ const BestRacketPage: React.FC = () => {
 
     setIsLoading(true);
     try {
-      // Load racket database
-      toast.loading("Cargando base de datos de palas...", { id: "loading" });
-
-      const response = await fetch("/palas_padel.json");
-
-      if (!response.ok) {
-        throw new Error("No se pudo cargar la base de datos de palas");
-      }
-
-      const racketData = await response.json();
-
       toast.loading("Generando recomendaciones con IA...", { id: "loading" });
 
-      const results = await getRacketRecommendations(
-        formData,
-        racketData.palas
-      );
+      const results = await getRacketRecommendations(formData, rackets);
 
       setRecommendations(results);
       setShowRecommendations(true);

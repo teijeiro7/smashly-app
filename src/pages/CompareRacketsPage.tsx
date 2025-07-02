@@ -1,6 +1,5 @@
 import { AnimatePresence, motion } from "framer-motion";
 import React, { useEffect, useState } from "react";
-import toast from "react-hot-toast";
 import {
   FiCheck,
   FiFilter,
@@ -13,6 +12,7 @@ import {
 } from "react-icons/fi";
 import styled from "styled-components";
 import { useComparison } from "../contexts/ComparisonContext";
+import { useRackets } from "../contexts/RacketsContext";
 import { Racket, RacketComparison } from "../types/racket";
 
 const Container = styled.div`
@@ -491,9 +491,8 @@ const EmptyState = styled.div`
 `;
 
 const CompareRacketsPage: React.FC = () => {
-  const [rackets, setRackets] = useState<Racket[]>([]);
+  const { rackets, loading } = useRackets();
   const [filteredRackets, setFilteredRackets] = useState<Racket[]>([]);
-  const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedBrand, setSelectedBrand] = useState("Todas");
   const [showComparison, setShowComparison] = useState(false);
@@ -507,47 +506,11 @@ const CompareRacketsPage: React.FC = () => {
     isRacketInComparison,
   } = useComparison();
 
-  // Load rackets data
+  // Update filtered rackets when rackets change
   useEffect(() => {
-    const loadRackets = async () => {
-      try {
-        setLoading(true);
-        const response = await fetch("/palas_padel.json");
-
-        if (!response.ok) {
-          throw new Error("No se pudo cargar la base de datos de palas");
-        }
-
-        const data = await response.json();
-        const mappedRackets: Racket[] = data.palas
-          .slice(0, 100)
-          .map((racket: any) => ({
-            nombre: racket.nombre,
-            marca: racket.marca,
-            modelo: racket.modelo,
-            precio_actual: racket.precio_actual,
-            precio_original: racket.precio_original,
-            descuento_porcentaje: racket.descuento_porcentaje,
-            enlace: racket.enlace,
-            imagen: racket.imagen,
-            es_bestseller: racket.es_bestseller,
-            en_oferta: racket.en_oferta,
-            scrapeado_en: racket.scrapeado_en,
-            fuente: racket.fuente,
-          }));
-
-        setRackets(mappedRackets);
-        setFilteredRackets(mappedRackets);
-      } catch (error) {
-        console.error("Error loading rackets:", error);
-        toast.error("Error al cargar las palas. Inténtalo de nuevo.");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadRackets();
-  }, []);
+    const limitedRackets = rackets.slice(0, 100); // Limit to first 100 for performance
+    setFilteredRackets(limitedRackets);
+  }, [rackets]);
 
   // Filter rackets based on search and brand
   useEffect(() => {
@@ -556,7 +519,7 @@ const CompareRacketsPage: React.FC = () => {
     // Filter by search query
     if (searchQuery) {
       filtered = filtered.filter(
-        (racket) =>
+        (racket: Racket) =>
           racket.nombre.toLowerCase().includes(searchQuery.toLowerCase()) ||
           racket.marca.toLowerCase().includes(searchQuery.toLowerCase()) ||
           racket.modelo.toLowerCase().includes(searchQuery.toLowerCase())
@@ -565,16 +528,20 @@ const CompareRacketsPage: React.FC = () => {
 
     // Filter by brand
     if (selectedBrand !== "Todas") {
-      filtered = filtered.filter((racket) => racket.marca === selectedBrand);
+      filtered = filtered.filter(
+        (racket: Racket) => racket.marca === selectedBrand
+      );
     }
 
     setFilteredRackets(filtered);
   }, [searchQuery, selectedBrand, rackets]);
 
   // Get unique brands
-  const uniqueBrands = [
+  const uniqueBrands: string[] = [
     "Todas",
-    ...Array.from(new Set(rackets.map((racket) => racket.marca))),
+    ...(Array.from(
+      new Set(rackets.map((racket: Racket) => racket.marca))
+    ) as string[]),
   ];
 
   // Handle racket selection

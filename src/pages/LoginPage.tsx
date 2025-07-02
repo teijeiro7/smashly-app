@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import toast from "react-hot-toast";
 import { FiEye, FiEyeOff, FiLock, FiMail, FiUser } from "react-icons/fi";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import styled from "styled-components";
+import { useAuth } from "../contexts/AuthContext.tsx";
 
 const Container = styled.div`
   min-height: 100vh;
@@ -211,6 +212,9 @@ interface FormErrors {
 }
 
 const LoginPage: React.FC = () => {
+  const { signIn } = useAuth();
+  const navigate = useNavigate();
+
   const [formData, setFormData] = useState<FormData>({
     email: "",
     password: "",
@@ -265,18 +269,24 @@ const LoginPage: React.FC = () => {
     setLoading(true);
 
     try {
-      // Simular llamada API
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      // Iniciar sesión con Supabase usando el contexto de autenticación
+      const { error } = await signIn(formData.email, formData.password);
 
-      // Aquí irían las llamadas reales a la API
-      console.log("Login attempt:", formData);
+      if (error) {
+        toast.error(error.message);
+        return;
+      }
 
+      // Login exitoso
       toast.success("¡Bienvenido a Smashly!");
 
-      // Redirect to dashboard or home page
-      // navigate('/');
-    } catch (error) {
-      toast.error("Error al iniciar sesión. Verifica tus credenciales.");
+      // Redirigir a la página principal
+      navigate("/");
+    } catch (error: any) {
+      console.error("Error during login:", error);
+      const errorMessage =
+        error?.message || "Error inesperado durante el inicio de sesión";
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }

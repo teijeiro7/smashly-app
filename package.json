@@ -10,11 +10,23 @@
         "build": "tsc && vite build",
         "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
         "preview": "vite preview",
-        "type-check": "tsc --noEmit"
+        "type-check": "tsc --noEmit",
+        "migrate:palas": "node scripts/migrate-cjs.cjs",
+        "migrate:palas:esm": "node scripts/migrate-palas.js",
+        "migrate:simple": "node scripts/migrate-simple.js",
+        "migrate:advanced": "node scripts/migrate-advanced.js",
+        "setup:complete": "node scripts/setup-complete.js",
+        "migrate:palas:ts": "node --loader ts-node/esm scripts/migrate-palas.ts",
+        "migrate:palas:tsx": "tsx scripts/migrate-palas.ts",
+        "migrate:json-to-supabase": "node scripts/migrate-json-to-supabase.js",
+        "verify:supabase": "node scripts/verify-supabase-migration.js",
+        "diagnose:auth": "node scripts/diagnose-auth.js"
     },
     "dependencies": {
         "@google/generative-ai": "^0.17.1",
+        "@supabase/supabase-js": "^2.50.2",
         "@tanstack/react-query": "^5.15.0",
+        "dotenv": "^16.3.1",
         "framer-motion": "^10.16.16",
         "react": "^18.2.0",
         "react-dom": "^18.2.0",
@@ -35,6 +47,8 @@
         "eslint": "^8.55.0",
         "eslint-plugin-react-hooks": "^4.6.0",
         "eslint-plugin-react-refresh": "^0.4.5",
+        "ts-node": "^10.9.2",
+        "tsx": "^4.20.3",
         "typescript": "^5.2.2",
         "vite": "^5.0.8"
     },
