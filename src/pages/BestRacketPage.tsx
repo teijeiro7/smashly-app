@@ -444,7 +444,7 @@ const ProsConsItem = styled.li`
 
 const BestRacketPage: React.FC = () => {
   const { rackets } = useRackets();
-  const { user, userProfile } = useAuth();
+  const { userProfile } = useAuth();
 
   const [formData, setFormData] = useState<FormData>({
     gameLevel: "",
