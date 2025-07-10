@@ -12,6 +12,7 @@ const HeaderContainer = styled.header`
   position: sticky;
   top: 0;
   z-index: 100;
+  position: relative;
 `;
 
 const HeaderContent = styled.div`
@@ -37,44 +38,127 @@ const Logo = styled(Link)`
   }
 `;
 
-const Nav = styled.nav<{ isOpen: boolean; isSearchOpen: boolean }>`
+// Desktop Navigation
+const DesktopNav = styled.nav`
   display: flex;
   align-items: center;
   gap: 2rem;
 
   @media (max-width: 768px) {
-    position: fixed;
-    top: 70px;
-    left: 0;
-    right: 0;
-    background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
-    flex-direction: column;
-    padding: 2rem;
-    transform: translateY(${(props) => (props.isOpen ? "0" : "-100%")});
-    transition: transform 0.3s ease;
-    box-shadow: 0 4px 20px rgba(22, 163, 74, 0.3);
+    display: none;
   }
 `;
 
-const NavLink = styled(Link)<{ isActive: boolean; isHidden?: boolean }>`
+// Mobile Elements Container
+const MobileElements = styled.div`
+  display: none;
+
+  @media (max-width: 768px) {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+`;
+
+// Search Toggle Button for Mobile
+const MobileSearchButton = styled.button`
+  background: none;
+  border: none;
   color: white;
-  text-decoration: none;
-  font-weight: 500;
-  padding: 8px 16px;
-  border-radius: 8px;
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 50%;
   transition: all 0.2s ease;
-  background: ${(props) =>
-    props.isActive ? "rgba(255, 255, 255, 0.15)" : "transparent"};
-  display: ${(props) => (props.isHidden ? "none" : "block")};
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
   &:hover {
     background: rgba(255, 255, 255, 0.1);
-    color: white;
+  }
+`;
+
+// Mobile Menu Dropdown
+const MobileMenuDropdown = styled.div<{ isOpen: boolean }>`
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: white;
+  border-radius: 0 0 16px 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  transform: translateY(${(props) => (props.isOpen ? "0" : "-10px")});
+  opacity: ${(props) => (props.isOpen ? "1" : "0")};
+  visibility: ${(props) => (props.isOpen ? "visible" : "hidden")};
+  transition: all 0.3s ease;
+  z-index: 50;
+`;
+
+// Mobile Search Container
+const MobileSearchContainer = styled.div<{ isOpen: boolean }>`
+  padding: 1rem;
+  border-bottom: 1px solid #e5e7eb;
+  transform: translateY(${(props) => (props.isOpen ? "0" : "-10px")});
+  opacity: ${(props) => (props.isOpen ? "1" : "0")};
+  transition: all 0.3s ease 0.1s;
+
+  @media (min-width: 769px) {
+    display: none;
+  }
+`;
+
+// Navigation Section in Mobile Menu
+const MobileNavSection = styled.div`
+  padding: 1rem;
+  border-bottom: 1px solid #e5e7eb;
+`;
+
+const MobileNavTitle = styled.h4`
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #6b7280;
+  margin: 0 0 0.75rem 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+`;
+
+// Auth Section in Mobile Menu
+const MobileAuthSection = styled.div`
+  padding: 1rem;
+`;
+
+const NavLink = styled(Link)<{ isActive: boolean; isMobile?: boolean }>`
+  color: ${(props) => (props.isMobile ? "#374151" : "white")};
+  text-decoration: none;
+  font-weight: 500;
+  padding: ${(props) => (props.isMobile ? "12px 0" : "8px 16px")};
+  border-radius: ${(props) => (props.isMobile ? "0" : "8px")};
+  transition: all 0.2s ease;
+  background: ${(props) =>
+    props.isActive && !props.isMobile
+      ? "rgba(255, 255, 255, 0.15)"
+      : "transparent"};
+  display: block;
+  position: relative;
+
+  ${(props) =>
+    props.isMobile &&
+    `
+    border-left: 3px solid ${props.isActive ? "#16a34a" : "transparent"};
+    padding-left: 16px;
+    margin-left: -1rem;
+  `}
+
+  &:hover {
+    background: ${(props) =>
+      props.isMobile ? "#f9fafb" : "rgba(255, 255, 255, 0.1)"};
+    color: ${(props) => (props.isMobile ? "#16a34a" : "white")};
     text-decoration: none;
   }
 `;
 
-const SearchButton = styled.button<{ isHidden?: boolean }>`
+const SearchButton = styled.button`
   background: none;
   border: none;
   color: white;
@@ -83,12 +167,16 @@ const SearchButton = styled.button<{ isHidden?: boolean }>`
   padding: 8px 16px;
   border-radius: 8px;
   transition: all 0.2s ease;
-  display: ${(props) => (props.isHidden ? "none" : "flex")};
+  display: flex;
   align-items: center;
   justify-content: center;
 
   &:hover {
     background: rgba(255, 255, 255, 0.1);
+  }
+
+  @media (max-width: 768px) {
+    display: none;
   }
 `;
 
@@ -142,46 +230,75 @@ const AuthButtons = styled.div`
   gap: 1rem;
 
   @media (max-width: 768px) {
-    flex-direction: column;
-    width: 100%;
+    display: none;
   }
 `;
 
-const AuthButton = styled(Link)<{ variant?: "primary" | "secondary" }>`
-  padding: 8px 20px;
-  border-radius: 8px;
+const MobileAuthButtons = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+`;
+
+const AuthButton = styled(Link)<{ variant?: "primary" | "secondary"; isMobile?: boolean }>`
+  padding: ${(props) => (props.isMobile ? "12px 16px" : "8px 20px")};
+  border-radius: ${(props) => (props.isMobile ? "12px" : "8px")};
   font-weight: 500;
   text-decoration: none;
   transition: all 0.2s ease;
   text-align: center;
+  display: block;
 
-  ${(props) =>
-    props.variant === "primary"
-      ? `
-    background: white;
-    color: #16a34a;
-    
-    &:hover {
-      background: #f0f0f0;
-      color: #15803d;
-      text-decoration: none;
+  ${(props) => {
+    if (props.isMobile) {
+      return props.variant === "primary"
+        ? `
+        background: #16a34a;
+        color: white;
+        
+        &:hover {
+          background: #15803d;
+          color: white;
+          text-decoration: none;
+        }
+      `
+        : `
+        background: transparent;
+        color: #374151;
+        border: 2px solid #e5e7eb;
+        
+        &:hover {
+          background: #f9fafb;
+          border-color: #16a34a;
+          color: #16a34a;
+          text-decoration: none;
+        }
+      `;
+    } else {
+      return props.variant === "primary"
+        ? `
+        background: white;
+        color: #16a34a;
+        
+        &:hover {
+          background: #f0f0f0;
+          color: #15803d;
+          text-decoration: none;
+        }
+      `
+        : `
+        background: transparent;
+        color: white;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        
+        &:hover {
+          background: rgba(255, 255, 255, 0.1);
+          color: white;
+          text-decoration: none;
+        }
+      `;
     }
-  `
-      : `
-    background: transparent;
-    color: white;
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    
-    &:hover {
-      background: rgba(255, 255, 255, 0.1);
-      color: white;
-      text-decoration: none;
-    }
-  `}
-
-  @media (max-width: 768px) {
-    width: 100%;
-  }
+  }}
 `;
 
 const MobileMenuButton = styled.button`
@@ -191,9 +308,18 @@ const MobileMenuButton = styled.button`
   color: white;
   font-size: 1.5rem;
   cursor: pointer;
+  padding: 8px;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.1);
+  }
 
   @media (max-width: 768px) {
-    display: block;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 `;
 
@@ -202,64 +328,97 @@ const UserMenu = styled.div`
   display: flex;
   align-items: center;
   gap: 1rem;
-
-  @media (max-width: 768px) {
-    flex-direction: column;
-    width: 100%;
-  }
 `;
 
-const UserButton = styled(Link)`
+const MobileUserSection = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+`;
+
+const UserButton = styled(Link)<{ isMobile?: boolean }>`
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  color: white;
-  padding: 8px 16px;
-  border-radius: 8px;
+  background: ${(props) =>
+    props.isMobile ? "#f9fafb" : "rgba(255, 255, 255, 0.1)"};
+  border: ${(props) =>
+    props.isMobile
+      ? "2px solid #e5e7eb"
+      : "1px solid rgba(255, 255, 255, 0.2)"};
+  color: ${(props) => (props.isMobile ? "#374151" : "white")};
+  padding: ${(props) => (props.isMobile ? "12px 16px" : "8px 16px")};
+  border-radius: ${(props) => (props.isMobile ? "12px" : "8px")};
   cursor: pointer;
   font-weight: 500;
   transition: all 0.2s ease;
   text-decoration: none;
 
   &:hover {
-    background: rgba(255, 255, 255, 0.15);
-    color: white;
+    background: ${(props) =>
+      props.isMobile ? "#16a34a" : "rgba(255, 255, 255, 0.15)"};
+    color: ${(props) => (props.isMobile ? "white" : "white")};
+    border-color: ${(props) => (props.isMobile ? "#16a34a" : "transparent")};
     text-decoration: none;
   }
 `;
 
-const LogoutButton = styled.button<{ disabled?: boolean }>`
+const LogoutButton = styled.button<{ disabled?: boolean; isMobile?: boolean }>`
   display: flex;
   align-items: center;
   gap: 0.5rem;
   background: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  color: white;
-  padding: 8px 16px;
-  border-radius: 8px;
+  border: ${(props) =>
+    props.isMobile
+      ? "2px solid #ef4444"
+      : "1px solid rgba(255, 255, 255, 0.3)"};
+  color: ${(props) => (props.isMobile ? "#ef4444" : "white")};
+  padding: ${(props) => (props.isMobile ? "12px 16px" : "8px 16px")};
+  border-radius: ${(props) => (props.isMobile ? "12px" : "8px")};
   cursor: ${(props) => (props.disabled ? "not-allowed" : "pointer")};
   font-weight: 500;
   transition: all 0.2s ease;
   opacity: ${(props) => (props.disabled ? 0.6 : 1)};
 
   &:hover {
-    background: ${(props) =>
-      props.disabled ? "transparent" : "rgba(255, 255, 255, 0.1)"};
+    background: ${(props) => {
+      if (props.disabled) return "transparent";
+      return props.isMobile ? "#ef4444" : "rgba(255, 255, 255, 0.1)";
+    }};
+    color: ${(props) => {
+      if (props.disabled) return props.isMobile ? "#ef4444" : "white";
+      return props.isMobile ? "white" : "white";
+    }};
   }
 `;
 
 const Header: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
   const { user, userProfile, signOut } = useAuth();
 
-  const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
+  const toggleMenu = () => {
+    setIsMenuOpen(!isMenuOpen);
+    // Close mobile search when opening menu
+    if (!isMenuOpen) {
+      setIsMobileSearchOpen(false);
+    }
+  };
+
   const toggleSearch = () => setIsSearchOpen(!isSearchOpen);
+  
+  const toggleMobileSearch = () => {
+    setIsMobileSearchOpen(!isMobileSearchOpen);
+    // Close menu when opening mobile search
+    if (!isMobileSearchOpen) {
+      setIsMenuOpen(false);
+    }
+  };
+
   const isActive = (path: string) => location.pathname === path;
 
   const handleLogout = async () => {
@@ -313,12 +472,18 @@ const Header: React.FC = () => {
     }
   };
 
+  const closeAllMenus = () => {
+    setIsMenuOpen(false);
+    setIsMobileSearchOpen(false);
+  };
+
   return (
     <HeaderContainer>
       <HeaderContent>
-        <Logo to="/">Smashly</Logo>
+        <Logo to="/" onClick={closeAllMenus}>Smashly</Logo>
 
-        <Nav isOpen={isMenuOpen} isSearchOpen={isSearchOpen}>
+        {/* Desktop Navigation */}
+        <DesktopNav>
           {isSearchOpen ? (
             <SearchContainer>
               <GlobalSearch
@@ -334,23 +499,24 @@ const Header: React.FC = () => {
               <SearchButton onClick={toggleSearch}>
                 <FiSearch />
               </SearchButton>
-              <NavLink to="/" isActive={isActive("/")}>
+              <NavLink to="/" isActive={isActive("/")} onClick={closeAllMenus}>
                 Inicio
               </NavLink>
-              <NavLink to="/rackets" isActive={isActive("/rackets")}>
+              <NavLink to="/rackets" isActive={isActive("/rackets")} onClick={closeAllMenus}>
                 Comparar Palas
               </NavLink>
-              <NavLink to="/faq" isActive={isActive("/faq")}>
+              <NavLink to="/faq" isActive={isActive("/faq")} onClick={closeAllMenus}>
                 FAQ
               </NavLink>
             </>
           )}
-        </Nav>
+        </DesktopNav>
 
+        {/* Desktop Auth */}
         <AuthButtons>
           {user ? (
             <UserMenu>
-              <UserButton to="/profile">
+              <UserButton to="/profile" onClick={closeAllMenus}>
                 <FiUser />
                 {userProfile?.nickname ||
                   user.email?.split("@")[0] ||
@@ -363,18 +529,87 @@ const Header: React.FC = () => {
             </UserMenu>
           ) : (
             <>
-              <AuthButton to="/login" variant="secondary">
+              <AuthButton to="/login" variant="secondary" onClick={closeAllMenus}>
                 Iniciar sesión
               </AuthButton>
-              <AuthButton to="/register" variant="primary">
+              <AuthButton to="/register" variant="primary" onClick={closeAllMenus}>
                 Registrarse
               </AuthButton>
             </>
           )}
+        </AuthButtons>
+
+        {/* Mobile Elements */}
+        <MobileElements>
+          <MobileSearchButton onClick={toggleMobileSearch}>
+            <FiSearch />
+          </MobileSearchButton>
           <MobileMenuButton onClick={toggleMenu}>
             {isMenuOpen ? <FiX /> : <FiMenu />}
           </MobileMenuButton>
-        </AuthButtons>
+        </MobileElements>
+
+        {/* Mobile Menu Dropdown */}
+        <MobileMenuDropdown isOpen={isMenuOpen || isMobileSearchOpen}>
+          {/* Mobile Search Section */}
+          <MobileSearchContainer isOpen={isMobileSearchOpen}>
+            <GlobalSearch
+              onSearchToggle={setIsMobileSearchOpen}
+              isInHeader={true}
+            />
+          </MobileSearchContainer>
+
+          {/* Navigation Section */}
+          {isMenuOpen && (
+            <>
+              <MobileNavSection>
+                <MobileNavTitle>Navegación</MobileNavTitle>
+                <NavLink to="/" isActive={isActive("/")} isMobile onClick={closeAllMenus}>
+                  Inicio
+                </NavLink>
+                <NavLink to="/rackets" isActive={isActive("/rackets")} isMobile onClick={closeAllMenus}>
+                  Comparar Palas
+                </NavLink>
+                <NavLink to="/faq" isActive={isActive("/faq")} isMobile onClick={closeAllMenus}>
+                  FAQ
+                </NavLink>
+              </MobileNavSection>
+
+              {/* Auth Section */}
+              <MobileAuthSection>
+                {user ? (
+                  <>
+                    <MobileNavTitle>Mi cuenta</MobileNavTitle>
+                    <MobileUserSection>
+                      <UserButton to="/profile" isMobile onClick={closeAllMenus}>
+                        <FiUser />
+                        {userProfile?.nickname ||
+                          user.email?.split("@")[0] ||
+                          "Usuario"}
+                      </UserButton>
+                      <LogoutButton onClick={handleLogout} disabled={isLoggingOut} isMobile>
+                        <FiLogOut />
+                        {isLoggingOut ? "Cerrando..." : "Cerrar sesión"}
+                      </LogoutButton>
+                    </MobileUserSection>
+                  </>
+                ) : (
+                  <>
+                    <MobileNavTitle>Acceso</MobileNavTitle>
+                    <MobileAuthButtons>
+                      <AuthButton to="/register" variant="primary" isMobile onClick={closeAllMenus}>
+                        Registrarse
+                      </AuthButton>
+                      <AuthButton to="/login" variant="secondary" isMobile onClick={closeAllMenus}>
+                        Iniciar sesión
+                      </AuthButton>
+                    </MobileAuthButtons>
+                  </>
+                )}
+              </MobileAuthSection>
+            </>
+          )}
+        </MobileMenuDropdown>
       </HeaderContent>
     </HeaderContainer>
   );
