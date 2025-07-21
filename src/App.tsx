@@ -4,6 +4,7 @@ import { AuthProvider } from "./contexts/AuthContext.tsx";
 import { ComparisonProvider } from "./contexts/ComparisonContext";
 import { RacketsProvider } from "./contexts/RacketsContext";
 import BestRacketPage from "./pages/BestRacketPage";
+import CatalogPage from "./pages/CatalogPage";
 import CompareRacketsPage from "./pages/CompareRacketsPage";
 import FAQPage from "./pages/FAQPage";
 import HomePage from "./pages/HomePage";
@@ -25,6 +26,7 @@ function App() {
 
               {/* Páginas de palas */}
               <Route path="/rackets" element={<RacketsPage />} />
+              <Route path="/catalog" element={<CatalogPage />} />
               <Route path="/racket-detail" element={<RacketDetailPage />} />
               <Route path="/best-racket" element={<BestRacketPage />} />
               <Route path="/compare-rackets" element={<CompareRacketsPage />} />

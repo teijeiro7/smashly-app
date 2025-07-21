@@ -1,4 +1,5 @@
 import { supabase } from "../config/supabase";
+import { RacketCharacteristics, RacketSpecifications } from "../types/racket";
 
 // Interfaz para las palas en Supabase
 export interface RacketDB {
@@ -17,6 +18,10 @@ export interface RacketDB {
   fuente: string;
   created_at?: string;
   updated_at?: string;
+  // Nuevos campos para características detalladas
+  descripcion?: string;
+  caracteristicas?: RacketCharacteristics;
+  especificaciones?: RacketSpecifications;
 }
 
 export class RacketService {

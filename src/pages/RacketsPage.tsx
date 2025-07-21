@@ -622,12 +622,12 @@ const RacketsPage: React.FC = () => {
 
           <StatsGrid>
             <StatCard>
-              <StatNumber>100+</StatNumber>
+              <StatNumber>800+</StatNumber>
               <StatLabel>Palas analizadas</StatLabel>
             </StatCard>
             <StatCard>
               <StatNumber>AI</StatNumber>
-              <StatLabel>Análisis inteligente</StatLabel>
+              <StatLabel>Análisis con IA</StatLabel>
             </StatCard>
             <StatCard>
               <StatNumber>24/7</StatNumber>

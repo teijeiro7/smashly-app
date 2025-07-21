@@ -240,7 +240,10 @@ const MobileAuthButtons = styled.div`
   gap: 0.75rem;
 `;
 
-const AuthButton = styled(Link)<{ variant?: "primary" | "secondary"; isMobile?: boolean }>`
+const AuthButton = styled(Link)<{
+  variant?: "primary" | "secondary";
+  isMobile?: boolean;
+}>`
   padding: ${(props) => (props.isMobile ? "12px 16px" : "8px 20px")};
   border-radius: ${(props) => (props.isMobile ? "12px" : "8px")};
   font-weight: 500;
@@ -410,7 +413,7 @@ const Header: React.FC = () => {
   };
 
   const toggleSearch = () => setIsSearchOpen(!isSearchOpen);
-  
+
   const toggleMobileSearch = () => {
     setIsMobileSearchOpen(!isMobileSearchOpen);
     // Close menu when opening mobile search
@@ -480,7 +483,9 @@ const Header: React.FC = () => {
   return (
     <HeaderContainer>
       <HeaderContent>
-        <Logo to="/" onClick={closeAllMenus}>Smashly</Logo>
+        <Logo to="/" onClick={closeAllMenus}>
+          Smashly
+        </Logo>
 
         {/* Desktop Navigation */}
         <DesktopNav>
@@ -502,10 +507,25 @@ const Header: React.FC = () => {
               <NavLink to="/" isActive={isActive("/")} onClick={closeAllMenus}>
                 Inicio
               </NavLink>
-              <NavLink to="/rackets" isActive={isActive("/rackets")} onClick={closeAllMenus}>
-                Comparar Palas
+              <NavLink
+                to="/catalog"
+                isActive={isActive("/catalog")}
+                onClick={closeAllMenus}
+              >
+                Catálogo de Palas
               </NavLink>
-              <NavLink to="/faq" isActive={isActive("/faq")} onClick={closeAllMenus}>
+              <NavLink
+                to="/rackets"
+                isActive={isActive("/rackets")}
+                onClick={closeAllMenus}
+              >
+                Comparar palas
+              </NavLink>
+              <NavLink
+                to="/faq"
+                isActive={isActive("/faq")}
+                onClick={closeAllMenus}
+              >
                 FAQ
               </NavLink>
             </>
@@ -529,10 +549,18 @@ const Header: React.FC = () => {
             </UserMenu>
           ) : (
             <>
-              <AuthButton to="/login" variant="secondary" onClick={closeAllMenus}>
+              <AuthButton
+                to="/login"
+                variant="secondary"
+                onClick={closeAllMenus}
+              >
                 Iniciar sesión
               </AuthButton>
-              <AuthButton to="/register" variant="primary" onClick={closeAllMenus}>
+              <AuthButton
+                to="/register"
+                variant="primary"
+                onClick={closeAllMenus}
+              >
                 Registrarse
               </AuthButton>
             </>
@@ -564,13 +592,28 @@ const Header: React.FC = () => {
             <>
               <MobileNavSection>
                 <MobileNavTitle>Navegación</MobileNavTitle>
-                <NavLink to="/" isActive={isActive("/")} isMobile onClick={closeAllMenus}>
+                <NavLink
+                  to="/"
+                  isActive={isActive("/")}
+                  isMobile
+                  onClick={closeAllMenus}
+                >
                   Inicio
                 </NavLink>
-                <NavLink to="/rackets" isActive={isActive("/rackets")} isMobile onClick={closeAllMenus}>
-                  Comparar Palas
+                <NavLink
+                  to="/catalog"
+                  isActive={isActive("/catalog")}
+                  isMobile
+                  onClick={closeAllMenus}
+                >
+                  Catálogo de Palas
                 </NavLink>
-                <NavLink to="/faq" isActive={isActive("/faq")} isMobile onClick={closeAllMenus}>
+                <NavLink
+                  to="/faq"
+                  isActive={isActive("/faq")}
+                  isMobile
+                  onClick={closeAllMenus}
+                >
                   FAQ
                 </NavLink>
               </MobileNavSection>
@@ -581,13 +624,21 @@ const Header: React.FC = () => {
                   <>
                     <MobileNavTitle>Mi cuenta</MobileNavTitle>
                     <MobileUserSection>
-                      <UserButton to="/profile" isMobile onClick={closeAllMenus}>
+                      <UserButton
+                        to="/profile"
+                        isMobile
+                        onClick={closeAllMenus}
+                      >
                         <FiUser />
                         {userProfile?.nickname ||
                           user.email?.split("@")[0] ||
                           "Usuario"}
                       </UserButton>
-                      <LogoutButton onClick={handleLogout} disabled={isLoggingOut} isMobile>
+                      <LogoutButton
+                        onClick={handleLogout}
+                        disabled={isLoggingOut}
+                        isMobile
+                      >
                         <FiLogOut />
                         {isLoggingOut ? "Cerrando..." : "Cerrar sesión"}
                       </LogoutButton>
@@ -597,10 +648,20 @@ const Header: React.FC = () => {
                   <>
                     <MobileNavTitle>Acceso</MobileNavTitle>
                     <MobileAuthButtons>
-                      <AuthButton to="/register" variant="primary" isMobile onClick={closeAllMenus}>
+                      <AuthButton
+                        to="/register"
+                        variant="primary"
+                        isMobile
+                        onClick={closeAllMenus}
+                      >
                         Registrarse
                       </AuthButton>
-                      <AuthButton to="/login" variant="secondary" isMobile onClick={closeAllMenus}>
+                      <AuthButton
+                        to="/login"
+                        variant="secondary"
+                        isMobile
+                        onClick={closeAllMenus}
+                      >
                         Iniciar sesión
                       </AuthButton>
                     </MobileAuthButtons>

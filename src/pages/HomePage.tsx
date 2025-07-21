@@ -1,6 +1,13 @@
 import { motion } from "framer-motion";
 import React from "react";
-import { FiDatabase, FiSearch, FiTarget, FiZap } from "react-icons/fi";
+import {
+  FiDatabase,
+  FiDollarSign,
+  FiSearch,
+  FiTarget,
+  FiUser,
+  FiZap,
+} from "react-icons/fi";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
 import AiBanner from "../components/features/AiBanner";
@@ -218,8 +225,10 @@ const HomePage: React.FC = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
-            Encuentra tu pala perfecta con{" "}
-            <span style={{ color: "#fbbf24" }}>Inteligencia Artificial</span>
+            La aplicacion que te permite{" "}
+            <span style={{ color: "#fbbf24" }}>
+              conocer y mejorar mas sobre pádel
+            </span>
           </Title>
 
           <Subtitle
@@ -227,8 +236,8 @@ const HomePage: React.FC = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
           >
-            Smashly analiza tu estilo de juego y te recomienda las mejores palas
-            de pádel del mercado. Más de 200 modelos analizados por IA.
+            En Smashly, tenemos como objetivo ayudarte a mejorar tu juego de
+            forma sencilla y efectiva.
           </Subtitle>
 
           <CTAButtons
@@ -236,13 +245,13 @@ const HomePage: React.FC = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.6 }}
           >
-            <PrimaryButton to="/rackets">
+            <PrimaryButton to="/catalog">
               <FiSearch size={20} />
-              Encontrar mi pala
+              Explorar catálogo
             </PrimaryButton>
-            <SecondaryButton to="/compare-rackets">
+            <SecondaryButton to="/rackets">
               <FiTarget size={20} />
-              Comparar palas
+              Encontrar mi pala ideal
             </SecondaryButton>
           </CTAButtons>
         </HeroContent>
@@ -256,22 +265,6 @@ const HomePage: React.FC = () => {
           </SectionSubtitle>
 
           <FeaturesGrid>
-            <FeatureCard
-              initial={{ opacity: 0, y: 50 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-              viewport={{ once: true }}
-            >
-              <FeatureIcon>
-                <FiZap />
-              </FeatureIcon>
-              <FeatureTitle>IA Avanzada</FeatureTitle>
-              <FeatureDescription>
-                Análisis personalizado con Gemini AI para recomendaciones
-                precisas según tu perfil de jugador.
-              </FeatureDescription>
-            </FeatureCard>
-
             <FeatureCard
               initial={{ opacity: 0, y: 50 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -299,7 +292,7 @@ const HomePage: React.FC = () => {
               </FeatureIcon>
               <FeatureTitle>Base de Datos Completa</FeatureTitle>
               <FeatureDescription>
-                Más de 200 modelos de las mejores marcas con precios
+                Más de 800 modelos de las mejores marcas con precios
                 actualizados en tiempo real.
               </FeatureDescription>
             </FeatureCard>
@@ -319,6 +312,38 @@ const HomePage: React.FC = () => {
                 avanzado y filtros inteligentes.
               </FeatureDescription>
             </FeatureCard>
+
+            <FeatureCard
+              initial={{ opacity: 0, y: 50 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.6 }}
+              viewport={{ once: true }}
+            >
+              <FeatureIcon>
+                <FiDollarSign />
+              </FeatureIcon>
+              <FeatureTitle>Comparador de precios</FeatureTitle>
+              <FeatureDescription>
+                Encuentra tu pala favorita y obtén el mejor precio entre todas
+                las tiendas
+              </FeatureDescription>
+            </FeatureCard>
+
+            <FeatureCard
+              initial={{ opacity: 0, y: 50 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.6 }}
+              viewport={{ once: true }}
+            >
+              <FeatureIcon>
+                <FiUser />
+              </FeatureIcon>
+              <FeatureTitle>Búsqueda de entrenadores</FeatureTitle>
+              <FeatureDescription>
+                Encuentra a los mejores entrenadores de pádel cerca de ti y
+                mejora tu juego.
+              </FeatureDescription>
+            </FeatureCard>
           </FeaturesGrid>
         </FeaturesContent>
       </FeaturesSection>
@@ -328,12 +353,8 @@ const HomePage: React.FC = () => {
       <StatsSection>
         <StatsGrid>
           <StatItem>
-            <h3>200+</h3>
+            <h3>800+</h3>
             <p>Palas analizadas</p>
-          </StatItem>
-          <StatItem>
-            <h3>1000+</h3>
-            <p>Usuarios activos</p>
           </StatItem>
           <StatItem>
             <h3>95%</h3>

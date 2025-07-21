@@ -15,6 +15,37 @@ export interface Racket {
   fuente: string;
   created_at?: string;
   updated_at?: string;
+  // Nuevos campos para características detalladas
+  descripcion?: string;
+  caracteristicas?: RacketCharacteristics;
+  especificaciones?: RacketSpecifications;
+}
+
+// Interface for detailed racket characteristics
+export interface RacketCharacteristics {
+  marca?: string;
+  color?: string;
+  color_secundario?: string;
+  balance?: string;
+  nucleo?: string;
+  dureza?: string;
+  acabado?: string;
+  superficie?: string;
+  forma?: string;
+  tipo_juego?: string;
+  nivel_jugador?: string;
+  nivel_juego?: string;
+  peso?: string;
+  grosor?: string;
+  material?: string;
+  material_cara?: string;
+  material_marco?: string;
+  [key: string]: string | undefined; // Para características adicionales
+}
+
+// Interface for additional specifications
+export interface RacketSpecifications {
+  [key: string]: string | number | boolean;
 }
 
 // Interface for racket recommendations from AI
