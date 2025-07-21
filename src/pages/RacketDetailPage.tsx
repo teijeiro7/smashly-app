@@ -274,37 +274,6 @@ const FeatureValue = styled.div<{ color?: string }>`
   color: ${(props) => props.color || "#1f2937"};
 `;
 
-const InfoCard = styled(motion.div)`
-  background: white;
-  padding: 2rem;
-  border-radius: 16px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-`;
-
-const InfoRow = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1rem 0;
-  border-bottom: 1px solid #f3f4f6;
-
-  &:last-child {
-    border-bottom: none;
-  }
-`;
-
-const InfoLabel = styled.div`
-  font-size: 0.875rem;
-  color: #6b7280;
-`;
-
-const InfoValue = styled.div<{ color?: string }>`
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: ${(props) => props.color || "#1f2937"};
-  text-align: right;
-`;
-
 const RecommendationCard = styled(motion.div)`
   background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
   padding: 2rem;
