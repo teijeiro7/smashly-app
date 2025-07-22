@@ -1,14 +1,14 @@
 import { AnimatePresence, motion } from "framer-motion";
 import React, { useEffect, useState } from "react";
 import {
-  FiCheck,
-  FiGrid,
-  FiList,
-  FiSearch,
-  FiStar,
-  FiTag,
-  FiTrendingUp,
-  FiX,
+    FiCheck,
+    FiGrid,
+    FiList,
+    FiSearch,
+    FiStar,
+    FiTag,
+    FiTrendingUp,
+    FiX,
 } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
@@ -272,7 +272,7 @@ const RacketImageContainer = styled.div<{ view: "grid" | "list" }>`
   position: relative;
   height: ${(props) => (props.view === "grid" ? "220px" : "120px")};
   width: ${(props) => (props.view === "list" ? "120px" : "100%")};
-  background: linear-gradient(135deg, #f8fdf8 0%, #f0f9f0 100%);
+  background: white;
   display: flex;
   align-items: center;
   justify-content: center;

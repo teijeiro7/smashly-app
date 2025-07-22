@@ -83,9 +83,9 @@ const RacketItem = styled.div`
 const RacketImage = styled.img`
   width: 40px;
   height: 40px;
-  object-fit: cover;
+  object-fit: contain;
   border-radius: 6px;
-  background: #f3f4f6;
+  background: white;
 `;
 
 const RacketInfo = styled.div`
@@ -274,8 +274,10 @@ const RacketAnalysisHeader = styled.div`
 const RacketAnalysisImage = styled.img`
   width: 60px;
   height: 60px;
-  object-fit: cover;
+  object-fit: contain;
   border-radius: 8px;
+  background: white;
+  padding: 0.25rem;
 `;
 
 const RacketAnalysisInfo = styled.div`

@@ -9,7 +9,6 @@ const HeaderContainer = styled.header`
   background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
   padding: 0;
   box-shadow: 0 2px 20px rgba(22, 163, 74, 0.15);
-  position: sticky;
   top: 0;
   z-index: 100;
   position: relative;
@@ -38,11 +37,19 @@ const Logo = styled(Link)`
   }
 `;
 
-// Desktop Navigation
-const DesktopNav = styled.nav`
+// Central Search Container (Desktop)
+const CentralSearchContainer = styled.div`
+  flex: 1;
+  max-width: 500px;
+  margin: 0 2rem;
   display: flex;
   align-items: center;
-  gap: 2rem;
+  justify-content: center;
+
+  @media (max-width: 1024px) {
+    max-width: 400px;
+    margin: 0 1.5rem;
+  }
 
   @media (max-width: 768px) {
     display: none;
@@ -155,72 +162,6 @@ const NavLink = styled(Link)<{ isActive: boolean; isMobile?: boolean }>`
       props.isMobile ? "#f9fafb" : "rgba(255, 255, 255, 0.1)"};
     color: ${(props) => (props.isMobile ? "#16a34a" : "white")};
     text-decoration: none;
-  }
-`;
-
-const SearchButton = styled.button`
-  background: none;
-  border: none;
-  color: white;
-  font-size: 1.2rem;
-  cursor: pointer;
-  padding: 8px 16px;
-  border-radius: 8px;
-  transition: all 0.2s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  &:hover {
-    background: rgba(255, 255, 255, 0.1);
-  }
-
-  @media (max-width: 768px) {
-    display: none;
-  }
-`;
-
-const SearchContainer = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  flex: 1;
-  justify-content: center;
-  max-width: 500px;
-  position: relative;
-
-  @media (max-width: 768px) {
-    width: 100%;
-    justify-content: flex-start;
-    max-width: none;
-    gap: 0.5rem;
-  }
-`;
-
-const CloseSearchButton = styled.button`
-  background: none;
-  border: none;
-  color: white;
-  font-size: 1.2rem;
-  cursor: pointer;
-  padding: 8px;
-  border-radius: 50%;
-  transition: all 0.2s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 36px;
-  height: 36px;
-  flex-shrink: 0;
-
-  &:hover {
-    background: rgba(255, 255, 255, 0.1);
-  }
-
-  @media (max-width: 768px) {
-    width: 32px;
-    height: 32px;
-    padding: 6px;
   }
 `;
 
@@ -397,7 +338,6 @@ const LogoutButton = styled.button<{ disabled?: boolean; isMobile?: boolean }>`
 
 const Header: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const location = useLocation();
@@ -411,8 +351,6 @@ const Header: React.FC = () => {
       setIsMobileSearchOpen(false);
     }
   };
-
-  const toggleSearch = () => setIsSearchOpen(!isSearchOpen);
 
   const toggleMobileSearch = () => {
     setIsMobileSearchOpen(!isMobileSearchOpen);
@@ -487,50 +425,13 @@ const Header: React.FC = () => {
           Smashly
         </Logo>
 
-        {/* Desktop Navigation */}
-        <DesktopNav>
-          {isSearchOpen ? (
-            <SearchContainer>
-              <GlobalSearch
-                onSearchToggle={setIsSearchOpen}
-                isInHeader={true}
-              />
-              <CloseSearchButton onClick={toggleSearch}>
-                <FiX />
-              </CloseSearchButton>
-            </SearchContainer>
-          ) : (
-            <>
-              <SearchButton onClick={toggleSearch}>
-                <FiSearch />
-              </SearchButton>
-              <NavLink to="/" isActive={isActive("/")} onClick={closeAllMenus}>
-                Inicio
-              </NavLink>
-              <NavLink
-                to="/catalog"
-                isActive={isActive("/catalog")}
-                onClick={closeAllMenus}
-              >
-                Catálogo de Palas
-              </NavLink>
-              <NavLink
-                to="/rackets"
-                isActive={isActive("/rackets")}
-                onClick={closeAllMenus}
-              >
-                Comparar palas
-              </NavLink>
-              <NavLink
-                to="/faq"
-                isActive={isActive("/faq")}
-                onClick={closeAllMenus}
-              >
-                FAQ
-              </NavLink>
-            </>
-          )}
-        </DesktopNav>
+        {/* Central Search Bar (Desktop) */}
+        <CentralSearchContainer>
+          <GlobalSearch
+            onSearchToggle={() => {}}
+            isInHeader={true}
+          />
+        </CentralSearchContainer>
 
         {/* Desktop Auth */}
         <AuthButtons>
@@ -607,6 +508,14 @@ const Header: React.FC = () => {
                   onClick={closeAllMenus}
                 >
                   Catálogo de Palas
+                </NavLink>
+                <NavLink
+                  to="/rackets"
+                  isActive={isActive("/rackets")}
+                  isMobile
+                  onClick={closeAllMenus}
+                >
+                  Comparar palas
                 </NavLink>
                 <NavLink
                   to="/faq"

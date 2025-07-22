@@ -4,8 +4,8 @@ import time
 import json
 import re
 
-BASE_URL = "https://www.padelnuestro.com/palas-padel"
-HEADERS = {
+BASE_URL = "https://www.padelnuestro.com/palas-padel" # define the URL to scrape
+HEADERS = { # the headers mimic a real browser
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
     "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
     "Accept-Language": "es-ES,es;q=0.8,en-US;q=0.5,en;q=0.3",
@@ -15,90 +15,24 @@ HEADERS = {
 
 
 def get_total_pages():
-    """Obtiene el número total de páginas disponibles"""
+    """Obtains the total number of pages from the main page"""
     try:
-        response = requests.get(BASE_URL, headers=HEADERS)
-        response.raise_for_status()
-        soup = BeautifulSoup(response.text, "html.parser")
+        response = requests.get(BASE_URL, headers=HEADERS) # make a GET request to the base URL
+        response.raise_for_status() # check if the request was successful
+        soup = BeautifulSoup(response.text, "html.parser") # parse the HTML content
 
-        # Método 1: Buscar el enlace con class="page last"
-        page_last_elem = soup.select_one("a.page.last")
-        if page_last_elem:
-            href = page_last_elem.get("href", "")
-            if href:
-                page_match = re.search(r"[?&]p=(\d+)", href)
-                if page_match:
-                    total_pages = int(page_match.group(1))
+        # 
+        page_last_elem = soup.select_one("a.page.last") # we find the last page link
+        if page_last_elem: # check if the element exists
+            href = page_last_elem.get("href", "") # get the href attribute
+            if href:    # if href is not empty
+                page_match = re.search(r"[?&]p=(\d+)", href) # search for the page number in the URL
+                if page_match: # if we found a match
+                    total_pages = int(page_match.group(1)) # convert it to an integer
                     print(
                         f"✅ Total de páginas encontrado en enlace 'page last': {total_pages}"
                     )
                     return total_pages
-
-        # Método 2: Buscar el span que contiene "Pág" y obtener el span siguiente con el número
-        label_span = soup.find(
-            "span", class_="label", string=re.compile(r"Pág", re.IGNORECASE)
-        )
-        if label_span:
-            next_span = label_span.find_next_sibling("span")
-            if next_span and next_span.get_text(strip=True).isdigit():
-                total_pages = int(next_span.get_text(strip=True))
-                print(
-                    f"✅ Total de páginas encontrado en span siguiente a 'Pág': {total_pages}"
-                )
-                return total_pages
-
-        # Método 3: Buscar dentro del contenedor de paginación con diferentes selectores
-        pagination_selectors = [
-            "a.page.last",
-            ".pages .page.last",
-            ".pages-item-last a",
-            ".pagination .page.last",
-            'a[href*="p="]',
-        ]
-
-        for selector in pagination_selectors:
-            last_page_elem = soup.select_one(selector)
-            if last_page_elem:
-                href = last_page_elem.get("href", "")
-                text = last_page_elem.get_text(strip=True)
-
-                # Extraer de la URL (ej: ?p=36)
-                if href:
-                    page_match = re.search(r"[?&]p=(\d+)", href)
-                    if page_match:
-                        total_pages = int(page_match.group(1))
-                        print(
-                            f"✅ Total de páginas encontrado en URL con selector '{selector}': {total_pages}"
-                        )
-                        return total_pages
-
-                # Extraer del texto
-                if text.isdigit():
-                    total_pages = int(text)
-                    print(
-                        f"✅ Total de páginas encontrado en texto con selector '{selector}': {total_pages}"
-                    )
-                    return total_pages
-
-        # Método 4: Buscar cualquier enlace que contenga el parámetro más alto de página
-        page_links = soup.find_all("a", href=re.compile(r"[?&]p=\d+"))
-        if page_links:
-            max_page = 0
-            for link in page_links:
-                href = link.get("href", "")
-                page_match = re.search(r"[?&]p=(\d+)", href)
-                if page_match:
-                    page_num = int(page_match.group(1))
-                    max_page = max(max_page, page_num)
-
-            if max_page > 0:
-                print(
-                    f"✅ Total de páginas encontrado buscando el máximo en enlaces: {max_page}"
-                )
-                return max_page
-
-        print("⚠️ No se pudo determinar el número de páginas, usando 1")
-        return 1
 
     except Exception as e:
         print(f"❌ Error obteniendo total de páginas: {e}")

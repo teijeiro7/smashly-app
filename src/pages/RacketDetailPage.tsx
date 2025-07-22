@@ -6,13 +6,13 @@ import { motion } from "framer-motion";
 import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import {
-  FiArrowLeft,
-  FiExternalLink,
-  FiInfo,
-  FiLoader,
-  FiStar,
-  FiTag,
-  FiTrendingUp,
+    FiArrowLeft,
+    FiExternalLink,
+    FiInfo,
+    FiLoader,
+    FiStar,
+    FiTag,
+    FiTrendingUp,
 } from "react-icons/fi";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import styled from "styled-components";
@@ -89,7 +89,7 @@ const ImageSection = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  background: linear-gradient(135deg, #f8fdf8 0%, #f0f9f0 100%);
+  background: white;
 `;
 
 const RacketImage = styled.img`

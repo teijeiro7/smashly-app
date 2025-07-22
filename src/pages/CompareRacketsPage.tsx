@@ -181,16 +181,21 @@ const RacketCard = styled(motion.div)<{ selected: boolean }>`
   }
 `;
 
-const RacketImage = styled.div`
+const RacketImageContainer = styled.div`
   position: relative;
-  height: 200px;
+  height: 220px;
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
   overflow: hidden;
+`;
 
-  img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
+const RacketImage = styled.img`
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
 `;
 
 const SelectionIndicator = styled.div`
@@ -371,8 +376,10 @@ const RacketAnalysisHeader = styled.div`
 const RacketAnalysisImage = styled.img`
   width: 60px;
   height: 60px;
-  object-fit: cover;
+  object-fit: contain;
   border-radius: 8px;
+  background: white;
+  padding: 0.25rem;
 `;
 
 const RacketAnalysisInfo = styled.div`
@@ -636,8 +643,8 @@ const CompareRacketsPage: React.FC = () => {
                   whileHover={{ y: -4 }}
                   transition={{ duration: 0.2 }}
                 >
-                  <RacketImage>
-                    <img
+                  <RacketImageContainer>
+                    <RacketImage
                       src={racket.imagen}
                       alt={racket.nombre}
                       onError={(e) => {
@@ -650,7 +657,7 @@ const CompareRacketsPage: React.FC = () => {
                         <FiCheck />
                       </SelectionIndicator>
                     )}
-                  </RacketImage>
+                  </RacketImageContainer>
 
                   <RacketInfo>
                     <RacketBrand>{racket.marca}</RacketBrand>

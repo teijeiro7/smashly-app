@@ -1,20 +1,16 @@
 import { motion } from "framer-motion";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import {
   FiChevronRight,
-  FiEye,
   FiLayers,
   FiSearch,
   FiStar,
-  FiTag,
   FiTarget,
   FiTrendingUp,
-  FiZap,
+  FiZap
 } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
-import { useRackets } from "../contexts/RacketsContext";
-import { Racket } from "../types/racket";
 
 const Container = styled.div`
   min-height: 100vh;
@@ -201,289 +197,11 @@ const StatLabel = styled.div`
   font-weight: 500;
 `;
 
-const CatalogSection = styled.div`
-  max-width: 1200px;
-  margin: 4rem auto 0;
-  padding: 0 2rem;
-`;
-
-const CatalogHeader = styled.div`
-  text-align: center;
-  margin-bottom: 3rem;
-`;
-
-const CatalogTitle = styled.h3`
-  font-size: 2rem;
-  font-weight: 700;
-  color: #1f2937;
-  margin-bottom: 0.5rem;
-`;
-
-const CatalogSubtitle = styled.p`
-  font-size: 1rem;
-  color: #6b7280;
-  margin-bottom: 2rem;
-`;
-
-const SearchAndFilters = styled.div`
-  display: flex;
-  gap: 1rem;
-  margin-bottom: 2rem;
-  flex-wrap: wrap;
-
-  @media (max-width: 768px) {
-    flex-direction: column;
-  }
-`;
-
-const SearchInput = styled.input`
-  flex: 1;
-  padding: 0.75rem 1rem;
-  border: 1px solid #d1d5db;
-  border-radius: 8px;
-  font-size: 0.875rem;
-  min-width: 200px;
-
-  &:focus {
-    outline: none;
-    border-color: #16a34a;
-    box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.1);
-  }
-`;
-
-const FilterSelect = styled.select`
-  padding: 0.75rem 1rem;
-  border: 1px solid #d1d5db;
-  border-radius: 8px;
-  font-size: 0.875rem;
-  background: white;
-  min-width: 150px;
-
-  &:focus {
-    outline: none;
-    border-color: #16a34a;
-  }
-`;
-
-const RacketsGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 1.5rem;
-  margin-bottom: 2rem;
-`;
-
-const RacketCard = styled(motion.div)`
-  background: white;
-  border-radius: 16px;
-  overflow: hidden;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-  cursor: pointer;
-  transition: all 0.3s ease;
-
-  &:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
-  }
-`;
-
-const RacketImageContainer = styled.div`
-  position: relative;
-  height: 200px;
-  background: linear-gradient(135deg, #f8fdf8 0%, #f0f9f0 100%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 1rem;
-`;
-
-const RacketImage = styled.img`
-  max-width: 100%;
-  max-height: 100%;
-  object-fit: contain;
-`;
-
-const RacketBadge = styled.div<{ variant: "bestseller" | "offer" }>`
-  position: absolute;
-  top: 0.5rem;
-  ${(props) =>
-    props.variant === "bestseller" ? "right: 0.5rem;" : "left: 0.5rem;"}
-  background: ${(props) =>
-    props.variant === "bestseller" ? "#f59e0b" : "#ef4444"};
-  color: white;
-  padding: 0.25rem 0.5rem;
-  border-radius: 4px;
-  font-size: 0.75rem;
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
-`;
-
-const RacketInfo = styled.div`
-  padding: 1.5rem;
-`;
-
-const RacketBrand = styled.div`
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: #16a34a;
-  margin-bottom: 0.25rem;
-`;
-
-const RacketName = styled.h4`
-  font-size: 1rem;
-  font-weight: 600;
-  color: #1f2937;
-  margin-bottom: 0.75rem;
-  line-height: 1.3;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-`;
-
-const RacketPriceContainer = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin-bottom: 1rem;
-`;
-
-const RacketPrice = styled.div`
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: #ef4444;
-`;
-
-const RacketOriginalPrice = styled.div`
-  font-size: 0.875rem;
-  color: #9ca3af;
-  text-decoration: line-through;
-`;
-
-const ViewDetailsButton = styled.button`
-  width: 100%;
-  background: #16a34a;
-  color: white;
-  border: none;
-  padding: 0.75rem;
-  border-radius: 8px;
-  font-size: 0.875rem;
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  cursor: pointer;
-  transition: all 0.2s ease;
-
-  &:hover {
-    background: #15803d;
-  }
-`;
-
-const LoadMoreButton = styled(motion.button)`
-  display: block;
-  margin: 2rem auto;
-  background: white;
-  color: #16a34a;
-  border: 2px solid #16a34a;
-  padding: 1rem 2rem;
-  border-radius: 12px;
-  font-size: 0.875rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-
-  &:hover {
-    background: #f0f9ff;
-  }
-`;
-
-const NoResults = styled.div`
-  text-align: center;
-  padding: 3rem;
-  color: #6b7280;
-`;
-
 const RacketsPage: React.FC = () => {
   const navigate = useNavigate();
-  const { rackets, loading: contextLoading } = useRackets();
-
-  // State for rackets catalog
-  const [filteredRackets, setFilteredRackets] = useState<Racket[]>([]);
-  const [displayedRackets, setDisplayedRackets] = useState<Racket[]>([]);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [brandFilter, setBrandFilter] = useState("");
-  const [sortBy, setSortBy] = useState("name");
-  const [displayCount, setDisplayCount] = useState(12);
-
-  // Update filtered rackets when rackets change
-  useEffect(() => {
-    setFilteredRackets(rackets);
-  }, [rackets]);
-
-  // Filter and search effect
-  useEffect(() => {
-    let filtered = [...rackets];
-
-    // Apply search filter
-    if (searchQuery.trim()) {
-      const query = searchQuery.toLowerCase();
-      filtered = filtered.filter(
-        (racket) =>
-          racket.nombre.toLowerCase().includes(query) ||
-          racket.marca.toLowerCase().includes(query) ||
-          racket.modelo.toLowerCase().includes(query)
-      );
-    }
-
-    // Apply brand filter
-    if (brandFilter) {
-      filtered = filtered.filter((racket) => racket.marca === brandFilter);
-    }
-
-    // Apply sorting
-    filtered.sort((a, b) => {
-      switch (sortBy) {
-        case "price-low":
-          return a.precio_actual - b.precio_actual;
-        case "price-high":
-          return b.precio_actual - a.precio_actual;
-        case "brand":
-          return a.marca.localeCompare(b.marca);
-        case "bestseller":
-          return b.es_bestseller ? 1 : -1;
-        case "offer":
-          return b.en_oferta ? 1 : -1;
-        default:
-          return a.modelo.localeCompare(b.modelo);
-      }
-    });
-
-    setFilteredRackets(filtered);
-  }, [rackets, searchQuery, brandFilter, sortBy]);
-
-  // Update displayed rackets when filters change
-  useEffect(() => {
-    setDisplayedRackets(filteredRackets.slice(0, displayCount));
-  }, [filteredRackets, displayCount]);
-
-  // Get unique brands for filter
-  const uniqueBrands: string[] = Array.from(
-    new Set(rackets.map((r: Racket) => r.marca))
-  ).sort() as string[];
 
   const handleNavigate = (path: string) => {
     navigate(path);
-  };
-
-  const handleRacketClick = (racket: Racket) => {
-    navigate(`/racket-detail?id=${encodeURIComponent(racket.nombre)}`);
-  };
-
-  const handleLoadMore = () => {
-    setDisplayCount((prev) => prev + 12);
   };
 
   const features = [
@@ -494,9 +212,9 @@ const RacketsPage: React.FC = () => {
       description: "Descubre las palas favoritas de la comunidad",
       detail:
         "Explora el ranking de las palas más populares entre los jugadores de pádel amateur, con valoraciones reales y opiniones verificadas.",
-      action: "Ver ranking de palas",
-      path: "/rackets",
-      available: false,
+      action: "Ver catálogo completo",
+      path: "/catalog",
+      available: true,
     },
     {
       id: 2,
@@ -636,133 +354,6 @@ const RacketsPage: React.FC = () => {
           </StatsGrid>
         </motion.div>
       </StatsSection>
-
-      {/* Rackets Catalog Section */}
-      <CatalogSection>
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.7 }}
-        >
-          <CatalogHeader>
-            <CatalogTitle>Catálogo de Palas</CatalogTitle>
-            <CatalogSubtitle>
-              Explora todas las palas disponibles y encuentra la perfecta para
-              ti
-            </CatalogSubtitle>
-
-            <SearchAndFilters>
-              <SearchInput
-                type="text"
-                placeholder="Buscar por marca, modelo o nombre..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-
-              <FilterSelect
-                value={brandFilter}
-                onChange={(e) => setBrandFilter(e.target.value)}
-              >
-                <option value="">Todas las marcas</option>
-                {uniqueBrands.map((brand) => (
-                  <option key={brand} value={brand}>
-                    {brand}
-                  </option>
-                ))}
-              </FilterSelect>
-
-              <FilterSelect
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value)}
-              >
-                <option value="name">Ordenar por nombre</option>
-                <option value="brand">Ordenar por marca</option>
-                <option value="price-low">Precio: menor a mayor</option>
-                <option value="price-high">Precio: mayor a menor</option>
-                <option value="bestseller">Bestsellers primero</option>
-                <option value="offer">Ofertas primero</option>
-              </FilterSelect>
-            </SearchAndFilters>
-          </CatalogHeader>
-
-          {contextLoading ? (
-            <NoResults>Cargando palas...</NoResults>
-          ) : filteredRackets.length === 0 ? (
-            <NoResults>
-              No se encontraron palas que coincidan con tu búsqueda.
-            </NoResults>
-          ) : (
-            <>
-              <RacketsGrid>
-                {displayedRackets.map((racket, index) => (
-                  <RacketCard
-                    key={racket.nombre}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.3, delay: index * 0.05 }}
-                    onClick={() => handleRacketClick(racket)}
-                  >
-                    <RacketImageContainer>
-                      <RacketImage
-                        src={racket.imagen}
-                        alt={racket.modelo}
-                        onError={(e) => {
-                          const target = e.target as HTMLImageElement;
-                          target.src = "/placeholder-racket.svg";
-                        }}
-                      />
-                      {racket.es_bestseller && (
-                        <RacketBadge variant="bestseller">
-                          <FiStar size={12} />
-                          Top
-                        </RacketBadge>
-                      )}
-                      {racket.en_oferta && (
-                        <RacketBadge variant="offer">
-                          <FiTag size={12} />
-                          Oferta
-                        </RacketBadge>
-                      )}
-                    </RacketImageContainer>
-
-                    <RacketInfo>
-                      <RacketBrand>{racket.marca}</RacketBrand>
-                      <RacketName>{racket.modelo}</RacketName>
-
-                      <RacketPriceContainer>
-                        <RacketPrice>€{racket.precio_actual}</RacketPrice>
-                        {racket.en_oferta &&
-                          racket.precio_original &&
-                          racket.precio_original > 0 && (
-                            <RacketOriginalPrice>
-                              €{racket.precio_original}
-                            </RacketOriginalPrice>
-                          )}
-                      </RacketPriceContainer>
-
-                      <ViewDetailsButton>
-                        <FiEye size={16} />
-                        Ver detalles
-                      </ViewDetailsButton>
-                    </RacketInfo>
-                  </RacketCard>
-                ))}
-              </RacketsGrid>
-
-              {displayedRackets.length < filteredRackets.length && (
-                <LoadMoreButton
-                  onClick={handleLoadMore}
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                >
-                  Cargar más palas (
-                  {filteredRackets.length - displayedRackets.length} restantes)
-                </LoadMoreButton>
-              )}
-            </>
-          )}
-        </motion.div>
-      </CatalogSection>
     </Container>
   );
 };

@@ -4,6 +4,7 @@ import styled from "styled-components";
 import FloatingComparisonPanel from "../features/FloatingComparisonPanel";
 import Footer from "./Footer";
 import Header from "./Header";
+import SubHeader from "./SubHeader";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -29,6 +30,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   return (
     <LayoutContainer>
       <Header />
+      <SubHeader />
       <Main>{children}</Main>
       <Footer />
       {showComparisonPanel && <FloatingComparisonPanel />}

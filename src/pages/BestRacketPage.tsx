@@ -2,14 +2,14 @@ import { AnimatePresence, motion } from "framer-motion";
 import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import {
-  FiAlertCircle,
-  FiCheck,
-  FiDollarSign,
-  FiStar,
-  FiTrendingUp,
-  FiUser,
-  FiX,
-  FiZap,
+    FiAlertCircle,
+    FiCheck,
+    FiDollarSign,
+    FiStar,
+    FiTrendingUp,
+    FiUser,
+    FiX,
+    FiZap,
 } from "react-icons/fi";
 import styled from "styled-components";
 import { useAuth } from "../contexts/AuthContext";

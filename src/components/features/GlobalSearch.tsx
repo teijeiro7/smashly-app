@@ -21,48 +21,93 @@ const SearchWrapper = styled.div`
 const SearchInputContainer = styled(motion.div)<{ isInHeader?: boolean }>`
   position: relative;
   background: ${(props) =>
-    props.isInHeader ? "rgba(255, 255, 255, 0.95)" : "white"};
-  border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    props.isInHeader ? "rgba(255, 255, 255, 0.15)" : "white"};
+  border-radius: ${(props) => (props.isInHeader ? "25px" : "12px")};
+  box-shadow: ${(props) =>
+    props.isInHeader
+      ? "0 2px 10px rgba(0, 0, 0, 0.1)"
+      : "0 4px 20px rgba(0, 0, 0, 0.1)"};
   overflow: hidden;
   width: 100%;
   backdrop-filter: ${(props) => (props.isInHeader ? "blur(10px)" : "none")};
   border: ${(props) =>
-    props.isInHeader ? "1px solid rgba(255, 255, 255, 0.3)" : "none"};
-`;
+    props.isInHeader
+      ? "1px solid rgba(255, 255, 255, 0.25)"
+      : "1px solid #e5e7eb"};
+  transition: all 0.3s ease;
 
-const SearchInput = styled.input`
-  width: 100%;
-  padding: 12px 45px 12px 16px;
-  border: none;
-  outline: none;
-  font-size: 16px;
-  color: #333;
-  background: transparent;
+  &:hover {
+    background: ${(props) =>
+      props.isInHeader ? "rgba(255, 255, 255, 0.2)" : "white"};
+    box-shadow: ${(props) =>
+      props.isInHeader
+        ? "0 4px 15px rgba(0, 0, 0, 0.15)"
+        : "0 4px 20px rgba(0, 0, 0, 0.15)"};
+  }
 
-  &::placeholder {
-    color: #999;
+  &:focus-within {
+    background: ${(props) =>
+      props.isInHeader ? "rgba(255, 255, 255, 0.25)" : "white"};
+    box-shadow: ${(props) =>
+      props.isInHeader
+        ? "0 6px 20px rgba(0, 0, 0, 0.2)"
+        : "0 4px 20px rgba(22, 163, 74, 0.15)"};
+    border-color: ${(props) =>
+      props.isInHeader ? "rgba(255, 255, 255, 0.4)" : "#16a34a"};
   }
 `;
 
-const SearchButton = styled.button`
+const SearchInput = styled.input<{ isInHeader?: boolean }>`
+  width: 100%;
+  padding: ${(props) => (props.isInHeader ? "12px 50px 12px 20px" : "12px 45px 12px 16px")};
+  border: none;
+  outline: none;
+  font-size: 16px;
+  color: ${(props) => (props.isInHeader ? "white" : "#333")};
+  background: transparent;
+  font-weight: 400;
+
+  &::placeholder {
+    color: ${(props) => (props.isInHeader ? "rgba(255, 255, 255, 0.7)" : "#999")};
+    font-weight: 400;
+  }
+
+  &:focus::placeholder {
+    color: ${(props) => (props.isInHeader ? "rgba(255, 255, 255, 0.5)" : "#ccc")};
+  }
+`;
+
+const SearchButton = styled.button<{ isInHeader?: boolean }>`
   position: relative;
-  background: linear-gradient(135deg, #16a34a, #15803d);
+  background: ${(props) =>
+    props.isInHeader
+      ? "rgba(255, 255, 255, 0.2)"
+      : "linear-gradient(135deg, #16a34a, #15803d)"};
   border: none;
   border-radius: 50%;
-  width: 44px;
-  height: 44px;
+  width: 36px;
+  height: 36px;
   display: flex;
   align-items: center;
   justify-content: center;
   color: white;
   cursor: pointer;
   transition: all 0.2s ease;
-  box-shadow: 0 4px 12px rgba(22, 163, 74, 0.3);
+  box-shadow: ${(props) =>
+    props.isInHeader
+      ? "none"
+      : "0 4px 12px rgba(22, 163, 74, 0.3)"};
 
   &:hover {
     transform: translateY(-1px);
-    box-shadow: 0 6px 16px rgba(22, 163, 74, 0.4);
+    background: ${(props) =>
+      props.isInHeader
+        ? "rgba(255, 255, 255, 0.3)"
+        : "linear-gradient(135deg, #15803d, #166534)"};
+    box-shadow: ${(props) =>
+      props.isInHeader
+        ? "0 2px 8px rgba(0, 0, 0, 0.1)"
+        : "0 6px 16px rgba(22, 163, 74, 0.4)"};
   }
 
   &:active {
@@ -70,23 +115,27 @@ const SearchButton = styled.button`
   }
 `;
 
-const ClearButton = styled.button`
+const ClearButton = styled.button<{ isInHeader?: boolean }>`
   position: absolute;
-  right: 12px;
+  right: ${(props) => (props.isInHeader ? "16px" : "12px")};
   top: 50%;
   transform: translateY(-50%);
   background: none;
   border: none;
-  color: #666;
+  color: ${(props) => (props.isInHeader ? "rgba(255, 255, 255, 0.8)" : "#666")};
   cursor: pointer;
-  padding: 4px;
+  padding: 6px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: all 0.2s ease;
+  font-size: ${(props) => (props.isInHeader ? "16px" : "14px")};
 
   &:hover {
-    background: #f0f0f0;
+    background: ${(props) =>
+      props.isInHeader ? "rgba(255, 255, 255, 0.2)" : "#f0f0f0"};
+    color: ${(props) => (props.isInHeader ? "white" : "#333")};
   }
 `;
 
@@ -401,13 +450,14 @@ export const GlobalSearch: React.FC<GlobalSearchProps> = ({
             >
               <SearchInput
                 ref={searchInputRef}
-                placeholder="Buscar palas..."
+                placeholder={isInHeader ? "Buscar palas, marcas, modelos..." : "Buscar palas..."}
                 value={searchQuery}
                 onChange={handleSearchChange}
                 onKeyDown={handleKeyPress}
+                isInHeader={isInHeader}
               />
               {searchQuery && (
-                <ClearButton onClick={clearSearch}>
+                <ClearButton onClick={clearSearch} isInHeader={isInHeader}>
                   <FiX size={16} />
                 </ClearButton>
               )}
