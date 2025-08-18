@@ -5,7 +5,6 @@ import {
   FiDollarSign,
   FiSearch,
   FiTarget,
-  FiUser,
   FiZap,
 } from "react-icons/fi";
 import { Link } from "react-router-dom";
