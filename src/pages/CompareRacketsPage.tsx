@@ -515,8 +515,7 @@ const CompareRacketsPage: React.FC = () => {
 
   // Update filtered rackets when rackets change
   useEffect(() => {
-    const limitedRackets = rackets.slice(0, 100); // Limit to first 100 for performance
-    setFilteredRackets(limitedRackets);
+    setFilteredRackets(rackets); // Usar todas las palas sin limitación
   }, [rackets]);
 
   // Filter rackets based on search and brand
@@ -528,8 +527,8 @@ const CompareRacketsPage: React.FC = () => {
       filtered = filtered.filter(
         (racket: Racket) =>
           racket.nombre.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          racket.marca.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          racket.modelo.toLowerCase().includes(searchQuery.toLowerCase())
+          (racket.marca && racket.marca.toLowerCase().includes(searchQuery.toLowerCase())) ||
+          (racket.modelo && racket.modelo.toLowerCase().includes(searchQuery.toLowerCase()))
       );
     }
 
@@ -645,7 +644,7 @@ const CompareRacketsPage: React.FC = () => {
                 >
                   <RacketImageContainer>
                     <RacketImage
-                      src={racket.imagen}
+                      src={racket.imagen || ""}
                       alt={racket.nombre}
                       onError={(e) => {
                         e.currentTarget.src =
@@ -743,7 +742,7 @@ const CompareRacketsPage: React.FC = () => {
                     <RacketAnalysisCard key={index}>
                       <RacketAnalysisHeader>
                         <RacketAnalysisImage
-                          src={selectedRackets[index]?.imagen}
+                          src={selectedRackets[index]?.imagen || ""}
                           alt={analysis.name}
                           onError={(e) => {
                             e.currentTarget.src =
@@ -817,7 +816,23 @@ const CompareRacketsPage: React.FC = () => {
                     Recomendación Final
                   </AnalysisTitle>
                   <AnalysisText>
-                    {comparisonResults.finalRecommendation}
+                    <strong>Mejor en general:</strong> {comparisonResults.finalRecommendation.bestOverall}
+                    <br /><br />
+                    <strong>Mejor relación calidad-precio:</strong> {comparisonResults.finalRecommendation.bestValue}
+                    {comparisonResults.finalRecommendation.bestForBeginners && (
+                      <>
+                        <br /><br />
+                        <strong>Mejor para principiantes:</strong> {comparisonResults.finalRecommendation.bestForBeginners}
+                      </>
+                    )}
+                    {comparisonResults.finalRecommendation.bestForAdvanced && (
+                      <>
+                        <br /><br />
+                        <strong>Mejor para avanzados:</strong> {comparisonResults.finalRecommendation.bestForAdvanced}
+                      </>
+                    )}
+                    <br /><br />
+                    <strong>Razonamiento:</strong> {comparisonResults.finalRecommendation.reasoning}
                   </AnalysisText>
                 </AnalysisSection>
               </ModalBody>

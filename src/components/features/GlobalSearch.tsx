@@ -3,6 +3,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { FiSearch, FiX } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
+import { useRackets } from "../../contexts/RacketsContext";
 import { Racket } from "../../types/racket";
 
 // Styled components
@@ -283,48 +284,15 @@ export const GlobalSearch: React.FC<GlobalSearchProps> = ({
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<Racket[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [rackets, setRackets] = useState<Racket[]>([]);
 
   // Refs
   const searchInputRef = useRef<HTMLInputElement>(null);
 
   // Navigation
   const navigate = useNavigate();
-
-  // Load rackets from JSON fallback for now
-  useEffect(() => {
-    const loadRackets = async () => {
-      try {
-        const response = await fetch("/palas_padel.json");
-        const data = await response.json();
-        const palas = data.palas || data;
-
-        const mappedRackets: Racket[] = palas
-          .slice(0, 500)
-          .map((racket: any) => ({
-            id: undefined,
-            nombre: racket.nombre,
-            marca: racket.marca,
-            modelo: racket.modelo,
-            precio_actual: racket.precio_actual,
-            precio_original: racket.precio_original || null,
-            descuento_porcentaje: racket.descuento_porcentaje,
-            enlace: racket.enlace,
-            imagen: racket.imagen,
-            es_bestseller: racket.es_bestseller,
-            en_oferta: racket.en_oferta,
-            scrapeado_en: racket.scrapeado_en,
-            fuente: racket.fuente,
-          }));
-
-        setRackets(mappedRackets);
-      } catch (error) {
-        console.error("Error loading rackets:", error);
-      }
-    };
-
-    loadRackets();
-  }, []);
+  
+  // Usar el contexto de RacketsContext para obtener las palas
+  const { rackets } = useRackets();
 
   // Effect for header mode - auto focus when mounted
   useEffect(() => {
@@ -350,8 +318,8 @@ export const GlobalSearch: React.FC<GlobalSearchProps> = ({
         const searchLower = searchQuery.toLowerCase();
         return (
           racket.nombre.toLowerCase().includes(searchLower) ||
-          racket.marca.toLowerCase().includes(searchLower) ||
-          racket.modelo.toLowerCase().includes(searchLower)
+          (racket.marca && racket.marca.toLowerCase().includes(searchLower)) ||
+          (racket.modelo && racket.modelo.toLowerCase().includes(searchLower))
         );
       });
 
@@ -503,8 +471,8 @@ export const GlobalSearch: React.FC<GlobalSearchProps> = ({
                     onClick={() => handleRacketSelect(racket)}
                   >
                     <ResultImage
-                      src={racket.imagen}
-                      alt={racket.modelo}
+                      src={racket.imagen || ""}
+                      alt={racket.modelo || racket.nombre}
                       onError={(e) => {
                         const target = e.target as HTMLImageElement;
                         target.src = "/placeholder-racket.svg";
