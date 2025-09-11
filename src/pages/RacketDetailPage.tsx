@@ -307,33 +307,6 @@ const RecommendationButton = styled(Link)`
   }
 `;
 
-// New styled components for description and characteristics
-const DescriptionCard = styled(motion.div)`
-  background: white;
-  padding: 2rem;
-  border-radius: 16px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-`;
-
-const DescriptionContent = styled.div`
-  background: linear-gradient(135deg, #f8fdf8 0%, #f0f9f0 100%);
-  border-radius: 12px;
-  padding: 1.5rem;
-  border-left: 4px solid #16a34a;
-`;
-
-const DescriptionText = styled.p`
-  color: #4b5563;
-  line-height: 1.7;
-  font-size: 0.95rem;
-  margin: 0;
-  text-align: justify;
-
-  @media (max-width: 768px) {
-    text-align: left;
-    font-size: 0.9rem;
-  }
-`;
 
 const CharacteristicsCard = styled(motion.div)`
   background: white;
@@ -458,21 +431,43 @@ const SpecificationValue = styled.span`
 `;
 
 // Helper functions for characteristics
+const getCharacteristicsFromRacket = (racket: Racket): Record<string, string> => {
+  const characteristics: Record<string, string> = {};
+  
+  // Map individual characteristic properties to a characteristics object
+  if (racket.caracteristicas_marca) characteristics.marca = racket.caracteristicas_marca;
+  if (racket.caracteristicas_color) characteristics.color = racket.caracteristicas_color;
+  if (racket.caracteristicas_color_2) characteristics.color_2 = racket.caracteristicas_color_2;
+  if (racket.caracteristicas_balance) characteristics.balance = racket.caracteristicas_balance;
+  if (racket.caracteristicas_nucleo) characteristics.nucleo = racket.caracteristicas_nucleo;
+  if (racket.caracteristicas_cara) characteristics.cara = racket.caracteristicas_cara;
+  if (racket.caracteristicas_dureza) characteristics.dureza = racket.caracteristicas_dureza;
+  if (racket.caracteristicas_nivel_de_juego) characteristics.nivel_de_juego = racket.caracteristicas_nivel_de_juego;
+  if (racket.caracteristicas_acabado) characteristics.acabado = racket.caracteristicas_acabado;
+  if (racket.caracteristicas_forma) characteristics.forma = racket.caracteristicas_forma;
+  if (racket.caracteristicas_superficie) characteristics.superficie = racket.caracteristicas_superficie;
+  if (racket.caracteristicas_tipo_de_juego) characteristics.tipo_de_juego = racket.caracteristicas_tipo_de_juego;
+  if (racket.caracteristicas_coleccion_jugadores) characteristics.coleccion_jugadores = racket.caracteristicas_coleccion_jugadores;
+  if (racket.caracteristicas_jugador) characteristics.jugador = racket.caracteristicas_jugador;
+  
+  return characteristics;
+};
+
 const getCharacteristicLabel = (key: string): string => {
   const labels: Record<string, string> = {
     marca: "Marca",
     color: "Color Principal",
     color_2: "Color Secundario",
     balance: "Balance",
-    núcleo: "Núcleo",
+    nucleo: "Núcleo",
     cara: "Material de las Caras",
     dureza: "Dureza",
     nivel_de_juego: "Nivel de Juego",
     acabado: "Acabado",
     forma: "Forma",
-    superfície: "Superficie",
+    superficie: "Superficie",
     tipo_de_juego: "Tipo de Juego",
-    colección_jugadores: "Colección",
+    coleccion_jugadores: "Colección",
     jugador: "Jugador",
     nivel_jugador: "Nivel Jugador",
     peso: "Peso",
@@ -507,7 +502,7 @@ const getCharacteristicIcon = (
         ? "#3b82f6"
         : "#16a34a",
     },
-    núcleo: { icon: "🔧", color: "#6b7280" },
+    nucleo: { icon: "🔧", color: "#6b7280" },
     cara: { icon: "💎", color: "#0ea5e9" },
     formato: { icon: "📐", color: "#8b5cf6" },
     dureza: {
@@ -534,7 +529,7 @@ const getCharacteristicIcon = (
         : "🔷",
       color: "#16a34a",
     },
-    superfície: { icon: "🏗️", color: "#6b7280" },
+    superficie: { icon: "🏗️", color: "#6b7280" },
     tipo_de_juego: {
       icon: value.toLowerCase().includes("potencia")
         ? "⚡"
@@ -547,7 +542,7 @@ const getCharacteristicIcon = (
         ? "#3b82f6"
         : "#16a34a",
     },
-    colección_jugadores: { icon: "👨‍🎾", color: "#8b5cf6" },
+    coleccion_jugadores: { icon: "👨‍🎾", color: "#8b5cf6" },
     jugador: { icon: "🎾", color: "#16a34a" },
     nivel_jugador: { icon: "📊", color: "#f59e0b" },
     peso: { icon: "⚖️", color: "#6b7280" },
@@ -731,8 +726,8 @@ const RacketDetailPage: React.FC = () => {
         >
           <ImageSection>
             <RacketImage
-              src={racket.imagen}
-              alt={racket.modelo}
+              src={racket.imagen || "/placeholder-racket.svg"}
+              alt={racket.modelo || "Pala de padel"}
               onError={(e) => {
                 const target = e.target as HTMLImageElement;
                 target.src = "/placeholder-racket.svg";
@@ -809,8 +804,9 @@ const RacketDetailPage: React.FC = () => {
         </MainCard>
 
         {/* Racket Characteristics */}
-        {racket.caracteristicas &&
-          Object.keys(racket.caracteristicas).length > 0 && (
+        {(() => {
+          const characteristics = getCharacteristicsFromRacket(racket);
+          return Object.keys(characteristics).length > 0 && (
             <CharacteristicsCard
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -821,11 +817,11 @@ const RacketDetailPage: React.FC = () => {
                 Características Técnicas
               </SectionTitle>
               <CharacteristicsGrid>
-                {Object.entries(racket.caracteristicas).map(([key, value]) => {
+                {Object.entries(characteristics).map(([key, value]) => {
                   if (!shouldDisplayCharacteristic(key, value)) return null;
 
                   const label = getCharacteristicLabel(key);
-                  const { icon, color } = getCharacteristicIcon(key, value!);
+                  const { icon, color } = getCharacteristicIcon(key, value);
 
                   return (
                     <CharacteristicCard key={key}>
@@ -843,7 +839,8 @@ const RacketDetailPage: React.FC = () => {
                 })}
               </CharacteristicsGrid>
             </CharacteristicsCard>
-          )}
+          );
+        })()}
 
         {/* Features Card - Now focusing on status and metadata */}
         <FeaturesCard
@@ -896,23 +893,6 @@ const RacketDetailPage: React.FC = () => {
             </FeatureItem>
           </FeatureGrid>
         </FeaturesCard>
-
-        {/* Racket Description */}
-        {racket.descripcion && (
-          <DescriptionCard
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-          >
-            <SectionTitle>
-              <FiInfo />
-              Descripción Detallada
-            </SectionTitle>
-            <DescriptionContent>
-              <DescriptionText>{racket.descripcion}</DescriptionText>
-            </DescriptionContent>
-          </DescriptionCard>
-        )}
 
         {/* Racket Specifications (if available) */}
         {racket.especificaciones &&
