@@ -99,6 +99,7 @@ export interface Racket {
 
 // Tipos para formularios y recomendaciones AI
 export interface FormData {
+  // Formulario básico
   gameLevel: string;
   playingStyle: string;
   weight: string;
@@ -108,6 +109,24 @@ export interface FormData {
   experience?: string;
   frequency?: string;
   goals?: string;
+
+  // Formulario avanzado
+  age?: string;
+  gender?: string;
+  physicalCondition?: string;
+  injuries?: string;
+  position?: string;
+  mostUsedShot?: string;
+  playingSurface?: string;
+  preferredWeight?: string;
+  preferredBalance?: string;
+  frameMaterial?: string;
+  faceMaterial?: string;
+  rubberType?: string;
+  durabilityVsPerformance?: string;
+  favoriteBrand?: string;
+  availability?: string;
+  colorPreference?: string;
 }
 
 export interface RacketRecommendation {
