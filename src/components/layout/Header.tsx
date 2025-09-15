@@ -25,15 +25,22 @@ const HeaderContent = styled.div`
 `;
 
 const Logo = styled(Link)`
-  font-size: 1.8rem;
-  font-weight: 800;
-  color: white;
+  display: flex;
+  align-items: center;
   text-decoration: none;
-  letter-spacing: -0.5px;
+
+  img {
+    height: 75px;
+    width: auto;
+    transition: transform 0.2s ease;
+  }
 
   &:hover {
-    color: white;
     text-decoration: none;
+
+    img {
+      transform: scale(1.05);
+    }
   }
 `;
 
@@ -422,15 +429,12 @@ const Header: React.FC = () => {
     <HeaderContainer>
       <HeaderContent>
         <Logo to="/" onClick={closeAllMenus}>
-          Smashly
+          <img src="/images/icons/smashly-large-icon.ico" alt="Smashly" />
         </Logo>
 
         {/* Central Search Bar (Desktop) */}
         <CentralSearchContainer>
-          <GlobalSearch
-            onSearchToggle={() => {}}
-            isInHeader={true}
-          />
+          <GlobalSearch onSearchToggle={() => {}} isInHeader={true} />
         </CentralSearchContainer>
 
         {/* Desktop Auth */}

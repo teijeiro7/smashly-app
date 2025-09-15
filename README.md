@@ -61,7 +61,97 @@ src/
 └── contexts/               # Estado global
 ```
 
-## 🔧 Configuración de APIs
+## � Interfaz de Usuario - Recorrido por la Aplicación
+
+### 🏠 Página Principal
+La experiencia comienza en nuestra página de inicio, diseñada para ofrecer acceso directo a las funcionalidades principales de Smashly.
+
+![Página Principal](public/images/readme-images/MAIN%20PAGE.png)
+
+Desde aquí, los usuarios pueden:
+- **Acceder al sistema de recomendaciones IA** 
+- **Explorar el catálogo completo de palas**
+- **Iniciar sesión o registrarse**
+- **Consultar las FAQ**
+
+---
+
+### 🔐 Sistema de Autenticación
+
+#### Registro de Usuario
+![Página de Registro](public/images/readme-images/REGISTER%20PAGE.png)
+
+#### Inicio de Sesión
+![Página de Login](public/images/readme-images/LOGIN%20PAGE.png)
+
+El sistema de autenticación permite a los usuarios crear perfiles personalizados que mejoran la precisión de las recomendaciones IA.
+
+---
+
+### 🤖 Motor de Recomendaciones IA
+
+![Formulario de Recomendación](public/images/readme-images/FORM%20PAGE.png)
+
+**Características del formulario:**
+- **Análisis de perfil completo**: Nivel de juego, estilo, características físicas
+- **Preferencias técnicas**: Forma de pala, balance, materiales
+- **Presupuesto personalizable**
+- **Recomendaciones instantáneas** con explicaciones detalladas
+
+---
+
+### 🏪 Catálogo de Palas
+
+![Catálogo Completo](public/images/readme-images/CATALOG%20PAGE.png)
+
+**Funcionalidades del catálogo:**
+- **+100 palas** de las mejores marcas
+- **Filtros avanzados** por marca, nivel, forma, precio
+- **Comparación de precios** entre múltiples tiendas
+- **Sistema de favoritos y comparación**
+
+---
+
+### 🔍 Detalle de Producto
+
+![Detalle de Pala](public/images/readme-images/RACKET%20DETAIL%20PAGE.png)
+
+**Información detallada:**
+- **Especificaciones técnicas completas**
+- **Comparación de precios multi-tienda**
+- **Reseñas y valoraciones**
+- **Botón de añadir a comparación**
+- **Recomendaciones relacionadas**
+
+---
+
+### ⚖️ Sistema de Comparación
+
+![Página de Comparación](public/images/readme-images/COMPARE%20PAGE.png)
+
+**Características de la comparación:**
+- **Hasta 3 palas simultáneamente**
+- **Análisis IA detallado** de cada opción
+- **Tabla comparativa de especificaciones**
+- **Recomendación final personalizada**
+- **Análisis de pros y contras**
+
+---
+
+### ❓ Centro de Ayuda
+
+![FAQ](public/images/readme-images/FAQ%20PAGE.png)
+
+**Soporte completo:**
+- **Preguntas frecuentes**
+- **Guías de uso**
+- **Consejos de selección de palas**
+- **Información técnica**
+
+---
+
+
+## �🔧 Configuración de APIs
 
 ### Google Gemini AI
 1. Obtener API key en [ai.google.dev](https://ai.google.dev)
