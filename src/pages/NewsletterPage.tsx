@@ -1,7 +1,8 @@
 import { motion } from "framer-motion";
 import React, { useState } from "react";
-import { FiCheck, FiMail } from "react-icons/fi";
+import { FiAlertCircle, FiCheck, FiMail } from "react-icons/fi";
 import styled from "styled-components";
+import { newsletterService } from "../services/newsletterService";
 
 const Container = styled.div`
   min-height: calc(100vh - 200px); /* Adjust for header and footer height */
@@ -165,6 +166,20 @@ const SuccessMessage = styled(motion.div)`
   gap: 8px;
 `;
 
+const ErrorMessage = styled(motion.div)`
+  background: #fef2f2;
+  color: #dc2626;
+  padding: 16px 24px;
+  border-radius: 12px;
+  border: 1px solid #fecaca;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 16px;
+`;
+
 const AdditionalText = styled(motion.p)`
   font-size: 14px;
   color: #6b7280;
@@ -172,10 +187,30 @@ const AdditionalText = styled(motion.p)`
   margin: 0;
 `;
 
+const ResetButton = styled.button`
+  background: transparent;
+  color: #16a34a;
+  border: 1px solid #16a34a;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-top: 16px;
+
+  &:hover {
+    background: #16a34a;
+    color: white;
+  }
+`;
+
 const NewsletterPage: React.FC = () => {
   const [email, setEmail] = useState("");
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -183,13 +218,32 @@ const NewsletterPage: React.FC = () => {
     if (!email || isLoading) return;
 
     setIsLoading(true);
+    setError("");
+    setSuccessMessage("");
 
-    // Simulate API call
-    setTimeout(() => {
-      setIsSubmitted(true);
+    try {
+      const result = await newsletterService.subscribe(email.trim(), "website");
+
+      if (result.success) {
+        setIsSubmitted(true);
+        setSuccessMessage(result.message);
+        setEmail("");
+      } else {
+        setError(result.message);
+      }
+    } catch (error) {
+      console.error("Error submitting newsletter subscription:", error);
+      setError("Error inesperado. Por favor, inténtalo de nuevo.");
+    } finally {
       setIsLoading(false);
-      setEmail("");
-    }, 1000);
+    }
+  };
+
+  const handleReset = () => {
+    setIsSubmitted(false);
+    setError("");
+    setSuccessMessage("");
+    setEmail("");
   };
 
   const containerVariants = {
@@ -238,6 +292,17 @@ const NewsletterPage: React.FC = () => {
         <FormContainer variants={itemVariants}>
           {!isSubmitted ? (
             <>
+              {error && (
+                <ErrorMessage
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <FiAlertCircle size={20} />
+                  {error}
+                </ErrorMessage>
+              )}
+
               <EmailForm onSubmit={handleSubmit}>
                 <EmailInput
                   type="email"
@@ -253,19 +318,25 @@ const NewsletterPage: React.FC = () => {
                   disabled={isLoading}
                   isSubmitted={false}
                 >
-                  {isLoading ? "..." : "Notificarme"}
+                  {isLoading ? "Suscribiendo..." : "Notificarme"}
                 </SubmitButton>
               </EmailForm>
             </>
           ) : (
-            <SuccessMessage
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.3 }}
-            >
-              <FiCheck size={20} />
-              ¡Gracias! Te notificaremos cuando esté lista.
-            </SuccessMessage>
+            <div>
+              <SuccessMessage
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.3 }}
+              >
+                <FiCheck size={20} />
+                {successMessage ||
+                  "¡Gracias! Te notificaremos cuando esté lista."}
+              </SuccessMessage>
+              <ResetButton onClick={handleReset}>
+                Suscribir otro email
+              </ResetButton>
+            </div>
           )}
         </FormContainer>
 
