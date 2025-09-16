@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import React, { useState } from "react";
 import { FiAlertCircle, FiCheck, FiMail } from "react-icons/fi";
 import styled from "styled-components";
+import { usePageTitle } from "../contexts/PageContext";
 import { newsletterService } from "../services/newsletterService";
 
 const Container = styled.div`
@@ -206,6 +207,9 @@ const ResetButton = styled.button`
 `;
 
 const NewsletterPage: React.FC = () => {
+  // Set dynamic page title
+  usePageTitle("Newsletter");
+
   const [email, setEmail] = useState("");
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
