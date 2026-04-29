@@ -57,8 +57,10 @@ jobs:
             LIMIT_ARG="--limit ${{ github.event.inputs.limit }}"
           fi
           echo "Running prices sync..."
+          set +e
           python3 -m src.scrapers.sync_catalog --mode prices $LIMIT_ARG > sync.log 2>&1
           EXIT_CODE=$?
+          set -e
           cat sync.log
           if [ $EXIT_CODE -ne 0 ]; then
             echo "sync_failed=true" >> $GITHUB_ENV
@@ -68,8 +70,10 @@ jobs:
       - name: Deduplicate rackets
         run: |
           cd src/scrapers
+          set +e
           python3 deduplicate_rackets.py >> dedupe.log 2>&1
           EXIT_CODE=$?
+          set -e
           cat dedupe.log
           if [ $EXIT_CODE -ne 0 ]; then
             echo "dedupe_failed=true" >> $GITHUB_ENV
@@ -127,8 +131,10 @@ jobs:
             LIMIT_ARG="--limit ${{ github.event.inputs.limit }}"
           fi
           echo "Running full sync (new + discontinued + prices)..."
+          set +e
           python3 -m src.scrapers.sync_catalog --mode full $LIMIT_ARG > sync.log 2>&1
           EXIT_CODE=$?
+          set -e
           cat sync.log
           if [ $EXIT_CODE -ne 0 ]; then
             echo "sync_failed=true" >> $GITHUB_ENV
@@ -138,8 +144,10 @@ jobs:
       - name: Deduplicate rackets
         run: |
           cd src/scrapers
+          set +e
           python3 deduplicate_rackets.py >> dedupe.log 2>&1
           EXIT_CODE=$?
+          set -e
           cat dedupe.log
           if [ $EXIT_CODE -ne 0 ]; then
             echo "dedupe_failed=true" >> $GITHUB_ENV
@@ -148,8 +156,10 @@ jobs:
       - name: Sync Radar Metrics
         run: |
           echo "Scraping radar metrics for new rackets..."
+          set +e
           python3 -m src.scrapers.sync_radar_metrics >> radar-metrics.log 2>&1
           EXIT_CODE=$?
+          set -e
           cat radar-metrics.log
           if [ $EXIT_CODE -ne 0 ]; then
             echo "metrics_failed=true" >> $GITHUB_ENV
