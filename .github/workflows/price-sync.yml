@@ -65,6 +65,16 @@ jobs:
           fi
           exit $EXIT_CODE
 
+      - name: Deduplicate rackets
+        run: |
+          cd src/scrapers
+          python3 deduplicate_rackets.py >> dedupe.log 2>&1
+          EXIT_CODE=$?
+          cat dedupe.log
+          if [ $EXIT_CODE -ne 0 ]; then
+            echo "dedupe_failed=true" >> $GITHUB_ENV
+          fi
+
       - name: Commit and push changes
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
@@ -74,7 +84,7 @@ jobs:
           git push || echo "Push failed"
 
       - name: Send failure notification
-        if: env.sync_failed == 'true'
+        if: env.sync_failed == 'true' || env.dedupe_failed == 'true'
         run: |
           echo "📧 Enviando notificación de fallo a ${{ env.EMAIL_TO }}"
           curl -s -X POST https://api.resend.com/emails \
@@ -84,7 +94,7 @@ jobs:
               "from": "Smashly <onboarding@resend.dev>",
               "to": ["${{ env.EMAIL_TO }}"],
               "subject": "[Smashly] Weekly Prices Sync - FALLO",
-              "text": "El sync semanal de precios ha fallado. Por favor revisa los logs en GitHub Actions."
+              "text": "El sync semanal de precios ha fallado (catalog o deduplicación). Por favor revisa los logs en GitHub Actions."
             }' || echo "Notification failed"
 
   full-sync:
@@ -125,6 +135,16 @@ jobs:
           fi
           exit $EXIT_CODE
 
+      - name: Deduplicate rackets
+        run: |
+          cd src/scrapers
+          python3 deduplicate_rackets.py >> dedupe.log 2>&1
+          EXIT_CODE=$?
+          cat dedupe.log
+          if [ $EXIT_CODE -ne 0 ]; then
+            echo "dedupe_failed=true" >> $GITHUB_ENV
+          fi
+
       - name: Sync Radar Metrics
         run: |
           echo "Scraping radar metrics for new rackets..."
@@ -144,7 +164,7 @@ jobs:
           git push || echo "Push failed"
 
       - name: Send failure notification
-        if: env.sync_failed == 'true' || env.metrics_failed == 'true'
+        if: env.sync_failed == 'true' || env.dedupe_failed == 'true' || env.metrics_failed == 'true'
         run: |
           echo "📧 Enviando notificación de fallo a ${{ env.EMAIL_TO }}"
           curl -s -X POST https://api.resend.com/emails \
@@ -154,5 +174,5 @@ jobs:
               "from": "Smashly <onboarding@resend.dev>",
               "to": ["${{ env.EMAIL_TO }}"],
               "subject": "[Smashly] Monthly Sync - FALLO",
-              "text": "El sync mensual ha fallado (catalog o radar metrics). Por favor revisa los logs."
+              "text": "El sync mensual ha fallado (catalog, deduplicación o radar metrics). Por favor revisa los logs."
             }' || echo "Notification failed"
