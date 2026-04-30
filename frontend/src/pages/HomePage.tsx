@@ -209,13 +209,32 @@ const FeaturesGrid = styled.div`
   }
 `;
 
-const FeatureCard = styled(motion.div)`
+const FeatureCard = styled.div`
   background: white;
   padding: clamp(24px, 4vw, 32px);
   border-radius: 16px;
   text-align: center;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.4s ease;
+  opacity: 0;
+  animation: fadeInUp 0.5s ease forwards;
+  animation-delay: var(--delay, 0s);
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    opacity: 1;
+    animation: none;
+  }
 
   &:hover {
     transform: translateY(-8px);
@@ -364,12 +383,7 @@ const HomePage: React.FC = () => {
           <SectionSubtitle>La tecnología más avanzada para encontrar tu pala ideal</SectionSubtitle>
 
           <FeaturesGrid>
-            <FeatureCard
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4 }}
-              viewport={{ once: true, amount: 0.2 }}
-            >
+            <FeatureCard style={{ '--delay': '0s' } as React.CSSProperties}>
               <FeatureIcon>
                 <FiTarget />
               </FeatureIcon>
@@ -380,12 +394,7 @@ const HomePage: React.FC = () => {
               </FeatureDescription>
             </FeatureCard>
 
-            <FeatureCard
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4, delay: 0.1 }}
-              viewport={{ once: true, amount: 0.2 }}
-            >
+            <FeatureCard style={{ '--delay': '0.1s' } as React.CSSProperties}>
               <FeatureIcon>
                 <FiDatabase />
               </FeatureIcon>
@@ -395,12 +404,7 @@ const HomePage: React.FC = () => {
               </FeatureDescription>
             </FeatureCard>
 
-            <FeatureCard
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4, delay: 0.2 }}
-              viewport={{ once: true, amount: 0.2 }}
-            >
+            <FeatureCard style={{ '--delay': '0.2s' } as React.CSSProperties}>
               <FeatureIcon>
                 <FiSearch />
               </FeatureIcon>
@@ -411,12 +415,7 @@ const HomePage: React.FC = () => {
               </FeatureDescription>
             </FeatureCard>
 
-            <FeatureCard
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4, delay: 0.3 }}
-              viewport={{ once: true, amount: 0.2 }}
-            >
+            <FeatureCard style={{ '--delay': '0.3s' } as React.CSSProperties}>
               <FeatureIcon>
                 <FiDollarSign />
               </FeatureIcon>

@@ -1,6 +1,12 @@
-import { AnimatePresence, motion } from 'framer-motion';
 import React, { useEffect, useState, useMemo } from 'react';
-import styled from 'styled-components';
+import styled, { keyframes } from 'styled-components';
+
+const fadeInOut = keyframes`
+  0% { opacity: 0; transform: translateY(8px); }
+  15% { opacity: 1; transform: translateY(0); }
+  85% { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(-8px); }
+`;
 
 const RotatingContainer = styled.span`
   color: #fbbf24;
@@ -32,12 +38,21 @@ const PhraseWrapper = styled.span`
   min-height: 1.4em;
 `;
 
-const PhraseItem = styled(motion.span)`
+const PhraseItem = styled.span<{ $key: number }>`
   position: absolute;
   left: 0;
   top: 0;
   white-space: nowrap;
-  will-change: transform, opacity;
+  animation: ${fadeInOut} 2.5s ease-in-out infinite;
+  animation-delay: ${props => props.$key * 2.5}s;
+  opacity: 0;
+  will-change: opacity, transform;
+
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+    opacity: 1;
+    position: static;
+  }
 `;
 
 interface RotatingPhrasesProps {
@@ -45,20 +60,11 @@ interface RotatingPhrasesProps {
 }
 
 const RotatingPhrases: React.FC<RotatingPhrasesProps> = ({ phrases }) => {
-  const [phraseIndex, setPhraseIndex] = useState(0);
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     setMounted(true);
   }, []);
-
-  useEffect(() => {
-    if (!mounted) return;
-    const id = setInterval(() => {
-      setPhraseIndex(prev => (prev + 1) % phrases.length);
-    }, 2500);
-    return () => clearInterval(id);
-  }, [phrases.length, mounted]);
 
   const longestPhrase = useMemo(() => {
     return Math.max(...phrases.map(p => p.length));
@@ -66,7 +72,7 @@ const RotatingPhrases: React.FC<RotatingPhrasesProps> = ({ phrases }) => {
 
   if (!mounted) {
     return (
-      <RotatingContainer aria-live='polite'>
+      <RotatingContainer aria-live="polite">
         <PhraseWrapper style={{ minWidth: `${longestPhrase * 0.6}ch` }}>
           {phrases[0]}
         </PhraseWrapper>
@@ -75,19 +81,13 @@ const RotatingPhrases: React.FC<RotatingPhrasesProps> = ({ phrases }) => {
   }
 
   return (
-    <RotatingContainer aria-live='polite'>
+    <RotatingContainer aria-live="polite">
       <PhraseWrapper style={{ minWidth: `${longestPhrase * 0.6}ch` }}>
-        <AnimatePresence mode='wait'>
-          <PhraseItem
-            key={phraseIndex}
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -8 }}
-            transition={{ duration: 0.35, ease: 'easeOut' }}
-          >
-            {phrases[phraseIndex]}
+        {phrases.map((phrase, index) => (
+          <PhraseItem key={index} $key={index}>
+            {phrase}
           </PhraseItem>
-        </AnimatePresence>
+        ))}
       </PhraseWrapper>
     </RotatingContainer>
   );
