@@ -942,7 +942,7 @@ const CatalogPage: React.FC = () => {
       {/* Header */}
       <Header>
         <HeaderContent>
-          <Title>
+          <Title data-testid='catalog-title'>
             Catálogo de <span className='highlight'>Palas</span>
           </Title>
           <Subtitle>

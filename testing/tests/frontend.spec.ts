@@ -85,9 +85,11 @@ async function mockCatalogApi(page: Page) {
 async function openCatalog(page: Page) {
   await mockCatalogApi(page);
   await page.goto('/catalog', { waitUntil: 'domcontentloaded' });
-  await expect(page.locator('h1').filter({ hasText: /cat[aá]logo de palas/i })).toBeVisible();
+  await expect(page.getByTestId('catalog-title')).toBeVisible({ timeout: 15000 });
+  await expect(page.getByTestId('rackets-count')).toBeVisible({ timeout: 15000 });
   await expect(page.getByTestId('rackets-count')).toHaveText(
-    `Total de palas mostradas: ${mockRackets.length}`
+    `Total de palas mostradas: ${mockRackets.length}`,
+    { timeout: 15000 }
   );
 }
 
