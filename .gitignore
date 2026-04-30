@@ -247,6 +247,7 @@ edgedriver.log
 # Lighthouse reports
 lighthouse-report.html
 lhci_reports/
+performance/
 
 # ===================================
 # BUILD & DEPLOYMENT
