@@ -1,5 +1,6 @@
 import { lazy, Suspense } from 'react';
 import { Route, Routes } from 'react-router-dom';
+import { AnimatePresence } from 'framer-motion';
 import Layout from './components/layout/Layout';
 import { ScrollToTop } from './components/common/ScrollToTop';
 import { ComparisonProvider } from './contexts/ComparisonContext';
@@ -60,6 +61,7 @@ export default function App() {
                     <PWAInstallPrompt />
                     <Layout>
                       <FloatingCompareButton />
+                      <AnimatePresence mode="wait">
                       <Routes>
                         {/* Critical routes - prioritized */}
                         <Route
@@ -289,6 +291,7 @@ export default function App() {
                           }
                         />
                       </Routes>
+                      </AnimatePresence>
                     </Layout>
                   </AuthModalProvider>
                 </ListsProvider>

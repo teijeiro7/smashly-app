@@ -7,9 +7,20 @@ export default defineConfig(({ mode }) => ({
   // Strip console.* in production builds
   esbuild: {
     drop: mode === 'production' ? ['console', 'debugger'] : [],
+    // Minify specifically for React
+    minifyIdentifiers: mode === 'production',
+    minifySyntax: mode === 'production',
+    minifyWhitespace: mode === 'production',
   },
   plugins: [
-    react(),
+    react({
+      // React compiler for better optimization
+      babel: {
+        parserOpts: {
+          plugins: ['styled-components'],
+        },
+      },
+    }),
     VitePWA({
       registerType: 'autoUpdate',
       includeAssets: ['robots.txt', 'images/icons/smashly-icon.png', 'icons/apple-touch-icon.png'],
@@ -71,6 +82,17 @@ export default defineConfig(({ mode }) => ({
               },
             },
           },
+          {
+            urlPattern: /\.(?:png|jpg|jpeg|svg|webp|avif)$/i,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'images',
+              expiration: {
+                maxEntries: 50,
+                maxAgeSeconds: 60 * 60 * 24 * 30,
+              },
+            },
+          },
         ],
       },
       devOptions: {
@@ -103,30 +125,75 @@ export default defineConfig(({ mode }) => ({
     },
   },
   build: {
-    // No sourcemaps in production (avoids leaking source code)
+    // No sourcemaps in production
     sourcemap: false,
-    // Minify output with esbuild (faster than terser)
+    // Minify output
     minify: 'esbuild',
-    target: 'es2015',
-    chunkSizeWarningLimit: 750,
+    target: 'es2020',
+    // Reduce chunk size limit to force more splitting
+    chunkSizeWarningLimit: 500,
+    // Enable CSS code splitting
+    cssCodeSplit: true,
+    // Generate manifest
+    manifest: true,
+    // Report written size for debugging
+    reportCompressedSize: true,
     rollupOptions: {
       output: {
-        // Split heavy vendor libs into separate cacheable chunks
-        manualChunks: {
-          'vendor-react': ['react', 'react-dom', 'react-router-dom'],
-          'vendor-query': ['@tanstack/react-query'],
-          'vendor-ui': ['styled-components', 'framer-motion'],
-          'vendor-markdown': ['react-markdown', 'remark-gfm'],
-          'vendor-charts': ['recharts'],
-          'vendor-pdf': ['jspdf', 'jspdf-autotable', 'html2canvas'],
-          'vendor-dnd': ['@dnd-kit/core', '@dnd-kit/sortable', '@dnd-kit/utilities'],
+        // More granular chunk splitting for better caching
+        manualChunks: (id) => {
+          // React core
+          if (id.includes('react-dom') || id.includes('react/')) {
+            return 'vendor-react';
+          }
+          // Router
+          if (id.includes('react-router') || id.includes('react-router-dom')) {
+            return 'vendor-router';
+          }
+          // Data fetching
+          if (id.includes('@tanstack') || id.includes('supabase')) {
+            return 'vendor-data';
+          }
+          // UI libraries
+          if (id.includes('styled-components') || id.includes('framer-motion')) {
+            return 'vendor-ui';
+          }
+          // Charts (lazy load)
+          if (id.includes('recharts')) {
+            return 'vendor-charts';
+          }
+          // PDF generation (lazy load)
+          if (id.includes('jspdf') || id.includes('html2canvas')) {
+            return 'vendor-pdf';
+          }
+          // Markdown (lazy load)
+          if (id.includes('react-markdown') || id.includes('remark')) {
+            return 'vendor-markdown';
+          }
+          // Drag & drop (lazy load)
+          if (id.includes('@dnd-kit')) {
+            return 'vendor-dnd';
+          }
         },
       },
     },
   },
   // Optimize dependencies
   optimizeDeps: {
-    include: ['react', 'react-dom', 'react-router-dom', 'styled-components', 'framer-motion'],
+    include: [
+      'react',
+      'react-dom',
+      'react-router-dom',
+      '@tanstack/react-query',
+    ],
+    // Exclude heavy libs from optimization to load on demand
+    exclude: [
+      'recharts',
+      'jspdf',
+      'html2canvas',
+      'react-markdown',
+      '@dnd-kit/core',
+    ],
   },
   test: {
     globals: true,
