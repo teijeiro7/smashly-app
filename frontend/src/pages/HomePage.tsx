@@ -23,7 +23,7 @@ const HeroSection = styled.section`
   background: linear-gradient(145deg, #14532d 0%, #166534 45%, #15803d 100%);
   color: white;
   position: relative;
-  overflow: hidden;
+  overflow: visible;
   will-change: transform, opacity;
   transform: translateZ(0);
 
@@ -90,19 +90,36 @@ const Title = styled.h1`
   position: relative;
   animation: ${heroFadeIn} 0.8s ease forwards;
   animation-delay: 0.2s;
+  overflow-wrap: break-word;
+  word-break: break-word;
+  hyphens: auto;
 
   @media (prefers-reduced-motion: reduce) {
     animation: none;
     opacity: 1;
+  }
+
+  @media (max-width: 640px) {
+    line-height: 1.3;
+  }
+
+  @media (max-width: 480px) {
+    line-height: 1.4;
   }
 `;
 
 const TitleStaticBefore = styled.span`
   display: block;
   white-space: nowrap;
+  overflow-wrap: break-word;
+  hyphens: auto;
 
   @media (max-width: 600px) {
     white-space: normal;
+  }
+
+  @media (max-width: 400px) {
+    word-break: break-word;
   }
 `;
 
