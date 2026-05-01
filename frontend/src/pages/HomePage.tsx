@@ -1,11 +1,16 @@
-import { motion } from 'framer-motion';
 import React, { useEffect } from 'react';
 import { FiDatabase, FiDollarSign, FiSearch, FiTarget, FiZap } from 'react-icons/fi';
 import { Link, useNavigate } from 'react-router-dom';
-import styled from 'styled-components';
+import styled, { keyframes } from 'styled-components';
 import AiBanner from '../components/features/AiBanner';
 import RotatingPhrases from '../components/features/RotatingPhrases';
 import { useAuth } from '../contexts/AuthContext';
+import { useInView } from '../hooks/useInView';
+
+const heroFadeIn = keyframes`
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+`;
 
 const Container = styled.div`
   min-height: 100dvh;
@@ -41,7 +46,7 @@ const HeroContent = styled.div`
   margin: 0 auto;
 `;
 
-const Badge = styled(motion.div)`
+const Badge = styled.div`
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -54,6 +59,12 @@ const Badge = styled(motion.div)`
   -webkit-backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.1);
   will-change: transform, opacity;
+  animation: ${heroFadeIn} 0.6s ease forwards;
+
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+    opacity: 1;
+  }
 
   @media (max-width: 768px) {
     backdrop-filter: none;
@@ -62,7 +73,7 @@ const Badge = styled(motion.div)`
   }
 `;
 
-const Title = styled(motion.h1)`
+const Title = styled.h1`
   font-size: clamp(2rem, 6vw, 4rem);
   font-weight: 800;
   margin-bottom: clamp(16px, 4vw, 24px);
@@ -77,6 +88,13 @@ const Title = styled(motion.h1)`
   align-items: center;
   gap: 0.5rem;
   position: relative;
+  animation: ${heroFadeIn} 0.8s ease forwards;
+  animation-delay: 0.2s;
+
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+    opacity: 1;
+  }
 `;
 
 const TitleStaticBefore = styled.span`
@@ -88,7 +106,7 @@ const TitleStaticBefore = styled.span`
   }
 `;
 
-const Subtitle = styled(motion.p)`
+const Subtitle = styled.p`
   font-size: clamp(1rem, 2.5vw, 1.25rem);
   margin-bottom: clamp(24px, 5vw, 40px);
   opacity: 0.95;
@@ -97,14 +115,28 @@ const Subtitle = styled(motion.p)`
   margin-left: auto;
   margin-right: auto;
   padding: 0 20px;
+  animation: ${heroFadeIn} 0.8s ease forwards;
+  animation-delay: 0.4s;
+
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+    opacity: 1;
+  }
 `;
 
-const CTAButtons = styled(motion.div)`
+const CTAButtons = styled.div`
   display: flex;
   gap: 16px;
   justify-content: center;
   flex-wrap: wrap;
   padding: 0 20px;
+  animation: ${heroFadeIn} 0.8s ease forwards;
+  animation-delay: 0.6s;
+
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+    opacity: 1;
+  }
 
   @media (max-width: 640px) {
     flex-direction: column;
@@ -209,36 +241,26 @@ const FeaturesGrid = styled.div`
   }
 `;
 
-const FeatureCard = styled.div`
+const FeatureCard = styled.div<{ $inView: boolean }>`
   background: white;
   padding: clamp(24px, 4vw, 32px);
   border-radius: 16px;
   text-align: center;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-  transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.4s ease;
-  opacity: 0;
-  animation: fadeInUp 0.5s ease forwards;
-  animation-delay: var(--delay, 0s);
-
-  @keyframes fadeInUp {
-    from {
-      opacity: 0;
-      transform: translateY(20px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
+  opacity: ${(props) => (props.$inView ? 1 : 0)};
+  transform: ${(props) => (props.$inView ? 'translateY(0)' : 'translateY(20px)')};
+  transition: opacity 0.5s ease, transform 0.5s ease, box-shadow 0.3s ease;
+  transition-delay: var(--delay, 0s);
 
   @media (prefers-reduced-motion: reduce) {
+    transition: none;
     opacity: 1;
-    animation: none;
+    transform: none;
   }
 
   &:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    transform: ${(props) => (props.$inView ? 'translateY(-8px)' : 'translateY(20px)')};
+    box-shadow: ${(props) => (props.$inView ? '0 20px 40px rgba(0, 0, 0, 0.1)' : '0 4px 20px rgba(0, 0, 0, 0.05)')};
   }
 `;
 
@@ -300,8 +322,11 @@ const StatItem = styled.div`
 const HomePage: React.FC = () => {
   const { user, isAuthenticated } = useAuth();
   const navigate = useNavigate();
+  const card1 = useInView({ threshold: 0.2 });
+  const card2 = useInView({ threshold: 0.2 });
+  const card3 = useInView({ threshold: 0.2 });
+  const card4 = useInView({ threshold: 0.2 });
 
-  // Redirect authenticated users to their respective dashboards
   useEffect(() => {
     if (isAuthenticated && user?.role) {
       const role = user.role.toLowerCase();
@@ -333,38 +358,22 @@ const HomePage: React.FC = () => {
     <Container>
       <HeroSection>
         <HeroContent>
-          <Badge
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-          >
+          <Badge>
             <FiZap size={16} />
             Impulsado por IA
           </Badge>
 
-          <Title
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-          >
+          <Title>
             <TitleStaticBefore>La aplicacion que te permite</TitleStaticBefore>
             <RotatingPhrases phrases={phrases} />
           </Title>
 
-          <Subtitle
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.4 }}
-          >
+          <Subtitle>
             En Smashly, tenemos como objetivo ayudarte a mejorar tu juego de forma sencilla y
             efectiva.
           </Subtitle>
 
-          <CTAButtons
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.6 }}
-          >
+          <CTAButtons>
             <PrimaryButton to='/catalog'>
               <FiSearch size={20} />
               Explorar catálogo
@@ -383,7 +392,7 @@ const HomePage: React.FC = () => {
           <SectionSubtitle>La tecnología más avanzada para encontrar tu pala ideal</SectionSubtitle>
 
           <FeaturesGrid>
-            <FeatureCard style={{ '--delay': '0s' } as React.CSSProperties}>
+            <FeatureCard ref={card1.ref} $inView={card1.inView} style={{ '--delay': '0s' } as React.CSSProperties}>
               <FeatureIcon>
                 <FiTarget />
               </FeatureIcon>
@@ -394,7 +403,7 @@ const HomePage: React.FC = () => {
               </FeatureDescription>
             </FeatureCard>
 
-            <FeatureCard style={{ '--delay': '0.1s' } as React.CSSProperties}>
+            <FeatureCard ref={card2.ref} $inView={card2.inView} style={{ '--delay': '0.1s' } as React.CSSProperties}>
               <FeatureIcon>
                 <FiDatabase />
               </FeatureIcon>
@@ -404,7 +413,7 @@ const HomePage: React.FC = () => {
               </FeatureDescription>
             </FeatureCard>
 
-            <FeatureCard style={{ '--delay': '0.2s' } as React.CSSProperties}>
+            <FeatureCard ref={card3.ref} $inView={card3.inView} style={{ '--delay': '0.2s' } as React.CSSProperties}>
               <FeatureIcon>
                 <FiSearch />
               </FeatureIcon>
@@ -415,7 +424,7 @@ const HomePage: React.FC = () => {
               </FeatureDescription>
             </FeatureCard>
 
-            <FeatureCard style={{ '--delay': '0.3s' } as React.CSSProperties}>
+            <FeatureCard ref={card4.ref} $inView={card4.inView} style={{ '--delay': '0.3s' } as React.CSSProperties}>
               <FeatureIcon>
                 <FiDollarSign />
               </FeatureIcon>

@@ -131,33 +131,20 @@ export class GoogleAuthController {
           });
         }
 
-        // For existing OAuth users, we need to create a session
-        // Since we don't know their original password, we'll update it temporarily
-        const tempPassword = `google_oauth_${googleUser.googleId}_${Date.now()}`;
+        // For existing OAuth users, use the admin API to generate a session directly
+        // This avoids changing the password and works for users who registered with OAuth
+        const { data: sessionData, error: sessionError } =
+          await supabase.auth.admin.createSession({
+            userId: userId,
+          });
 
-        // Update user password using admin API
-        const { error: updateError } = await supabase.auth.admin.updateUserById(userId, {
-          password: tempPassword,
-        });
-
-        if (updateError) {
-          logger.error('Error updating user password:', updateError);
-          throw new Error('Failed to update user credentials');
-        }
-
-        // Now sign in with the new password to get a valid session
-        const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
-          email: googleUser.email,
-          password: tempPassword,
-        });
-
-        if (signInError || !signInData.session) {
-          logger.error('Error signing in existing user:', signInError);
+        if (sessionError || !sessionData.session) {
+          logger.error('Error creating session for existing OAuth user:', sessionError);
           throw new Error('Failed to create session for existing user');
         }
 
-        session = signInData.session;
-        logger.info('Session created successfully for existing user');
+        session = sessionData.session;
+        logger.info('Session created successfully for existing OAuth user');
       } else {
         // New user - create account
         logger.info('Creating new user with Google OAuth');
