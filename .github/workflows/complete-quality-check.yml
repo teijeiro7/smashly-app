@@ -135,7 +135,7 @@ jobs:
   e2e-tests:
     name: E2E Tests (Playwright)
     runs-on: ubuntu-latest
-    needs: [backend-complete, frontend-complete]
+    needs: [frontend-complete]
     environment: SMASHLY
 
     strategy:
@@ -152,15 +152,8 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: "npm"
-          cache-dependency-path: |
-            frontend/package-lock.json
-            testing/package-lock.json
 
       # Instalar dependencias
-      - name: Install backend dependencies
-        working-directory: ./backend/api
-        run: npm install
-
       - name: Install frontend dependencies
         working-directory: ./frontend
         run: npm install
@@ -174,10 +167,6 @@ jobs:
         run: npx playwright install --with-deps ${{ matrix.browser }}
 
       # Build de aplicaciones
-      - name: Build backend
-        working-directory: ./backend/api
-        run: npm run build
-
       - name: Build frontend
         working-directory: ./frontend
         run: npm run build
@@ -203,34 +192,14 @@ jobs:
           else
             echo "❌ index.html not found!"
             exit 1
-          fi
+           fi
 
-      # Iniciar aplicación en background
-      - name: Start backend server
-        working-directory: ./backend/api
-        run: |
-          mkdir -p logs
-          npm start > logs/backend.log 2>&1 &
-          echo $! > backend.pid
-          echo "Backend started with PID: $(cat backend.pid)"
-          echo "Waiting 5 seconds for backend to initialize..."
-          sleep 5
-          tail -n 20 logs/backend.log || echo "No logs yet"
-        env:
-          NODE_ENV: test
-          PORT: 3000
-          USE_HTTPS: "false"
-          JWT_SECRET: ${{ secrets.JWT_SECRET }}
-          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
-          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
-          FRONTEND_URL: http://localhost:5173
-
+      # Iniciar frontend server
       - name: Start frontend server
         working-directory: ./frontend
         run: |
           mkdir -p logs
-          npm run preview -- --port 5173 --host 0.0.0.0 > logs/frontend.log 2>&1 &
+          npx serve dist -s -l 5173 > logs/frontend.log 2>&1 &
           echo $! > frontend.pid
           echo "Frontend started with PID: $(cat frontend.pid)"
           echo "Waiting 5 seconds for frontend to initialize..."
@@ -239,44 +208,8 @@ jobs:
         env:
           VITE_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           VITE_SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
-          VITE_API_URL: http://localhost:3000
 
-      # Esperar que los servicios estén listos
-      - name: Wait for backend
-        run: |
-          echo "Checking if backend process is running..."
-          if [ -f "./backend/api/backend.pid" ]; then
-            BACKEND_PID=$(cat ./backend/api/backend.pid)
-            if ps -p $BACKEND_PID > /dev/null; then
-              echo "✅ Backend process is running (PID: $BACKEND_PID)"
-            else
-              echo "❌ Backend process is not running!"
-              echo "Backend logs:"
-              cat ./backend/api/logs/backend.log || echo "No logs"
-              exit 1
-            fi
-          else
-            echo "❌ Backend PID file not found!"
-            exit 1
-          fi
-
-          echo ""
-          echo "Waiting for backend health check..."
-          for i in {1..30}; do
-            if curl -f http://localhost:3000/api/v1/health > /dev/null 2>&1; then
-              echo "✅ Backend health check passed!"
-              echo "Health response:"
-              curl -s http://localhost:3000/api/v1/health | head -c 300
-              break
-            fi
-            echo "Attempt $i: Backend not ready yet, waiting 2s..."
-            sleep 2
-          done
-
-          echo ""
-          echo "Backend logs (last 15 lines):"
-          tail -n 15 ./backend/api/logs/backend.log || echo "No backend logs"
-
+      # Esperar que el frontend esté listo
       - name: Wait for frontend
         run: |
           echo "Checking if frontend process is running..."
@@ -312,6 +245,21 @@ jobs:
           echo "Frontend logs (last 15 lines):"
           tail -n 15 ./frontend/logs/frontend.log || echo "No frontend logs"
 
+      # Verificar routing del frontend
+      - name: Debug frontend routing
+        run: |
+          echo "=== Root response (first 200 chars) ==="
+          curl -s http://localhost:5173/ | head -c 200
+          echo ""
+          echo ""
+          echo "=== /catalog HTTP status code ==="
+          curl -s -o /dev/null -w "%{http_code}" http://localhost:5173/catalog
+          echo ""
+          echo ""
+          echo "=== /catalog response (first 300 chars) ==="
+          curl -s http://localhost:5173/catalog | head -c 300
+          echo ""
+
       # Ejecutar tests E2E con Playwright
       - name: Run E2E tests (${{ matrix.browser }})
         working-directory: ./testing
@@ -323,33 +271,24 @@ jobs:
           FRONTEND_URL: http://localhost:5173
 
       # Cleanup
-      - name: Stop services
+      - name: Stop frontend service
         if: always()
         run: |
-          echo "Stopping services..."
-          if [ -f "./backend/api/backend.pid" ]; then
-            BACKEND_PID=$(cat ./backend/api/backend.pid)
-            echo "Killing backend PID: $BACKEND_PID"
-            kill $BACKEND_PID || true
-            rm ./backend/api/backend.pid
-          fi
+          echo "Stopping frontend service..."
           if [ -f "./frontend/frontend.pid" ]; then
             FRONTEND_PID=$(cat ./frontend/frontend.pid)
             echo "Killing frontend PID: $FRONTEND_PID"
             kill $FRONTEND_PID || true
             rm ./frontend/frontend.pid
           fi
+          echo "Frontend service stopped"
 
-          echo "Services stopped"
-
-      - name: Upload service logs on failure
+      - name: Upload frontend logs on failure
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: service-logs-${{ matrix.browser }}
-          path: |
-            ./backend/api/logs/
-            ./frontend/logs/
+          name: frontend-logs-${{ matrix.browser }}
+          path: ./frontend/logs/
           retention-days: 7
 
       - name: Upload E2E test results (${{ matrix.browser }})
