@@ -184,6 +184,7 @@ jobs:
         env:
           VITE_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           VITE_SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+          VITE_API_URL: http://localhost:3000
 
       - name: Verify frontend build
         working-directory: ./frontend
@@ -238,6 +239,7 @@ jobs:
         env:
           VITE_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           VITE_SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+          VITE_API_URL: http://localhost:3000
 
       # Esperar que los servicios estén listos
       - name: Wait for backend
