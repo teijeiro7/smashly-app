@@ -185,12 +185,36 @@ jobs:
           VITE_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           VITE_SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
 
+      - name: Verify frontend build
+        working-directory: ./frontend
+        run: |
+          echo "Verifying frontend build..."
+          if [ -d "dist" ]; then
+            echo "✅ dist directory exists"
+            echo "Files in dist:"
+            ls -la dist/
+          else
+            echo "❌ dist directory not found!"
+            exit 1
+          fi
+          if [ -f "dist/index.html" ]; then
+            echo "✅ index.html exists"
+          else
+            echo "❌ index.html not found!"
+            exit 1
+          fi
+
       # Iniciar aplicación en background
       - name: Start backend server
         working-directory: ./backend/api
         run: |
-          npm start &
+          mkdir -p logs
+          npm start > logs/backend.log 2>&1 &
           echo $! > backend.pid
+          echo "Backend started with PID: $(cat backend.pid)"
+          echo "Waiting 5 seconds for backend to initialize..."
+          sleep 5
+          tail -n 20 logs/backend.log || echo "No logs yet"
         env:
           NODE_ENV: test
           PORT: 3000
@@ -204,24 +228,87 @@ jobs:
       - name: Start frontend server
         working-directory: ./frontend
         run: |
-          npm run preview -- --port 5173 --host 0.0.0.0 &
+          mkdir -p logs
+          npm run preview -- --port 5173 --host 0.0.0.0 > logs/frontend.log 2>&1 &
           echo $! > frontend.pid
+          echo "Frontend started with PID: $(cat frontend.pid)"
+          echo "Waiting 5 seconds for frontend to initialize..."
+          sleep 5
+          tail -n 20 logs/frontend.log || echo "No logs yet"
         env:
           VITE_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           VITE_SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
 
       # Esperar que los servicios estén listos
-      - name: Wait for services
+      - name: Wait for backend
         run: |
-          echo "Waiting for backend..."
-          timeout 60 bash -c 'until curl -f http://localhost:3000/api/v1/health; do sleep 2; done'
-          echo "Backend is ready!"
+          echo "Checking if backend process is running..."
+          if [ -f "./backend/api/backend.pid" ]; then
+            BACKEND_PID=$(cat ./backend/api/backend.pid)
+            if ps -p $BACKEND_PID > /dev/null; then
+              echo "✅ Backend process is running (PID: $BACKEND_PID)"
+            else
+              echo "❌ Backend process is not running!"
+              echo "Backend logs:"
+              cat ./backend/api/logs/backend.log || echo "No logs"
+              exit 1
+            fi
+          else
+            echo "❌ Backend PID file not found!"
+            exit 1
+          fi
 
+          echo ""
+          echo "Waiting for backend health check..."
+          for i in {1..30}; do
+            if curl -f http://localhost:3000/api/v1/health > /dev/null 2>&1; then
+              echo "✅ Backend health check passed!"
+              echo "Health response:"
+              curl -s http://localhost:3000/api/v1/health | head -c 300
+              break
+            fi
+            echo "Attempt $i: Backend not ready yet, waiting 2s..."
+            sleep 2
+          done
+
+          echo ""
+          echo "Backend logs (last 15 lines):"
+          tail -n 15 ./backend/api/logs/backend.log || echo "No backend logs"
+
+      - name: Wait for frontend
+        run: |
+          echo "Checking if frontend process is running..."
+          if [ -f "./frontend/frontend.pid" ]; then
+            FRONTEND_PID=$(cat ./frontend/frontend.pid)
+            if ps -p $FRONTEND_PID > /dev/null; then
+              echo "✅ Frontend process is running (PID: $FRONTEND_PID)"
+            else
+              echo "❌ Frontend process is not running!"
+              echo "Frontend logs:"
+              cat ./frontend/logs/frontend.log || echo "No logs"
+              exit 1
+            fi
+          else
+            echo "❌ Frontend PID file not found!"
+            exit 1
+          fi
+
+          echo ""
           echo "Waiting for frontend..."
-          timeout 60 bash -c 'until curl -f http://localhost:5173; do sleep 2; done'
-          echo "Frontend is ready!"
+          for i in {1..30}; do
+            if curl -f http://localhost:5173 > /dev/null 2>&1; then
+              echo "✅ Frontend is ready!"
+              echo "Frontend response:"
+              curl -s http://localhost:5173 | head -c 200
+              break
+            fi
+            echo "Attempt $i: Frontend not ready yet, waiting 2s..."
+            sleep 2
+          done
 
-          echo "All services are ready!"
+          echo ""
+          echo "Frontend logs (last 15 lines):"
+          tail -n 15 ./frontend/logs/frontend.log || echo "No frontend logs"
 
       # Ejecutar tests E2E con Playwright
       - name: Run E2E tests (${{ matrix.browser }})
@@ -237,12 +324,31 @@ jobs:
       - name: Stop services
         if: always()
         run: |
+          echo "Stopping services..."
           if [ -f "./backend/api/backend.pid" ]; then
-            kill $(cat ./backend/api/backend.pid) || true
+            BACKEND_PID=$(cat ./backend/api/backend.pid)
+            echo "Killing backend PID: $BACKEND_PID"
+            kill $BACKEND_PID || true
+            rm ./backend/api/backend.pid
           fi
           if [ -f "./frontend/frontend.pid" ]; then
-            kill $(cat ./frontend/frontend.pid) || true
+            FRONTEND_PID=$(cat ./frontend/frontend.pid)
+            echo "Killing frontend PID: $FRONTEND_PID"
+            kill $FRONTEND_PID || true
+            rm ./frontend/frontend.pid
           fi
+
+          echo "Services stopped"
+
+      - name: Upload service logs on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: service-logs-${{ matrix.browser }}
+          path: |
+            ./backend/api/logs/
+            ./frontend/logs/
+          retention-days: 7
 
       - name: Upload E2E test results (${{ matrix.browser }})
         uses: actions/upload-artifact@v4
@@ -253,6 +359,25 @@ jobs:
             ./testing/playwright-report/
             ./testing/test-results/
           retention-days: 30
+
+      - name: E2E test summary (${{ matrix.browser }})
+        if: always()
+        run: |
+          echo "=========================================="
+          echo "E2E Test Summary - ${{ matrix.browser }}"
+          echo "=========================================="
+          if [ -f "./testing/playwright-report/index.html" ]; then
+            echo "✅ Test report generated"
+          else
+            echo "❌ No test report found"
+          fi
+          if [ -d "./testing/test-results" ]; then
+            echo "Test results files:"
+            find ./testing/test-results -type f 2>/dev/null | head -10 || echo "No test result files"
+          else
+            echo "❌ No test results directory"
+          fi
+          echo "=========================================="
 
   # ===========================
   # SECURITY SCAN
