@@ -103,6 +103,53 @@ export class RacketController {
   }
 
   /**
+   * GET /api/rackets/by-name/:nombre
+   * Obtiene una pala por su nombre exacto (case-insensitive)
+   * Usado para compatibilidad con URLs antiguas por nombre
+   */
+  static async getRacketByName(req: Request, res: Response): Promise<void> {
+    try {
+      const nombre = decodeURIComponent(req.params.nombre);
+
+      if (!nombre || nombre.trim().length === 0) {
+        res.status(400).json({
+          success: false,
+          error: 'Invalid name',
+          message: 'Name is required',
+          timestamp: new Date().toISOString(),
+        } as ApiResponse);
+        return;
+      }
+
+      const racket = await RacketService.getRacketByName(nombre.trim());
+
+      if (!racket) {
+        res.status(404).json({
+          success: false,
+          error: 'Pala no encontrada',
+          message: `No se encontró una pala con el nombre "${nombre}"`,
+          timestamp: new Date().toISOString(),
+        } as ApiResponse);
+        return;
+      }
+
+      res.json({
+        success: true,
+        data: racket,
+        timestamp: new Date().toISOString(),
+      } as ApiResponse<Racket>);
+    } catch (error: unknown) {
+      logger.error('Error in getRacketByName:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Error interno del servidor',
+        message: getErrorMessage(error),
+        timestamp: new Date().toISOString(),
+      } as ApiResponse);
+    }
+  }
+
+  /**
    * PUT /api/rackets/:id
    * Actualiza una pala existente
    */

@@ -17,6 +17,7 @@ export const API_ENDPOINTS = {
   // Rackets
   RACKETS: '/api/v1/rackets',
   RACKETS_BY_ID: (id: number) => `/api/v1/rackets/${id}`,
+  RACKETS_BY_NAME: (nombre: string) => `/api/v1/rackets/by-name/${encodeURIComponent(nombre)}`,
   RACKETS_SEARCH: '/api/v1/rackets/search',
   RACKETS_FILTER: '/api/v1/rackets/filter',
   RACKETS_BESTSELLERS: '/api/v1/rackets/bestsellers',

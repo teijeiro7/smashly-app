@@ -109,12 +109,21 @@ export class RacketService {
   }
 
   /**
-   * Obtiene una pala por su nombre (busca y filtra el resultado)
+   * Obtiene una pala por su nombre (exact match, case-insensitive)
    */
   static async getRacketByName(nombre: string): Promise<Racket | null> {
     try {
-      const results = await this.searchRackets(nombre);
-      return results.find(r => r.nombre === nombre) || null;
+      const url = buildApiUrl(API_ENDPOINTS.RACKETS_BY_NAME(nombre));
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: getCommonHeaders(),
+      });
+
+      if (response.status === 404) {
+        return null;
+      }
+
+      return await handleApiResponse<Racket>(response);
     } catch (error: any) {
       console.error('Error fetching racket by name:', error);
       return null;

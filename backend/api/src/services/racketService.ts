@@ -583,6 +583,29 @@ export class RacketService {
   }
 
   /**
+   * Obtiene una pala por su nombre exacto (case-insensitive)
+   * Usado para compatibilidad con URLs antiguas por nombre
+   */
+  static async getRacketByName(nombre: string): Promise<Racket | null> {
+    const { data, error } = await supabase
+      .from('rackets')
+      .select('*')
+      .ilike('name', nombre)
+      .single();
+
+    if (error) {
+      if (error.code === 'PGRST116') {
+        return null; // No encontrado
+      }
+      logger.error('Error fetching racket by name:', error);
+      throw new Error(`Error al cargar la pala: ${error.message}`);
+    }
+
+    const processedData = processRacketData([data]);
+    return mapToFrontendFormat(processedData[0]);
+  }
+
+  /**
    * Actualiza una pala existente
    */
   static async updateRacket(id: number, updates: Partial<Racket>): Promise<Racket> {

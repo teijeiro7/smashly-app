@@ -43,6 +43,10 @@ router.get('/version', RacketController.getCatalogVersion);
 // GET /api/rackets/brands/:brand - Gets rackets by specific brand
 router.get('/brands/:brand', optionalAuth, RacketController.getRacketsByBrand);
 
+// GET /api/rackets/by-name/:nombre - Gets a racket by name (exact match, case-insensitive)
+// Used for backward compatibility with old name-based URLs
+router.get('/by-name/:nombre', optionalAuth, RacketController.getRacketByName);
+
 // GET /api/rackets/:id/price-history - Historial de precios de una pala
 // Query params: days (default 90), store (opcional)
 router.get('/:id/price-history', optionalAuth, validateIdParam(), RacketController.getRacketPriceHistory);
