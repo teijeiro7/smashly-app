@@ -1,43 +1,65 @@
-import { AnimatePresence, motion } from 'framer-motion';
-import React, { useEffect, useState, useMemo } from 'react';
-import styled from 'styled-components';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
+import styled, { keyframes } from 'styled-components';
 
-const RotatingContainer = styled.span`
+const FADE_DURATION = 0.35;
+const DISPLAY_DURATION = 2500;
+
+const rotateIn = keyframes`
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+`;
+
+const rotateOut = keyframes`
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-12px);
+  }
+`;
+
+const RotatingContainer = styled.div`
   color: #fbbf24;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 180px;
+  display: block;
+  width: 100%;
+  text-align: center;
   min-height: 1.4em;
-  position: relative;
-  contain: layout paint;
+  white-space: nowrap;
+  overflow-wrap: break-word;
+  hyphens: auto;
 
   @media (max-width: 640px) {
     font-size: 0.9em;
+    min-height: 2.8em;
     white-space: normal;
-    max-width: 90vw;
-    min-width: 140px;
   }
 
   @media (max-width: 480px) {
     font-size: 0.85em;
-    min-width: 120px;
+    min-height: 3.2em;
+    white-space: normal;
   }
 `;
 
-const PhraseWrapper = styled.span`
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  min-height: 1.4em;
-`;
-
-const PhraseItem = styled(motion.span)`
-  position: absolute;
-  left: 0;
-  top: 0;
-  white-space: nowrap;
+const PhraseSpan = styled.span<{ $isExiting: boolean }>`
+  display: block;
+  animation: ${(props) => (props.$isExiting ? rotateOut : rotateIn)} ${FADE_DURATION}s ease-in-out;
   will-change: transform, opacity;
+  word-break: break-word;
+
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
 `;
 
 interface RotatingPhrasesProps {
@@ -45,50 +67,32 @@ interface RotatingPhrasesProps {
 }
 
 const RotatingPhrases: React.FC<RotatingPhrasesProps> = ({ phrases }) => {
-  const [phraseIndex, setPhraseIndex] = useState(0);
-  const [mounted, setMounted] = useState(false);
+  const [isExiting, setIsExiting] = useState(false);
+  const [displayIndex, setDisplayIndex] = useState(0);
+  const intervalRef = useRef<ReturnType<typeof setInterval>>();
+  const timeoutRef = useRef<ReturnType<typeof setTimeout>>();
+
+  const advance = useCallback(() => {
+    setIsExiting(true);
+    timeoutRef.current = setTimeout(() => {
+      setDisplayIndex((prev) => (prev + 1) % phrases.length);
+      setIsExiting(false);
+    }, FADE_DURATION * 1000);
+  }, [phrases.length]);
 
   useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  useEffect(() => {
-    if (!mounted) return;
-    const id = setInterval(() => {
-      setPhraseIndex(prev => (prev + 1) % phrases.length);
-    }, 2500);
-    return () => clearInterval(id);
-  }, [phrases.length, mounted]);
-
-  const longestPhrase = useMemo(() => {
-    return Math.max(...phrases.map(p => p.length));
-  }, [phrases]);
-
-  if (!mounted) {
-    return (
-      <RotatingContainer aria-live='polite'>
-        <PhraseWrapper style={{ minWidth: `${longestPhrase * 0.6}ch` }}>
-          {phrases[0]}
-        </PhraseWrapper>
-      </RotatingContainer>
-    );
-  }
+    intervalRef.current = setInterval(advance, DISPLAY_DURATION);
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    };
+  }, [advance]);
 
   return (
-    <RotatingContainer aria-live='polite'>
-      <PhraseWrapper style={{ minWidth: `${longestPhrase * 0.6}ch` }}>
-        <AnimatePresence mode='wait'>
-          <PhraseItem
-            key={phraseIndex}
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -8 }}
-            transition={{ duration: 0.35, ease: 'easeOut' }}
-          >
-            {phrases[phraseIndex]}
-          </PhraseItem>
-        </AnimatePresence>
-      </PhraseWrapper>
+    <RotatingContainer aria-live="polite">
+      <PhraseSpan $isExiting={isExiting}>
+        {phrases[displayIndex]}
+      </PhraseSpan>
     </RotatingContainer>
   );
 };

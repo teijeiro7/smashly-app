@@ -255,9 +255,17 @@ const AdvancedFiltersToggle = styled.button<{ $active: boolean }>`
   }
 `;
 
-const AdvancedFiltersPanel = styled(motion.div)`
+const AdvancedFiltersPanel = styled.div<{ $isOpen: boolean }>`
   overflow: hidden;
   margin-top: 1rem;
+  max-height: ${props => props.$isOpen ? '500px' : '0'};
+  opacity: ${props => props.$isOpen ? 1 : 0};
+  transition: max-height 0.3s ease, opacity 0.3s ease;
+  
+  @media (prefers-reduced-motion: reduce) {
+    max-height: ${props => props.$isOpen ? '500px' : '0'};
+    transition: none;
+  }
 `;
 
 const AdvancedFiltersGrid = styled.div`
@@ -934,7 +942,7 @@ const CatalogPage: React.FC = () => {
       {/* Header */}
       <Header>
         <HeaderContent>
-          <Title>
+          <Title data-testid='catalog-title'>
             Catálogo de <span className='highlight'>Palas</span>
           </Title>
           <Subtitle>
@@ -1001,14 +1009,7 @@ const CatalogPage: React.FC = () => {
           </AdvancedFiltersToggle>
 
           {/* Advanced Filters Panel */}
-          <AnimatePresence>
-            {showAdvancedFilters && (
-              <AdvancedFiltersPanel
-                initial={{ height: 0, opacity: 0 }}
-                animate={{ height: 'auto', opacity: 1 }}
-                exit={{ height: 0, opacity: 0 }}
-                transition={{ duration: 0.3 }}
-              >
+          <AdvancedFiltersPanel $isOpen={showAdvancedFilters}>
                 <AdvancedFiltersGrid>
                   <FilterSelect
                     value={selectedShape}
@@ -1087,9 +1088,7 @@ const CatalogPage: React.FC = () => {
                     ))}
                   </FilterSelect>
                 </AdvancedFiltersGrid>
-              </AdvancedFiltersPanel>
-            )}
-          </AnimatePresence>
+          </AdvancedFiltersPanel>
         </FiltersSection>
 
         {/* Results Header */}

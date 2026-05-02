@@ -1,0 +1,1410 @@
+[
+  {
+    "name": "Home",
+    "url": "http://localhost:5173/",
+    "fcp": 8735.212,
+    "lcp": 12051.829,
+    "tbt": 356.5500000000029,
+    "cls": 0.009218,
+    "tti": 12383.967,
+    "mainThreadWork": [
+      {
+        "group": "other",
+        "groupLabel": "Other",
+        "duration": 1906.5179999996244
+      },
+      {
+        "group": "scriptEvaluation",
+        "groupLabel": "Script Evaluation",
+        "duration": 1356.5289999999675
+      },
+      {
+        "group": "styleLayout",
+        "groupLabel": "Style & Layout",
+        "duration": 968.714
+      },
+      {
+        "group": "paintCompositeRender",
+        "groupLabel": "Rendering",
+        "duration": 74.78099999999982
+      },
+      {
+        "group": "scriptParseCompile",
+        "groupLabel": "Script Parsing & Compilation",
+        "duration": 23.689999999999994
+      },
+      {
+        "group": "parseHTML",
+        "groupLabel": "Parse HTML & CSS",
+        "duration": 5.0329999999999995
+      },
+      {
+        "group": "garbageCollection",
+        "groupLabel": "Garbage Collection",
+        "duration": 3.9579999999999993
+      }
+    ],
+    "largestContentfulPaintElement": [
+      {
+        "type": "table",
+        "headings": [
+          {
+            "key": "node",
+            "valueType": "node",
+            "label": "Element"
+          }
+        ],
+        "items": [
+          {
+            "node": {
+              "type": "node",
+              "lhId": "page-0-SPAN",
+              "path": "1,HTML,1,BODY,0,DIV,1,DIV,3,MAIN,0,DIV,0,SECTION,0,DIV,1,H1,0,SPAN",
+              "selector": "section.sc-bsDpAt > div.sc-fgcRbO > h1.sc-dpDFRI > span.sc-vugip",
+              "boundingRect": {
+                "top": 178,
+                "bottom": 241,
+                "left": 40,
+                "right": 372,
+                "width": 332,
+                "height": 62
+              },
+              "snippet": "<span class=\"sc-vugip fNMpgK\">",
+              "nodeLabel": "La aplicacion que te permite"
+            }
+          }
+        ]
+      },
+      {
+        "type": "table",
+        "headings": [
+          {
+            "key": "phase",
+            "valueType": "text",
+            "label": "Phase"
+          },
+          {
+            "key": "percent",
+            "valueType": "text",
+            "label": "% of LCP"
+          },
+          {
+            "key": "timing",
+            "valueType": "ms",
+            "label": "Timing"
+          }
+        ],
+        "items": [
+          {
+            "phase": "TTFB",
+            "timing": 5.218,
+            "percent": "0%"
+          },
+          {
+            "phase": "Load Delay",
+            "timing": 0,
+            "percent": "0%"
+          },
+          {
+            "phase": "Load Time",
+            "timing": 0,
+            "percent": "0%"
+          },
+          {
+            "phase": "Render Delay",
+            "timing": 12046.610999999999,
+            "percent": "100%"
+          }
+        ]
+      }
+    ],
+    "unusedJavascript": [
+      {
+        "url": "http://localhost:5173/node_modules/.vite/deps/react-icons_fa.js?v=12970416",
+        "totalBytes": 1407409,
+        "wastedBytes": 1379616,
+        "wastedPercent": 98.02523644512718,
+        "subItems": {
+          "type": "subitems",
+          "items": [
+            {
+              "source": "…",
+              "sourceBytes": 1382717,
+              "sourceWastedBytes": 1379616
+            }
+          ]
+        }
+      },
+      {
+        "url": "http://localhost:5173/node_modules/.vite/deps/react-router-dom.js?v=12970416",
+        "totalBytes": 443541,
+        "wastedBytes": 391010,
+        "wastedPercent": 88.15645002378585,
+        "subItems": {
+          "type": "subitems",
+          "items": [
+            {
+              "source": "…react-router/dist/development/chunk-OIYGIGL5.mjs",
+              "sourceBytes": 330762,
+              "sourceWastedBytes": 286563
+            },
+            {
+              "source": "…react-router/dist/development/chunk-WY5IRSCW.mjs",
+              "sourceBytes": 90065,
+              "sourceWastedBytes": 88599
+            },
+            {
+              "source": "…react-router/dist/development/dom-export.mjs",
+              "sourceBytes": 6382,
+              "sourceWastedBytes": 6204
+            },
+            {
+              "source": "…set-cookie-parser/lib/set-cookie.js",
+              "sourceBytes": 5642,
+              "sourceWastedBytes": 5207
+            },
+            {
+              "source": "…cookie/src/index.ts",
+              "sourceBytes": 4733,
+              "sourceWastedBytes": 4157
+            }
+          ]
+        }
+      },
+      {
+        "url": "http://localhost:5173/node_modules/.vite/deps/react-icons_fc.js?v=12970416",
+        "totalBytes": 354321,
+        "wastedBytes": 348639,
+        "wastedPercent": 98.39636939385473,
+        "subItems": {
+          "type": "subitems",
+          "items": [
+            {
+              "source": "…",
+              "sourceBytes": 348968,
+              "sourceWastedBytes": 348639
+            }
+          ]
+        }
+      },
+      {
+        "url": "http://localhost:5173/node_modules/.vite/deps/chunk-YQ5BCTVV.js?v=12970416",
+        "totalBytes": 931930,
+        "wastedBytes": 306049,
+        "wastedPercent": 32.84034208577897,
+        "subItems": {
+          "type": "subitems",
+          "items": [
+            {
+              "source": "…react-dom/cjs/react-dom.development.js",
+              "sourceBytes": 913053,
+              "sourceWastedBytes": 302290
+            },
+            {
+              "source": "…scheduler/cjs/scheduler.development.js",
+              "sourceBytes": 16890,
+              "sourceWastedBytes": 3759
+            }
+          ]
+        }
+      },
+      {
+        "url": "http://localhost:5173/node_modules/.vite/deps/chunk-XPNUZFTB.js?v=12970416",
+        "totalBytes": 419961,
+        "wastedBytes": 241121,
+        "wastedPercent": 57.415093306283204,
+        "subItems": {
+          "type": "subitems",
+          "items": [
+            {
+              "source": "…motion-dom/src/projection/node/create-projection-node.ts",
+              "sourceBytes": 39377,
+              "sourceWastedBytes": 32879
+            },
+            {
+              "source": "…framer-motion/src/gestures/drag/VisualElementDragControls.ts",
+              "sourceBytes": 13868,
+              "sourceWastedBytes": 13768
+            },
+            {
+              "source": "…motion-dom/src/layout/LayoutAnimationBuilder.ts",
+              "sourceBytes": 7341,
+              "sourceWastedBytes": 7226
+            },
+            {
+              "source": "…framer-motion/src/animation/sequence/create.ts",
+              "sourceBytes": 6699,
+              "sourceWastedBytes": 6585
+            },
+            {
+              "source": "…framer-motion/src/gestures/pan/PanSession.ts",
+              "sourceBytes": 6617,
+              "sourceWastedBytes": 6521
+            }
+          ]
+        }
+      },
+      {
+        "url": "http://localhost:5173/node_modules/.vite/deps/react-icons_fi.js?v=12970416",
+        "totalBytes": 149379,
+        "wastedBytes": 134864,
+        "wastedPercent": 90.28310538964647,
+        "subItems": {
+          "type": "subitems",
+          "items": [
+            {
+              "source": "…",
+              "sourceBytes": 145135,
+              "sourceWastedBytes": 134864
+            }
+          ]
+        }
+      },
+      {
+        "url": "http://localhost:5173/node_modules/.vite/deps/@tanstack_react-query.js?v=12970416",
+        "totalBytes": 109540,
+        "wastedBytes": 96393,
+        "wastedPercent": 87.99799160124155,
+        "subItems": {
+          "type": "subitems",
+          "items": [
+            {
+              "source": "…query-core/src/queryObserver.ts",
+              "sourceBytes": 14627,
+              "sourceWastedBytes": 14539
+            },
+            {
+              "source": "…query-core/src/query.ts",
+              "sourceBytes": 10406,
+              "sourceWastedBytes": 10338
+            },
+            {
+              "source": "…query-core/src/queryClient.ts",
+              "sourceBytes": 8024,
+              "sourceWastedBytes": 7073
+            },
+            {
+              "source": "…query-core/src/utils.ts",
+              "sourceBytes": 6295,
+              "sourceWastedBytes": 6130
+            },
+            {
+              "source": "…query-core/src/queriesObserver.ts",
+              "sourceBytes": 5436,
+              "sourceWastedBytes": 5364
+            }
+          ]
+        }
+      },
+      {
+        "url": "http://localhost:5173/src/components/auth/RegisterForm.tsx",
+        "totalBytes": 108052,
+        "wastedBytes": 47532,
+        "wastedPercent": 43.989930774071745,
+        "subItems": {
+          "type": "subitems",
+          "items": [
+            {
+              "source": "…",
+              "sourceBytes": 50721,
+              "sourceWastedBytes": 47183
+            }
+          ]
+        }
+      },
+      {
+        "url": "http://localhost:5173/node_modules/.vite/deps/chunk-QJTFJ6OV.js?v=12970416",
+        "totalBytes": 77818,
+        "wastedBytes": 35687,
+        "wastedPercent": 45.85956976534992,
+        "subItems": {
+          "type": "subitems",
+          "items": [
+            {
+              "source": "…cjs/react.development.js",
+              "sourceBytes": 77050,
+              "sourceWastedBytes": 35687
+            }
+          ]
+        }
+      },
+      {
+        "url": "http://localhost:5173/node_modules/.vite/deps/sileo.js?v=12970416",
+        "totalBytes": 43111,
+        "wastedBytes": 29134,
+        "wastedPercent": 67.57904015216533,
+        "subItems": {
+          "type": "subitems",
+          "items": [
+            {
+              "source": "…index.mjs",
+              "sourceBytes": 41775,
+              "sourceWastedBytes": 28374
+            },
+            {
+              "source": "…cc-B6peeNak.mjs",
+              "sourceBytes": 762,
+              "sourceWastedBytes": 760
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "name": "Catalog",
+    "url": "http://localhost:5173/catalog",
+    "fcp": 8664.147,
+    "lcp": 11564.077,
+    "tbt": 677.2920000000013,
+    "cls": 0,
+    "tti": 11842.821,
+    "mainThreadWork": [
+      {
+        "group": "other",
+        "groupLabel": "Other",
+        "duration": 1884.1839999995816
+      },
+      {
+        "group": "scriptEvaluation",
+        "groupLabel": "Script Evaluation",
+        "duration": 1616.0919999999562
+      },
+      {
+        "group": "styleLayout",
+        "groupLabel": "Style & Layout",
+        "duration": 1086.0539999999996
+      },
+      {
+        "group": "paintCompositeRender",
+        "groupLabel": "Rendering",
+        "duration": 70.35599999999992
+      },
+      {
+        "group": "scriptParseCompile",
+        "groupLabel": "Script Parsing & Compilation",
+        "duration": 20.697
+      },
+      {
+        "group": "parseHTML",
+        "groupLabel": "Parse HTML & CSS",
+        "duration": 5.17
+      },
+      {
+        "group": "garbageCollection",
+        "groupLabel": "Garbage Collection",
+        "duration": 4.479
+      }
+    ],
+    "largestContentfulPaintElement": [
+      {
+        "type": "table",
+        "headings": [
+          {
+            "key": "node",
+            "valueType": "node",
+            "label": "Element"
+          }
+        ],
+        "items": [
+          {
+            "node": {
+              "type": "node",
+              "lhId": "page-10-P",
+              "path": "1,HTML,1,BODY,0,DIV,1,DIV,3,MAIN,0,DIV,0,DIV,0,DIV,1,P",
+              "selector": "div.sc-lgxuYe > div.sc-kplXrF > div.sc-hsRmLE > p.sc-cxZNbP",
+              "boundingRect": {
+                "top": 129,
+                "bottom": 171,
+                "left": 13,
+                "right": 399,
+                "width": 386,
+                "height": 42
+              },
+              "snippet": "<p class=\"sc-cxZNbP izsXdu\">",
+              "nodeLabel": "Descubre nuestra colección completa de palas de pádel con las mejores marcas y …"
+            }
+          }
+        ]
+      },
+      {
+        "type": "table",
+        "headings": [
+          {
+            "key": "phase",
+            "valueType": "text",
+            "label": "Phase"
+          },
+          {
+            "key": "percent",
+            "valueType": "text",
+            "label": "% of LCP"
+          },
+          {
+            "key": "timing",
+            "valueType": "ms",
+            "label": "Timing"
+          }
+        ],
+        "items": [
+          {
+            "phase": "TTFB",
+            "timing": 4.745000000953675,
+            "percent": "0%"
+          },
+          {
+            "phase": "Load Delay",
+            "timing": 0,
+            "percent": "0%"
+          },
+          {
+            "phase": "Load Time",
+            "timing": 0,
+            "percent": "0%"
+          },
+          {
+            "phase": "Render Delay",
+            "timing": 11559.331999999045,
+            "percent": "100%"
+          }
+        ]
+      }
+    ],
+    "unusedJavascript": [
+      {
+        "url": "http://localhost:5173/node_modules/.vite/deps/react-icons_fa.js?v=12970416",
+        "totalBytes": 1407409,
+        "wastedBytes": 1379616,
+        "wastedPercent": 98.02523644512718,
+        "subItems": {
+          "type": "subitems",
+          "items": [
+            {
+              "source": "…",
+              "sourceBytes": 1382717,
+              "sourceWastedBytes": 1379616
+            }
+          ]
+        }
+      },
+      {
+        "url": "http://localhost:5173/node_modules/.vite/deps/react-router-dom.js?v=12970416",
+        "totalBytes": 443541,
+        "wastedBytes": 388044,
+        "wastedPercent": 87.48774070491793,
+        "subItems": {
+          "type": "subitems",
+          "items": [
+            {
+              "source": "…react-router/dist/development/chunk-OIYGIGL5.mjs",
+              "sourceBytes": 330762,
+              "sourceWastedBytes": 283597
+            },
+            {
+              "source": "…react-router/dist/development/chunk-WY5IRSCW.mjs",
+              "sourceBytes": 90065,
+              "sourceWastedBytes": 88599
+            },
+            {
+              "source": "…react-router/dist/development/dom-export.mjs",
+              "sourceBytes": 6382,
+              "sourceWastedBytes": 6204
+            },
+            {
+              "source": "…set-cookie-parser/lib/set-cookie.js",
+              "sourceBytes": 5642,
+              "sourceWastedBytes": 5207
+            },
+            {
+              "source": "…cookie/src/index.ts",
+              "sourceBytes": 4733,
+              "sourceWastedBytes": 4157
+            }
+          ]
+        }
+      },
+      {
+        "url": "http://localhost:5173/node_modules/.vite/deps/react-icons_fc.js?v=12970416",
+        "totalBytes": 354321,
+        "wastedBytes": 348639,
+        "wastedPercent": 98.39636939385473,
+        "subItems": {
+          "type": "subitems",
+          "items": [
+            {
+              "source": "…",
+              "sourceBytes": 348968,
+              "sourceWastedBytes": 348639
+            }
+          ]
+        }
+      },
+      {
+        "url": "http://localhost:5173/node_modules/.vite/deps/chunk-YQ5BCTVV.js?v=12970416",
+        "totalBytes": 931930,
+        "wastedBytes": 298575,
+        "wastedPercent": 32.03835051988883,
+        "subItems": {
+          "type": "subitems",
+          "items": [
+            {
+              "source": "…react-dom/cjs/react-dom.development.js",
+              "sourceBytes": 913053,
+              "sourceWastedBytes": 294898
+            },
+            {
+              "source": "…scheduler/cjs/scheduler.development.js",
+              "sourceBytes": 16890,
+              "sourceWastedBytes": 3677
+            }
+          ]
+        }
+      },
+      {
+        "url": "http://localhost:5173/node_modules/.vite/deps/chunk-XPNUZFTB.js?v=12970416",
+        "totalBytes": 419961,
+        "wastedBytes": 239267,
+        "wastedPercent": 56.97362374125217,
+        "subItems": {
+          "type": "subitems",
+          "items": [
+            {
+              "source": "…motion-dom/src/projection/node/create-projection-node.ts",
+              "sourceBytes": 39377,
+              "sourceWastedBytes": 32421
+            },
+            {
+              "source": "…framer-motion/src/gestures/drag/VisualElementDragControls.ts",
+              "sourceBytes": 13868,
+              "sourceWastedBytes": 13768
+            },
+            {
+              "source": "…motion-dom/src/layout/LayoutAnimationBuilder.ts",
+              "sourceBytes": 7341,
+              "sourceWastedBytes": 7226
+            },
+            {
+              "source": "…framer-motion/src/animation/sequence/create.ts",
+              "sourceBytes": 6699,
+              "sourceWastedBytes": 6585
+            },
+            {
+              "source": "…framer-motion/src/gestures/pan/PanSession.ts",
+              "sourceBytes": 6617,
+              "sourceWastedBytes": 6521
+            }
+          ]
+        }
+      },
+      {
+        "url": "http://localhost:5173/node_modules/.vite/deps/react-icons_fi.js?v=12970416",
+        "totalBytes": 149379,
+        "wastedBytes": 135435,
+        "wastedPercent": 90.66535456791115,
+        "subItems": {
+          "type": "subitems",
+          "items": [
+            {
+              "source": "…",
+              "sourceBytes": 145135,
+              "sourceWastedBytes": 135435
+            }
+          ]
+        }
+      },
+      {
+        "url": "http://localhost:5173/node_modules/.vite/deps/@tanstack_react-query.js?v=12970416",
+        "totalBytes": 109540,
+        "wastedBytes": 96393,
+        "wastedPercent": 87.99799160124155,
+        "subItems": {
+          "type": "subitems",
+          "items": [
+            {
+              "source": "…query-core/src/queryObserver.ts",
+              "sourceBytes": 14627,
+              "sourceWastedBytes": 14539
+            },
+            {
+              "source": "…query-core/src/query.ts",
+              "sourceBytes": 10406,
+              "sourceWastedBytes": 10338
+            },
+            {
+              "source": "…query-core/src/queryClient.ts",
+              "sourceBytes": 8024,
+              "sourceWastedBytes": 7073
+            },
+            {
+              "source": "…query-core/src/utils.ts",
+              "sourceBytes": 6295,
+              "sourceWastedBytes": 6130
+            },
+            {
+              "source": "…query-core/src/queriesObserver.ts",
+              "sourceBytes": 5436,
+              "sourceWastedBytes": 5364
+            }
+          ]
+        }
+      },
+      {
+        "url": "http://localhost:5173/src/components/auth/RegisterForm.tsx",
+        "totalBytes": 108052,
+        "wastedBytes": 47532,
+        "wastedPercent": 43.989930774071745,
+        "subItems": {
+          "type": "subitems",
+          "items": [
+            {
+              "source": "…",
+              "sourceBytes": 50721,
+              "sourceWastedBytes": 47183
+            }
+          ]
+        }
+      },
+      {
+        "url": "http://localhost:5173/node_modules/.vite/deps/chunk-QJTFJ6OV.js?v=12970416",
+        "totalBytes": 77818,
+        "wastedBytes": 34465,
+        "wastedPercent": 44.28923899354905,
+        "subItems": {
+          "type": "subitems",
+          "items": [
+            {
+              "source": "…cjs/react.development.js",
+              "sourceBytes": 77050,
+              "sourceWastedBytes": 34465
+            }
+          ]
+        }
+      },
+      {
+        "url": "http://localhost:5173/node_modules/.vite/deps/sileo.js?v=12970416",
+        "totalBytes": 43111,
+        "wastedBytes": 29134,
+        "wastedPercent": 67.57904015216533,
+        "subItems": {
+          "type": "subitems",
+          "items": [
+            {
+              "source": "…index.mjs",
+              "sourceBytes": 41775,
+              "sourceWastedBytes": 28374
+            },
+            {
+              "source": "…cc-B6peeNak.mjs",
+              "sourceBytes": 762,
+              "sourceWastedBytes": 760
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "name": "Compare",
+    "url": "http://localhost:5173/compare",
+    "fcp": 8664.464,
+    "lcp": 10014.494,
+    "tbt": 330.14800000000105,
+    "cls": 0,
+    "tti": 10490.852,
+    "mainThreadWork": [
+      {
+        "group": "other",
+        "groupLabel": "Other",
+        "duration": 1529.1409999996588
+      },
+      {
+        "group": "scriptEvaluation",
+        "groupLabel": "Script Evaluation",
+        "duration": 1005.7689999999753
+      },
+      {
+        "group": "styleLayout",
+        "groupLabel": "Style & Layout",
+        "duration": 489.549
+      },
+      {
+        "group": "paintCompositeRender",
+        "groupLabel": "Rendering",
+        "duration": 24.193000000000033
+      },
+      {
+        "group": "scriptParseCompile",
+        "groupLabel": "Script Parsing & Compilation",
+        "duration": 21.353999999999996
+      },
+      {
+        "group": "parseHTML",
+        "groupLabel": "Parse HTML & CSS",
+        "duration": 4.428
+      },
+      {
+        "group": "garbageCollection",
+        "groupLabel": "Garbage Collection",
+        "duration": 4.396999999999999
+      }
+    ],
+    "largestContentfulPaintElement": [
+      {
+        "type": "table",
+        "headings": [
+          {
+            "key": "node",
+            "valueType": "node",
+            "label": "Element"
+          }
+        ],
+        "items": [
+          {
+            "node": {
+              "type": "node",
+              "lhId": "page-0-P",
+              "path": "1,HTML,1,BODY,0,DIV,1,DIV,3,MAIN,0,DIV,0,DIV,1,P",
+              "selector": "main#main-content > div.sc-cETWCA > div.sc-eOyLsQ > p.sc-bjzMPS",
+              "boundingRect": {
+                "top": 149,
+                "bottom": 212,
+                "left": 26,
+                "right": 386,
+                "width": 360,
+                "height": 62
+              },
+              "snippet": "<p class=\"sc-bjzMPS cRmWUp\">",
+              "nodeLabel": "Utiliza nuestras herramientas avanzadas para encontrar la pala perfecta para tu…"
+            }
+          }
+        ]
+      },
+      {
+        "type": "table",
+        "headings": [
+          {
+            "key": "phase",
+            "valueType": "text",
+            "label": "Phase"
+          },
+          {
+            "key": "percent",
+            "valueType": "text",
+            "label": "% of LCP"
+          },
+          {
+            "key": "timing",
+            "valueType": "ms",
+            "label": "Timing"
+          }
+        ],
+        "items": [
+          {
+            "phase": "TTFB",
+            "timing": 4.701,
+            "percent": "0%"
+          },
+          {
+            "phase": "Load Delay",
+            "timing": 0,
+            "percent": "0%"
+          },
+          {
+            "phase": "Load Time",
+            "timing": 0,
+            "percent": "0%"
+          },
+          {
+            "phase": "Render Delay",
+            "timing": 10009.793000000001,
+            "percent": "100%"
+          }
+        ]
+      }
+    ],
+    "unusedJavascript": [
+      {
+        "url": "http://localhost:5173/node_modules/.vite/deps/react-icons_fa.js?v=12970416",
+        "totalBytes": 1407409,
+        "wastedBytes": 1379616,
+        "wastedPercent": 98.02523644512718,
+        "subItems": {
+          "type": "subitems",
+          "items": [
+            {
+              "source": "…",
+              "sourceBytes": 1382717,
+              "sourceWastedBytes": 1379616
+            }
+          ]
+        }
+      },
+      {
+        "url": "http://localhost:5173/node_modules/.vite/deps/react-router-dom.js?v=12970416",
+        "totalBytes": 443541,
+        "wastedBytes": 391010,
+        "wastedPercent": 88.15645002378585,
+        "subItems": {
+          "type": "subitems",
+          "items": [
+            {
+              "source": "…react-router/dist/development/chunk-OIYGIGL5.mjs",
+              "sourceBytes": 330762,
+              "sourceWastedBytes": 286563
+            },
+            {
+              "source": "…react-router/dist/development/chunk-WY5IRSCW.mjs",
+              "sourceBytes": 90065,
+              "sourceWastedBytes": 88599
+            },
+            {
+              "source": "…react-router/dist/development/dom-export.mjs",
+              "sourceBytes": 6382,
+              "sourceWastedBytes": 6204
+            },
+            {
+              "source": "…set-cookie-parser/lib/set-cookie.js",
+              "sourceBytes": 5642,
+              "sourceWastedBytes": 5207
+            },
+            {
+              "source": "…cookie/src/index.ts",
+              "sourceBytes": 4733,
+              "sourceWastedBytes": 4157
+            }
+          ]
+        }
+      },
+      {
+        "url": "http://localhost:5173/node_modules/.vite/deps/react-icons_fc.js?v=12970416",
+        "totalBytes": 354321,
+        "wastedBytes": 348639,
+        "wastedPercent": 98.39636939385473,
+        "subItems": {
+          "type": "subitems",
+          "items": [
+            {
+              "source": "…",
+              "sourceBytes": 348968,
+              "sourceWastedBytes": 348639
+            }
+          ]
+        }
+      },
+      {
+        "url": "http://localhost:5173/node_modules/.vite/deps/chunk-YQ5BCTVV.js?v=12970416",
+        "totalBytes": 931930,
+        "wastedBytes": 305094,
+        "wastedPercent": 32.73786657796187,
+        "subItems": {
+          "type": "subitems",
+          "items": [
+            {
+              "source": "…react-dom/cjs/react-dom.development.js",
+              "sourceBytes": 913053,
+              "sourceWastedBytes": 301417
+            },
+            {
+              "source": "…scheduler/cjs/scheduler.development.js",
+              "sourceBytes": 16890,
+              "sourceWastedBytes": 3677
+            }
+          ]
+        }
+      },
+      {
+        "url": "http://localhost:5173/node_modules/.vite/deps/chunk-XPNUZFTB.js?v=12970416",
+        "totalBytes": 419961,
+        "wastedBytes": 243303,
+        "wastedPercent": 57.9346653617836,
+        "subItems": {
+          "type": "subitems",
+          "items": [
+            {
+              "source": "…motion-dom/src/projection/node/create-projection-node.ts",
+              "sourceBytes": 39377,
+              "sourceWastedBytes": 32879
+            },
+            {
+              "source": "…framer-motion/src/gestures/drag/VisualElementDragControls.ts",
+              "sourceBytes": 13868,
+              "sourceWastedBytes": 13768
+            },
+            {
+              "source": "…motion-dom/src/layout/LayoutAnimationBuilder.ts",
+              "sourceBytes": 7341,
+              "sourceWastedBytes": 7226
+            },
+            {
+              "source": "…framer-motion/src/animation/sequence/create.ts",
+              "sourceBytes": 6699,
+              "sourceWastedBytes": 6585
+            },
+            {
+              "source": "…framer-motion/src/gestures/pan/PanSession.ts",
+              "sourceBytes": 6617,
+              "sourceWastedBytes": 6521
+            }
+          ]
+        }
+      },
+      {
+        "url": "http://localhost:5173/node_modules/.vite/deps/react-icons_fi.js?v=12970416",
+        "totalBytes": 149379,
+        "wastedBytes": 135751,
+        "wastedPercent": 90.87689702033084,
+        "subItems": {
+          "type": "subitems",
+          "items": [
+            {
+              "source": "…",
+              "sourceBytes": 145135,
+              "sourceWastedBytes": 135751
+            }
+          ]
+        }
+      },
+      {
+        "url": "http://localhost:5173/node_modules/.vite/deps/@tanstack_react-query.js?v=12970416",
+        "totalBytes": 109540,
+        "wastedBytes": 96393,
+        "wastedPercent": 87.99799160124155,
+        "subItems": {
+          "type": "subitems",
+          "items": [
+            {
+              "source": "…query-core/src/queryObserver.ts",
+              "sourceBytes": 14627,
+              "sourceWastedBytes": 14539
+            },
+            {
+              "source": "…query-core/src/query.ts",
+              "sourceBytes": 10406,
+              "sourceWastedBytes": 10338
+            },
+            {
+              "source": "…query-core/src/queryClient.ts",
+              "sourceBytes": 8024,
+              "sourceWastedBytes": 7073
+            },
+            {
+              "source": "…query-core/src/utils.ts",
+              "sourceBytes": 6295,
+              "sourceWastedBytes": 6130
+            },
+            {
+              "source": "…query-core/src/queriesObserver.ts",
+              "sourceBytes": 5436,
+              "sourceWastedBytes": 5364
+            }
+          ]
+        }
+      },
+      {
+        "url": "http://localhost:5173/src/components/auth/RegisterForm.tsx",
+        "totalBytes": 108052,
+        "wastedBytes": 47532,
+        "wastedPercent": 43.989930774071745,
+        "subItems": {
+          "type": "subitems",
+          "items": [
+            {
+              "source": "…",
+              "sourceBytes": 50721,
+              "sourceWastedBytes": 47183
+            }
+          ]
+        }
+      },
+      {
+        "url": "http://localhost:5173/node_modules/.vite/deps/chunk-QJTFJ6OV.js?v=12970416",
+        "totalBytes": 77818,
+        "wastedBytes": 35687,
+        "wastedPercent": 45.85956976534992,
+        "subItems": {
+          "type": "subitems",
+          "items": [
+            {
+              "source": "…cjs/react.development.js",
+              "sourceBytes": 77050,
+              "sourceWastedBytes": 35687
+            }
+          ]
+        }
+      },
+      {
+        "url": "http://localhost:5173/node_modules/.vite/deps/sileo.js?v=12970416",
+        "totalBytes": 43111,
+        "wastedBytes": 29134,
+        "wastedPercent": 67.57904015216533,
+        "subItems": {
+          "type": "subitems",
+          "items": [
+            {
+              "source": "…index.mjs",
+              "sourceBytes": 41775,
+              "sourceWastedBytes": 28374
+            },
+            {
+              "source": "…cc-B6peeNak.mjs",
+              "sourceBytes": 762,
+              "sourceWastedBytes": 760
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "name": "FAQ",
+    "url": "http://localhost:5173/faq",
+    "fcp": 8694.785,
+    "lcp": 10761.397,
+    "tbt": 317.3660000000018,
+    "cls": 0,
+    "tti": 10736.388,
+    "mainThreadWork": [
+      {
+        "group": "other",
+        "groupLabel": "Other",
+        "duration": 1492.182999999637
+      },
+      {
+        "group": "scriptEvaluation",
+        "groupLabel": "Script Evaluation",
+        "duration": 1126.4209999999705
+      },
+      {
+        "group": "styleLayout",
+        "groupLabel": "Style & Layout",
+        "duration": 660.175
+      },
+      {
+        "group": "paintCompositeRender",
+        "groupLabel": "Rendering",
+        "duration": 29.75600000000002
+      },
+      {
+        "group": "scriptParseCompile",
+        "groupLabel": "Script Parsing & Compilation",
+        "duration": 20.857000000000003
+      },
+      {
+        "group": "garbageCollection",
+        "groupLabel": "Garbage Collection",
+        "duration": 4.078999999999999
+      },
+      {
+        "group": "parseHTML",
+        "groupLabel": "Parse HTML & CSS",
+        "duration": 4.01
+      }
+    ],
+    "largestContentfulPaintElement": [
+      {
+        "type": "table",
+        "headings": [
+          {
+            "key": "node",
+            "valueType": "node",
+            "label": "Element"
+          }
+        ],
+        "items": [
+          {
+            "node": {
+              "type": "node",
+              "lhId": "page-0-P",
+              "path": "1,HTML,1,BODY,0,DIV,1,DIV,3,MAIN,0,DIV,0,DIV,1,P",
+              "selector": "main#main-content > div.sc-cETWCA > div.sc-eOyLsQ > p.sc-fFrLqr",
+              "boundingRect": {
+                "top": 131,
+                "bottom": 166,
+                "left": 20,
+                "right": 393,
+                "width": 373,
+                "height": 35
+              },
+              "snippet": "<p class=\"sc-fFrLqr fDTbMc\">",
+              "nodeLabel": "Encuentra respuestas a las preguntas más comunes sobre Smashly"
+            }
+          }
+        ]
+      },
+      {
+        "type": "table",
+        "headings": [
+          {
+            "key": "phase",
+            "valueType": "text",
+            "label": "Phase"
+          },
+          {
+            "key": "percent",
+            "valueType": "text",
+            "label": "% of LCP"
+          },
+          {
+            "key": "timing",
+            "valueType": "ms",
+            "label": "Timing"
+          }
+        ],
+        "items": [
+          {
+            "phase": "TTFB",
+            "timing": 3.696,
+            "percent": "0%"
+          },
+          {
+            "phase": "Load Delay",
+            "timing": 0,
+            "percent": "0%"
+          },
+          {
+            "phase": "Load Time",
+            "timing": 0,
+            "percent": "0%"
+          },
+          {
+            "phase": "Render Delay",
+            "timing": 10757.701000000001,
+            "percent": "100%"
+          }
+        ]
+      }
+    ],
+    "unusedJavascript": [
+      {
+        "url": "http://localhost:5173/node_modules/.vite/deps/react-icons_fa.js?v=12970416",
+        "totalBytes": 1407409,
+        "wastedBytes": 1379616,
+        "wastedPercent": 98.02523644512718,
+        "subItems": {
+          "type": "subitems",
+          "items": [
+            {
+              "source": "…",
+              "sourceBytes": 1382717,
+              "sourceWastedBytes": 1379616
+            }
+          ]
+        }
+      },
+      {
+        "url": "http://localhost:5173/node_modules/.vite/deps/react-router-dom.js?v=12970416",
+        "totalBytes": 443541,
+        "wastedBytes": 391174,
+        "wastedPercent": 88.1934251850449,
+        "subItems": {
+          "type": "subitems",
+          "items": [
+            {
+              "source": "…react-router/dist/development/chunk-OIYGIGL5.mjs",
+              "sourceBytes": 330762,
+              "sourceWastedBytes": 286727
+            },
+            {
+              "source": "…react-router/dist/development/chunk-WY5IRSCW.mjs",
+              "sourceBytes": 90065,
+              "sourceWastedBytes": 88599
+            },
+            {
+              "source": "…react-router/dist/development/dom-export.mjs",
+              "sourceBytes": 6382,
+              "sourceWastedBytes": 6204
+            },
+            {
+              "source": "…set-cookie-parser/lib/set-cookie.js",
+              "sourceBytes": 5642,
+              "sourceWastedBytes": 5207
+            },
+            {
+              "source": "…cookie/src/index.ts",
+              "sourceBytes": 4733,
+              "sourceWastedBytes": 4157
+            }
+          ]
+        }
+      },
+      {
+        "url": "http://localhost:5173/node_modules/.vite/deps/react-icons_fc.js?v=12970416",
+        "totalBytes": 354321,
+        "wastedBytes": 348639,
+        "wastedPercent": 98.39636939385473,
+        "subItems": {
+          "type": "subitems",
+          "items": [
+            {
+              "source": "…",
+              "sourceBytes": 348968,
+              "sourceWastedBytes": 348639
+            }
+          ]
+        }
+      },
+      {
+        "url": "http://localhost:5173/node_modules/.vite/deps/chunk-YQ5BCTVV.js?v=12970416",
+        "totalBytes": 931930,
+        "wastedBytes": 291431,
+        "wastedPercent": 31.271769338898842,
+        "subItems": {
+          "type": "subitems",
+          "items": [
+            {
+              "source": "…react-dom/cjs/react-dom.development.js",
+              "sourceBytes": 913053,
+              "sourceWastedBytes": 287754
+            },
+            {
+              "source": "…scheduler/cjs/scheduler.development.js",
+              "sourceBytes": 16890,
+              "sourceWastedBytes": 3677
+            }
+          ]
+        }
+      },
+      {
+        "url": "http://localhost:5173/node_modules/.vite/deps/chunk-XPNUZFTB.js?v=12970416",
+        "totalBytes": 419961,
+        "wastedBytes": 246306,
+        "wastedPercent": 58.649731760806354,
+        "subItems": {
+          "type": "subitems",
+          "items": [
+            {
+              "source": "…motion-dom/src/projection/node/create-projection-node.ts",
+              "sourceBytes": 39377,
+              "sourceWastedBytes": 32879
+            },
+            {
+              "source": "…framer-motion/src/gestures/drag/VisualElementDragControls.ts",
+              "sourceBytes": 13868,
+              "sourceWastedBytes": 13768
+            },
+            {
+              "source": "…motion-dom/src/layout/LayoutAnimationBuilder.ts",
+              "sourceBytes": 7341,
+              "sourceWastedBytes": 7226
+            },
+            {
+              "source": "…framer-motion/src/animation/sequence/create.ts",
+              "sourceBytes": 6699,
+              "sourceWastedBytes": 6585
+            },
+            {
+              "source": "…framer-motion/src/gestures/pan/PanSession.ts",
+              "sourceBytes": 6617,
+              "sourceWastedBytes": 6521
+            }
+          ]
+        }
+      },
+      {
+        "url": "http://localhost:5173/node_modules/.vite/deps/react-icons_fi.js?v=12970416",
+        "totalBytes": 149379,
+        "wastedBytes": 137003,
+        "wastedPercent": 91.71503357232275,
+        "subItems": {
+          "type": "subitems",
+          "items": [
+            {
+              "source": "…",
+              "sourceBytes": 145135,
+              "sourceWastedBytes": 137003
+            }
+          ]
+        }
+      },
+      {
+        "url": "http://localhost:5173/node_modules/.vite/deps/@tanstack_react-query.js?v=12970416",
+        "totalBytes": 109540,
+        "wastedBytes": 96393,
+        "wastedPercent": 87.99799160124155,
+        "subItems": {
+          "type": "subitems",
+          "items": [
+            {
+              "source": "…query-core/src/queryObserver.ts",
+              "sourceBytes": 14627,
+              "sourceWastedBytes": 14539
+            },
+            {
+              "source": "…query-core/src/query.ts",
+              "sourceBytes": 10406,
+              "sourceWastedBytes": 10338
+            },
+            {
+              "source": "…query-core/src/queryClient.ts",
+              "sourceBytes": 8024,
+              "sourceWastedBytes": 7073
+            },
+            {
+              "source": "…query-core/src/utils.ts",
+              "sourceBytes": 6295,
+              "sourceWastedBytes": 6130
+            },
+            {
+              "source": "…query-core/src/queriesObserver.ts",
+              "sourceBytes": 5436,
+              "sourceWastedBytes": 5364
+            }
+          ]
+        }
+      },
+      {
+        "url": "http://localhost:5173/src/components/auth/RegisterForm.tsx",
+        "totalBytes": 108052,
+        "wastedBytes": 47532,
+        "wastedPercent": 43.989930774071745,
+        "subItems": {
+          "type": "subitems",
+          "items": [
+            {
+              "source": "…",
+              "sourceBytes": 50721,
+              "sourceWastedBytes": 47183
+            }
+          ]
+        }
+      },
+      {
+        "url": "http://localhost:5173/node_modules/.vite/deps/chunk-QJTFJ6OV.js?v=12970416",
+        "totalBytes": 77818,
+        "wastedBytes": 35622,
+        "wastedPercent": 45.77604153280732,
+        "subItems": {
+          "type": "subitems",
+          "items": [
+            {
+              "source": "…cjs/react.development.js",
+              "sourceBytes": 77050,
+              "sourceWastedBytes": 35622
+            }
+          ]
+        }
+      },
+      {
+        "url": "http://localhost:5173/node_modules/.vite/deps/sileo.js?v=12970416",
+        "totalBytes": 43111,
+        "wastedBytes": 29134,
+        "wastedPercent": 67.57904015216533,
+        "subItems": {
+          "type": "subitems",
+          "items": [
+            {
+              "source": "…index.mjs",
+              "sourceBytes": 41775,
+              "sourceWastedBytes": 28374
+            },
+            {
+              "source": "…cc-B6peeNak.mjs",
+              "sourceBytes": 762,
+              "sourceWastedBytes": 760
+            }
+          ]
+        }
+      }
+    ]
+  }
+]

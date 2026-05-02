@@ -14,11 +14,10 @@ const RacketCardContainer = styled.li<{ $view: 'grid' | 'list'; $index: number }
   cursor: pointer;
   transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
   border: 1px solid rgba(22, 163, 74, 0.1);
-
+  contain: layout style paint;
   display: ${props => (props.$view === 'list' ? 'flex' : 'flex')};
   flex-direction: ${props => (props.$view === 'list' ? 'row' : 'column')};
   height: ${props => (props.$view === 'grid' ? '100%' : 'auto')};
-
   animation: cardFadeIn 0.4s ease forwards;
   animation-delay: ${props => Math.min(props.$index * 0.05, 0.5)}s;
   opacity: 0;
@@ -290,6 +289,8 @@ const RacketCardComponent: React.FC<RacketCardProps> = memo(
             }
             alt={racket.modelo}
             onError={handleImageError}
+            loading="lazy"
+            decoding="async"
           />
           {racket.view_count !== undefined && racket.view_count > 10 && (
             <RacketBadge $variant='bestseller'>
