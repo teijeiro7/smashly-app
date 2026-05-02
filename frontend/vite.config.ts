@@ -142,8 +142,15 @@ export default defineConfig(({ mode }) => ({
       output: {
         // More granular chunk splitting for better caching
         manualChunks: (id) => {
-          // React core
-          if (id.includes('react-dom') || id.includes('react/')) {
+          // React core — match only the actual react package,
+          // not react-is, react-smooth, etc. that belong to other chunks
+          if (
+            id.includes('node_modules/react-dom/') ||
+            (id.includes('node_modules/react/') &&
+              !id.includes('react-is') &&
+              !id.includes('react-smooth') &&
+              !id.includes('react-transition-group'))
+          ) {
             return 'vendor-react';
           }
           // Router
@@ -158,8 +165,12 @@ export default defineConfig(({ mode }) => ({
           if (id.includes('styled-components') || id.includes('framer-motion')) {
             return 'vendor-ui';
           }
-          // Charts (lazy load)
-          if (id.includes('recharts')) {
+          // Charts (lazy load) — include recharts and its deps
+          if (
+            id.includes('recharts') ||
+            id.includes('react-smooth') ||
+            id.includes('react-is')
+          ) {
             return 'vendor-charts';
           }
           // PDF generation (lazy load)
@@ -188,7 +199,6 @@ export default defineConfig(({ mode }) => ({
     ],
     // Exclude heavy libs from optimization to load on demand
     exclude: [
-      'recharts',
       'jspdf',
       'html2canvas',
       'react-markdown',
