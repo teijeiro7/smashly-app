@@ -852,7 +852,7 @@ const CatalogPage: React.FC = () => {
 
   // Handlers
   const handleRacketClick = (racket: Racket) => {
-    navigate(`/racket-detail?id=${encodeURIComponent(racket.nombre)}`);
+    navigate(`/racket-detail?id=${racket.id}`);
   };
 
   const handleLoadMore = useCallback(() => {

@@ -2,17 +2,75 @@ import NodeCache from 'node-cache';
 import crypto from 'crypto';
 import logger from '../config/logger';
 import { RecommendationResult, BasicFormData, AdvancedFormData } from '../types/recommendation';
+import { Racket } from '../types';
 
 /**
  * Cache service for storing recommendation results
  * Uses in-memory cache with TTL
  */
 export class CacheService {
+  // Recommendation cache (7 days TTL)
   private static cache = new NodeCache({
     stdTTL: 604800, // 7 days in seconds
     checkperiod: 3600, // Check for expired keys every hour
     useClones: false, // Don't clone objects for better performance
   });
+
+  // Catalog cache (1 hour TTL — enough since prices update weekly)
+  private static CATALOG_KEY = 'catalog_rackets';
+  private static CATALOG_VERSION_KEY = 'catalog_version';
+  private static catalogCache = new NodeCache({
+    stdTTL: 3600, // 1 hour
+    checkperiod: 300, // Check expired every 5 min
+    useClones: false,
+  });
+
+  // --- Catalog Caching ---
+
+  /**
+   * Guarda el catálogo completo de palas en caché
+   */
+  static setCatalog(rackets: Racket[]): void {
+    this.catalogCache.set<Racket[]>(this.CATALOG_KEY, rackets);
+    logger.info(`💾 Catálogo cacheado (${rackets.length} palas)`);
+  }
+
+  /**
+   * Obtiene el catálogo completo de palas desde caché
+   */
+  static getCatalog(): Racket[] | null {
+    const cached = this.catalogCache.get<Racket[]>(this.CATALOG_KEY);
+    if (cached) {
+      logger.info(`✅ Catálogo HIT (${cached.length} palas desde RAM)`);
+      return cached;
+    }
+    logger.info('❌ Catálogo MISS');
+    return null;
+  }
+
+  /**
+   * Guarda la versión/hash actual del catálogo (basado en max updated_at)
+   */
+  static setCatalogVersion(version: string): void {
+    this.catalogCache.set<string>(this.CATALOG_VERSION_KEY, version);
+    logger.info(`💾 Versión de catálogo cacheada: ${version}`);
+  }
+
+  /**
+   * Obtiene la versión/hash actual del catálogo
+   */
+  static getCatalogVersion(): string | null {
+    return this.catalogCache.get<string>(this.CATALOG_VERSION_KEY) || null;
+  }
+
+  /**
+   * Invalida la caché del catálogo (llamar tras actualizaciones/imports)
+   */
+  static invalidateCatalog(): void {
+    this.catalogCache.del(this.CATALOG_KEY);
+    this.catalogCache.del(this.CATALOG_VERSION_KEY);
+    logger.info('🗑️  Caché de catálogo invalidada');
+  }
 
   /**
    * Generate a unique hash for a user profile
@@ -84,23 +142,33 @@ export class CacheService {
   }
 
   /**
-   * Clear all cache (useful when catalog is updated)
+   * Clear all caches (recommendations + catalog)
    */
   static clearAll(): void {
     this.cache.flushAll();
-    logger.info('🗑️  Cache cleared');
+    this.catalogCache.flushAll();
+    logger.info('🗑️  Todas las cachés limpiadas');
   }
 
   /**
-   * Get cache statistics
+   * Get cache statistics for both caches
    */
   static getStats() {
     const stats = this.cache.getStats();
+    const catalogStats = this.catalogCache.getStats();
     return {
-      keys: this.cache.keys().length,
-      hits: stats.hits,
-      misses: stats.misses,
-      hitRate: stats.hits / (stats.hits + stats.misses) || 0,
+      recommendations: {
+        keys: this.cache.keys().length,
+        hits: stats.hits,
+        misses: stats.misses,
+        hitRate: stats.hits / (stats.hits + stats.misses) || 0,
+      },
+      catalog: {
+        keys: this.catalogCache.keys().length,
+        hits: catalogStats.hits,
+        misses: catalogStats.misses,
+        hitRate: catalogStats.hits / (catalogStats.hits + catalogStats.misses) || 0,
+      },
     };
   }
 }
