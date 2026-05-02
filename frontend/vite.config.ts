@@ -141,37 +141,6 @@ export default defineConfig(({ mode }) => ({
     rollupOptions: {
       output: {
         // More granular chunk splitting for better caching
-        manualChunks: (id) => {
-          if (id.includes('node_modules')) {
-            if (id.includes('react') || id.includes('react-dom')) {
-              return 'vendor-react';
-            }
-            if (id.includes('react-router') || id.includes('react-router-dom')) {
-              return 'vendor-router';
-            }
-            if (id.includes('@tanstack') || id.includes('supabase')) {
-              return 'vendor-data';
-            }
-            if (id.includes('styled-components') || id.includes('framer-motion')) {
-              return 'vendor-ui';
-            }
-            if (id.includes('recharts')) {
-              return 'vendor-charts';
-            }
-            // PDF generation (lazy load)
-            if (id.includes('jspdf') || id.includes('html2canvas')) {
-              return 'vendor-pdf';
-            }
-            // Markdown (lazy load)
-            if (id.includes('react-markdown') || id.includes('remark')) {
-              return 'vendor-markdown';
-            }
-            // Drag & drop (lazy load)
-            if (id.includes('@dnd-kit')) {
-              return 'vendor-dnd';
-            }
-          }
-        },
       },
     },
   },
