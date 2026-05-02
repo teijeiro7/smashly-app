@@ -36,6 +36,8 @@ export class RacketController {
         } as ApiResponse<PaginatedResponse<Racket>>);
       } else {
         const rackets = await RacketService.getAllRackets();
+        // Cache-Control: catálogo cambia poco, 5 min de CDN cache + stale-while-revalidate
+        res.set('Cache-Control', 'public, max-age=300, stale-while-revalidate=600');
         res.json({
           success: true,
           data: rackets,
@@ -438,6 +440,31 @@ export class RacketController {
       res.status(500).json({
         success: false,
         error: 'Error interno del servidor',
+        message: getErrorMessage(error),
+        timestamp: new Date().toISOString(),
+      } as ApiResponse);
+    }
+  }
+
+  /**
+   * GET /api/rackets/version
+   * Devuelve la versión actual del catálogo (hash basado en updated_at + count)
+   * El frontend usa esto para saber si debe recargar los datos o usar caché local
+   */
+  static async getCatalogVersion(req: Request, res: Response): Promise<void> {
+    try {
+      const version = await RacketService.getCatalogVersion();
+
+      res.json({
+        success: true,
+        data: { version },
+        timestamp: new Date().toISOString(),
+      } as ApiResponse);
+    } catch (error: unknown) {
+      logger.error('Error in getCatalogVersion:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Error al obtener versión del catálogo',
         message: getErrorMessage(error),
         timestamp: new Date().toISOString(),
       } as ApiResponse);

@@ -37,6 +37,9 @@ router.get('/brands', optionalAuth, RacketController.getBrands);
 // GET /api/rackets/stats - Gets racket statistics
 router.get('/stats', optionalAuth, RacketController.getStats);
 
+// GET /api/rackets/version - Gets catalog version hash (lightweight, no auth needed)
+router.get('/version', RacketController.getCatalogVersion);
+
 // GET /api/rackets/brands/:brand - Gets rackets by specific brand
 router.get('/brands/:brand', optionalAuth, RacketController.getRacketsByBrand);
 

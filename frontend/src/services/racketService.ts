@@ -212,6 +212,73 @@ export class RacketService {
   }
 
   /**
+   * Obtiene la versión actual del catálogo (hash ligero)
+   * Sirve para decidir si recargar datos del servidor o usar caché local
+   */
+  static async getCatalogVersion(): Promise<string> {
+    try {
+      const url = buildApiUrl(API_ENDPOINTS.RACKETS_VERSION);
+      const response = await fetch(url, { credentials: 'include' });
+      const data = await response.json();
+      return data?.data?.version || 'unknown';
+    } catch (error: any) {
+      console.warn('Error fetching catalog version:', error);
+      return 'unknown';
+    }
+  }
+
+  /**
+   * Obtiene todas las palas con soporte de caché local (localStorage)
+   * - Primero checkea versión del servidor
+   * - Si la versión coincide con la local → carga desde localStorage (instantáneo)
+   * - Si cambió → fetch de API, guarda en localStorage, retorna
+   */
+  static async getAllRacketsCached(): Promise<Racket[]> {
+    const CACHE_KEY = 'smashly_catalog';
+    const VERSION_KEY = 'smashly_catalog_version';
+
+    try {
+      // 1. Obtener versión del servidor (request ligero)
+      const serverVersion = await this.getCatalogVersion();
+
+      // 2. Checkear versión local
+      const localVersion = localStorage.getItem(VERSION_KEY);
+      const localData = localStorage.getItem(CACHE_KEY);
+
+      if (localVersion === serverVersion && localData) {
+        try {
+          const parsed = JSON.parse(localData);
+          console.log(`⚡ Catálogo cargado desde localStorage (${parsed.length} palas, versión: ${serverVersion})`);
+          return parsed;
+        } catch {
+          // Datos corruptos, ignorar
+          localStorage.removeItem(CACHE_KEY);
+          localStorage.removeItem(VERSION_KEY);
+        }
+      }
+
+      // 3. Versión diferente o sin caché → fetch de API
+      console.log('🔄 Versión de catálogo cambiada, recargando desde API...');
+      const rackets = await this.getAllRackets();
+
+      // 4. Guardar en localStorage
+      try {
+        localStorage.setItem(CACHE_KEY, JSON.stringify(rackets));
+        localStorage.setItem(VERSION_KEY, serverVersion);
+        console.log(`💾 Catálogo guardado en localStorage (${rackets.length} palas)`);
+      } catch (e) {
+        console.warn('No se pudo guardar en localStorage (posiblemente quota excedida):', e);
+      }
+
+      return rackets;
+    } catch (error: any) {
+      // Fallback: si falla el version check, cargar normal
+      console.warn('Error en carga cacheada, fallback a API directa:', error);
+      return this.getAllRackets();
+    }
+  }
+
+  /**
    * Obtiene estadísticas básicas desde la API REST
    */
   static async getStats(): Promise<{
