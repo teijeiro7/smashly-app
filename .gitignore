@@ -247,6 +247,7 @@ edgedriver.log
 # Lighthouse reports
 lighthouse-report.html
 lhci_reports/
+performance/
 
 # ===================================
 # BUILD & DEPLOYMENT
@@ -369,3 +370,6 @@ frontend/dev-dist/
 .github/copilot-instructions.md
 /scratch
 
+AGENTS.md
+opencode.json
+docs/TFG_Cristian_Teijeiro

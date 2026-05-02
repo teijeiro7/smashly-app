@@ -36,6 +36,8 @@ export class RacketController {
         } as ApiResponse<PaginatedResponse<Racket>>);
       } else {
         const rackets = await RacketService.getAllRackets();
+        // Cache-Control: catálogo cambia poco, 5 min de CDN cache + stale-while-revalidate
+        res.set('Cache-Control', 'public, max-age=300, stale-while-revalidate=600');
         res.json({
           success: true,
           data: rackets,
@@ -91,6 +93,53 @@ export class RacketController {
       } as ApiResponse<Racket>);
     } catch (error: unknown) {
       logger.error('Error in getRacketById:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Error interno del servidor',
+        message: getErrorMessage(error),
+        timestamp: new Date().toISOString(),
+      } as ApiResponse);
+    }
+  }
+
+  /**
+   * GET /api/rackets/by-name/:nombre
+   * Obtiene una pala por su nombre exacto (case-insensitive)
+   * Usado para compatibilidad con URLs antiguas por nombre
+   */
+  static async getRacketByName(req: Request, res: Response): Promise<void> {
+    try {
+      const nombre = decodeURIComponent(req.params.nombre);
+
+      if (!nombre || nombre.trim().length === 0) {
+        res.status(400).json({
+          success: false,
+          error: 'Invalid name',
+          message: 'Name is required',
+          timestamp: new Date().toISOString(),
+        } as ApiResponse);
+        return;
+      }
+
+      const racket = await RacketService.getRacketByName(nombre.trim());
+
+      if (!racket) {
+        res.status(404).json({
+          success: false,
+          error: 'Pala no encontrada',
+          message: `No se encontró una pala con el nombre "${nombre}"`,
+          timestamp: new Date().toISOString(),
+        } as ApiResponse);
+        return;
+      }
+
+      res.json({
+        success: true,
+        data: racket,
+        timestamp: new Date().toISOString(),
+      } as ApiResponse<Racket>);
+    } catch (error: unknown) {
+      logger.error('Error in getRacketByName:', error);
       res.status(500).json({
         success: false,
         error: 'Error interno del servidor',
@@ -438,6 +487,31 @@ export class RacketController {
       res.status(500).json({
         success: false,
         error: 'Error interno del servidor',
+        message: getErrorMessage(error),
+        timestamp: new Date().toISOString(),
+      } as ApiResponse);
+    }
+  }
+
+  /**
+   * GET /api/rackets/version
+   * Devuelve la versión actual del catálogo (hash basado en updated_at + count)
+   * El frontend usa esto para saber si debe recargar los datos o usar caché local
+   */
+  static async getCatalogVersion(req: Request, res: Response): Promise<void> {
+    try {
+      const version = await RacketService.getCatalogVersion();
+
+      res.json({
+        success: true,
+        data: { version },
+        timestamp: new Date().toISOString(),
+      } as ApiResponse);
+    } catch (error: unknown) {
+      logger.error('Error in getCatalogVersion:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Error al obtener versión del catálogo',
         message: getErrorMessage(error),
         timestamp: new Date().toISOString(),
       } as ApiResponse);

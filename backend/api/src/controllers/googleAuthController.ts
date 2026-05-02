@@ -103,101 +103,41 @@ export class GoogleAuthController {
         return;
       }
 
-      // Verify Google token
-      const googleUser = await GoogleAuthController.verifyGoogleToken(idToken);
-      logger.info('Google user verified:', { email: googleUser.email });
+      // Use signInWithIdToken directly - handles both new and existing users
+      const { data: authData, error: authError } = await supabase.auth.signInWithIdToken({
+        provider: 'google',
+        token: idToken,
+      });
 
-      // Check if user exists in Supabase Auth
-      const { data: existingUsers } = await supabase.auth.admin.listUsers();
-      const existingUser = existingUsers?.users.find(u => u.email === googleUser.email);
+      if (authError || !authData.user) {
+        logger.error('Error signing in with Google ID token:', authError);
+        res.status(401).json({
+          success: false,
+          error: 'Authentication failed',
+          message: getErrorMessage(authError),
+          timestamp: new Date().toISOString(),
+        } as ApiResponse);
+        return;
+      }
 
-      let userId: string;
-      let isNewUser = false;
-      let session: any;
+      const userId = authData.user.id;
+      const session = authData.session;
 
-      if (existingUser) {
-        // User exists - link OAuth provider if not already linked
-        logger.info('Existing user found:', existingUser.id);
-        userId = existingUser.id;
+      // Check if user already has a profile (determine if new user)
+      const { data: existingProfile } = await supabase
+        .from('user_profiles')
+        .select('id')
+        .eq('id', userId)
+        .single();
 
-        // Update user metadata to include Google info if not present
-        if (!existingUser.user_metadata?.oauth_provider) {
-          await supabase.auth.admin.updateUserById(userId, {
-            user_metadata: {
-              ...existingUser.user_metadata,
-              oauth_provider: 'google',
-              google_id: googleUser.googleId,
-            },
-          });
-        }
+      const isNewUser = !existingProfile;
 
-        // For existing OAuth users, we need to create a session
-        // Since we don't know their original password, we'll update it temporarily
-        const tempPassword = `google_oauth_${googleUser.googleId}_${Date.now()}`;
+      if (isNewUser) {
+        logger.info('Creating new user profile for Google OAuth user:', userId);
 
-        // Update user password using admin API
-        const { error: updateError } = await supabase.auth.admin.updateUserById(userId, {
-          password: tempPassword,
-        });
-
-        if (updateError) {
-          logger.error('Error updating user password:', updateError);
-          throw new Error('Failed to update user credentials');
-        }
-
-        // Now sign in with the new password to get a valid session
-        const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
-          email: googleUser.email,
-          password: tempPassword,
-        });
-
-        if (signInError || !signInData.session) {
-          logger.error('Error signing in existing user:', signInError);
-          throw new Error('Failed to create session for existing user');
-        }
-
-        session = signInData.session;
-        logger.info('Session created successfully for existing user');
-      } else {
-        // New user - create account
-        logger.info('Creating new user with Google OAuth');
-        isNewUser = true;
-
+        // Get user data from Google token
+        const googleUser = await GoogleAuthController.verifyGoogleToken(idToken);
         const suggestedNickname = GoogleAuthController.generateNicknameFromEmail(googleUser.email);
-
-        // Create user in Supabase Auth with a random password
-        // (since OAuth users don't use password login)
-        const randomPassword = `google_${googleUser.googleId}_${Date.now()}`;
-
-        const { data: newUserData, error: signUpError } = await supabase.auth.signUp({
-          email: googleUser.email,
-          password: randomPassword,
-          options: {
-            data: {
-              nickname: suggestedNickname,
-              full_name: googleUser.name,
-              avatar_url: googleUser.picture,
-              oauth_provider: 'google',
-              google_id: googleUser.googleId,
-              email_confirmed: googleUser.emailVerified,
-            },
-            emailRedirectTo: undefined, // Don't send confirmation email for OAuth users
-          },
-        });
-
-        if (signUpError || !newUserData.user) {
-          logger.error('Error creating user:', signUpError);
-          res.status(400).json({
-            success: false,
-            error: 'Error creating user',
-            message: getErrorMessage(signUpError),
-            timestamp: new Date().toISOString(),
-          } as ApiResponse);
-          return;
-        }
-
-        userId = newUserData.user.id;
-        session = newUserData.session;
 
         // Create user profile
         const { error: profileError } = await supabase.from('user_profiles').insert({
@@ -206,26 +146,26 @@ export class GoogleAuthController {
           nickname: suggestedNickname,
           full_name: googleUser.name || null,
           avatar_url: googleUser.picture || null,
-          role: 'player', // OAuth users are always players
+          role: 'player',
           oauth_provider: 'google',
         });
 
         if (profileError) {
           logger.error('Error creating user profile:', profileError);
-          // Don't fail the request, profile can be created later
         }
 
-        // Auto-login the user if session is not available
-        if (!session?.access_token) {
-          const { data: loginData, error: loginError } = await supabase.auth.signInWithPassword({
-            email: googleUser.email,
-            password: randomPassword,
-          });
+        // Update user metadata
+        await supabase.auth.updateUser({
+          data: {
+            nickname: suggestedNickname,
+            full_name: googleUser.name,
+            avatar_url: googleUser.picture,
+            oauth_provider: 'google',
+            google_id: googleUser.googleId,
+          },
+        });
 
-          if (!loginError && loginData.session) {
-            session = loginData.session;
-          }
-        }
+        logger.info('New user profile created:', userId);
       }
 
       // Get user profile
@@ -235,7 +175,7 @@ export class GoogleAuthController {
         .eq('id', userId)
         .single();
 
-      // Set httpOnly auth cookies (same pattern as email/password login)
+      // Set httpOnly auth cookies
       if (session?.access_token) {
         const isProd = process.env.NODE_ENV === 'production';
         const cookieOptions = {
@@ -246,15 +186,18 @@ export class GoogleAuthController {
         };
         res.cookie('access_token', session.access_token, {
           ...cookieOptions,
-          maxAge: 60 * 60 * 1000, // 1 hour
+          maxAge: 60 * 60 * 1000,
         });
         if (session.refresh_token) {
           res.cookie('refresh_token', session.refresh_token, {
             ...cookieOptions,
-            maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+            maxAge: 30 * 24 * 60 * 60 * 1000,
           });
         }
       }
+
+      const googleUser = await GoogleAuthController.verifyGoogleToken(idToken);
+      const suggestedNickname = GoogleAuthController.generateNicknameFromEmail(googleUser.email);
 
       res.status(200).json({
         success: true,
@@ -262,7 +205,7 @@ export class GoogleAuthController {
           user: profile || {
             id: userId,
             email: googleUser.email,
-            nickname: GoogleAuthController.generateNicknameFromEmail(googleUser.email),
+            nickname: suggestedNickname,
             full_name: googleUser.name,
             avatar_url: googleUser.picture,
           },
@@ -272,9 +215,7 @@ export class GoogleAuthController {
             expires_at: session?.expires_at,
           },
           isNewUser,
-          suggestedNickname: isNewUser
-            ? GoogleAuthController.generateNicknameFromEmail(googleUser.email)
-            : undefined,
+          suggestedNickname: isNewUser ? suggestedNickname : undefined,
         },
         message: isNewUser
           ? 'Usuario registrado exitosamente con Google'
