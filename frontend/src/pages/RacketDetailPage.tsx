@@ -13,6 +13,8 @@ import {
   FiChevronRight,
   FiTruck,
   FiLock,
+  FiHome,
+  FiSearch,
 } from 'react-icons/fi';
 
 import { Link, useSearchParams } from 'react-router-dom';
@@ -1110,7 +1112,7 @@ const StickyCTA = styled.a`
 
 const RacketDetailPage: React.FC = () => {
   const [searchParams] = useSearchParams();
-  const { rackets } = useRackets();
+  const { rackets, loading: catalogLoading } = useRackets();
   const { isAuthenticated } = useAuth();
 
   const [racket, setRacket] = useState<Racket | null>(null);
@@ -1141,6 +1143,7 @@ const RacketDetailPage: React.FC = () => {
       }
 
       try {
+        setError(null);
         setLoading(true);
         const numericId = parseInt(racketId);
         let foundRacket: Racket | null = null;
@@ -1151,6 +1154,12 @@ const RacketDetailPage: React.FC = () => {
 
         if (!foundRacket) {
           const decodedRacketId = decodeURIComponent(racketId);
+
+          if (catalogLoading && rackets.length === 0) {
+            setLoading(false);
+            return;
+          }
+
           foundRacket = rackets.find(pala => pala.nombre === decodedRacketId) || null;
           if (!foundRacket) {
             foundRacket = await RacketService.getRacketByName(decodedRacketId);
@@ -1159,6 +1168,7 @@ const RacketDetailPage: React.FC = () => {
 
         if (foundRacket) {
           setRacket(foundRacket);
+          setError(null);
         } else {
           setError('Racket not found');
         }
@@ -1170,7 +1180,7 @@ const RacketDetailPage: React.FC = () => {
     };
 
     loadRacket();
-  }, [racketId, rackets]);
+  }, [racketId, rackets, catalogLoading]);
 
   useEffect(() => {
     if (racket && racket.id && isAuthenticated) {
@@ -1243,7 +1253,110 @@ const RacketDetailPage: React.FC = () => {
 
   if (loading) return <RacketDetailSkeleton />;
 
-  if (error || !racket) return <div>Error: {error}</div>;
+  if (error || !racket) {
+    return (
+      <div style={{
+        minHeight: '70vh',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '2rem',
+        background: 'linear-gradient(135deg, #f0fdf4 0%, #ffffff 100%)'
+      }}>
+        <div style={{
+          background: 'white',
+          borderRadius: '24px',
+          padding: 'clamp(2rem, 5vw, 3rem)',
+          maxWidth: '480px',
+          width: '100%',
+          boxShadow: '0 10px 40px rgba(22, 163, 74, 0.08)',
+          border: '1px solid #dcfce7',
+          textAlign: 'center'
+        }}>
+          <div style={{ fontSize: '4rem', marginBottom: '1rem' }}>🎾</div>
+          <h1 style={{
+            fontSize: 'clamp(1.5rem, 4vw, 2rem)',
+            fontWeight: 800,
+            color: '#1f2937',
+            marginBottom: '0.75rem'
+          }}>
+            Pala no encontrada
+          </h1>
+          <p style={{
+            color: '#6b7280',
+            lineHeight: 1.6,
+            marginBottom: '2rem',
+            fontSize: '1rem'
+          }}>
+            {error || 'No hemos podido encontrar la pala que buscas.'}
+          </p>
+          <div style={{
+            display: 'flex',
+            gap: '1rem',
+            justifyContent: 'center',
+            flexWrap: 'wrap'
+          }}>
+            <Link
+              to='/'
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.5rem',
+                background: '#16a34a',
+                color: 'white',
+                padding: '0.75rem 1.5rem',
+                borderRadius: '10px',
+                fontWeight: 600,
+                textDecoration: 'none',
+                transition: 'all 0.2s ease'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = '#15803d';
+                e.currentTarget.style.transform = 'translateY(-2px)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = '#16a34a';
+                e.currentTarget.style.transform = 'translateY(0)';
+              }}
+            >
+              <FiHome size={16} />
+              Ir al inicio
+            </Link>
+            <Link
+              to='/catalog'
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.5rem',
+                background: 'white',
+                color: '#374151',
+                padding: '0.75rem 1.5rem',
+                borderRadius: '10px',
+                fontWeight: 600,
+                textDecoration: 'none',
+                border: '1px solid #e5e7eb',
+                transition: 'all 0.2s ease'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.borderColor = '#16a34a';
+                e.currentTarget.style.color = '#16a34a';
+                e.currentTarget.style.transform = 'translateY(-2px)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.borderColor = '#e5e7eb';
+                e.currentTarget.style.color = '#374151';
+                e.currentTarget.style.transform = 'translateY(0)';
+              }}
+            >
+              <FiSearch size={16} />
+              Ver catálogo
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   const lowestPrice = getLowestPrice(racket);
   const allPrices = getAllStorePrices(racket);

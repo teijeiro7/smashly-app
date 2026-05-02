@@ -489,7 +489,7 @@ export const GlobalSearch: React.FC<GlobalSearchProps> = ({
     } else {
       toggleSearch();
     }
-    navigate(`/racket-detail?id=${encodeURIComponent(racket.nombre)}`);
+    navigate(`/racket-detail?id=${racket.id}`);
   };
 
   const handleBrandSelect = (brand: string) => {

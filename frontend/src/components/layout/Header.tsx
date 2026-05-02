@@ -165,7 +165,7 @@ const MobileSearchContainer = styled.div<{ $isOpen: boolean }>`
 `;
 
 // Navigation Section in Mobile Menu
-const MobileNavSection = styled(motion.div)`
+const MobileNavSection = styled.div`
   padding: 1.25rem 1rem;
   
   &:not(:last-child) {
@@ -611,25 +611,14 @@ const Header: React.FC = () => {
           </MobileSearchContainer>
 
           {/* Navigation Section */}
-          <motion.div
-            initial='hidden'
-            animate={isMenuOpen ? 'visible' : 'hidden'}
-            variants={{
-              hidden: { opacity: 0 },
-              visible: {
-                opacity: 1,
-                transition: {
-                  staggerChildren: 0.03,
-                },
-              },
+          <div
+            style={{
+              opacity: isMenuOpen ? 1 : 0,
+              transition: 'opacity 0.2s ease',
+              pointerEvents: isMenuOpen ? 'auto' : 'none',
             }}
           >
-            <MobileNavSection
-              variants={{
-                hidden: { opacity: 0, x: -10 },
-                visible: { opacity: 1, x: 0 },
-              }}
-            >
+            <MobileNavSection>
               <MobileNavTitle>Navegación</MobileNavTitle>
               <NavLink to='/' $isActive={isActive('/')} $isMobile onClick={closeAllMenus}>
                 <FiHome />
@@ -665,12 +654,7 @@ const Header: React.FC = () => {
             </MobileNavSection>
 
             {/* Auth Section for Mobile */}
-            <MobileNavSection
-              variants={{
-                hidden: { opacity: 0, x: -10 },
-                visible: { opacity: 1, x: 0 },
-              }}
-            >
+            <MobileNavSection>
               <MobileNavTitle>Cuenta</MobileNavTitle>
               {userProfile ? (
                 <>
@@ -724,7 +708,7 @@ const Header: React.FC = () => {
                 </div>
               )}
             </MobileNavSection>
-          </motion.div>
+          </div>
         </MobileMenuDropdown>
       </HeaderContent>
     </HeaderContainer>

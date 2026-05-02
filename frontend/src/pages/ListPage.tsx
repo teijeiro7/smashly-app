@@ -212,7 +212,7 @@ const ListPage: React.FC = () => {
                 racket={racket} 
                 view="grid"
                 index={index}
-                onClick={() => navigate(`/racket-detail?id=${encodeURIComponent(racket.nombre)}`)}
+                onClick={() => navigate(`/racket-detail?id=${racket.id}`)}
               />
             ))}
           </RacketsGrid>

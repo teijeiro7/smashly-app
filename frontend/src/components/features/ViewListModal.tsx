@@ -258,8 +258,8 @@ export const ViewListModal: React.FC<ViewListModalProps> = ({
     }
   };
 
-  const handleViewRacket = (racketName: string) => {
-    navigate(`/racket-detail?id=${encodeURIComponent(racketName)}`);
+  const handleViewRacket = (racketId: number) => {
+    navigate(`/racket-detail?id=${racketId}`);
     onClose();
   };
 
@@ -334,7 +334,7 @@ export const ViewListModal: React.FC<ViewListModalProps> = ({
                         <RacketActions>
                           <ActionButton
                             variant="primary"
-                            onClick={() => handleViewRacket(racket.nombre)}
+                            onClick={() => handleViewRacket(racket.id!)}
                             title="Ver detalles"
                           >
                             <FiExternalLink size={18} />

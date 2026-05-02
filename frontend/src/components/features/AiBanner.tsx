@@ -108,7 +108,7 @@ const CTASection = styled.div`
   flex-wrap: wrap;
 `;
 
-const CTAButton = styled(motion.button)<{ variant?: "primary" | "secondary" }>`
+const CTAButton = styled.button<{ variant?: "primary" | "secondary" }>`
   padding: 1rem 2rem;
   border-radius: 12px;
   border: ${(props) =>
@@ -126,7 +126,7 @@ const CTAButton = styled(motion.button)<{ variant?: "primary" | "secondary" }>`
   gap: 0.5rem;
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
   will-change: transform, opacity;
 
   @media (max-width: 768px) {
@@ -136,6 +136,7 @@ const CTAButton = styled(motion.button)<{ variant?: "primary" | "secondary" }>`
       props.variant === "secondary"
         ? "rgba(255, 255, 255, 0.15)"
         : "rgba(255, 255, 255, 0.35)"};
+    transition: transform 0.1s ease;
   }
 
   &:hover {
@@ -144,6 +145,16 @@ const CTAButton = styled(motion.button)<{ variant?: "primary" | "secondary" }>`
         ? "rgba(255, 255, 255, 0.2)"
         : "rgba(255, 255, 255, 0.4)"};
     transform: translateY(-2px);
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+
+  @media (hover: none) {
+    &:hover {
+      transform: none;
+    }
   }
 `;
 
@@ -188,8 +199,6 @@ const AiBanner: React.FC = () => {
           <CTAButton
             variant="primary"
             onClick={() => navigate("/best-racket")}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
           >
             <FiZap />
             Encontrar Mi Pala Ideal
@@ -198,8 +207,6 @@ const AiBanner: React.FC = () => {
           <CTAButton
             variant="secondary"
             onClick={() => navigate("/compare-rackets")}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
           >
             <FiTrendingUp />
             Comparar Palas

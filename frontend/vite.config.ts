@@ -7,9 +7,20 @@ export default defineConfig(({ mode }) => ({
   // Strip console.* in production builds
   esbuild: {
     drop: mode === 'production' ? ['console', 'debugger'] : [],
+    // Minify specifically for React
+    minifyIdentifiers: mode === 'production',
+    minifySyntax: mode === 'production',
+    minifyWhitespace: mode === 'production',
   },
   plugins: [
-    react(),
+    react({
+      // React compiler for better optimization
+      babel: {
+        parserOpts: {
+          plugins: ['styled-components'],
+        },
+      },
+    }),
     VitePWA({
       registerType: 'autoUpdate',
       includeAssets: ['robots.txt', 'images/icons/smashly-icon.png', 'icons/apple-touch-icon.png'],
@@ -71,6 +82,17 @@ export default defineConfig(({ mode }) => ({
               },
             },
           },
+          {
+            urlPattern: /\.(?:png|jpg|jpeg|svg|webp|avif)$/i,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'images',
+              expiration: {
+                maxEntries: 50,
+                maxAgeSeconds: 60 * 60 * 24 * 30,
+              },
+            },
+          },
         ],
       },
       devOptions: {
@@ -103,30 +125,40 @@ export default defineConfig(({ mode }) => ({
     },
   },
   build: {
-    // No sourcemaps in production (avoids leaking source code)
+    // No sourcemaps in production
     sourcemap: false,
-    // Minify output with esbuild (faster than terser)
-    minify: 'esbuild',
-    target: 'es2015',
-    chunkSizeWarningLimit: 750,
+    // Minify output
+    minify: "esbuild",
+    target: 'es2020',
+    // Reduce chunk size limit to force more splitting
+    chunkSizeWarningLimit: 500,
+    // Enable CSS code splitting
+    cssCodeSplit: true,
+    // Generate manifest
+    manifest: true,
+    // Report written size for debugging
+    reportCompressedSize: true,
     rollupOptions: {
       output: {
-        // Split heavy vendor libs into separate cacheable chunks
-        manualChunks: {
-          'vendor-react': ['react', 'react-dom', 'react-router-dom'],
-          'vendor-query': ['@tanstack/react-query'],
-          'vendor-ui': ['styled-components', 'framer-motion'],
-          'vendor-markdown': ['react-markdown', 'remark-gfm'],
-          'vendor-charts': ['recharts'],
-          'vendor-pdf': ['jspdf', 'jspdf-autotable', 'html2canvas'],
-          'vendor-dnd': ['@dnd-kit/core', '@dnd-kit/sortable', '@dnd-kit/utilities'],
-        },
+        // More granular chunk splitting for better caching
       },
     },
   },
   // Optimize dependencies
   optimizeDeps: {
-    include: ['react', 'react-dom', 'react-router-dom', 'styled-components', 'framer-motion'],
+    include: [
+      'react',
+      'react-dom',
+      'react-router-dom',
+      '@tanstack/react-query',
+    ],
+    // Exclude heavy libs from optimization to load on demand
+    exclude: [
+      'jspdf',
+      'html2canvas',
+      'react-markdown',
+      '@dnd-kit/core',
+    ],
   },
   test: {
     globals: true,

@@ -32,10 +32,6 @@ export default defineConfig({
       use: { ...devices['Desktop Safari'] },
     },
   ],
-  webServer: {
-    command: 'cd ../frontend && npm run dev',
-    url: 'http://localhost:5173',
-    reuseExistingServer: true,
-    timeout: 120000,
-  },
+  // webServer is managed by CI workflow, not here
+  // This prevents conflicts when running in GitHub Actions
 });
