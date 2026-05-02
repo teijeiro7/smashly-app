@@ -128,7 +128,7 @@ export default defineConfig(({ mode }) => ({
     // No sourcemaps in production
     sourcemap: false,
     // Minify output
-    minify: 'esbuild',
+    minify: "esbuild",
     target: 'es2020',
     // Reduce chunk size limit to force more splitting
     chunkSizeWarningLimit: 500,
@@ -142,48 +142,34 @@ export default defineConfig(({ mode }) => ({
       output: {
         // More granular chunk splitting for better caching
         manualChunks: (id) => {
-          // React core — match only the actual react package,
-          // not react-is, react-smooth, etc. that belong to other chunks
-          if (
-            id.includes('node_modules/react-dom/') ||
-            (id.includes('node_modules/react/') &&
-              !id.includes('react-is') &&
-              !id.includes('react-smooth') &&
-              !id.includes('react-transition-group'))
-          ) {
-            return 'vendor-react';
-          }
-          // Router
-          if (id.includes('react-router') || id.includes('react-router-dom')) {
-            return 'vendor-router';
-          }
-          // Data fetching
-          if (id.includes('@tanstack') || id.includes('supabase')) {
-            return 'vendor-data';
-          }
-          // UI libraries
-          if (id.includes('styled-components') || id.includes('framer-motion')) {
-            return 'vendor-ui';
-          }
-          // Charts (lazy load) — include recharts and its deps
-          if (
-            id.includes('recharts') ||
-            id.includes('react-smooth') ||
-            id.includes('react-is')
-          ) {
-            return 'vendor-charts';
-          }
-          // PDF generation (lazy load)
-          if (id.includes('jspdf') || id.includes('html2canvas')) {
-            return 'vendor-pdf';
-          }
-          // Markdown (lazy load)
-          if (id.includes('react-markdown') || id.includes('remark')) {
-            return 'vendor-markdown';
-          }
-          // Drag & drop (lazy load)
-          if (id.includes('@dnd-kit')) {
-            return 'vendor-dnd';
+          if (id.includes('node_modules')) {
+            if (id.includes('react') || id.includes('react-dom')) {
+              return 'vendor-react';
+            }
+            if (id.includes('react-router') || id.includes('react-router-dom')) {
+              return 'vendor-router';
+            }
+            if (id.includes('@tanstack') || id.includes('supabase')) {
+              return 'vendor-data';
+            }
+            if (id.includes('styled-components') || id.includes('framer-motion')) {
+              return 'vendor-ui';
+            }
+            if (id.includes('recharts')) {
+              return 'vendor-charts';
+            }
+            // PDF generation (lazy load)
+            if (id.includes('jspdf') || id.includes('html2canvas')) {
+              return 'vendor-pdf';
+            }
+            // Markdown (lazy load)
+            if (id.includes('react-markdown') || id.includes('remark')) {
+              return 'vendor-markdown';
+            }
+            // Drag & drop (lazy load)
+            if (id.includes('@dnd-kit')) {
+              return 'vendor-dnd';
+            }
           }
         },
       },
