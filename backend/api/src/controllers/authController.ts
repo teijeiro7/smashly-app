@@ -210,6 +210,20 @@ export class AuthController {
       };
     }
 
+    // 🚨 Si identities está vacío, el usuario ya existía en Supabase Auth
+    // Supabase devuelve el user existente sin error pero sin crear identidad nueva.
+    if (!data.user.identities || data.user.identities.length === 0) {
+      logger.warn("Signup attempt for existing email:", credentials.email);
+      return {
+        error: {
+          success: false,
+          error: "EMAIL_ALREADY_EXISTS",
+          message: "Ya existe una cuenta con este correo electrónico.",
+          timestamp: new Date().toISOString(),
+        } as ApiResponse
+      };
+    }
+
     return { user: data.user, session: data.session };
   }
 
