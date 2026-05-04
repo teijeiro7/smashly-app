@@ -469,7 +469,9 @@ export class AuthController {
       const normalizedEmail = email.toLowerCase().trim();
       const rawFrontendUrl = process.env.FRONTEND_URL || "http://localhost:5173";
       // Handle comma-separated URLs (often used for CORS)
-      const frontendUrl = rawFrontendUrl.split(',').find(url => url.includes('5173')) || rawFrontendUrl.split(',')[0];
+      // Prefer production URL (https) over localhost, fallback to first URL
+      const frontendUrls = rawFrontendUrl.split(',').map(url => url.trim());
+      const frontendUrl = frontendUrls.find(url => url.startsWith('https://')) || frontendUrls[0];
 
       const { error } = await supabase.auth.resetPasswordForEmail(normalizedEmail, {
         redirectTo: `${frontendUrl}/update-password`,

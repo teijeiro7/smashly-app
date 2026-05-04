@@ -124,7 +124,7 @@ export class GoogleAuthService {
   }
 
   /**
-   * Get Google ID Token using credential flow
+   * Get Google ID Token using credential flow (JWT for Supabase)
    */
   private static async getGoogleIdToken(): Promise<string> {
     // Use the credential flow with popup for better security
@@ -133,6 +133,9 @@ export class GoogleAuthService {
 
   /**
    * Get Google credential using popup (using OAuth2 token client)
+   * NOTE: initTokenClient returns access_token, not id_token.
+   * For Supabase signInWithIdToken we need an ID token (JWT).
+   * We use a hybrid approach: get access token, fetch user info, then create session.
    */
   private static async getCredentialWithPopup(): Promise<string> {
     return new Promise((resolve, reject) => {
@@ -142,7 +145,7 @@ export class GoogleAuthService {
       }
 
       try {
-        // Use OAuth2 token client instead of One Tap for better compatibility
+        // Use OAuth2 token client to get access token
         const client = window.google.accounts.oauth2.initTokenClient({
           client_id: GOOGLE_CLIENT_ID!,
           scope: 'openid email profile',
@@ -153,10 +156,11 @@ export class GoogleAuthService {
             }
 
             if (response.access_token) {
-              // Send access token directly - backend will verify it with Google
+              // We have an access token - use it to authenticate with our backend
+              // The backend will verify it via Google API and create a Supabase session
               resolve(response.access_token);
             } else {
-              reject(new Error('No access token received from Google'));
+              reject(new Error('No token received from Google'));
             }
           },
           error_callback: (error: any) => {
@@ -183,9 +187,9 @@ export class GoogleAuthService {
   }
 
   /**
-   * Send Google ID token to backend for verification and authentication
+   * Send Google access token to backend for verification and authentication
    */
-  private static async sendTokenToBackend(idToken: string): Promise<GoogleAuthResponse> {
+  private static async sendTokenToBackend(accessToken: string): Promise<GoogleAuthResponse> {
     try {
       const url = buildApiUrl(API_ENDPOINTS.AUTH_GOOGLE);
       const response = await fetch(url, {
@@ -194,7 +198,7 @@ export class GoogleAuthService {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ idToken }),
+        body: JSON.stringify({ accessToken }),
       });
 
       if (!response.ok) {
