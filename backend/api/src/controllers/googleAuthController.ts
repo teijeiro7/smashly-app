@@ -3,6 +3,7 @@ import { OAuth2Client } from 'google-auth-library';
 import { supabase } from '../config/supabase';
 import logger from '../config/logger';
 import { ApiResponse } from '../types/common';
+import crypto from 'crypto';
 
 // Helper function to get error message
 function getErrorMessage(error: unknown): string {
@@ -88,40 +89,136 @@ export class GoogleAuthController {
   /**
    * POST /api/auth/google
    * Handles Google OAuth authentication
+   * Accepts both ID tokens (JWT) and access tokens
    */
   static async handleGoogleAuth(req: Request, res: Response): Promise<void> {
     try {
-      const { idToken } = req.body;
+      const { idToken, accessToken } = req.body;
+      const token = idToken || accessToken;
 
-      if (!idToken) {
+      if (!token) {
         res.status(400).json({
           success: false,
-          error: 'ID Token required',
-          message: 'Google ID token is required',
+          error: 'Token required',
+          message: 'Google ID token or access token is required',
           timestamp: new Date().toISOString(),
         } as ApiResponse);
         return;
       }
 
-      // Use signInWithIdToken directly - handles both new and existing users
-      const { data: authData, error: authError } = await supabase.auth.signInWithIdToken({
-        provider: 'google',
-        token: idToken,
-      });
-
-      if (authError || !authData.user) {
-        logger.error('Error signing in with Google ID token:', authError);
+      // Verify the token with Google and get user info
+      let googleUser;
+      try {
+        googleUser = await GoogleAuthController.verifyGoogleToken(token);
+      } catch (verifyError) {
+        logger.error('Token verification failed:', verifyError);
         res.status(401).json({
           success: false,
-          error: 'Authentication failed',
-          message: getErrorMessage(authError),
+          error: 'Invalid token',
+          message: 'Failed to verify Google token',
           timestamp: new Date().toISOString(),
         } as ApiResponse);
         return;
       }
 
-      const userId = authData.user.id;
-      const session = authData.session;
+      if (!googleUser.email) {
+        res.status(400).json({
+          success: false,
+          error: 'No email',
+          message: 'Could not get email from Google account',
+          timestamp: new Date().toISOString(),
+        } as ApiResponse);
+        return;
+      }
+
+      // Try to sign in with ID token first (for JWT tokens)
+      let authData;
+      let authError;
+      let session = null;
+      let userId = '';
+
+      // Check if it's a JWT ID token (contains 3 parts separated by dots)
+      const isJwtToken = token.split('.').length === 3;
+
+      if (isJwtToken) {
+        // Try Supabase signInWithIdToken for JWT tokens
+        const result = await supabase.auth.signInWithIdToken({
+          provider: 'google',
+          token: token,
+        });
+        authData = result.data;
+        authError = result.error;
+
+        if (authData?.user) {
+          userId = authData.user.id;
+          session = authData.session;
+        }
+      }
+
+      // If ID token flow failed or it's an access token, handle manually
+      if (!userId) {
+        logger.info('Using manual user creation for access token flow');
+
+        // Check if user exists by email using admin API
+        const { data: userList, error: listError } = await supabase.auth.admin.listUsers();
+        
+        if (listError) {
+          logger.error('Error listing users with admin API:', listError);
+        }
+
+        // Find user by email
+        const existingUser = userList?.users?.find(
+          (u: any) => u.email === googleUser.email
+        );
+
+        if (existingUser) {
+          userId = existingUser.id;
+          logger.info('Found existing user:', userId);
+        } else {
+          // Create new user with admin API
+          const { data: newUser, error: createError } = await supabase.auth.admin.createUser({
+            email: googleUser.email,
+            email_confirm: true,
+            user_metadata: {
+              full_name: googleUser.name,
+              avatar_url: googleUser.picture,
+              oauth_provider: 'google',
+              google_id: googleUser.googleId,
+            },
+          });
+
+          if (createError || !newUser?.user) {
+            logger.error('Error creating user:', createError);
+            res.status(500).json({
+              success: false,
+              error: 'User creation failed',
+              message: getErrorMessage(createError),
+              timestamp: new Date().toISOString(),
+            } as ApiResponse);
+            return;
+          }
+
+          userId = newUser.user.id;
+          logger.info('Created new user:', userId);
+        }
+
+        // Create a session for the user using signInWithOtp or generate a custom session
+        // Since we can't use signInWithPassword (no password for OAuth users),
+        // we'll create a session using the admin API or return without session
+        // and let the frontend handle authentication via cookies
+        
+        // Alternative: Use magic link to create a session
+        const { data: otpData, error: otpError } = await supabase.auth.signInWithOtp({
+          email: googleUser.email,
+          options: {
+            shouldCreateUser: false,
+          },
+        });
+
+        if (otpError) {
+          logger.error('Error creating OTP session:', otpError);
+        }
+      }
 
       // Check if user already has a profile (determine if new user)
       const { data: existingProfile } = await supabase
@@ -135,8 +232,6 @@ export class GoogleAuthController {
       if (isNewUser) {
         logger.info('Creating new user profile for Google OAuth user:', userId);
 
-        // Get user data from Google token
-        const googleUser = await GoogleAuthController.verifyGoogleToken(idToken);
         const suggestedNickname = GoogleAuthController.generateNicknameFromEmail(googleUser.email);
 
         // Create user profile
@@ -196,7 +291,6 @@ export class GoogleAuthController {
         }
       }
 
-      const googleUser = await GoogleAuthController.verifyGoogleToken(idToken);
       const suggestedNickname = GoogleAuthController.generateNicknameFromEmail(googleUser.email);
 
       res.status(200).json({
@@ -209,11 +303,11 @@ export class GoogleAuthController {
             full_name: googleUser.name,
             avatar_url: googleUser.picture,
           },
-          session: {
-            access_token: session?.access_token,
-            refresh_token: session?.refresh_token,
-            expires_at: session?.expires_at,
-          },
+          session: session ? {
+            access_token: session.access_token,
+            refresh_token: session.refresh_token,
+            expires_at: session.expires_at,
+          } : null,
           isNewUser,
           suggestedNickname: isNewUser ? suggestedNickname : undefined,
         },

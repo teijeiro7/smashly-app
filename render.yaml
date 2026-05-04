@@ -11,7 +11,7 @@ services:
       - key: USE_HTTPS
         value: "false" # Render termina TLS en su edge; el contenedor usa HTTP
       - key: FRONTEND_URL
-        value: https://smashly-app.onrender.com # Cambia esto por tu URL real tras el primer deploy
+        value: https://smashly-app.es
 
       # --- Supabase ---
       - key: SUPABASE_URL
