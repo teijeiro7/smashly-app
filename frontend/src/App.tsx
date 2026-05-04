@@ -1,4 +1,5 @@
 import { lazy, Suspense } from 'react';
+import React from 'react';
 import { Route, Routes } from 'react-router-dom';
 import { AnimatePresence } from 'framer-motion';
 import Layout from './components/layout/Layout';
@@ -46,6 +47,70 @@ const ForgotPasswordPage = lazy(() => import('./pages/ForgotPasswordPage'));
 const UpdatePasswordPage = lazy(() => import('./pages/UpdatePasswordPage'));
 const NotFoundPage = lazy(() => import('./pages/NotFoundPage'));
 
+// Error Boundary for lazy-loaded chunks with retry
+class LazyChunkErrorBoundary extends React.Component<
+  { children: React.ReactNode; fallback?: React.ReactNode },
+  { hasError: boolean; error?: Error }
+> {
+  state = { hasError: false };
+
+  static getDerivedStateFromError(error: Error) {
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(error: Error) {
+    console.error('Lazy chunk load error:', error);
+  }
+
+  handleRetry = () => {
+    this.setState({ hasError: false, error: undefined });
+    // Force reload the page to re-fetch chunks
+    window.location.reload();
+  };
+
+  render() {
+    if (this.state.hasError) {
+      if (this.props.fallback) {
+        return this.props.fallback;
+      }
+      return (
+        <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem' }}>
+          <div style={{ textAlign: 'center', maxWidth: '400px' }}>
+            <h2 style={{ color: '#dc2626', marginBottom: '1rem' }}>Error al cargar la página</h2>
+            <p style={{ color: '#6b7280', marginBottom: '1.5rem' }}>
+              No se pudo cargar el contenido. Esto suele deberse a una versión en caché desactualizada.
+            </p>
+            <button
+              onClick={this.handleRetry}
+              style={{
+                padding: '0.75rem 1.5rem',
+                background: '#16a34a',
+                color: 'white',
+                border: 'none',
+                borderRadius: '8px',
+                fontWeight: 600,
+                cursor: 'pointer',
+              }}
+            >
+              Recargar página
+            </button>
+          </div>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+
+// Wrapper for lazy routes with error boundary
+const LazyRoute: React.FC<{ children: React.ReactNode; fallback?: React.ReactNode }> = ({ children, fallback }) => (
+  <LazyChunkErrorBoundary fallback={fallback}>
+    <Suspense fallback={fallback || <RouteLoadingFallback />}>
+      {children}
+    </Suspense>
+  </LazyChunkErrorBoundary>
+);
+
 export default function App() {
   return (
     <ErrorBoundary>
@@ -67,17 +132,17 @@ export default function App() {
                         <Route
                           path='/'
                           element={
-                            <Suspense fallback={<RouteLoadingFallback />}>
+                            <LazyRoute>
                               <HomePage />
-                            </Suspense>
+                            </LazyRoute>
                           }
                         />
                         <Route
                           path='/dashboard'
                           element={
-                            <Suspense fallback={<RouteLoadingFallback />}>
+                            <LazyRoute>
                               <PlayerDashboard />
-                            </Suspense>
+                            </LazyRoute>
                           }
                         />
 
@@ -85,9 +150,9 @@ export default function App() {
                         <Route
                           path='/catalog'
                           element={
-                            <Suspense fallback={<CatalogSkeleton />}>
+                            <LazyRoute fallback={<CatalogSkeleton />}>
                               <CatalogPage />
-                            </Suspense>
+                            </LazyRoute>
                           }
                         />
 
@@ -95,17 +160,17 @@ export default function App() {
                         <Route
                           path='/racket-detail'
                           element={
-                            <Suspense fallback={<RouteLoadingFallback />}>
+                            <LazyRoute>
                               <RacketDetailPage />
-                            </Suspense>
+                            </LazyRoute>
                           }
                         />
                         <Route
                           path='/best-racket'
                           element={
-                            <Suspense fallback={<RouteLoadingFallback />}>
+                            <LazyRoute>
                               <BestRacketPage />
-                            </Suspense>
+                            </LazyRoute>
                           }
                         />
 
@@ -113,59 +178,59 @@ export default function App() {
                         <Route
                           path='/compare'
                           element={
-                            <Suspense fallback={<RouteLoadingFallback />}>
+                            <LazyRoute>
                               <ComparePage />
-                            </Suspense>
+                            </LazyRoute>
                           }
                         />
                         <Route
                           path='/compare-rackets'
                           element={
-                            <Suspense fallback={<RouteLoadingFallback />}>
+                            <LazyRoute>
                               <CompareRacketsPage />
-                            </Suspense>
+                            </LazyRoute>
                           }
                         />
                         <Route
                           path='/compare/:id'
                           element={
-                            <Suspense fallback={<RouteLoadingFallback />}>
+                            <LazyRoute>
                               <SavedComparisonPage />
-                            </Suspense>
+                            </LazyRoute>
                           }
                         />
                         <Route
                           path='/comparisons'
                           element={
                             <ProtectedRoute>
-                              <Suspense fallback={<RouteLoadingFallback />}>
+                              <LazyRoute>
                                 <MyComparisonsPage />
-                              </Suspense>
+                              </LazyRoute>
                             </ProtectedRoute>
                           }
                         />
                         <Route
                           path='/shared/:token'
                           element={
-                            <Suspense fallback={<RouteLoadingFallback />}>
+                            <LazyRoute>
                               <SharedComparisonPage />
-                            </Suspense>
+                            </LazyRoute>
                           }
                         />
                         <Route
                           path='/forgot-password'
                           element={
-                            <Suspense fallback={<RouteLoadingFallback />}>
+                            <LazyRoute>
                               <ForgotPasswordPage />
-                            </Suspense>
+                            </LazyRoute>
                           }
                         />
                         <Route
                           path='/update-password'
                           element={
-                            <Suspense fallback={<RouteLoadingFallback />}>
+                            <LazyRoute>
                               <UpdatePasswordPage />
-                            </Suspense>
+                            </LazyRoute>
                           }
                         />
 
@@ -173,9 +238,9 @@ export default function App() {
                         <Route
                           path='/faq'
                           element={
-                            <Suspense fallback={<RouteLoadingFallback />}>
+                            <LazyRoute>
                               <FAQPage />
-                            </Suspense>
+                            </LazyRoute>
                           }
                         />
 
@@ -183,9 +248,9 @@ export default function App() {
                           path='/profile'
                           element={
                             <ProtectedRoute>
-                              <Suspense fallback={<RouteLoadingFallback />}>
+                              <LazyRoute>
                                 <UserProfilePage />
-                              </Suspense>
+                              </LazyRoute>
                             </ProtectedRoute>
                           }
                         />
@@ -194,9 +259,9 @@ export default function App() {
                           path='/lists/:id'
                           element={
                             <ProtectedRoute>
-                              <Suspense fallback={<RouteLoadingFallback />}>
+                              <LazyRoute>
                                 <ListPage />
-                              </Suspense>
+                              </LazyRoute>
                             </ProtectedRoute>
                           }
                         />
@@ -205,17 +270,17 @@ export default function App() {
                         <Route
                           path='/terms-and-conditions'
                           element={
-                            <Suspense fallback={<RouteLoadingFallback />}>
+                            <LazyRoute>
                               <TermsAndConditionsPage />
-                            </Suspense>
+                            </LazyRoute>
                           }
                         />
                         <Route
                           path='/privacy-policy'
                           element={
-                            <Suspense fallback={<RouteLoadingFallback />}>
+                            <LazyRoute>
                               <PrivacyPolicyPage />
-                            </Suspense>
+                            </LazyRoute>
                           }
                         />
 
@@ -224,9 +289,9 @@ export default function App() {
                           path='/admin'
                           element={
                             <ProtectedRoute requireAdmin>
-                              <Suspense fallback={<RouteLoadingFallback />}>
+                              <LazyRoute>
                                 <AdminPanelPage />
-                              </Suspense>
+                              </LazyRoute>
                             </ProtectedRoute>
                           }
                         />
@@ -234,9 +299,9 @@ export default function App() {
                           path='/admin/rackets/review'
                           element={
                             <ProtectedRoute requireAdmin>
-                              <Suspense fallback={<RouteLoadingFallback />}>
+                              <LazyRoute>
                                 <AdminRacketReviewPage />
-                              </Suspense>
+                              </LazyRoute>
                             </ProtectedRoute>
                           }
                         />
@@ -244,9 +309,9 @@ export default function App() {
                           path='/admin/rackets'
                           element={
                             <ProtectedRoute requireAdmin>
-                              <Suspense fallback={<RouteLoadingFallback />}>
+                              <LazyRoute>
                                 <AdminRacketsPage />
-                              </Suspense>
+                              </LazyRoute>
                             </ProtectedRoute>
                           }
                         />
@@ -254,9 +319,9 @@ export default function App() {
                           path='/admin/users'
                           element={
                             <ProtectedRoute requireAdmin>
-                              <Suspense fallback={<RouteLoadingFallback />}>
+                              <LazyRoute>
                                 <AdminUsersPage />
-                              </Suspense>
+                              </LazyRoute>
                             </ProtectedRoute>
                           }
                         />
@@ -264,9 +329,9 @@ export default function App() {
                           path='/admin/stores'
                           element={
                             <ProtectedRoute requireAdmin>
-                              <Suspense fallback={<RouteLoadingFallback />}>
+                              <LazyRoute>
                                 <AdminStoresPage />
-                              </Suspense>
+                              </LazyRoute>
                             </ProtectedRoute>
                           }
                         />
@@ -274,9 +339,9 @@ export default function App() {
                           path='/admin/settings'
                           element={
                             <ProtectedRoute requireAdmin>
-                              <Suspense fallback={<RouteLoadingFallback />}>
+                              <LazyRoute>
                                 <AdminSettingsPage />
-                              </Suspense>
+                              </LazyRoute>
                             </ProtectedRoute>
                           }
                         />
@@ -285,9 +350,9 @@ export default function App() {
                         <Route
                           path='*'
                           element={
-                            <Suspense fallback={<RouteLoadingFallback />}>
+                            <LazyRoute>
                               <NotFoundPage />
-                            </Suspense>
+                            </LazyRoute>
                           }
                         />
                       </Routes>

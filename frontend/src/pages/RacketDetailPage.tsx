@@ -3,7 +3,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Racket } from '@/types/racket';
 import { API_URL } from '@/config/api';
 
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import {
   FiExternalLink,
   FiLoader,
@@ -1118,6 +1118,7 @@ const RacketDetailPage: React.FC = () => {
   const [racket, setRacket] = useState<Racket | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [loadAttempted, setLoadAttempted] = useState<boolean>(false);
   const [showAddToListModal, setShowAddToListModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
@@ -1134,53 +1135,69 @@ const RacketDetailPage: React.FC = () => {
   // Obtener estadísticas de reviews
   const { stats: reviewStats, loading: reviewStatsLoading } = useReviewStats(racket?.id);
 
-  useEffect(() => {
-    const loadRacket = async () => {
-      if (!racketId) {
-        setError('ID not specified');
-        setLoading(false);
-        return;
+  // ── Load racket data ──────────────────────────────────────────────
+  const loadRacket = useCallback(async () => {
+    if (!racketId) {
+      setError('ID not specified');
+      setLoading(false);
+      setLoadAttempted(true);
+      return;
+    }
+
+    try {
+      setError(null);
+      setLoading(true);
+      const numericId = parseInt(racketId);
+      let foundRacket: Racket | null = null;
+
+      if (!isNaN(numericId)) {
+        foundRacket = await RacketService.getRacketById(numericId);
       }
 
-      try {
-        setError(null);
-        setLoading(true);
-        const numericId = parseInt(racketId);
-        let foundRacket: Racket | null = null;
-
-        if (!isNaN(numericId)) {
-          foundRacket = await RacketService.getRacketById(numericId);
-        }
-
+      // Fallback: search in catalog context (if loaded)
+      if (!foundRacket && !catalogLoading) {
+        const decodedRacketId = decodeURIComponent(racketId);
+        foundRacket = rackets.find(pala => pala.nombre === decodedRacketId) || null;
         if (!foundRacket) {
-          const decodedRacketId = decodeURIComponent(racketId);
-
-          if (catalogLoading && rackets.length === 0) {
-            setLoading(false);
-            return;
-          }
-
-          foundRacket = rackets.find(pala => pala.nombre === decodedRacketId) || null;
-          if (!foundRacket) {
-            foundRacket = await RacketService.getRacketByName(decodedRacketId);
-          }
+          foundRacket = await RacketService.getRacketByName(decodedRacketId);
         }
+      }
 
-        if (foundRacket) {
-          setRacket(foundRacket);
-          setError(null);
+      if (foundRacket) {
+        setRacket(foundRacket);
+        setError(null);
+      } else {
+        // If catalog is still loading, don't show error yet — wait for next attempt
+        if (catalogLoading && rackets.length === 0) {
+          // Keep loading state, will retry when catalog finishes
+          setLoading(true);
         } else {
           setError('Racket not found');
         }
-      } catch (err) {
-        setError('Error loading racket');
-      } finally {
-        setLoading(false);
       }
-    };
-
-    loadRacket();
+    } catch (err: any) {
+      console.error('Error loading racket:', err);
+      setError(err.message || 'Error loading racket');
+    } finally {
+      setLoading(false);
+      setLoadAttempted(true);
+    }
   }, [racketId, rackets, catalogLoading]);
+
+  useEffect(() => {
+    loadRacket();
+  }, [loadRacket]);
+
+  // Retry mechanism: if catalog finishes loading and we haven't found the racket, retry
+  useEffect(() => {
+    if (loadAttempted && !racket && !loading && !error && catalogLoading && rackets.length === 0) {
+      // Catalog was loading when we first tried, retry now
+      const timer = setTimeout(() => {
+        loadRacket();
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+  }, [catalogLoading, rackets.length, loadAttempted, racket, loading, error, loadRacket]);
 
   useEffect(() => {
     if (racket && racket.id && isAuthenticated) {
