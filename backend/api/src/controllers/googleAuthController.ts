@@ -76,10 +76,14 @@ export class GoogleAuthController {
 
   static async handleGoogleAuth(req: Request, res: Response): Promise<void> {
     try {
+      logger.info('[GoogleAuth] Received request');
       const { idToken, accessToken } = req.body;
       const token = idToken || accessToken;
+      
+      logger.info('[GoogleAuth] Token present:', !!token, 'Token length:', token?.length);
 
       if (!token) {
+        logger.error('[GoogleAuth] No token provided');
         res.status(400).json({
           success: false,
           error: 'Token required',
@@ -180,32 +184,35 @@ export class GoogleAuthController {
 
         // Generate session via admin generateLink (magiclink type)
         // This bypasses email restrictions since it uses the service_role key
+        logger.info('[GoogleAuth] Generating magic link for session...');
         const { data: linkData, error: linkError } =
           await admin.auth.admin.generateLink({
             type: 'magiclink',
             email: googleUser.email,
           });
 
-        if (linkError) {
-          logger.error('Error generating session link:', linkError);
-        } else if (linkData?.properties?.action_link) {
-          try {
-            const actionUrl = new URL(linkData.properties.action_link);
-            const hashParams = new URLSearchParams(actionUrl.hash.substring(1));
-            const at = hashParams.get('access_token');
-            const rt = hashParams.get('refresh_token');
-            const ea = hashParams.get('expires_at');
+        logger.info('[GoogleAuth] generateLink result:', { 
+          hasError: !!linkError, 
+          hasHashedToken: !!linkData?.properties?.hashed_token,
+          linkError: linkError?.message || null
+        });
 
-            if (at && rt) {
-              session = {
-                access_token: at,
-                refresh_token: rt,
-                expires_at: ea ? parseInt(ea, 10) : Math.floor(Date.now() / 1000) + 3600,
-              } as any;
-              logger.info('Session created from admin generateLink');
-            }
-          } catch (parseErr) {
-            logger.error('Error parsing admin link for session tokens:', parseErr);
+        if (linkError || !linkData?.properties?.hashed_token) {
+          logger.error('Error generating session link:', linkError);
+        } else {
+          // Exchange the hashed_token for a real session via verifyOtp
+          const { data: otpData, error: otpError } = await admin.auth.verifyOtp({
+            token_hash: linkData.properties.hashed_token,
+            type: 'email',
+          });
+
+          if (otpError) {
+            logger.error('[GoogleAuth] verifyOtp failed:', otpError);
+          } else if (otpData.session) {
+            session = otpData.session;
+            logger.info('[GoogleAuth] Session created via verifyOtp');
+          } else {
+            logger.warn('[GoogleAuth] No session returned from verifyOtp');
           }
         }
       }
@@ -280,6 +287,12 @@ export class GoogleAuthController {
       }
 
       const suggestedNickname = GoogleAuthController.generateNicknameFromEmail(googleUser.email);
+
+      logger.info('[GoogleAuth] Sending success response:', { 
+        userId, 
+        hasSession: !!session, 
+        isNewUser 
+      });
 
       res.status(200).json({
         success: true,

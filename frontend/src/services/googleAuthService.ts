@@ -99,8 +99,11 @@ export class GoogleAuthService {
    */
   static async signInWithGoogle(): Promise<GoogleAuthResponse> {
     try {
+      console.log('[GoogleAuth] Starting sign in...');
+      
       // Ensure SDK is loaded
       await this.initialize();
+      console.log('[GoogleAuth] SDK initialized');
 
       if (!window.google) {
         throw new Error('Google SDK not loaded');
@@ -109,16 +112,21 @@ export class GoogleAuthService {
       if (!GOOGLE_CLIENT_ID) {
         throw new Error('Google Client ID not configured. Add VITE_GOOGLE_CLIENT_ID to .env');
       }
+      console.log('[GoogleAuth] Client ID configured');
 
       // Get ID Token using One Tap or Token Client
+      console.log('[GoogleAuth] Getting credential from popup...');
       const idToken = await this.getGoogleIdToken();
+      console.log('[GoogleAuth] Got token from Google');
 
       // Send token to backend for verification
+      console.log('[GoogleAuth] Sending to backend...');
       const response = await this.sendTokenToBackend(idToken);
+      console.log('[GoogleAuth] Backend response received');
 
       return response;
     } catch (error) {
-      console.error('Error signing in with Google:', error);
+      console.error('[GoogleAuth] Error signing in with Google:', error);
       throw error;
     }
   }
@@ -150,14 +158,19 @@ export class GoogleAuthService {
           client_id: GOOGLE_CLIENT_ID!,
           scope: 'openid email profile',
           callback: async (response: any) => {
+            console.log('[GoogleAuth] Popup callback received:', { 
+              hasError: !!response.error, 
+              hasAccessToken: !!response.access_token,
+              error: response.error 
+            });
+            
             if (response.error) {
               reject(new Error(`Google OAuth error: ${response.error}`));
               return;
             }
 
             if (response.access_token) {
-              // We have an access token - use it to authenticate with our backend
-              // The backend will verify it via Google API and create a Supabase session
+              console.log('[GoogleAuth] Access token received, length:', response.access_token.length);
               resolve(response.access_token);
             } else {
               reject(new Error('No token received from Google'));
@@ -192,6 +205,8 @@ export class GoogleAuthService {
   private static async sendTokenToBackend(accessToken: string): Promise<GoogleAuthResponse> {
     try {
       const url = buildApiUrl(API_ENDPOINTS.AUTH_GOOGLE);
+      console.log('[GoogleAuth] Sending token to backend:', url);
+      
       const response = await fetch(url, {
         method: 'POST',
         credentials: 'include',
@@ -201,12 +216,16 @@ export class GoogleAuthService {
         body: JSON.stringify({ accessToken }),
       });
 
+      console.log('[GoogleAuth] Backend response status:', response.status);
+
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
+        console.error('[GoogleAuth] Backend error:', errorData);
         throw new Error(errorData.message || `HTTP ${response.status}: ${response.statusText}`);
       }
 
       const data = await response.json();
+      console.log('[GoogleAuth] Backend response:', { success: data.success, hasData: !!data.data });
 
       if (!data.success) {
         throw new Error(data.message || 'Authentication failed');
@@ -214,7 +233,7 @@ export class GoogleAuthService {
 
       return data.data as GoogleAuthResponse;
     } catch (error) {
-      console.error('Error sending token to backend:', error);
+      console.error('[GoogleAuth] Error sending token to backend:', error);
       throw error;
     }
   }

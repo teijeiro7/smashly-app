@@ -6,7 +6,7 @@ import { motion } from 'framer-motion';
 import { useAuth } from '../../contexts/AuthContext';
 import { useAuthModal } from '../../contexts/AuthModalContext';
 import GlobalSearch from '../features/GlobalSearch';
-import { NotificationBell } from '../notifications/NotificationBell';
+import { NotificationBell, MobileNotificationBell } from '../notifications/NotificationBell';
 
 const HeaderContainer = styled.header`
   background: linear-gradient(135deg, #169f4d 0%, #15743a 100%);
@@ -588,6 +588,7 @@ const Header: React.FC = () => {
 
         {/* Mobile Elements */}
         <MobileElements>
+          <MobileNotificationBell />
           <MobileSearchButton onClick={toggleMobileSearch}>
             <FiSearch />
           </MobileSearchButton>

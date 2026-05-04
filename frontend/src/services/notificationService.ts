@@ -63,6 +63,7 @@ export class NotificationService {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
+        credentials: "include",
       });
 
       if (!response.ok) {
@@ -91,6 +92,7 @@ export class NotificationService {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
+        credentials: "include",
       });
 
       if (!response.ok) {
@@ -119,6 +121,7 @@ export class NotificationService {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
+        credentials: "include",
       });
 
       if (!response.ok) {
@@ -156,6 +159,7 @@ export class NotificationService {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
+        credentials: "include",
       });
 
       if (!response.ok) {
@@ -194,6 +198,7 @@ export class NotificationService {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
+        credentials: "include",
         body: JSON.stringify({ type, title, message, data }),
       });
 
@@ -235,6 +240,7 @@ export class NotificationService {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
+        credentials: "include",
       });
 
       if (!response.ok) {

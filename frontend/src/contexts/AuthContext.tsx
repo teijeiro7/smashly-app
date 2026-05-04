@@ -327,10 +327,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         suggestedNickname,
       };
     } catch (error: any) {
-      console.error('Google sign-in error:', error);
+      console.error('❌ Google SignIn failed:', error.message);
+      console.error('❌ Full error:', error);
       return {
         data: null,
-        error: error.message || 'Error durante el inicio de sesión con Google',
+        error: error.message || 'Error al iniciar sesión con Google',
       };
     }
   };

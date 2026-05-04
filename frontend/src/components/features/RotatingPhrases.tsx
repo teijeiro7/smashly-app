@@ -51,7 +51,7 @@ const RotatingContainer = styled.div`
 
 const PhraseSpan = styled.span<{ $isExiting: boolean }>`
   display: block;
-  animation: ${(props) => (props.$isExiting ? rotateOut : rotateIn)} ${FADE_DURATION}s ease-in-out;
+  animation: ${(props) => (props.$isExiting ? rotateOut : rotateIn)} ${FADE_DURATION}s ease-in-out forwards;
   will-change: transform, opacity;
   word-break: break-word;
 
@@ -69,28 +69,29 @@ interface RotatingPhrasesProps {
 const RotatingPhrases: React.FC<RotatingPhrasesProps> = ({ phrases }) => {
   const [isExiting, setIsExiting] = useState(false);
   const [displayIndex, setDisplayIndex] = useState(0);
-  const intervalRef = useRef<ReturnType<typeof setInterval>>();
-  const timeoutRef = useRef<ReturnType<typeof setTimeout>>();
-
-  const advance = useCallback(() => {
-    setIsExiting(true);
-    timeoutRef.current = setTimeout(() => {
-      setDisplayIndex((prev) => (prev + 1) % phrases.length);
-      setIsExiting(false);
-    }, FADE_DURATION * 1000);
-  }, [phrases.length]);
 
   useEffect(() => {
-    intervalRef.current = setInterval(advance, DISPLAY_DURATION);
-    return () => {
-      if (intervalRef.current) clearInterval(intervalRef.current);
-      if (timeoutRef.current) clearTimeout(timeoutRef.current);
-    };
-  }, [advance]);
+    if (phrases.length <= 1) return;
+
+    const mainInterval = setInterval(() => {
+      // 1. Start exit animation
+      setIsExiting(true);
+
+      // 2. Wait for exit animation to complete, then change phrase
+      const exitTimeout = setTimeout(() => {
+        setDisplayIndex((prev) => (prev + 1) % phrases.length);
+        setIsExiting(false);
+      }, FADE_DURATION * 1000);
+
+      return () => clearTimeout(exitTimeout);
+    }, DISPLAY_DURATION);
+
+    return () => clearInterval(mainInterval);
+  }, [phrases.length]);
 
   return (
     <RotatingContainer aria-live="polite">
-      <PhraseSpan $isExiting={isExiting}>
+      <PhraseSpan key={displayIndex} $isExiting={isExiting}>
         {phrases[displayIndex]}
       </PhraseSpan>
     </RotatingContainer>

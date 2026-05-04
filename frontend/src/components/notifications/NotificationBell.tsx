@@ -74,18 +74,21 @@ const MobileBellButton = styled.button`
   display: none;
   background: none;
   border: none;
-  color: #374151;
+  color: white;
+  font-size: 1.25rem;
   cursor: pointer;
-  padding: 8px;
-  border-radius: 8px;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 10px;
+  border-radius: 50%;
   transition: all 0.2s ease;
   position: relative;
 
   &:hover {
-    background: #f3f4f6;
+    background: rgba(255, 255, 255, 0.15);
   }
 
-  @media (max-width: 768px) {
+  @media (max-width: 1024px) {
     display: flex;
     align-items: center;
     justify-content: center;
