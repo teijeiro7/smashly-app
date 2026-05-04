@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { supabase } from "../config/supabase";
+import { supabase, getSupabaseAnon, getSupabaseAdmin } from "../config/supabase";
 import logger from "../config/logger";
 import { ApiResponse } from "../types/common";
 
@@ -32,15 +32,14 @@ export class AuthController {
       }
 
       const normalizedEmail = email.toLowerCase().trim();
+      const supabaseClient = getSupabaseAnon();
 
-      const { data, error } = await supabase.auth.signInWithPassword({
+      const { data, error } = await supabaseClient.auth.signInWithPassword({
         email: normalizedEmail,
         password,
       });
 
       if (error || !data.session) {
-        // SECURITY: Siempre el mismo mensaje genérico para no revelar si el email existe o no
-        // (evita user enumeration attacks)
         res.status(401).json({
           success: false,
           error: "INVALID_PASSWORD",
@@ -50,7 +49,6 @@ export class AuthController {
         return;
       }
 
-      // Set auth cookies as httpOnly to prevent XSS token theft
       AuthController.setAuthCookies(res, data.session.access_token, data.session.refresh_token);
 
       res.json({
@@ -174,7 +172,9 @@ export class AuthController {
   }
 
   private static async performSignUp(credentials: { email: string; password: string }, userData: { nickname: string; full_name: string; role: string; metadata?: Record<string, unknown> }) {
-    const { data, error } = await supabase.auth.signUp({
+    const supabaseClient = getSupabaseAnon();
+
+    const { data, error } = await supabaseClient.auth.signUp({
       email: credentials.email,
       password: credentials.password,
       options: {
@@ -210,8 +210,6 @@ export class AuthController {
       };
     }
 
-    // 🚨 Si identities está vacío, el usuario ya existía en Supabase Auth
-    // Supabase devuelve el user existente sin error pero sin crear identidad nueva.
     if (!data.user.identities || data.user.identities.length === 0) {
       logger.warn("Signup attempt for existing email:", credentials.email);
       return {
@@ -257,7 +255,8 @@ export class AuthController {
     if (!initialSession?.access_token) {
       logger.info("⚠️ No access token from signUp, attempting auto-login...");
       try {
-        const { data: loginData, error: loginError } = await supabase.auth.signInWithPassword({
+        const supabaseClient = getSupabaseAnon();
+        const { data: loginData, error: loginError } = await supabaseClient.auth.signInWithPassword({
           email,
           password,
         });
@@ -312,9 +311,9 @@ export class AuthController {
    */
   static async logout(req: Request, res: Response): Promise<void> {
     try {
-      const { error } = await supabase.auth.signOut();
+      const supabaseClient = getSupabaseAnon();
+      const { error } = await supabaseClient.auth.signOut();
 
-      // Clear httpOnly cookies regardless of Supabase response
       AuthController.clearAuthCookies(res);
 
       if (error) {
@@ -363,7 +362,8 @@ export class AuthController {
         return;
       }
 
-      const { data, error } = await supabase.auth.refreshSession({
+      const supabaseClient = getSupabaseAnon();
+      const { data, error } = await supabaseClient.auth.refreshSession({
         refresh_token,
       });
 
@@ -417,8 +417,9 @@ export class AuthController {
       }
 
       const token = authHeader.split(" ")[1];
+      const supabaseClient = getSupabaseAnon();
 
-      const { data, error } = await supabase.auth.getUser(token);
+      const { data, error } = await supabaseClient.auth.getUser(token);
 
       if (error || !data.user) {
         res.status(401).json({
@@ -468,12 +469,11 @@ export class AuthController {
 
       const normalizedEmail = email.toLowerCase().trim();
       const rawFrontendUrl = process.env.FRONTEND_URL || "http://localhost:5173";
-      // Handle comma-separated URLs (often used for CORS)
-      // Prefer production URL (https) over localhost, fallback to first URL
       const frontendUrls = rawFrontendUrl.split(',').map(url => url.trim());
       const frontendUrl = frontendUrls.find(url => url.startsWith('https://')) || frontendUrls[0];
 
-      const { error } = await supabase.auth.resetPasswordForEmail(normalizedEmail, {
+      const supabaseClient = getSupabaseAnon();
+      const { error } = await supabaseClient.auth.resetPasswordForEmail(normalizedEmail, {
         redirectTo: `${frontendUrl}/update-password`,
       });
 
@@ -536,9 +536,9 @@ export class AuthController {
       }
 
       const token = authHeader.split(" ")[1];
+      const supabaseAnonClient = getSupabaseAnon();
 
-      // Verificamos el usuario con el token
-      const { data: userData, error: userError } = await supabase.auth.getUser(token);
+      const { data: userData, error: userError } = await supabaseAnonClient.auth.getUser(token);
 
       if (userError || !userData.user) {
         res.status(401).json({
@@ -550,8 +550,8 @@ export class AuthController {
         return;
       }
 
-      // Actualizamos la contraseña usando el API de administración
-      const { error: updateError } = await supabase.auth.admin.updateUserById(userData.user.id, {
+      const admin = getSupabaseAdmin();
+      const { error: updateError } = await admin.auth.admin.updateUserById(userData.user.id, {
         password: newPassword,
       });
 
@@ -584,3 +584,4 @@ export class AuthController {
     }
   }
 }
+

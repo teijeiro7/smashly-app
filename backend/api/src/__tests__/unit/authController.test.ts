@@ -1,31 +1,49 @@
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { AuthController } from '../../controllers/authController';
 import type { Request, Response } from 'express';
-import { supabase } from '../../config/supabase';
+import { supabase, getSupabaseAnon, getSupabaseAdmin } from '../../config/supabase';
 
-const mockFrom = vi.fn();
-const mockSelect = vi.fn();
-const mockEq = vi.fn();
-const mockSingle = vi.fn();
-
-vi.mock('../../config/supabase', () => ({
-  supabase: {
-    auth: {
-      signInWithPassword: vi.fn(),
-      signUp: vi.fn(),
-      signOut: vi.fn(),
-      refreshSession: vi.fn(),
-      getUser: vi.fn(),
+vi.mock('../../config/supabase', () => {
+  const mockAuth = {
+    signInWithPassword: vi.fn(),
+    signUp: vi.fn(),
+    signOut: vi.fn(),
+    refreshSession: vi.fn(),
+    getUser: vi.fn(),
+    resetPasswordForEmail: vi.fn(),
+  };
+  const mockAdminAuth = {
+    admin: {
+      updateUserById: vi.fn(),
     },
-    from: vi.fn(() => ({
-      select: vi.fn(() => ({
-        eq: vi.fn(() => ({
-          single: vi.fn(),
+  };
+
+  return {
+    supabase: {
+      auth: mockAuth,
+      from: vi.fn(() => ({
+        select: vi.fn(() => ({
+          eq: vi.fn(() => ({
+            single: vi.fn(),
+          })),
+        })),
+      })),
+    },
+    getSupabaseAnon: vi.fn(() => ({
+      auth: mockAuth,
+    })),
+    getSupabaseAdmin: vi.fn(() => ({
+      auth: mockAdminAuth,
+      from: vi.fn(() => ({
+        select: vi.fn(() => ({
+          eq: vi.fn(() => ({
+            single: vi.fn(),
+          })),
         })),
       })),
     })),
-  },
-}));
+  };
+});
 
 function createMockReq(body: any = {}, headers: Record<string, string> = {}): Partial<Request> {
   return { body, headers };
@@ -171,7 +189,12 @@ describe('AuthController.register', () => {
 
     (supabase.auth.signUp as any).mockResolvedValueOnce({
       data: {
-        user: { id: 'u1', email: 'u@test.com', user_metadata: { nickname: 'nick', full_name: 'User' } },
+        user: { 
+          id: 'u1', 
+          email: 'u@test.com', 
+          user_metadata: { nickname: 'nick', full_name: 'User' },
+          identities: [{ provider: 'email', id: '123' }],
+        },
         session: { access_token: 'at', refresh_token: 'rt', expires_at: 111 },
       },
       error: null,
@@ -198,7 +221,12 @@ describe('AuthController.register', () => {
 
     (supabase.auth.signUp as any).mockResolvedValueOnce({
       data: {
-        user: { id: 'u1', email: 'u@test.com', user_metadata: { nickname: 'nick', full_name: 'User' } },
+        user: { 
+          id: 'u1', 
+          email: 'u@test.com', 
+          user_metadata: { nickname: 'nick', full_name: 'User' },
+          identities: [{ provider: 'email', id: '123' }],
+        },
         session: { access_token: undefined },
       },
       error: null,

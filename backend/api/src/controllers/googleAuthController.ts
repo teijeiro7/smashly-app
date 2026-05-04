@@ -1,11 +1,9 @@
 import { Request, Response } from 'express';
 import { OAuth2Client } from 'google-auth-library';
-import { supabase } from '../config/supabase';
+import { supabase, getSupabaseAdmin } from '../config/supabase';
 import logger from '../config/logger';
 import { ApiResponse } from '../types/common';
-import crypto from 'crypto';
 
-// Helper function to get error message
 function getErrorMessage(error: unknown): string {
   if (error instanceof Error) {
     return error.message;
@@ -13,16 +11,11 @@ function getErrorMessage(error: unknown): string {
   return String(error);
 }
 
-// Initialize Google OAuth2 Client
 const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 export class GoogleAuthController {
-  /**
-   * Verifies Google token (ID token or access token) and extracts user information
-   */
   private static async verifyGoogleToken(token: string) {
     try {
-      // First, try to verify as an ID token (JWT)
       try {
         const ticket = await googleClient.verifyIdToken({
           idToken: token,
@@ -41,11 +34,9 @@ export class GoogleAuthController {
           };
         }
       } catch (idTokenError) {
-        // Not an ID token, try as access token
         logger.info('Token is not an ID token, trying as access token');
       }
 
-      // If ID token verification failed, try using it as an access token
       const userInfoResponse = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -79,18 +70,10 @@ export class GoogleAuthController {
     }
   }
 
-  /**
-   * Generates suggested nickname from email
-   */
   private static generateNicknameFromEmail(email: string): string {
     return email.split('@')[0];
   }
 
-  /**
-   * POST /api/auth/google
-   * Handles Google OAuth authentication
-   * Accepts both ID tokens (JWT) and access tokens
-   */
   static async handleGoogleAuth(req: Request, res: Response): Promise<void> {
     try {
       const { idToken, accessToken } = req.body;
@@ -106,7 +89,6 @@ export class GoogleAuthController {
         return;
       }
 
-      // Verify the token with Google and get user info
       let googleUser;
       try {
         googleUser = await GoogleAuthController.verifyGoogleToken(token);
@@ -131,42 +113,37 @@ export class GoogleAuthController {
         return;
       }
 
-      // Try to sign in with ID token first (for JWT tokens)
-      let authData;
-      let authError;
+      const admin = getSupabaseAdmin();
       let session = null;
       let userId = '';
 
-      // Check if it's a JWT ID token (contains 3 parts separated by dots)
       const isJwtToken = token.split('.').length === 3;
 
       if (isJwtToken) {
-        // Try Supabase signInWithIdToken for JWT tokens
-        const result = await supabase.auth.signInWithIdToken({
-          provider: 'google',
-          token: token,
-        });
-        authData = result.data;
-        authError = result.error;
+        try {
+          const { data, error } = await admin.auth.signInWithIdToken({
+            provider: 'google',
+            token: token,
+          });
 
-        if (authData?.user) {
-          userId = authData.user.id;
-          session = authData.session;
+          if (!error && data.user) {
+            userId = data.user.id;
+            session = data.session;
+          }
+        } catch (e) {
+          logger.info('signInWithIdToken failed, falling back to manual flow:', e);
         }
       }
 
-      // If ID token flow failed or it's an access token, handle manually
       if (!userId) {
         logger.info('Using manual user creation for access token flow');
 
-        // Check if user exists by email using admin API
-        const { data: userList, error: listError } = await supabase.auth.admin.listUsers();
-        
+        const { data: userList, error: listError } = await admin.auth.admin.listUsers();
+
         if (listError) {
           logger.error('Error listing users with admin API:', listError);
         }
 
-        // Find user by email
         const existingUser = userList?.users?.find(
           (u: any) => u.email === googleUser.email
         );
@@ -175,8 +152,7 @@ export class GoogleAuthController {
           userId = existingUser.id;
           logger.info('Found existing user:', userId);
         } else {
-          // Create new user with admin API
-          const { data: newUser, error: createError } = await supabase.auth.admin.createUser({
+          const { data: newUser, error: createError } = await admin.auth.admin.createUser({
             email: googleUser.email,
             email_confirm: true,
             user_metadata: {
@@ -202,26 +178,40 @@ export class GoogleAuthController {
           logger.info('Created new user:', userId);
         }
 
-        // Create a session for the user using signInWithOtp or generate a custom session
-        // Since we can't use signInWithPassword (no password for OAuth users),
-        // we'll create a session using the admin API or return without session
-        // and let the frontend handle authentication via cookies
-        
-        // Alternative: Use magic link to create a session
-        const { data: otpData, error: otpError } = await supabase.auth.signInWithOtp({
-          email: googleUser.email,
-          options: {
-            shouldCreateUser: false,
-          },
-        });
+        // Generate session via admin generateLink (magiclink type)
+        // This bypasses email restrictions since it uses the service_role key
+        const { data: linkData, error: linkError } =
+          await admin.auth.admin.generateLink({
+            type: 'magiclink',
+            email: googleUser.email,
+          });
 
-        if (otpError) {
-          logger.error('Error creating OTP session:', otpError);
+        if (linkError) {
+          logger.error('Error generating session link:', linkError);
+        } else if (linkData?.properties?.action_link) {
+          try {
+            const actionUrl = new URL(linkData.properties.action_link);
+            const hashParams = new URLSearchParams(actionUrl.hash.substring(1));
+            const at = hashParams.get('access_token');
+            const rt = hashParams.get('refresh_token');
+            const ea = hashParams.get('expires_at');
+
+            if (at && rt) {
+              session = {
+                access_token: at,
+                refresh_token: rt,
+                expires_at: ea ? parseInt(ea, 10) : Math.floor(Date.now() / 1000) + 3600,
+              } as any;
+              logger.info('Session created from admin generateLink');
+            }
+          } catch (parseErr) {
+            logger.error('Error parsing admin link for session tokens:', parseErr);
+          }
         }
       }
 
       // Check if user already has a profile (determine if new user)
-      const { data: existingProfile } = await supabase
+      const { data: existingProfile } = await admin
         .from('user_profiles')
         .select('id')
         .eq('id', userId)
@@ -234,8 +224,7 @@ export class GoogleAuthController {
 
         const suggestedNickname = GoogleAuthController.generateNicknameFromEmail(googleUser.email);
 
-        // Create user profile
-        const { error: profileError } = await supabase.from('user_profiles').insert({
+        const { error: profileError } = await admin.from('user_profiles').insert({
           id: userId,
           email: googleUser.email,
           nickname: suggestedNickname,
@@ -249,9 +238,8 @@ export class GoogleAuthController {
           logger.error('Error creating user profile:', profileError);
         }
 
-        // Update user metadata
-        await supabase.auth.updateUser({
-          data: {
+        await admin.auth.admin.updateUserById(userId, {
+          user_metadata: {
             nickname: suggestedNickname,
             full_name: googleUser.name,
             avatar_url: googleUser.picture,
@@ -264,7 +252,7 @@ export class GoogleAuthController {
       }
 
       // Get user profile
-      const { data: profile } = await supabase
+      const { data: profile } = await admin
         .from('user_profiles')
         .select('*')
         .eq('id', userId)

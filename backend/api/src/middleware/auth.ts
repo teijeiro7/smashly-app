@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { supabase } from "../config/supabase";
+import { supabase, getSupabaseAnon } from "../config/supabase";
 import logger from "../config/logger";
 import { RequestWithUser, ApiResponse } from "../types";
 
@@ -58,10 +58,11 @@ function validateAuthHeader(authHeader: string | undefined, res: Response): stri
 // Keep for backward compat but prefer extractToken() below
 
 async function verifyToken(token: string, res: Response) {
+  const supabaseAnonClient = getSupabaseAnon();
   const {
     data: { user },
     error,
-  } = await supabase.auth.getUser(token);
+  } = await supabaseAnonClient.auth.getUser(token);
 
   if (error || !user) {
     logger.error("Authentication error:", error);
@@ -156,19 +157,17 @@ export async function optionalAuth(
     const token = extractToken(req);
 
     if (!token) {
-      // No token in cookie or header, continue without user
       next();
       return;
     }
 
-    // Try to verify the token
+    const supabaseAnonClient = getSupabaseAnon();
     const {
       data: { user },
       error,
-    } = await supabase.auth.getUser(token);
+    } = await supabaseAnonClient.auth.getUser(token);
 
     if (!error && user) {
-      // Valid token, add user to request
       req.user = {
         id: user.id,
         email: user.email || "",
@@ -176,11 +175,9 @@ export async function optionalAuth(
       };
     }
 
-    // Continue regardless of whether the token is valid or not
     next();
   } catch (error: unknown) {
     logger.error("Optional auth middleware error:", error);
-    // In case of error, continue without user
     next();
   }
 }

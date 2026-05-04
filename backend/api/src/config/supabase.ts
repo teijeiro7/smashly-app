@@ -57,6 +57,23 @@ export const supabase: SupabaseClient =
         auth: { autoRefreshToken: false, persistSession: false, detectSessionInUrl: false },
       });
 
+// Anon client for user authentication operations (login, signup, password reset, etc.)
+export const supabaseAnon: SupabaseClient | null =
+  supabaseUrl && supabaseAnonKey
+    ? createClient(supabaseUrl, supabaseAnonKey, {
+        auth: {
+          autoRefreshToken: false,
+          persistSession: false,
+          detectSessionInUrl: false,
+        },
+        global: {
+          headers: {
+            'X-Client-Info': 'smashly-api-anon@1.0.0',
+          },
+        },
+      })
+    : null;
+
 // Administrative client with service role (if available)
 export const supabaseAdmin: SupabaseClient | null =
   supabaseUrl && supabaseServiceKey
@@ -73,6 +90,13 @@ export const supabaseAdmin: SupabaseClient | null =
         },
       })
     : null;
+
+export function getSupabaseAnon(): SupabaseClient {
+  if (!supabaseAnon) {
+    throw new Error('SUPABASE_ANON_KEY is required for user authentication operations');
+  }
+  return supabaseAnon;
+}
 
 export function getSupabaseAdmin(): SupabaseClient {
   if (!supabaseAdmin) {
