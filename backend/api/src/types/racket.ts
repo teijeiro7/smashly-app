@@ -125,6 +125,12 @@ export interface SearchFilters {
   max_price?: number;
   on_offer?: boolean;
   is_bestseller?: boolean;
+  core?: string;
+  face?: string;
+  game_type?: string;
+  hardness?: string;
+  available_only?: boolean;
+  most_viewed?: boolean;
 }
 
 export interface SortOptions {
