@@ -4,6 +4,7 @@ import { FiX, FiTag, FiGrid, FiBox } from 'react-icons/fi';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { useRackets } from '../../contexts/RacketsContext';
+import { RacketService } from '../../services/racketService';
 import { Racket } from '../../types/racket';
 import { toTitleCase } from '../../utils/textUtils';
 
@@ -409,13 +410,10 @@ export const GlobalSearch: React.FC<GlobalSearchProps> = ({
       return;
     }
 
-    setIsLoading(true);
-
     const query = deferredQuery.toLowerCase().trim();
-    const queryWords = query.split(/\s+/);
-
     const results: SearchResult[] = [];
 
+    // Search brands and categories locally (fast)
     const brandResults = uniqueBrands
       .filter(brand => brand.toLowerCase().includes(query))
       .slice(0, 4);
@@ -430,22 +428,44 @@ export const GlobalSearch: React.FC<GlobalSearchProps> = ({
       results.push({ type: 'category', data: shape });
     });
 
-    const racketResults = searchReadyRackets
-      .filter(racket => {
-        return queryWords.every(word => 
-          racket._lowName.includes(word) || 
-          racket._lowBrand.includes(word) || 
-          racket._lowModel.includes(word)
-        );
-      })
-      .slice(0, 6);
+    // Search rackets via API (fuzzy search)
+    const searchRackets = async () => {
+      setIsLoading(true);
+      try {
+        const result = await RacketService.searchRackets(query, {}, { limit: 6 });
+        if (result?.data) {
+          result.data.forEach((racket: Racket) => {
+            results.push({ type: 'racket', data: racket });
+          });
+        }
+      } catch (error) {
+        console.error('Error in global search:', error);
+        // Fallback to local search
+        const racketResults = searchReadyRackets
+          .filter(racket => {
+            const queryWords = query.split(/\s+/);
+            return queryWords.every(word => 
+              racket._lowName.includes(word) || 
+              racket._lowBrand.includes(word) || 
+              racket._lowModel.includes(word)
+            );
+          })
+          .slice(0, 6);
+        racketResults.forEach(racket => {
+          results.push({ type: 'racket', data: racket });
+        });
+      } finally {
+        setSearchResults(results);
+        setIsLoading(false);
+      }
+    };
 
-    racketResults.forEach(racket => {
-      results.push({ type: 'racket', data: racket });
-    });
-
-    setSearchResults(results);
-    setIsLoading(false);
+    if (query.length >= 2) {
+      searchRackets();
+    } else {
+      setSearchResults(results);
+      setIsLoading(false);
+    }
   }, [deferredQuery, rackets, uniqueBrands, uniqueShapes]);
 
   useEffect(() => {

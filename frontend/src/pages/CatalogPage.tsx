@@ -363,11 +363,11 @@ const SortSelect = styled.select`
   }
 `;
 
-const RacketsGrid = styled.ul<{ view: 'grid' | 'list' }>`
+const RacketsGrid = styled.ul<{ $view: 'grid' | 'list' }>`
   display: grid;
   grid-template-columns: ${props =>
-    props.view === 'grid' ? 'repeat(auto-fill, minmax(min(280px, 100%), 1fr))' : '1fr'};
-  gap: ${props => (props.view === 'grid' ? '1.5rem' : '1rem')};
+    props.$view === 'grid' ? 'repeat(auto-fill, minmax(min(280px, 100%), 1fr))' : '1fr'};
+  gap: ${props => (props.$view === 'grid' ? '1.5rem' : '1rem')};
   list-style: none;
   padding: 0;
   margin: 0;
@@ -594,137 +594,189 @@ const CatalogPage: React.FC = () => {
     })();
   }, []);
 
-  // Filter and search effect
+  // Filter and search effect - uses API fuzzy search when there's a search query
   useEffect(() => {
-    let filtered = [...rackets];
+    const performSearch = async () => {
+      // If there's a search query, use API-based fuzzy search
+      if (searchQuery.trim().length >= 2) {
+        try {
+          const filters: Record<string, string> = {};
+          
+          if (selectedBrand !== 'Todas') filters.brand = selectedBrand;
+          if (selectedShape !== 'Todas') filters.shape = selectedShape;
+          if (selectedBalance !== 'Todos') filters.balance = selectedBalance;
+          if (selectedCore !== 'Todos') filters.core = selectedCore;
+          if (selectedFace !== 'Todas') filters.face = selectedFace;
+          if (selectedLevel !== 'Todos') filters.level = selectedLevel;
+          if (selectedGameType !== 'Todos') filters.game_type = selectedGameType;
+          if (selectedHardness !== 'Todas') filters.hardness = selectedHardness;
+          if (showOffers) filters.on_sale = 'true';
+          if (showAvailableOnly) filters.available_only = 'true';
+          if (showMostViewed) filters.most_viewed = 'true';
 
-    // Apply search filter - flexible word-based search
-    if (searchQuery.trim()) {
-      const searchWords = searchQuery.toLowerCase().trim().split(/\s+/);
-      filtered = filtered.filter(racket => {
-        const nombre = (racket.nombre || '').toLowerCase();
-        const marca = (racket.marca || '').toLowerCase();
-        const modelo = (racket.modelo || '').toLowerCase();
-        const combinedText = `${nombre} ${marca} ${modelo}`;
-
-        // Check if ALL search words are present in the racket's text
-        return searchWords.every(word => combinedText.includes(word));
-      });
-    }
-
-    // Apply brand filter
-    if (selectedBrand !== 'Todas') {
-      filtered = filtered.filter(racket => racket.marca === selectedBrand);
-    }
-
-    // Apply most viewed filter (top 20% by view count)
-    if (showMostViewed) {
-      // Sort by view count and take top 20%
-      const sortedByViews = [...filtered].sort((a, b) => (b.view_count || 0) - (a.view_count || 0));
-      const topCount = Math.ceil(sortedByViews.length * 0.2);
-      const topViewedIds = new Set(sortedByViews.slice(0, topCount).map(r => r.id));
-      filtered = filtered.filter(racket => topViewedIds.has(racket.id));
-    }
-
-    // Apply offers filter
-    if (showOffers) {
-      filtered = filtered.filter(racket => racket.en_oferta);
-    }
-
-    // Apply available only filter
-    if (showAvailableOnly) {
-      filtered = filtered.filter(racket => !racket.solo_comparacion);
-    }
-
-    // Apply advanced filters
-    if (selectedShape !== 'Todas') {
-      filtered = filtered.filter(
-        r => (r.caracteristicas_forma || r.especificaciones?.forma) === selectedShape
-      );
-    }
-
-    if (selectedBalance !== 'Todos') {
-      filtered = filtered.filter(
-        r => (r.caracteristicas_balance || r.especificaciones?.balance) === selectedBalance
-      );
-    }
-
-    if (selectedCore !== 'Todos') {
-      filtered = filtered.filter(
-        r => (r.caracteristicas_nucleo || r.especificaciones?.nucleo) === selectedCore
-      );
-    }
-
-    if (selectedFace !== 'Todas') {
-      filtered = filtered.filter(
-        r => (r.caracteristicas_cara || r.especificaciones?.cara) === selectedFace
-      );
-    }
-
-    if (selectedLevel !== 'Todos') {
-      filtered = filtered.filter(
-        r =>
-          (r.caracteristicas_nivel_de_juego || r.especificaciones?.nivel_de_juego) === selectedLevel
-      );
-    }
-
-    if (selectedGameType !== 'Todos') {
-      filtered = filtered.filter(
-        r =>
-          (r.caracteristicas_tipo_de_juego || r.especificaciones?.tipo_de_juego) ===
-          selectedGameType
-      );
-    }
-
-    if (selectedHardness !== 'Todas') {
-      filtered = filtered.filter(
-        r => (r.caracteristicas_dureza || r.especificaciones?.dureza) === selectedHardness
-      );
-    }
-
-    // Apply sorting
-    try {
-      filtered.sort((a, b) => {
-        switch (sortBy) {
-          case 'price-low':
-            const priceA = getLowestPrice(a)?.price || a.precio_actual || 0;
-            const priceB = getLowestPrice(b)?.price || b.precio_actual || 0;
-            return priceA - priceB;
-          case 'price-high':
-            const priceHighA = getLowestPrice(a)?.price || a.precio_actual || 0;
-            const priceHighB = getLowestPrice(b)?.price || b.precio_actual || 0;
-            return priceHighB - priceHighA;
-          case 'brand':
-            const brandA = a.marca || '';
-            const brandB = b.marca || '';
-            return brandA.localeCompare(brandB);
-          case 'most-viewed':
-            // Más vistas primero (ordenar por view_count descendente)
-            const viewsA = a.view_count || 0;
-            const viewsB = b.view_count || 0;
-            return viewsB - viewsA;
-          case 'offer':
-            // Ofertas primero (true > false)
-            if (a.en_oferta && !b.en_oferta) return -1;
-            if (!a.en_oferta && b.en_oferta) return 1;
-            return 0;
-          default:
-            const modelA = a.modelo || '';
-            const modelB = b.modelo || '';
-            return modelA.localeCompare(modelB);
+          const result = await RacketService.searchRackets(searchQuery, filters);
+          
+          if (result?.data) {
+            // Apply local sorting since API returns sorted by relevance
+            let sorted = [...result.data];
+            try {
+              sorted.sort((a, b) => {
+                switch (sortBy) {
+                  case 'price-low':
+                    const priceA = getLowestPrice(a)?.price || a.precio_actual || 0;
+                    const priceB = getLowestPrice(b)?.price || b.precio_actual || 0;
+                    return priceA - priceB;
+                  case 'price-high':
+                    const priceHighA = getLowestPrice(a)?.price || a.precio_actual || 0;
+                    const priceHighB = getLowestPrice(b)?.price || b.precio_actual || 0;
+                    return priceHighB - priceHighA;
+                  case 'brand':
+                    return (a.marca || '').localeCompare(b.marca || '');
+                  case 'offer':
+                    if (a.en_oferta && !b.en_oferta) return -1;
+                    if (!a.en_oferta && b.en_oferta) return 1;
+                    return 0;
+                  default:
+                    return (b.view_count || 0) - (a.view_count || 0);
+                }
+              });
+            } catch (error) {
+              console.error('Error sorting search results:', error);
+            }
+            setFilteredRackets(sorted);
+          } else {
+            setFilteredRackets([]);
+          }
+        } catch (error) {
+          console.error('Fuzzy search error, falling back to local:', error);
+          // Fall back to local filtering on error
+          filterLocally();
         }
-      });
-    } catch (error) {
-      console.error('Error sorting rackets:', error);
-    }
+      } else {
+        // No search query - use local filtering
+        filterLocally();
+      }
+    };
 
-    setFilteredRackets(filtered);
+    const filterLocally = () => {
+      let filtered = [...rackets];
+
+      // Apply brand filter
+      if (selectedBrand !== 'Todas') {
+        filtered = filtered.filter(racket => racket.marca === selectedBrand);
+      }
+
+      // Apply most viewed filter (top 20% by view count)
+      if (showMostViewed) {
+        const sortedByViews = [...filtered].sort((a, b) => (b.view_count || 0) - (a.view_count || 0));
+        const topCount = Math.ceil(sortedByViews.length * 0.2);
+        const topViewedIds = new Set(sortedByViews.slice(0, topCount).map(r => r.id));
+        filtered = filtered.filter(racket => topViewedIds.has(racket.id));
+      }
+
+      // Apply offers filter
+      if (showOffers) {
+        filtered = filtered.filter(racket => racket.en_oferta);
+      }
+
+      // Apply available only filter
+      if (showAvailableOnly) {
+        filtered = filtered.filter(racket => !racket.solo_comparacion);
+      }
+
+      // Apply advanced filters
+      if (selectedShape !== 'Todas') {
+        filtered = filtered.filter(
+          r => (r.caracteristicas_forma || r.especificaciones?.forma) === selectedShape
+        );
+      }
+
+      if (selectedBalance !== 'Todos') {
+        filtered = filtered.filter(
+          r => (r.caracteristicas_balance || r.especificaciones?.balance) === selectedBalance
+        );
+      }
+
+      if (selectedCore !== 'Todos') {
+        filtered = filtered.filter(
+          r => (r.caracteristicas_nucleo || r.especificaciones?.nucleo) === selectedCore
+        );
+      }
+
+      if (selectedFace !== 'Todas') {
+        filtered = filtered.filter(
+          r => (r.caracteristicas_cara || r.especificaciones?.cara) === selectedFace
+        );
+      }
+
+      if (selectedLevel !== 'Todos') {
+        filtered = filtered.filter(
+          r =>
+            (r.caracteristicas_nivel_de_juego || r.especificaciones?.nivel_de_juego) === selectedLevel
+        );
+      }
+
+      if (selectedGameType !== 'Todos') {
+        filtered = filtered.filter(
+          r =>
+            (r.caracteristicas_tipo_de_juego || r.especificaciones?.tipo_de_juego) ===
+            selectedGameType
+        );
+      }
+
+      if (selectedHardness !== 'Todas') {
+        filtered = filtered.filter(
+          r => (r.caracteristicas_dureza || r.especificaciones?.dureza) === selectedHardness
+        );
+      }
+
+      // Apply sorting
+      try {
+        filtered.sort((a, b) => {
+          switch (sortBy) {
+            case 'price-low':
+              const priceA = getLowestPrice(a)?.price || a.precio_actual || 0;
+              const priceB = getLowestPrice(b)?.price || b.precio_actual || 0;
+              return priceA - priceB;
+            case 'price-high':
+              const priceHighA = getLowestPrice(a)?.price || a.precio_actual || 0;
+              const priceHighB = getLowestPrice(b)?.price || b.precio_actual || 0;
+              return priceHighB - priceHighA;
+            case 'brand':
+              const brandA = a.marca || '';
+              const brandB = b.marca || '';
+              return brandA.localeCompare(brandB);
+            case 'most-viewed':
+              const viewsA = a.view_count || 0;
+              const viewsB = b.view_count || 0;
+              return viewsB - viewsA;
+            case 'offer':
+              if (a.en_oferta && !b.en_oferta) return -1;
+              if (!a.en_oferta && b.en_oferta) return 1;
+              return 0;
+            default:
+              const modelA = a.modelo || '';
+              const modelB = b.modelo || '';
+              return modelA.localeCompare(modelB);
+          }
+        });
+      } catch (error) {
+        console.error('Error sorting rackets:', error);
+      }
+
+      setFilteredRackets(filtered);
+    };
+
+    // Debounce search to avoid too many API calls
+    const debounceTimer = setTimeout(performSearch, 300);
+    return () => clearTimeout(debounceTimer);
   }, [
-    rackets,
+rackets,
     searchQuery,
     selectedBrand,
     showMostViewed,
     showOffers,
+    showAvailableOnly,
     sortBy,
     selectedShape,
     selectedBalance,
@@ -1136,7 +1188,7 @@ const CatalogPage: React.FC = () => {
           </EmptyState>
         ) : (
           <>
-            <RacketsGrid view={viewMode}>
+            <RacketsGrid $view={viewMode}>
               {displayedRackets.map((racket, index) => (
                 <RacketCard
                   key={`${racket.id}-${racket.nombre}-${index}`}
