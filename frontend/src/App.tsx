@@ -1,6 +1,6 @@
 import { lazy, Suspense } from 'react';
 import React from 'react';
-import { Route, Routes } from 'react-router-dom';
+import { Navigate, Route, Routes } from 'react-router-dom';
 import { AnimatePresence } from 'framer-motion';
 import Layout from './components/layout/Layout';
 import { ScrollToTop } from './components/common/ScrollToTop';
@@ -14,6 +14,7 @@ import { AuthProvider } from './contexts/AuthContext';
 import { AuthModalProvider } from './contexts/AuthModalContext';
 import { NotificationProvider } from './contexts/NotificationContext';
 import AuthModal from './components/auth/AuthModal';
+import { useAuthModal } from './contexts/AuthModalContext';
 import { RouteLoadingFallback, CatalogSkeleton } from './components/common/LoadingFallbacks';
 import { PWAInstallPrompt } from './components/pwa/PWAInstallPrompt';
 
@@ -110,6 +111,18 @@ const LazyRoute: React.FC<{ children: React.ReactNode; fallback?: React.ReactNod
     </Suspense>
   </LazyChunkErrorBoundary>
 );
+
+const LoginRedirect: React.FC = () => {
+  const { openLogin } = useAuthModal();
+  React.useEffect(() => { openLogin(); }, [openLogin]);
+  return <Navigate to="/" replace />;
+};
+
+const RegisterRedirect: React.FC = () => {
+  const { openRegister } = useAuthModal();
+  React.useEffect(() => { openRegister(); }, [openRegister]);
+  return <Navigate to="/" replace />;
+};
 
 export default function App() {
   return (
@@ -235,6 +248,14 @@ export default function App() {
                         />
 
                         {/* User routes */}
+                        <Route
+                          path='/login'
+                          element={<LoginRedirect />}
+                        />
+                        <Route
+                          path='/register'
+                          element={<RegisterRedirect />}
+                        />
                         <Route
                           path='/faq'
                           element={
