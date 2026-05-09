@@ -373,3 +373,6 @@ frontend/dev-dist/
 AGENTS.md
 opencode.json
 docs/TFG_Cristian_Teijeiro
+
+graphify-out
+.graphify*
