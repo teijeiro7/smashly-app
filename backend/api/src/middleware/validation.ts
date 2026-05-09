@@ -13,6 +13,7 @@ const userProfileSchema = Joi.object({
     .pattern(/^[a-zA-Z0-9_]+$/)
     .required(),
   fullName: Joi.string().optional().allow(''),
+  current_racket: Joi.string().max(120).optional().allow(''),
   weight: Joi.number().min(30).max(200).optional(),
   height: Joi.number().min(100).max(250).optional(),
   birthdate: Joi.string().isoDate().optional(),
@@ -33,6 +34,7 @@ const updateProfileSchema = Joi.object({
     .optional(),
   full_name: Joi.string().optional().allow(''),
   avatar_url: Joi.string().uri().optional().allow(''),
+  current_racket: Joi.string().max(120).optional().allow(''),
   weight: Joi.number().min(30).max(200).optional(),
   height: Joi.number().min(100).max(250).optional(),
   birthdate: Joi.string().isoDate().optional(),

@@ -3,10 +3,13 @@ import { RecommendationService } from '../../services/recommendationService';
 import { OpenRouterService } from '../../services/openRouterService';
 import { RacketService } from '../../services/racketService';
 import { RacketFilterService } from '../../services/racketFilterService';
-import { supabase } from '../../config/supabase';
+import { supabase, supabaseAdmin } from '../../config/supabase';
 
 vi.mock('../../config/supabase', () => ({
   supabase: {
+    from: vi.fn(),
+  },
+  supabaseAdmin: {
     from: vi.fn(),
   },
 }));
@@ -82,7 +85,7 @@ describe('RecommendationService', () => {
         created_at: '2024-01-01T00:00:00Z',
       };
 
-      (supabase.from as vi.Mock).mockImplementation(() => ({
+      (supabaseAdmin.from as vi.Mock).mockImplementation(() => ({
         insert: vi.fn().mockReturnValue({
           select: vi.fn().mockReturnValue({
             single: vi.fn().mockResolvedValue({

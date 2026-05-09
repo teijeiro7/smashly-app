@@ -65,6 +65,7 @@ export class UserService {
           email: profileData.email,
           nickname: profileData.nickname,
           full_name: profileData.fullName || "",
+          current_racket: profileData.current_racket || "",
           weight: profileData.weight,
           height: profileData.height,
           birthdate: profileData.birthdate,

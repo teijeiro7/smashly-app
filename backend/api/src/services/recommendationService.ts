@@ -1,4 +1,4 @@
-import { supabase } from '../config/supabase';
+import { supabase, supabaseAdmin } from '../config/supabase';
 import logger from '../config/logger';
 import {
   Recommendation,
@@ -52,27 +52,25 @@ export class RecommendationService {
         throw new Error('No rackets match your criteria. Please adjust your filters.');
       }
 
-      // 4. Build strategic prompt with Testea metrics
-      const prompt = this.buildStrategicPrompt(filteredRackets, data);
+      // 4. Limit to top 20 safest/most relevant rackets for faster AI response
+      const MAX_RACKETS_FOR_AI = 20;
+      const limitedRackets = filteredRackets.slice(0, MAX_RACKETS_FOR_AI);
 
-      // 5. Call OpenRouter with strategic prompt
-      logger.info(`🤖 Sending ${filteredRackets.length} safe rackets to AI with strategic prompt`);
+      // 5. Build strategic prompt with Testea metrics
+      const prompt = this.buildStrategicPrompt(limitedRackets, data);
+
+      // 6. Call OpenRouter with strategic prompt
+      logger.info(`🤖 Sending ${limitedRackets.length} safe rackets to AI with strategic prompt`);
       const aiResponse = await OpenRouterService.generateContent(prompt);
 
       // 6. Parse response
-      const jsonMatch = aiResponse.match(/\{[\s\S]*\}/);
-      if (!jsonMatch) {
-        logger.error('❌ Failed to parse AI response - no JSON found');
-        throw new Error('Failed to parse AI response');
-      }
-
-      const aiResult = JSON.parse(jsonMatch[0]);
+      const aiResult = this.parseJsonResponse(aiResponse);
       logger.info(`🤖 AI recommended ${aiResult.rackets?.length || 0} rackets`);
 
       // 7. Enrich AI recommendations with Testea metrics and biomechanical safety
       const enrichedRackets = await this.enrichRecommendations(
         aiResult.rackets,
-        filteredRackets,
+        limitedRackets,
         data
       );
 
@@ -88,7 +86,7 @@ export class RecommendationService {
         process_summary: {
           total_catalog: allRackets.length,
           discarded_biomechanical: allRackets.length - filteredRackets.length,
-          safe_evaluated: filteredRackets.length,
+          safe_evaluated: limitedRackets.length,
           main_criterion: this.getMainCriterion(data),
         },
         transparency_note:
@@ -105,6 +103,41 @@ export class RecommendationService {
     } catch (error: unknown) {
       logger.error('Error generating recommendation:', error);
       throw error;
+    }
+  }
+
+  /**
+   * Extracts and parses the first JSON object from an AI response.
+   * Handles common wrappers like markdown fences or leading/trailing prose.
+   */
+  private static parseJsonResponse(responseText: string): any {
+    const cleanedText = responseText
+      .replace(/```json\s*/gi, '')
+      .replace(/```\s*/g, '')
+      .trim();
+
+    const firstBrace = cleanedText.indexOf('{');
+    const lastBrace = cleanedText.lastIndexOf('}');
+
+    if (firstBrace === -1 || lastBrace === -1 || lastBrace <= firstBrace) {
+      logger.error('❌ Failed to parse AI response - no valid JSON object boundaries found', {
+        preview: cleanedText.slice(0, 500),
+      });
+      throw new Error('Failed to parse AI response');
+    }
+
+    const candidate = cleanedText.slice(firstBrace, lastBrace + 1);
+
+    try {
+      return JSON.parse(candidate);
+    } catch (error) {
+      logger.error('❌ Failed to parse AI response JSON', {
+        message: error instanceof Error ? error.message : String(error),
+        previewStart: candidate.slice(0, 500),
+        previewEnd: candidate.slice(Math.max(0, candidate.length - 500)),
+        length: candidate.length,
+      });
+      throw new Error('Failed to parse AI response');
     }
   }
 
@@ -374,14 +407,25 @@ RESPONDE SOLO CON EL JSON:`;
   /**
    * Saves a recommendation for a user
    */
-  static async saveRecommendation(
+static async saveRecommendation(
     userId: string,
     type: 'basic' | 'advanced',
     formData: BasicFormData | AdvancedFormData,
     result: RecommendationResult
   ): Promise<Recommendation> {
     try {
-      const { data, error } = await supabase
+      logger.info('💾 Attempting to save recommendation', {
+        userId,
+        type,
+        formDataKeys: Object.keys(formData),
+        resultRacketsCount: result.rackets?.length
+      });
+
+      if (!supabaseAdmin) {
+        throw new Error('supabaseAdmin is null - check SUPABASE_SERVICE_ROLE_KEY');
+      }
+
+      const { data, error } = await supabaseAdmin
         .from('recommendations')
         .insert({
           user_id: userId,
@@ -393,6 +437,12 @@ RESPONDE SOLO CON EL JSON:`;
         .single();
 
       if (error) {
+        logger.error('❌ Supabase error saving recommendation:', {
+          code: error.code,
+          message: error.message,
+          details: error.details,
+          hint: error.hint
+        });
         throw new Error(`Error saving recommendation: ${error.message}`);
       }
 

@@ -6,6 +6,7 @@ export interface UserProfile {
   full_name?: string;
   avatar_url?: string;
   role?: string; // rol del usuario (player, admin, etc)
+  current_racket?: string; // pala actual del usuario
   weight?: number; // peso en la base de datos
   height?: number; // altura en la base de datos
   birthdate?: string; // fecha_nacimiento en la base de datos
@@ -20,6 +21,7 @@ export interface CreateUserProfileRequest {
   email: string;
   nickname: string;
   fullName?: string;
+  current_racket?: string;
   weight?: number;
   height?: number;
   birthdate?: string;
@@ -32,6 +34,7 @@ export interface UpdateUserProfileRequest {
   nickname?: string;
   full_name?: string;
   avatar_url?: string;
+  current_racket?: string;
   weight?: number;
   height?: number;
   birthdate?: string;

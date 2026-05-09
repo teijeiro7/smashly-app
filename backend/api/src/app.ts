@@ -232,6 +232,7 @@ app.use('*', (req, res) => {
       '/api/v1/auth',
       '/api/v1/rackets',
       '/api/v1/users',
+      '/api/v1/recommendations',
       '/api/v1/docs',
       '/api/v1/reviews',
     ],
