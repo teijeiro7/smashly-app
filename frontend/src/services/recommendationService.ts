@@ -1,5 +1,4 @@
 import { buildApiUrl } from '../config/api';
-import { getAuthToken } from '../utils/authUtils';
 import { BasicFormData, AdvancedFormData, RecommendationResult, Recommendation } from '../types/recommendation';
 
 export class RecommendationService {
@@ -29,14 +28,13 @@ export class RecommendationService {
     result: RecommendationResult
   ): Promise<Recommendation> {
     const url = buildApiUrl('/api/v1/recommendations/save');
-    const token = getAuthToken();
-    
+
     const response = await fetch(url, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
       },
+      credentials: 'include',
       body: JSON.stringify({ type, formData, result }),
     });
 
@@ -49,13 +47,10 @@ export class RecommendationService {
 
   static async getLast(): Promise<Recommendation | null> {
     const url = buildApiUrl('/api/v1/recommendations/last');
-    const token = getAuthToken();
 
     const response = await fetch(url, {
       method: 'GET',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-      },
+      credentials: 'include',
     });
 
     if (!response.ok) {

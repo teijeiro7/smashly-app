@@ -29,13 +29,10 @@ export const removeAuthToken = (): void => {
  * Use this only for in-session checks; prefer server validation on init.
  */
 export const getAuthToken = (): string | null => {
-  // Legacy: also accept tokens still in localStorage (migration period)
-  try {
-    const legacy = localStorage.getItem('auth_token');
-    if (legacy) return legacy;
-  } catch (_) { /* ignore */ }
-  // Return a placeholder so callers know the user may be authenticated via cookie
-  return _isAuthenticated ? '__cookie_auth__' : null;
+  if (_isAuthenticated) {
+    return '__cookie_auth__';
+  }
+  return null;
 };
 
 /**
