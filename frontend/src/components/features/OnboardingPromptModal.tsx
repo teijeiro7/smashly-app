@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -14,6 +14,7 @@ import {
 import { UserProfileService } from '../../services/userProfileService';
 import { sileo } from 'sileo';
 import { useAuth } from '../../contexts/AuthContext';
+import { useRackets } from '../../contexts/RacketsContext';
 
 interface OnboardingPromptModalProps {
   isOpen: boolean;
@@ -267,14 +268,25 @@ const HelperText = styled.span`
 const OnboardingPromptModal: React.FC<OnboardingPromptModalProps> = ({ isOpen, onClose }) => {
   const [step, setStep] = useState<'prompt' | 'form'>('prompt');
   const [loading, setLoading] = useState(false);
-  const { refreshUserProfile } = useAuth();
+  const { refreshUserProfile, user } = useAuth();
+  const { rackets, loading: racketsLoading } = useRackets();
   const [formData, setFormData] = useState({
+    current_racket: '',
     weight: '',
     height: '',
     birthdate: '',
     game_level: '',
     limitations: '',
   });
+
+  useEffect(() => {
+    if (isOpen) {
+      setFormData(prev => ({
+        ...prev,
+        current_racket: user?.current_racket || '',
+      }));
+    }
+  }, [isOpen, user]);
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
@@ -292,6 +304,7 @@ const OnboardingPromptModal: React.FC<OnboardingPromptModalProps> = ({ isOpen, o
 
     try {
       const updates = {
+        current_racket: formData.current_racket || undefined,
         weight: formData.weight ? Number(formData.weight) : undefined,
         height: formData.height ? Number(formData.height) : undefined,
         birthdate: formData.birthdate || undefined,
@@ -399,6 +412,30 @@ const OnboardingPromptModal: React.FC<OnboardingPromptModalProps> = ({ isOpen, o
                     value={formData.birthdate}
                     onChange={handleInputChange}
                   />
+                </FormGroup>
+
+                <FormGroup>
+                  <Label htmlFor='current_racket'>
+                    <FiUserCheck /> Tu pala actual
+                  </Label>
+                  <Select
+                    id='current_racket'
+                    name='current_racket'
+                    value={formData.current_racket}
+                    onChange={handleInputChange}
+                    disabled={racketsLoading}
+                  >
+                    <option value=''>Selecciona tu pala actual</option>
+                    {rackets.map(racket => {
+                      const displayName = `${racket.marca} ${racket.modelo || racket.nombre}`.trim();
+                      return (
+                        <option key={racket.id} value={displayName}>
+                          {displayName}
+                        </option>
+                      );
+                    })}
+                  </Select>
+                  <HelperText>Usaremos esta referencia para afinar tus futuras recomendaciones</HelperText>
                 </FormGroup>
 
                 <FormGroup>

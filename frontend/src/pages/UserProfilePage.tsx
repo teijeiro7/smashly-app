@@ -13,6 +13,7 @@ import {
   FiAlertCircle,
   FiCalendar,
 } from 'react-icons/fi';
+import { GiTennisRacket } from 'react-icons/gi';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { UserProfileService } from '../services/userProfileService';
@@ -23,6 +24,7 @@ import ProfileAvatar from '../components/features/ProfileAvatar';
 import ActivityStats from '../components/features/ActivityStats';
 import UserCollections from '../components/features/UserCollections';
 import AccountSettings from '../components/features/AccountSettings';
+import RacketSearchInput, { RacketSearchResult } from '../components/recommendation/RacketSearchInput';
 
 const Container = styled.div`
   min-height: 100vh;
@@ -292,6 +294,30 @@ const HelperText = styled.p`
   margin: 0.25rem 0 0 0;
 `;
 
+const SmallActionRow = styled.div`
+  display: flex;
+  gap: 0.5rem;
+  align-items: stretch;
+`;
+
+const SearchWrapper = styled.div`
+  width: 100%;
+  display: block;
+
+  /* Target the inner input of the RacketSearchInput component */
+  input {
+    height: 44px;
+    padding: 0 1rem;
+    box-sizing: border-box;
+    border-radius: 10px;
+  }
+
+  /* Ensure dropdowns align */
+  .results-dropdown {
+    max-height: 320px;
+  }
+`;
+
 const FormActions = styled.div`
   display: flex;
   gap: 0.75rem;
@@ -332,6 +358,15 @@ const Button = styled(motion.button)<{ $primary?: boolean }>`
   }
 `;
 
+const SmallButton = styled(Button)`
+  padding: 0.5rem 0.9rem;
+  font-size: 0.9375rem;
+  min-height: 52px;
+  height: 52px;
+  display: inline-flex;
+  align-items: center;
+`;
+
 const InfoCard = styled.div`
   background: #f0f9ff;
   border: 1px solid #bae6fd;
@@ -368,6 +403,7 @@ type TabType = 'profile' | 'activity' | 'collections' | 'account';
 
 interface UserProfileFormData {
   full_name: string;
+  current_racket: string;
   peso: string;
   altura: string;
   birthdate: string;
@@ -385,6 +421,7 @@ const UserProfilePage: React.FC = () => {
 
   const [formData, setFormData] = useState<UserProfileFormData>({
     full_name: '',
+    current_racket: '',
     peso: '',
     altura: '',
     birthdate: '',
@@ -403,6 +440,7 @@ const UserProfilePage: React.FC = () => {
     if (userProfile) {
       setFormData({
         full_name: userProfile.full_name || '',
+        current_racket: userProfile.current_racket || '',
         peso: userProfile.weight?.toString() || '',
         altura: userProfile.height?.toString() || '',
         birthdate: userProfile.birthdate || '',
@@ -522,6 +560,7 @@ const UserProfilePage: React.FC = () => {
     try {
       await UserProfileService.updateUserProfile({
         full_name: formData.full_name || undefined,
+        current_racket: formData.current_racket || undefined,
         weight: formData.peso ? Number(formData.peso) : undefined,
         height: formData.altura ? Number(formData.altura) : undefined,
         birthdate: formData.birthdate || undefined,
@@ -629,6 +668,7 @@ const UserProfilePage: React.FC = () => {
                             onChange={handleInputChange}
                           />
                         </FormGroup>
+                        {/* current_racket moved to its own section below */}
                         <FormGroup>
                           <FormLabel htmlFor='birthdate'>
                             <FiCalendar size={14} /> Fecha de nacimiento
@@ -645,6 +685,54 @@ const UserProfilePage: React.FC = () => {
                           )}
                         </FormGroup>
                       </FormGrid>
+                    </FormSection>
+
+                    <FormSection>
+                      <SectionTitle>
+                        <GiTennisRacket size={18} /> Pala actual
+                      </SectionTitle>
+                      <FormGroup>
+                        <FormLabel>Selecciona o busca tu pala actual</FormLabel>
+                        <SmallActionRow>
+                          <SearchWrapper style={{ flex: 1 }}>
+                            <RacketSearchInput
+                              value={
+                                formData.current_racket
+                                  ? ({ id: 0, name: formData.current_racket, marca: '' } as RacketSearchResult)
+                                  : null
+                              }
+                              onChange={(racket) => {
+                                const display = racket ? `${racket.marca} ${racket.name}`.trim() : '';
+                                setFormData(prev => ({ ...prev, current_racket: display }));
+                              }}
+                            />
+                            <HelperText>
+                              Busca tu pala escribiendo el nombre o marca. También puedes añadirla manualmente.
+                            </HelperText>
+                          </SearchWrapper>
+                          <SmallButton
+                            type='button'
+                            $primary
+                            onClick={async () => {
+                              setSaving(true);
+                              try {
+                                await UserProfileService.updateUserProfile({
+                                  current_racket: formData.current_racket || undefined,
+                                } as any);
+                                await refreshUserProfile();
+                                sileo.success({ title: 'Éxito', description: 'Pala actual guardada' });
+                              } catch (err: any) {
+                                sileo.error({ title: 'Error', description: err?.message || 'Error al guardar pala' });
+                              } finally {
+                                setSaving(false);
+                              }
+                            }}
+                            disabled={saving}
+                          >
+                            <FiSave size={14} /> Guardar
+                          </SmallButton>
+                        </SmallActionRow>
+                      </FormGroup>
                     </FormSection>
 
                     <FormSection>

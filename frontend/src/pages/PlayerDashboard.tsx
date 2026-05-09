@@ -1,13 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { useAuth } from '../contexts/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { QuickActionCard } from '../components/dashboard/QuickActionCard';
 import { FaLightbulb, FaBalanceScale, FaChartBar, FaUser } from 'react-icons/fa';
 import { RacketService } from '../services/racketService';
 import { RacketViewService, RecentlyViewedRacket } from '../services/racketViewService';
 import { Racket } from '../types/racket';
 import { ListService } from '../services/listService';
+import { RecommendationService } from '../services/recommendationService';
+import { Recommendation } from '../types/recommendation';
+import CurrentRacketFinderModal from '../components/features/CurrentRacketFinderModal';
 
 const Container = styled.div`
   min-height: 100dvh;
@@ -178,14 +181,241 @@ const ViewAllButton = styled.button`
   }
 `;
 
+const RecommendationSection = styled.section`
+  margin-bottom: 2rem;
+`;
+
+const RecommendationHero = styled.div`
+  background: linear-gradient(135deg, #0f172a 0%, #14532d 55%, #16a34a 100%);
+  border-radius: 24px;
+  padding: clamp(1.25rem, 3vw, 2rem);
+  color: white;
+  box-shadow: 0 18px 45px rgba(15, 23, 42, 0.18);
+  display: grid;
+  grid-template-columns: 1.6fr 1fr;
+  gap: 1.25rem;
+  align-items: center;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+    border-radius: 18px;
+  }
+`;
+
+const RecommendationCopy = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+`;
+
+const Eyebrow = styled.span`
+  font-size: 0.8125rem;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: rgba(255, 255, 255, 0.72);
+`;
+
+const RecommendationTitle = styled.h3`
+  margin: 0;
+  font-size: clamp(1.5rem, 3vw, 2.2rem);
+  line-height: 1.05;
+`;
+
+const RecommendationText = styled.p`
+  margin: 0;
+  max-width: 62ch;
+  color: rgba(255, 255, 255, 0.86);
+  line-height: 1.6;
+`;
+
+const RecommendationMeta = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+`;
+
+const MetaPill = styled.span`
+  padding: 0.5rem 0.8rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  font-size: 0.875rem;
+`;
+
+const RecommendationActionButton = styled.button`
+  border: none;
+  border-radius: 14px;
+  min-height: 48px;
+  padding: 0.9rem 1rem;
+  background: white;
+  color: #14532d;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 20px rgba(15, 23, 42, 0.15);
+  }
+`;
+
+const RecommendationsGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(250px, 100%), 1fr));
+  gap: 1rem;
+`;
+
+const RecommendedRacketCard = styled.div`
+  background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+  border-radius: 20px;
+  padding: 1rem;
+  border: 1px solid rgba(22, 163, 74, 0.12);
+  box-shadow: 0 8px 22px rgba(15, 23, 42, 0.05);
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  height: 100%;
+`;
+
+const RacketPosition = styled.span`
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 12px;
+  background: #dcfce7;
+  color: #166534;
+  font-weight: 800;
+`;
+
+const RacketImageWrap = styled.div`
+  border-radius: 16px;
+  overflow: hidden;
+  background: white;
+  border: 1px solid rgba(22, 163, 74, 0.08);
+  min-height: 180px;
+  padding: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
+const RacketImageSmall = styled.img`
+  width: 100%;
+  height: 180px;
+  object-fit: contain;
+`;
+
+const RacketMetaLine = styled.p`
+  margin: 0;
+  color: #64748b;
+  font-size: 0.875rem;
+`;
+
+const RecommendedRacketBody = styled.div`
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 0.5rem;
+`;
+
+const RacketReason = styled.p`
+  margin: 0;
+  color: #475569;
+  line-height: 1.6;
+`;
+
+const DetailLinkButton = styled(Link)`
+  margin-top: auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 0.75rem 1rem;
+  border-radius: 14px;
+  background: #16a34a;
+  color: white;
+  font-weight: 700;
+  text-decoration: none;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+
+  &:hover {
+    transform: translateY(-1px);
+    background: #15803d;
+    box-shadow: 0 10px 18px rgba(22, 163, 74, 0.2);
+  }
+`;
+
+const ChangeDataCard = styled.div`
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 20px;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  justify-content: space-between;
+`;
+
+const titleCase = (value: string): string =>
+  value
+    .toLowerCase()
+    .replace(/\(.*?\)/g, '')
+    .replace(/\b([a-záéíóúüñ])/g, letter => letter.toUpperCase())
+    .trim();
+
+const formatRecommendationModelName = (name?: string | null, brand?: string | null): string => {
+  const rawName = (name || '').trim();
+  const rawBrand = (brand || '').trim();
+
+  if (!rawName && !rawBrand) {
+    return 'Pala sin nombre';
+  }
+
+  let normalized = rawName || rawBrand;
+  normalized = normalized.replace(/\s*\([^)]*\)\s*/g, ' ').replace(/\s+/g, ' ').trim();
+
+  if (rawBrand) {
+    const lowerBrand = rawBrand.toLowerCase();
+    const lowerNormalized = normalized.toLowerCase();
+
+    if (lowerNormalized.startsWith(`${lowerBrand} `)) {
+      normalized = normalized.slice(rawBrand.length).trim();
+    } else if (lowerNormalized.startsWith(`${lowerBrand}-`)) {
+      normalized = normalized.slice(rawBrand.length + 1).trim();
+    }
+  }
+
+  return titleCase(normalized || rawName || rawBrand);
+};
+
 export const PlayerDashboard: React.FC = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const [favorites, setFavorites] = useState<Racket[]>([]);
   const [favoritesCount, setFavoritesCount] = useState<number>(0);
   const [offers, setOffers] = useState<Racket[]>([]);
   const [recentlyViewed, setRecentlyViewed] = useState<RecentlyViewedRacket[]>([]);
+  const [lastRecommendation, setLastRecommendation] = useState<Recommendation | null>(null);
   const [loading, setLoading] = useState(true);
+  const [_recommendationLoading, setRecommendationLoading] = useState(true);
+  const [showFinderModal, setShowFinderModal] = useState(false);
+  const hasRecommendation = Boolean(lastRecommendation?.recommendation_result?.rackets?.length);
+
+  const loadLastRecommendation = async () => {
+    try {
+      setRecommendationLoading(true);
+      const recommendation = await RecommendationService.getLast();
+      setLastRecommendation(recommendation);
+    } catch (error) {
+      console.error('Error fetching last recommendation:', error);
+      setLastRecommendation(null);
+    } finally {
+      setRecommendationLoading(false);
+    }
+  };
 
   useEffect(() => {
     const fetchDashboardData = async () => {
@@ -234,6 +464,19 @@ export const PlayerDashboard: React.FC = () => {
 
     fetchDashboardData();
   }, [user]);
+
+  useEffect(() => {
+    if (user) {
+      loadLastRecommendation();
+    }
+  }, [user]);
+
+  useEffect(() => {
+    if (location.hash === '#next-rackets' && hasRecommendation) {
+      const target = document.getElementById('next-rackets');
+      target?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }, [location.hash, hasRecommendation, lastRecommendation]);
 
   const quickActions = [
     {
@@ -357,6 +600,83 @@ export const PlayerDashboard: React.FC = () => {
             </RacketsGrid>
           </Section>
         )}
+
+        <RecommendationSection id='next-rackets'>
+          <RecommendationHero>
+            <RecommendationCopy>
+              <Eyebrow>Encuentra tu nueva pala</Eyebrow>
+              <RecommendationTitle>Tu próximo paso, siempre a mano</RecommendationTitle>
+              <RecommendationText>
+                Revisa tus tres opciones más recientes y vuelve a afinar los datos cuando quieras.
+                La recomendación se actualiza sin salir del dashboard.
+              </RecommendationText>
+              <RecommendationMeta>
+                <MetaPill>Pala actual: {user?.current_racket || 'Pendiente de completar'}</MetaPill>
+                <MetaPill>Presupuesto: 50€ - 700€</MetaPill>
+                <MetaPill>3 opciones guardadas</MetaPill>
+              </RecommendationMeta>
+            </RecommendationCopy>
+
+            <ChangeDataCard>
+              {hasRecommendation ? (
+                <>
+                  <strong>¿Quieres cambiar datos?</strong>
+                  <span>
+                    Vuelve a abrir el formulario, ajusta tu objetivo o presupuesto y genera una
+                    nueva terna de palas.
+                  </span>
+                  <RecommendationActionButton onClick={() => setShowFinderModal(true)}>
+                    Cambiar datos
+                  </RecommendationActionButton>
+                </>
+              ) : (
+                <>
+                  <strong>Averigua cuál es tu siguiente pala</strong>
+                  <span>
+                    Completa el formulario y guardaremos tus 3 primeras recomendaciones para que
+                    las tengas siempre a mano.
+                  </span>
+                  <RecommendationActionButton onClick={() => setShowFinderModal(true)}>
+                    Averigua cuál es tu siguiente pala
+                  </RecommendationActionButton>
+                </>
+              )}
+            </ChangeDataCard>
+          </RecommendationHero>
+        </RecommendationSection>
+
+        {hasRecommendation && (
+          <Section>
+            <SectionTitle>🆕 Tus próximas palas</SectionTitle>
+            <RecommendationsGrid>
+              {lastRecommendation!.recommendation_result.rackets.slice(0, 3).map((racket, index) => (
+                <RecommendedRacketCard key={racket.id}>
+                  <RacketPosition>#{index + 1}</RacketPosition>
+                  <RacketImageWrap>
+                    {racket.image ? <RacketImageSmall src={racket.image} alt={racket.name} /> : null}
+                  </RacketImageWrap>
+                  <RecommendedRacketBody>
+                    <div>
+                      <RacketName>{formatRecommendationModelName(racket.name, racket.brand)}</RacketName>
+                      <RacketMetaLine>Puntuación: {racket.match_score}</RacketMetaLine>
+                      {racket.price ? <RacketMetaLine>Precio aprox.: {racket.price}€</RacketMetaLine> : null}
+                    </div>
+                    <RacketReason>{racket.reason}</RacketReason>
+                  </RecommendedRacketBody>
+                  <DetailLinkButton to={`/racket-detail?id=${racket.id}`}>
+                    Ver detalle
+                  </DetailLinkButton>
+                </RecommendedRacketCard>
+              ))}
+            </RecommendationsGrid>
+          </Section>
+        )}
+
+        <CurrentRacketFinderModal
+          isOpen={showFinderModal}
+          onClose={() => setShowFinderModal(false)}
+          onGenerated={loadLastRecommendation}
+        />
 
         {loading && (
           <EmptyState>

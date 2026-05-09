@@ -2,11 +2,13 @@ import { lazy, Suspense } from 'react';
 import React from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import { AnimatePresence } from 'framer-motion';
+
 import Layout from './components/layout/Layout';
 import { ScrollToTop } from './components/common/ScrollToTop';
 import { ComparisonProvider } from './contexts/ComparisonContext';
 import { RacketsProvider } from './contexts/RacketsContext';
 import { ListsProvider } from './contexts/ListsContext';
+import { BackgroundTasksProvider } from './contexts/BackgroundTasksContext';
 import ErrorBoundary from './components/ErrorBoundary';
 import ProtectedRoute from './components/ProtectedRoute';
 import { FloatingCompareButton } from './components/common/FloatingCompareButton';
@@ -17,6 +19,7 @@ import AuthModal from './components/auth/AuthModal';
 import { useAuthModal } from './contexts/AuthModalContext';
 import { RouteLoadingFallback, CatalogSkeleton } from './components/common/LoadingFallbacks';
 import { PWAInstallPrompt } from './components/pwa/PWAInstallPrompt';
+import { BackgroundTaskPopup } from './components/common/BackgroundTaskPopup';
 
 // Code split routes - load on demand
 const HomePage = lazy(() => import('./pages/HomePage'));
@@ -127,20 +130,22 @@ const RegisterRedirect: React.FC = () => {
 export default function App() {
   return (
     <ErrorBoundary>
-      <Suspense fallback={<RouteLoadingFallback />}>
-        <AuthProvider>
+        <Suspense fallback={<RouteLoadingFallback />}>
+          <AuthProvider>
           <NotificationProvider>
-            <RacketsProvider>
-              <ComparisonProvider>
-                <ListsProvider>
-                  <AuthModalProvider>
-                    <ScrollToTop />
-                    <AuthModal />
-                    <PWAInstallPrompt />
-                    <Layout>
-                      <FloatingCompareButton />
-                      <AnimatePresence mode="wait">
-                      <Routes>
+            <BackgroundTasksProvider>
+              <RacketsProvider>
+                <ComparisonProvider>
+                  <ListsProvider>
+                    <AuthModalProvider>
+                      <ScrollToTop />
+                      <AuthModal />
+                      <PWAInstallPrompt />
+                      <Layout>
+                        <FloatingCompareButton />
+                        <BackgroundTaskPopup />
+                        <AnimatePresence mode="wait">
+                        <Routes>
                         {/* Critical routes - prioritized */}
                         <Route
                           path='/'
@@ -376,13 +381,14 @@ export default function App() {
                             </LazyRoute>
                           }
                         />
-                      </Routes>
-                      </AnimatePresence>
-                    </Layout>
-                  </AuthModalProvider>
-                </ListsProvider>
-              </ComparisonProvider>
-            </RacketsProvider>
+                        </Routes>
+                        </AnimatePresence>
+                      </Layout>
+                    </AuthModalProvider>
+                  </ListsProvider>
+                </ComparisonProvider>
+              </RacketsProvider>
+            </BackgroundTasksProvider>
           </NotificationProvider>
         </AuthProvider>
       </Suspense>
