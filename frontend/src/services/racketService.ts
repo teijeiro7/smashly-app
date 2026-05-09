@@ -131,17 +131,34 @@ export class RacketService {
   }
 
   /**
-   * Busca palas por texto desde la API REST
+   * Busca palas por texto desde la API REST con filtros opcionales
    */
-  static async searchRackets(query: string): Promise<Racket[]> {
+  static async searchRackets(
+    query: string,
+    filters?: Record<string, string>,
+    pagination?: { page?: number; limit?: number }
+  ): Promise<{ data: Racket[]; pagination?: any }> {
     try {
-      const url = buildApiUrl(API_ENDPOINTS.RACKETS_SEARCH, { q: query });
+      const params: Record<string, string> = { q: query };
+      
+      if (filters) {
+        Object.entries(filters).forEach(([key, value]) => {
+          if (value) params[key] = value;
+        });
+      }
+
+      if (pagination) {
+        if (pagination.page !== undefined) params.page = String(pagination.page);
+        if (pagination.limit !== undefined) params.limit = String(pagination.limit);
+      }
+
+      const url = buildApiUrl(API_ENDPOINTS.RACKETS_SEARCH, params);
       const response = await fetch(url, {
         method: 'GET',
         headers: getCommonHeaders(),
       });
 
-      return await handleApiResponse<Racket[]>(response);
+      return await handleApiResponse<any>(response);
     } catch (error: any) {
       console.error('Error searching rackets:', error);
       throw error;

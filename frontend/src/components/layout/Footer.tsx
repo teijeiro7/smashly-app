@@ -89,6 +89,7 @@ const Footer: React.FC = () => {
               href="https://www.instagram.com/smashly.app/"
               target="_blank"
               rel="noopener noreferrer"
+              aria-label="Instagram"
             >
               <FaInstagram />
             </a>
@@ -96,10 +97,11 @@ const Footer: React.FC = () => {
               href="https://www.tiktok.com/@smashlyapp"
               target="_blank"
               rel="noopener noreferrer"
+              aria-label="TikTok"
             >
               <FaTiktok />
             </a>
-            <a href="mailto:hello@smashly.app">
+            <a href="mailto:hello@smashly.app" aria-label="Enviar correo">
               <FiMail />
             </a>
           </SocialLinks>

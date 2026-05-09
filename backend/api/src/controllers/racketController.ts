@@ -227,7 +227,7 @@ export class RacketController {
 
   /**
    * GET /api/rackets/search?q=...
-   * Busca palas por nombre, marca o modelo
+   * Busca palas con búsqueda fuzzy + filtros avanzada
    */
   static async searchRackets(req: Request, res: Response): Promise<void> {
     try {
@@ -243,14 +243,22 @@ export class RacketController {
         return;
       }
 
-      const rackets = await RacketService.searchRackets(query.trim());
+      const filters = this.buildSearchFilters(req.query);
+      const page = parseInt(req.query.page as string) || 0;
+      const limit = parseInt(req.query.limit as string) || 50;
+
+      const result = await RacketService.searchRacketsFuzzy(
+        query.trim(),
+        filters,
+        { limit, offset: page * limit }
+      );
 
       res.json({
         success: true,
-        data: rackets,
-        message: `${rackets.length} palas encontradas para "${query}"`,
+        data: result,
+        message: `${result.data.length} palas encontradas para "${query}"`,
         timestamp: new Date().toISOString(),
-      } as ApiResponse<Racket[]>);
+      } as ApiResponse);
     } catch (error: unknown) {
       logger.error('Error in searchRackets:', error);
       res.status(500).json({
@@ -300,12 +308,18 @@ export class RacketController {
     if (query.shape) filters.shape = query.shape as string;
     if (query.balance) filters.balance = query.balance as string;
     if (query.level) filters.game_level = query.level as string;
+    if (query.core) (filters as any).core = query.core as string;
+    if (query.face) (filters as any).face = query.face as string;
+    if (query.hardness) (filters as any).hardness = query.hardness as string;
+    if (query.game_type) (filters as any).game_type = query.game_type as string;
 
     if (query.min_price) filters.min_price = parseFloat(query.min_price as string);
     if (query.max_price) filters.max_price = parseFloat(query.max_price as string);
 
     if (query.on_sale) filters.on_offer = query.on_sale === 'true';
     if (query.bestseller) filters.is_bestseller = query.bestseller === 'true';
+    if (query.available_only) (filters as any).available_only = query.available_only === 'true';
+    if (query.most_viewed) (filters as any).most_viewed = query.most_viewed === 'true';
 
     return filters;
   }

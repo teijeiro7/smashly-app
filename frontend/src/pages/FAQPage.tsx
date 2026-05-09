@@ -105,24 +105,24 @@ const CategoryScrollContainer = styled.div`
   }
 `;
 
-const CategoryButton = styled.button<{ isActive: boolean }>`
+const CategoryButton = styled.button<{ $isActive: boolean }>`
   padding: 0.625rem 1.25rem;
   border-radius: 50px;
   background: ${(props) =>
-    props.isActive
+    props.$isActive
       ? "linear-gradient(135deg, #16a34a 0%, #059669 100%)"
       : "white"};
-  border: 2px solid ${(props) => (props.isActive ? "#16a34a" : "#e5e7eb")};
+  border: 2px solid ${(props) => (props.$isActive ? "#16a34a" : "#e5e7eb")};
   font-size: 0.8125rem;
-  font-weight: ${(props) => (props.isActive ? "600" : "500")};
-  color: ${(props) => (props.isActive ? "white" : "#6b7280")};
+  font-weight: ${(props) => (props.$isActive ? "600" : "500")};
+  color: ${(props) => (props.$isActive ? "white" : "#6b7280")};
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   white-space: nowrap;
   position: relative;
   overflow: hidden;
   box-shadow: ${(props) =>
-    props.isActive
+    props.$isActive
       ? "0 4px 14px rgba(22, 163, 74, 0.3)"
       : "0 2px 4px rgba(0, 0, 0, 0.05)"};
 
@@ -145,13 +145,13 @@ const CategoryButton = styled.button<{ isActive: boolean }>`
   &:hover {
     transform: translateY(-2px);
     background: ${(props) =>
-      props.isActive
+      props.$isActive
         ? "linear-gradient(135deg, #059669 0%, #047857 100%)"
         : "#f9fafb"};
-    border-color: ${(props) => (props.isActive ? "#059669" : "#16a34a")};
-    color: ${(props) => (props.isActive ? "white" : "#16a34a")};
+    border-color: ${(props) => (props.$isActive ? "#059669" : "#16a34a")};
+    color: ${(props) => (props.$isActive ? "white" : "#16a34a")};
     box-shadow: ${(props) =>
-      props.isActive
+      props.$isActive
         ? "0 8px 25px rgba(22, 163, 74, 0.4)"
         : "0 4px 12px rgba(22, 163, 74, 0.15)"};
 
@@ -502,7 +502,7 @@ const FAQPage: React.FC = () => {
             {categories.map((category) => (
               <CategoryButton
                 key={category}
-                isActive={activeCategory === category}
+                $isActive={activeCategory === category}
                 onClick={() => setActiveCategory(category)}
               >
                 {category}

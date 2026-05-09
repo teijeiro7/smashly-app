@@ -665,7 +665,7 @@ export class RacketService {
   }
 
   /**
-   * Busca palas por nombre
+   * Busca palas por nombre (búsqueda exacta - legacy)
    */
   static async searchRackets(query: string): Promise<Racket[]> {
     const { data, error } = await supabase
@@ -682,6 +682,56 @@ export class RacketService {
 
     const processedData = processRacketData(data || []);
     return processedData.map(mapToFrontendFormat);
+  }
+
+  /**
+   * Busca palas con búsqueda fuzzy usando pg_trgm
+   * Permite encontrar palas con palabras en cualquier orden
+   */
+  static async searchRacketsFuzzy(
+    query: string,
+    filters: SearchFilters = {},
+    pagination: { limit?: number; offset?: number } = {}
+  ): Promise<PaginatedResponse<Racket>> {
+    try {
+      const { data, error } = await supabase.rpc('search_rackets_fuzzy', {
+        search_query: query.trim(),
+        filter_brand: filters.brand || null,
+        filter_shape: filters.shape || null,
+        filter_balance: filters.balance || null,
+        filter_core: filters.core || null,
+        filter_face: filters.face || null,
+        filter_game_level: filters.game_level || null,
+        filter_game_type: filters.game_type || null,
+        filter_hardness: filters.hardness || null,
+        filter_available_only: filters.available_only || false,
+        filter_on_offer: filters.on_offer || false,
+        filter_most_viewed: filters.most_viewed || false,
+        result_limit: pagination.limit || 50,
+        result_offset: pagination.offset || 0,
+      });
+
+      if (error) {
+        logger.error('Error in fuzzy search:', error);
+        throw new Error(`Error en búsqueda: ${error.message}`);
+      }
+
+      const processedData = processRacketData(data || []);
+      return {
+        data: processedData.map(mapToFrontendFormat),
+        pagination: {
+          page: Math.floor((pagination.offset || 0) / (pagination.limit || 50)),
+          limit: pagination.limit || 50,
+          total: data?.length || 0,
+          totalPages: 1,
+          hasNext: false,
+          hasPrev: (pagination.offset || 0) > 0,
+        },
+      };
+    } catch (error: unknown) {
+      logger.error('Fuzzy search failed:', error);
+      throw error;
+    }
   }
 
   /**

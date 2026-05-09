@@ -545,7 +545,7 @@ const Header: React.FC = () => {
               style={{ display: 'flex', alignItems: 'center', gap: '8px' }}
             >
               <NotificationBell />
-              <AvatarButton onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}>
+              <AvatarButton onClick={() => setIsUserMenuOpen(!isUserMenuOpen)} aria-label="Menú de usuario">
                 {userProfile.avatar_url ? (
                   <img src={userProfile.avatar_url} alt='Avatar' />
                 ) : (
@@ -589,10 +589,10 @@ const Header: React.FC = () => {
         {/* Mobile Elements */}
         <MobileElements>
           <MobileNotificationBell />
-          <MobileSearchButton onClick={toggleMobileSearch}>
+          <MobileSearchButton onClick={toggleMobileSearch} aria-label="Buscar">
             <FiSearch />
           </MobileSearchButton>
-          <MobileMenuButton onClick={toggleMenu}>
+          <MobileMenuButton onClick={toggleMenu} aria-label={isMenuOpen ? 'Cerrar menú' : 'Abrir menú'}>
             {isMenuOpen ? <FiX /> : <FiMenu />}
           </MobileMenuButton>
         </MobileElements>

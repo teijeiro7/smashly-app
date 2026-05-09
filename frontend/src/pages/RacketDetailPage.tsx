@@ -434,19 +434,19 @@ const DotsContainer = styled.div`
   margin-top: 1rem;
 `;
 
-const Dot = styled.button<{ isActive: boolean }>`
+const Dot = styled.button<{ $isActive: boolean }>`
   width: 8px;
   height: 8px;
   border-radius: 50%;
   border: none;
-  background: ${props => (props.isActive ? 'var(--color-primary)' : 'var(--color-gray-300)')};
+  background: ${props => (props.$isActive ? 'var(--color-primary)' : 'var(--color-gray-300)')};
   cursor: pointer;
   transition: background-color 0.2s, transform 0.2s;
   padding: 0;
 
   &:hover {
     background: ${props =>
-      props.isActive ? 'var(--color-primary-dark)' : 'var(--color-gray-400)'};
+      props.$isActive ? 'var(--color-primary-dark)' : 'var(--color-gray-400)'};
     transform: scale(1.2);
   }
 `;
@@ -1449,7 +1449,7 @@ const RacketDetailPage: React.FC = () => {
                   {racket.imagenes.map((_, index) => (
                     <Dot
                       key={index}
-                      isActive={index === selectedImageIndex}
+                      $isActive={index === selectedImageIndex}
                       onClick={() => setSelectedImageIndex(index)}
                       aria-label={`Ver imagen ${index + 1}`}
                     />

@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { useAuthModal } from '../contexts/AuthModalContext';
 import LoadingSpinner from './common/LoadingSpinner';
 
 interface ProtectedRouteProps {
@@ -15,15 +16,22 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   redirectTo,
 }) => {
   const { user, loading } = useAuth();
+  const { openLogin } = useAuthModal();
+  const hasTriggeredLogin = useRef(false);
+
+  useEffect(() => {
+    if (!loading && !user && !hasTriggeredLogin.current) {
+      hasTriggeredLogin.current = true;
+      openLogin();
+    }
+  }, [loading, user, openLogin]);
 
   if (loading) {
     return <LoadingSpinner fullScreen text='Verificando sesión...' />;
   }
 
-  // Si no hay usuario, redirigir a página de error de no autorizado
   if (!user) {
-    const destination = redirectTo || '/error?type=unauthorized';
-    return <Navigate to={destination} replace />;
+    return <Navigate to={redirectTo || '/'} replace />;
   }
 
   // Si requiere admin pero el usuario no es admin, mostrar error 403
