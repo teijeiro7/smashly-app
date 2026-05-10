@@ -1,6 +1,7 @@
 import { Router, Request, Response } from 'express';
 import axios from 'axios';
 import logger from '../config/logger';
+import { proxyLimiter } from '../middleware/rateLimits';
 
 const router = Router();
 
@@ -52,7 +53,7 @@ const ALLOWED_IMAGE_DOMAINS: string[] = [
  * This solves CORS issues when trying to load images in PDFs.
  * SECURITY: Only domains in ALLOWED_IMAGE_DOMAINS are accessible.
  */
-router.get('/image', async (req: Request, res: Response) => {
+router.get('/image', proxyLimiter, async (req: Request, res: Response) => {
   try {
     const imageUrl = req.query.url as string;
 
