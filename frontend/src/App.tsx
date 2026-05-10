@@ -158,9 +158,11 @@ export default function App() {
                         <Route
                           path='/dashboard'
                           element={
-                            <LazyRoute>
-                              <PlayerDashboard />
-                            </LazyRoute>
+                            <ProtectedRoute>
+                              <LazyRoute>
+                                <PlayerDashboard />
+                              </LazyRoute>
+                            </ProtectedRoute>
                           }
                         />
 
