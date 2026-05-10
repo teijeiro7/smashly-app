@@ -370,6 +370,12 @@ frontend/dev-dist/
 .github/copilot-instructions.md
 /scratch
 
+# Design and product docs
+DESIGN.md
+PRODUCT.md
+design.json
+.impeccable/
+
 AGENTS.md
 opencode.json
 docs/TFG_Cristian_Teijeiro
