@@ -3,8 +3,8 @@ import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import compression from 'compression';
-import rateLimit from 'express-rate-limit';
 import cookieParser from 'cookie-parser';
+import { globalLimiter, authLimiter } from './middleware/rateLimits';
 import { validateConfig } from './config';
 import logger from './config/logger';
 
@@ -80,30 +80,7 @@ app.use(
 );
 
 // Rate limiting
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutos
-  max: 500, // Límite general razonable
-  message: {
-    error: 'Too many requests from this IP, please try again later.',
-    code: 'RATE_LIMIT_EXCEEDED',
-  },
-  standardHeaders: true,
-  legacyHeaders: false,
-});
-
-// Stricter rate limiting for auth endpoints to prevent brute force
-const authLimiter = rateLimit({
-  windowMs: 1 * 60 * 1000, // 1 minuto
-  max: 10, // Máximo 10 intentos por minuto
-  message: {
-    error: 'Demasiados intentos. Por favor, espere un minuto.',
-    code: 'AUTH_RATE_LIMIT_EXCEEDED',
-  },
-  standardHeaders: true,
-  legacyHeaders: false,
-});
-
-app.use('/api/v1/', limiter);
+app.use('/api/v1/', globalLimiter);
 app.use('/api/v1/auth/', authLimiter);
 
 // Cookie parser (needed for httpOnly auth cookies)
