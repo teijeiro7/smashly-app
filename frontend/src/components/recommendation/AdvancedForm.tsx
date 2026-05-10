@@ -27,13 +27,13 @@ const FormContainer = styled.div`
   background: white;
   border-radius: 24px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
-  border: 1px solid rgba(22, 163, 74, 0.1);
+  border: 1px solid rgba(21, 128, 61, 0.1);
 `;
 
 const SectionTitle = styled.h3`
   font-size: 1.1rem;
   font-weight: 700;
-  color: #16a34a;
+  color: #15803d;
   margin: 2rem 0 1rem 0;
   padding-bottom: 0.5rem;
   border-bottom: 2px solid #f0fdf4;
@@ -93,8 +93,8 @@ const Select = styled.select`
 
   &:focus {
     outline: none;
-    border-color: #16a34a;
-    box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.1);
+    border-color: #15803d;
+    box-shadow: 0 0 0 3px rgba(21, 128, 61, 0.1);
   }
 `;
 
@@ -110,8 +110,8 @@ const Input = styled.input`
 
   &:focus {
     outline: none;
-    border-color: #16a34a;
-    box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.1);
+    border-color: #15803d;
+    box-shadow: 0 0 0 3px rgba(21, 128, 61, 0.1);
   }
 `;
 
@@ -129,8 +129,8 @@ const TextArea = styled.textarea`
 
   &:focus {
     outline: none;
-    border-color: #16a34a;
-    box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.1);
+    border-color: #15803d;
+    box-shadow: 0 0 0 3px rgba(21, 128, 61, 0.1);
   }
 `;
 
@@ -146,7 +146,7 @@ const RadioLabel = styled.label<{ $checked?: boolean }>`
   gap: 0.5rem;
   padding: 0.6rem 1rem;
   border-radius: 8px;
-  border: 2px solid ${props => (props.$checked ? '#16a34a' : '#e5e7eb')};
+  border: 2px solid ${props => (props.$checked ? '#15803d' : '#e5e7eb')};
   background: ${props => (props.$checked ? '#f0fdf4' : 'white')};
   cursor: pointer;
   transition: all 0.2s;
@@ -155,7 +155,7 @@ const RadioLabel = styled.label<{ $checked?: boolean }>`
   color: ${props => (props.$checked ? '#15803d' : '#4b5563')};
 
   &:hover {
-    border-color: #16a34a;
+    border-color: #15803d;
     background: #f0fdf4;
   }
 
@@ -180,7 +180,7 @@ const CheckboxLabel = styled.label`
   font-weight: 500;
 
   input {
-    accent-color: #16a34a;
+    accent-color: #15803d;
     width: 16px;
     height: 16px;
   }
@@ -212,19 +212,19 @@ const PriorityItem = styled.div<{ $isDragging?: boolean }>`
   gap: 1rem;
   padding: 1rem;
   background: ${props => (props.$isDragging ? '#f0fdf4' : 'white')};
-  border: 2px solid ${props => (props.$isDragging ? '#16a34a' : '#e5e7eb')};
+  border: 2px solid ${props => (props.$isDragging ? '#15803d' : '#e5e7eb')};
   border-radius: 8px;
   cursor: grab;
   transition: all 0.2s;
   box-shadow: ${props =>
-    props.$isDragging ? '0 4px 12px rgba(22, 163, 74, 0.2)' : '0 1px 3px rgba(0,0,0,0.05)'};
+    props.$isDragging ? '0 4px 12px rgba(21, 128, 61, 0.2)' : '0 1px 3px rgba(0,0,0,0.05)'};
 
   &:active {
     cursor: grabbing;
   }
 
   &:hover {
-    border-color: #16a34a;
+    border-color: #15803d;
     transform: translateY(-1px);
   }
 `;
@@ -233,7 +233,7 @@ const PriorityNumber = styled.div`
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+  background: linear-gradient(135deg, #15803d 0%, #15803d 100%);
   color: white;
   display: flex;
   align-items: center;
@@ -278,7 +278,7 @@ const Button = styled.button<{ $primary?: boolean }>`
   border: none;
   font-weight: 600;
   cursor: pointer;
-  background: ${props => (props.$primary ? '#16a34a' : '#f3f4f6')};
+  background: ${props => (props.$primary ? '#15803d' : '#f3f4f6')};
   color: ${props => (props.$primary ? 'white' : '#4b5563')};
   transition: all 0.2s;
   font-size: 1rem;
