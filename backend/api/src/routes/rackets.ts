@@ -1,6 +1,8 @@
 import { Router } from 'express';
 import { RacketController } from '../controllers/racketController';
-import { optionalAuth } from '../middleware/auth';
+import { optionalAuth, authenticateUser } from '../middleware/auth';
+import { requireAdmin } from '../middleware/requireAdmin';
+import { requireRacketOwner } from '../middleware/requireRacketOwner';
 import {
   validatePagination,
   validateIdParam,
@@ -54,14 +56,13 @@ router.get('/:id/price-history', optionalAuth, validateIdParam(), RacketControll
 // GET /api/rackets/:id - Gets a racket by ID (must go at the end)
 router.get('/:id', optionalAuth, validateIdParam(), RacketController.getRacketById);
 
-// PUT /api/rackets/:id - Updates a racket by ID
-// TODO: Add stricter auth middleware (requireAuth + admin check)
-router.put('/:id', optionalAuth, validateIdParam(), RacketController.updateRacket);
+// PUT /api/rackets/:id - Updates a racket (admin or store owner)
+router.put('/:id', authenticateUser, requireRacketOwner, validateIdParam(), RacketController.updateRacket);
 
-// DELETE /api/rackets/:id - Deletes a racket by ID
-router.delete('/:id', optionalAuth, validateIdParam(), RacketController.deleteRacket);
+// DELETE /api/rackets/:id - Deletes a racket (admin or store owner)
+router.delete('/:id', authenticateUser, requireRacketOwner, validateIdParam(), RacketController.deleteRacket);
 
-// POST /api/rackets/bulk-update - Bulk updates rackets
-router.post('/bulk-update', optionalAuth, RacketController.bulkUpdateRackets);
+// POST /api/rackets/bulk-update - Bulk updates rackets (admin only)
+router.post('/bulk-update', authenticateUser, requireAdmin, RacketController.bulkUpdateRackets);
 
 export default router;
