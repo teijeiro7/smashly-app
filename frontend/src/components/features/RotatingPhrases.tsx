@@ -28,32 +28,35 @@ const rotateOut = keyframes`
 
 const RotatingContainer = styled.div`
   color: #fbbf24;
-  display: block;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   width: 100%;
-  text-align: center;
-  min-height: 1.4em;
-  white-space: nowrap;
-  overflow-wrap: break-word;
-  hyphens: auto;
+  min-height: 1.2em;
+  font-size: clamp(1.5rem, 5.5vw, 4rem);
 
   @media (max-width: 640px) {
-    font-size: 0.9em;
-    min-height: 2.8em;
-    white-space: normal;
+    min-height: 2.4em;
+    font-size: clamp(1.4rem, 7vw, 2.2rem);
   }
 
   @media (max-width: 480px) {
-    font-size: 0.85em;
-    min-height: 3.2em;
-    white-space: normal;
+    min-height: 2.8em;
+    font-size: clamp(1.2rem, 8vw, 1.8rem);
   }
 `;
 
 const PhraseSpan = styled.span<{ $isExiting: boolean }>`
-  display: block;
+  display: inline-block;
+  text-align: center;
+  white-space: nowrap;
   animation: ${(props) => (props.$isExiting ? rotateOut : rotateIn)} ${FADE_DURATION}s ease-in-out forwards;
   will-change: transform, opacity;
-  word-break: break-word;
+
+  @media (max-width: 640px) {
+    white-space: normal;
+    word-break: break-word;
+  }
 
   @media (prefers-reduced-motion: reduce) {
     animation: none;

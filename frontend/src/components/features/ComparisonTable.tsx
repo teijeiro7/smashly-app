@@ -110,7 +110,7 @@ const Td = styled.td`
 `;
 
 const CheckMark = styled(FiCheckCircle)`
-  color: #16a34a;
+  color: #15803d;
   margin-left: 0.5rem;
   vertical-align: middle;
 `;
@@ -172,7 +172,7 @@ const ComparisonTable: React.FC<ComparisonTableProps> = ({ data, metrics }) => {
 
   return (
     <div style={{ marginBottom: '2rem' }}>
-      <h3 style={{ color: '#16a34a', marginBottom: '1.5rem', fontSize: '1.5rem', fontWeight: 700 }}>
+      <h3 style={{ color: '#15803d', marginBottom: '1.5rem', fontSize: '1.5rem', fontWeight: 700 }}>
         Comparativa Detallada
       </h3>
       <TableContainer>

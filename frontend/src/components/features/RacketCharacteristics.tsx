@@ -8,7 +8,7 @@ const CharacteristicsContainer = styled(motion.div)`
   background: white;
   border-radius: 16px;
   padding: 1.5rem;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
   margin-bottom: 1.5rem;
 `;
 
@@ -20,14 +20,6 @@ const SectionTitle = styled.h3`
   display: flex;
   align-items: center;
   gap: 0.5rem;
-
-  &:before {
-    content: "";
-    width: 4px;
-    height: 20px;
-    background: linear-gradient(135deg, #16a34a, #22c55e);
-    border-radius: 2px;
-  }
 `;
 
 const CharacteristicsGrid = styled.div`
@@ -43,7 +35,8 @@ const CharacteristicItem = styled.div`
   padding: 0.75rem;
   background: #f8fafc;
   border-radius: 8px;
-  border-left: 3px solid #16a34a;
+  border: 1px solid rgba(22, 163, 74, 0.15);
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
 `;
 
 const CharacteristicLabel = styled.span`
@@ -58,11 +51,12 @@ const CharacteristicValue = styled.span`
 `;
 
 const DescriptionContainer = styled.div`
-  background: #f8fafc;
+  background: #f0fdf4;
   border-radius: 12px;
   padding: 1.25rem;
   margin-top: 1rem;
-  border-left: 4px solid #16a34a;
+  border: 1px solid rgba(22, 163, 74, 0.2);
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
 `;
 
 const DescriptionTitle = styled.h4`
