@@ -20,7 +20,7 @@ import ComparisonTable from '../components/features/ComparisonTable';
 const Container = styled.div`
   min-height: 100dvh;
   background:
-    radial-gradient(circle at top right, rgba(22, 163, 74, 0.08), transparent 45%),
+    radial-gradient(circle at top right, rgba(21, 128, 61, 0.08), transparent 45%),
     linear-gradient(145deg, #f8faf8 0%, #edf7ef 55%, #e8f5e8 100%);
   padding: 1rem;
   padding-bottom: calc(6.5rem + env(safe-area-inset-bottom));
@@ -47,7 +47,7 @@ const Title = styled.h1`
   margin-bottom: 1rem;
 
   .highlight {
-    color: #16a34a;
+    color: #15803d;
   }
 
   @media (max-width: 768px) {
@@ -71,9 +71,9 @@ const SelectionSection = styled.div`
   max-width: 1000px;
   margin: 0 auto 3rem;
   background: white;
-  border-radius: 24px;
+  border-radius: 20px;
   padding: 2rem;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 
   @media (max-width: 768px) {
     margin-bottom: 1.25rem;
@@ -91,10 +91,13 @@ const SearchInput = styled.input`
   width: 100%;
   padding: 1rem 1rem 1rem 3rem;
   min-height: 48px;
-  border: 2px solid #e5e7eb;
-  border-radius: 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
   font-size: 1rem;
-  transition: all 0.2s ease;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  color: #1f2937;
+
+  &::placeholder { color: #9ca3af; }
 
   &:focus {
     outline: none;
@@ -158,7 +161,7 @@ const SelectedRacketsContainer = styled.div`
 
 const SelectedRacketCard = styled(motion.div)`
   background: white;
-  border: 1px solid #e5e7eb;
+  border: 1px solid rgba(0, 0, 0, 0.06);
   border-radius: 16px;
   padding: 1rem;
   position: relative;
@@ -166,6 +169,7 @@ const SelectedRacketCard = styled(motion.div)`
   flex-direction: column;
   align-items: center;
   text-align: center;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 `;
 
 const RemoveButton = styled.button`
@@ -210,7 +214,7 @@ const RacketBrand = styled.span`
 `;
 
 const EmptySlot = styled.div`
-  border: 2px dashed #e5e7eb;
+  border: 2px dashed #d1d5db;
   border-radius: 16px;
   height: 200px;
   display: flex;
@@ -219,11 +223,19 @@ const EmptySlot = styled.div`
   justify-content: center;
   color: #9ca3af;
   gap: 0.5rem;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+  background: rgba(0, 0, 0, 0.01);
+
+  &:hover {
+    border-color: rgba(21, 128, 61, 0.4);
+    background: rgba(22, 163, 74, 0.02);
+    color: #6b7280;
+  }
 `;
 
 const CompareButton = styled.button`
   width: 100%;
-  background: #16a34a;
+  background: #15803d;
   color: white;
   border: none;
   padding: 1rem;
@@ -244,8 +256,9 @@ const CompareButton = styled.button`
   }
 
   &:not(:disabled):hover {
-    background: #15803d;
-    transform: translateY(-2px);
+    background: #166534;
+    transform: translateY(-1px);
+    box-shadow: 0 10px 15px -3px rgba(21, 128, 61, 0.3), 0 4px 6px -2px rgba(21, 128, 61, 0.15);
   }
 `;
 
@@ -253,9 +266,9 @@ const ResultSection = styled(motion.div)`
   max-width: 1000px;
   margin: 0 auto;
   background: white;
-  border-radius: 24px;
+  border-radius: 20px;
   padding: 3rem;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
   position: relative;
   overflow-x: hidden;
 
@@ -349,8 +362,8 @@ const ActionButton = styled.button<{ variant?: 'secondary' }>`
   `
       : `
     background: #f0fdf4;
-    border: 1px solid #16a34a;
-    color: #16a34a;
+    border: 1px solid #15803d;
+    color: #15803d;
     &:hover { background: #dcfce7; }
   `}
 `;
@@ -369,7 +382,7 @@ const MarkdownContent = styled.div`
 
   h3 {
     font-size: 1.25rem;
-    color: #16a34a;
+    color: #15803d;
   }
 
   ul,
@@ -531,10 +544,10 @@ const FavoriteRacketCard = styled(motion.div)<{ $isSelected?: boolean }>`
     ${props =>
       !props.$isSelected &&
       `
-      border-color: #16a34a;
+      border-color: #15803d;
       background: #f0fdf4;
       transform: translateY(-1px);
-      box-shadow: 0 2px 6px rgba(22, 163, 74, 0.12);
+      box-shadow: 0 2px 6px rgba(21, 128, 61, 0.12);
     `}
   }
 
@@ -684,7 +697,7 @@ const CompareRacketsPage: React.FC = () => {
         {/* Resumen Ejecutivo */}
         {comparisonResult.executiveSummary && (
           <div style={{ marginBottom: '2rem' }}>
-            <h3 style={{ color: '#16a34a', marginBottom: '1rem' }}>Resumen Ejecutivo</h3>
+            <h3 style={{ color: '#15803d', marginBottom: '1rem' }}>Resumen Ejecutivo</h3>
             <ReactMarkdown remarkPlugins={[remarkGfm]}>
               {comparisonResult.executiveSummary}
             </ReactMarkdown>
@@ -710,7 +723,7 @@ const CompareRacketsPage: React.FC = () => {
         {/* Análisis Técnico */}
         {comparisonResult.technicalAnalysis && comparisonResult.technicalAnalysis.length > 0 && (
           <div style={{ marginBottom: '2rem' }}>
-            <h3 style={{ color: '#16a34a', marginBottom: '1rem' }}>Análisis Técnico</h3>
+            <h3 style={{ color: '#15803d', marginBottom: '1rem' }}>Análisis Técnico</h3>
             {comparisonResult.technicalAnalysis.map((section, index) => (
               <div key={index} style={{ marginBottom: '1.5rem' }}>
                 <h4 style={{ color: '#1f2937', marginBottom: '0.5rem' }}>{section.title}</h4>
@@ -723,7 +736,7 @@ const CompareRacketsPage: React.FC = () => {
         {/* Perfiles Recomendados */}
         {comparisonResult.recommendedProfiles && (
           <div style={{ marginBottom: '2rem' }}>
-            <h3 style={{ color: '#16a34a', marginBottom: '1rem' }}>Perfiles Recomendados</h3>
+            <h3 style={{ color: '#15803d', marginBottom: '1rem' }}>Perfiles Recomendados</h3>
             <ReactMarkdown remarkPlugins={[remarkGfm]}>
               {comparisonResult.recommendedProfiles}
             </ReactMarkdown>
@@ -733,7 +746,7 @@ const CompareRacketsPage: React.FC = () => {
         {/* Consideraciones Biomecánicas */}
         {comparisonResult.biomechanicalConsiderations && (
           <div style={{ marginBottom: '2rem' }}>
-            <h3 style={{ color: '#16a34a', marginBottom: '1rem' }}>Consideraciones Biomecánicas</h3>
+            <h3 style={{ color: '#15803d', marginBottom: '1rem' }}>Consideraciones Biomecánicas</h3>
             <ReactMarkdown remarkPlugins={[remarkGfm]}>
               {comparisonResult.biomechanicalConsiderations}
             </ReactMarkdown>
@@ -743,7 +756,7 @@ const CompareRacketsPage: React.FC = () => {
         {/* Conclusión */}
         {comparisonResult.conclusion && (
           <div style={{ marginBottom: '2rem' }}>
-            <h3 style={{ color: '#16a34a', marginBottom: '1rem' }}>Conclusión</h3>
+            <h3 style={{ color: '#15803d', marginBottom: '1rem' }}>Conclusión</h3>
             <ReactMarkdown remarkPlugins={[remarkGfm]}>{comparisonResult.conclusion}</ReactMarkdown>
           </div>
         )}
@@ -1078,7 +1091,7 @@ const CompareRacketsPage: React.FC = () => {
               >
                 <ResultHeader>
                   <ResultTitle>
-                    <FiCheck color='#16a34a' /> Análisis Comparativo
+                    <FiCheck color='#15803d' /> Análisis Comparativo
                   </ResultTitle>
                   <ActionButtons className='no-pdf'>
                     {isAuthenticated && (

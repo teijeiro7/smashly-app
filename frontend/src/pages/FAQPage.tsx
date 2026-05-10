@@ -36,7 +36,7 @@ const MainTitle = styled.h1`
 `;
 
 const HighlightText = styled.span`
-  color: #16a34a;
+  color: #15803d;
 `;
 
 const Subtitle = styled.p`
@@ -110,9 +110,9 @@ const CategoryButton = styled.button<{ $isActive: boolean }>`
   border-radius: 50px;
   background: ${(props) =>
     props.$isActive
-      ? "linear-gradient(135deg, #16a34a 0%, #059669 100%)"
+      ? "linear-gradient(135deg, #15803d 0%, #059669 100%)"
       : "white"};
-  border: 2px solid ${(props) => (props.$isActive ? "#16a34a" : "#e5e7eb")};
+  border: 2px solid ${(props) => (props.$isActive ? "#15803d" : "#e5e7eb")};
   font-size: 0.8125rem;
   font-weight: ${(props) => (props.$isActive ? "600" : "500")};
   color: ${(props) => (props.$isActive ? "white" : "#6b7280")};
@@ -123,7 +123,7 @@ const CategoryButton = styled.button<{ $isActive: boolean }>`
   overflow: hidden;
   box-shadow: ${(props) =>
     props.$isActive
-      ? "0 4px 14px rgba(22, 163, 74, 0.3)"
+      ? "0 4px 14px rgba(21, 128, 61, 0.3)"
       : "0 2px 4px rgba(0, 0, 0, 0.05)"};
 
   &::before {
@@ -148,12 +148,12 @@ const CategoryButton = styled.button<{ $isActive: boolean }>`
       props.$isActive
         ? "linear-gradient(135deg, #059669 0%, #047857 100%)"
         : "#f9fafb"};
-    border-color: ${(props) => (props.$isActive ? "#059669" : "#16a34a")};
-    color: ${(props) => (props.$isActive ? "white" : "#16a34a")};
+    border-color: ${(props) => (props.$isActive ? "#059669" : "#15803d")};
+    color: ${(props) => (props.$isActive ? "white" : "#15803d")};
     box-shadow: ${(props) =>
       props.$isActive
-        ? "0 8px 25px rgba(22, 163, 74, 0.4)"
-        : "0 4px 12px rgba(22, 163, 74, 0.15)"};
+        ? "0 8px 25px rgba(21, 128, 61, 0.4)"
+        : "0 4px 12px rgba(21, 128, 61, 0.15)"};
 
     &::before {
       left: 100%;
@@ -167,7 +167,7 @@ const CategoryButton = styled.button<{ $isActive: boolean }>`
 
   &:focus {
     outline: none;
-    ring: 2px solid #16a34a;
+    ring: 2px solid #15803d;
     ring-opacity: 0.5;
   }
 
@@ -230,7 +230,7 @@ const QuestionText = styled.span`
 
 const ChevronIcon = styled.div`
   margin-left: 0.5rem;
-  color: #16a34a;
+  color: #15803d;
   flex-shrink: 0;
 `;
 
@@ -256,7 +256,7 @@ const CategoryBadge = styled.div`
 const CategoryBadgeText = styled.span`
   font-size: 0.75rem;
   font-weight: 500;
-  color: #16a34a;
+  color: #15803d;
 `;
 
 const AnswerText = styled.p`
@@ -312,7 +312,7 @@ const ContactDescription = styled.p`
 `;
 
 const ContactButton = styled.button`
-  background: #16a34a;
+  background: #15803d;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -354,8 +354,8 @@ const CategorySelect = styled.select`
 
   &:focus {
     outline: none;
-    border-color: #16a34a;
-    box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.1);
+    border-color: #15803d;
+    box-shadow: 0 0 0 3px rgba(21, 128, 61, 0.1);
   }
 
   @media (max-width: 767px) {
@@ -545,7 +545,7 @@ const FAQPage: React.FC = () => {
       <ContactSection>
         <ContactCard>
           <ContactIconContainer>
-            <FiHelpCircle size={32} color="#16a34a" />
+            <FiHelpCircle size={32} color="#15803d" />
           </ContactIconContainer>
           <ContactTitle>¿No encuentras lo que buscas?</ContactTitle>
           <ContactDescription>

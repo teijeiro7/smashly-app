@@ -33,7 +33,7 @@ const HeroSection = styled.div`
   }
 
   h1 span {
-    color: #16a34a;
+    color: #15803d;
   }
 
   p {
@@ -54,26 +54,27 @@ const ModeSelector = styled.div`
 
 const ModeButton = styled.button<{ $active: boolean }>`
   padding: 0.75rem 1.5rem;
-  border-radius: 20px;
-  border: 1px solid ${props => (props.$active ? '#16a34a' : '#e5e7eb')};
-  background: ${props => (props.$active ? '#f0fdf4' : 'white')};
-  color: ${props => (props.$active ? '#16a34a' : '#6b7280')};
+  border-radius: 9999px;
+  border: 1.5px solid ${props => (props.$active ? '#15803d' : '#e5e7eb')};
+  background: ${props => (props.$active ? '#15803d' : 'white')};
+  color: ${props => (props.$active ? 'white' : '#6b7280')};
   cursor: pointer;
-  transition: all 0.2s;
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
   font-weight: 600;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+  font-size: 0.9375rem;
+  box-shadow: ${props => props.$active ? '0 4px 6px -1px rgba(21,128,61,0.25), 0 2px 4px -1px rgba(21,128,61,0.15)' : '0 1px 2px 0 rgba(0,0,0,0.05)'};
 
   &:hover {
-    border-color: #16a34a;
-    color: #16a34a;
+    border-color: #15803d;
+    color: ${props => (props.$active ? 'white' : '#15803d')};
     transform: translateY(-1px);
   }
 `;
 
 const AlertBox = styled.div`
   background: #f0fdf4;
-  border: 1px solid #16a34a;
-  padding: 1rem;
+  border: 1px solid rgba(21, 128, 61, 0.3);
+  padding: 1rem 1.25rem;
   border-radius: 12px;
   max-width: 600px;
   margin: 0 auto 2rem;
@@ -81,7 +82,7 @@ const AlertBox = styled.div`
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 6px -1px rgba(21, 128, 61, 0.08), 0 2px 4px -1px rgba(21, 128, 61, 0.04);
 `;
 
 const AlertText = styled.p`
@@ -92,7 +93,7 @@ const AlertText = styled.p`
 `;
 
 const AlertButton = styled.button`
-  background: #16a34a;
+  background: #15803d;
   color: white;
   border: none;
   padding: 0.5rem 1rem;
@@ -401,7 +402,7 @@ export const BestRacketPage: React.FC = () => {
       {step === 'completing' && (
         <div style={{ textAlign: 'center', padding: '4rem' }}>
           <PalaRotatingScene isComplete={true} />
-          <h2 style={{ marginTop: '2rem', color: '#16a34a' }}>¡Análisis completado!</h2>
+          <h2 style={{ marginTop: '2rem', color: '#15803d' }}>¡Análisis completado!</h2>
         </div>
       )}
 

@@ -156,7 +156,6 @@ export default defineConfig(({ mode }) => ({
     exclude: [
       'jspdf',
       'html2canvas',
-      'react-markdown',
       '@dnd-kit/core',
     ],
   },
