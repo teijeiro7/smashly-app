@@ -9,38 +9,39 @@ import GlobalSearch from '../features/GlobalSearch';
 import { NotificationBell, MobileNotificationBell } from '../notifications/NotificationBell';
 
 const HeaderContainer = styled.header`
-  background: linear-gradient(135deg, #169f4d 0%, #15743a 100%);
+  background: #15803d;
   padding: 0;
-  box-shadow: 0 10px 32px rgba(21, 116, 58, 0.2);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
   position: sticky;
   top: 0;
   z-index: 350;
   padding-top: env(safe-area-inset-top, 0);
   will-change: transform;
-  transform: translateZ(0); /* Force layer decomposition for smoother scroll */
+  transform: translateZ(0);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+
+  @media (max-width: 768px) {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  }
 `;
 
 const HeaderContent = styled.div`
-  max-width: 1500px;
+  max-width: 1400px;
   margin: 0 auto;
-  padding: 0 clamp(20px, 5vw, 80px);
+  padding: 0 clamp(16px, 4vw, 48px);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  min-height: 72px;
+  min-height: 64px;
   width: 100%;
 
-  @media (max-width: 1600px) {
-    padding: 0 clamp(20px, 3vw, 60px);
-  }
-
   @media (max-width: 1200px) {
-    padding: 0 clamp(20px, 2vw, 40px);
+    padding: 0 clamp(16px, 3vw, 32px);
   }
 
   @media (max-width: 768px) {
-    padding: 0 16px;
-    min-height: 68px;
+    padding: 0 12px;
+    min-height: 56px;
   }
 `;
 
@@ -48,18 +49,19 @@ const Logo = styled(Link)`
   display: flex;
   align-items: center;
   text-decoration: none;
+  flex-shrink: 0;
 
   img {
-    height: 75px;
+    height: 60px;
     width: auto;
-    transition: transform 0.2s ease;
+    transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 
     @media (max-width: 768px) {
-      height: 50px;
+      height: 40px;
     }
 
     @media (max-width: 480px) {
-      height: 40px;
+      height: 36px;
     }
   }
 
@@ -67,7 +69,7 @@ const Logo = styled(Link)`
     text-decoration: none;
 
     img {
-      transform: scale(1.05);
+      transform: scale(1.03);
     }
   }
 `;
@@ -79,7 +81,7 @@ const CentralSearchContainer = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  max-width: 500px;
+  max-width: 420px;
   width: 100%;
 
   @media (max-width: 1024px) {
@@ -87,72 +89,75 @@ const CentralSearchContainer = styled.div`
   }
 `;
 
-// Mobile Elements Container
 const MobileElements = styled.div`
   display: none;
 
   @media (max-width: 1024px) {
     display: flex;
     align-items: center;
-    gap: 0.25rem;
+    gap: 2px;
   }
 `;
 
-// Search Toggle Button for Mobile
 const MobileSearchButton = styled.button`
   background: none;
   border: none;
   color: white;
-  font-size: 1.25rem;
+  font-size: 1.1rem;
   cursor: pointer;
-  min-width: 44px;
-  min-height: 44px;
-  padding: 10px;
-  border-radius: 50%;
+  min-width: 40px;
+  min-height: 40px;
+  padding: 8px;
+  border-radius: 8px;
   transition: all 0.2s ease;
   display: flex;
   align-items: center;
   justify-content: center;
+  opacity: 0.9;
 
   &:hover {
-    background: rgba(255, 255, 255, 0.15);
+    background: rgba(255, 255, 255, 0.1);
+    opacity: 1;
+  }
+
+  &:active {
+    transform: scale(0.95);
   }
 
   @media (max-width: 480px) {
-    padding: 8px;
-    font-size: 1.1rem;
+    padding: 6px;
+    font-size: 1rem;
+    min-width: 36px;
+    min-height: 36px;
   }
 `;
 
-// Mobile Menu Dropdown - GPU Accelerated with CSS-only visibility toggle
 const MobileMenuDropdown = styled(motion.div)<{ $isOpen: boolean }>`
   position: absolute;
   top: 100%;
   left: 0;
   right: 0;
   background: white;
-  border-radius: 0 0 24px 24px;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
+  border-radius: 0 0 20px 20px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
   z-index: 100;
   overflow: hidden;
   max-height: min(85dvh, 720px);
   overflow-y: auto;
-  border: 1px solid rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(0, 0, 0, 0.04);
   border-top: none;
   
-  /* GPU acceleration for smooth 60fps animation */
   will-change: transform, opacity;
   transform-origin: top;
-  transform: translateY(${props => props.$isOpen ? '0' : '-10px'});
+  transform: translateY(${props => props.$isOpen ? '0' : '-8px'});
   opacity: ${props => props.$isOpen ? 1 : 0};
   visibility: ${props => props.$isOpen ? 'visible' : 'hidden'};
   pointer-events: ${props => props.$isOpen ? 'auto' : 'none'};
-  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease;
 `;
 
-// Mobile Search Container
 const MobileSearchContainer = styled.div<{ $isOpen: boolean }>`
-  padding: 1.25rem 1rem;
+  padding: 1rem;
   border-bottom: 1px solid rgba(229, 231, 235, 0.5);
   transition: all 0.3s ease;
   overflow: visible;
@@ -164,7 +169,6 @@ const MobileSearchContainer = styled.div<{ $isOpen: boolean }>`
   }
 `;
 
-// Navigation Section in Mobile Menu
 const MobileNavSection = styled.div`
   padding: 1.25rem 1rem;
   
@@ -174,56 +178,57 @@ const MobileNavSection = styled.div`
 `;
 
 const MobileNavTitle = styled.h4`
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   font-weight: 700;
   color: #9ca3af;
-  margin: 0 0 1rem 0.5rem;
+  margin: 0 0 0.75rem 0.5rem;
   text-transform: uppercase;
-  letter-spacing: 1.2px;
+  letter-spacing: 1.5px;
 `;
 
 const NavLink = styled(Link)<{ $isActive: boolean; $isMobile?: boolean }>`
   color: ${props => (props.$isMobile ? '#374151' : 'white')};
   text-decoration: none;
-  font-weight: 600;
+  font-weight: 500;
   padding: ${props => (props.$isMobile ? '12px 16px' : '8px 16px')};
-  border-radius: ${props => (props.$isMobile ? '12px' : '8px')};
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: ${props => (props.$isMobile ? '10px' : '8px')};
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   background: ${props =>
-    props.$isActive && !props.$isMobile ? 'rgba(255, 255, 255, 0.15)' : 'transparent'};
+    props.$isActive && !props.$isMobile ? 'rgba(255, 255, 255, 0.1)' : 'transparent'};
   display: flex;
   align-items: center;
   gap: 12px;
   position: relative;
-  border: ${props => (props.$isMobile ? 'none' : '1px solid rgba(255, 255, 255, 0.3)')};
-  margin-bottom: ${props => (props.$isMobile ? '4px' : '0')};
+  margin-bottom: ${props => (props.$isMobile ? '2px' : '0')};
+  font-size: 0.9rem;
 
   ${props =>
     props.$isMobile &&
     `
-    background: ${props.$isActive ? 'rgba(22, 163, 74, 0.08)' : 'transparent'};
-    color: ${props.$isActive ? '#16a34a' : '#374151'};
+    background: ${props.$isActive ? 'rgba(22, 163, 74, 0.06)' : 'transparent'};
+    color: ${props.$isActive ? '#15803d' : '#374151'};
+    font-weight: ${props.$isActive ? '600' : '500'};
     
     svg {
-      color: ${props.$isActive ? '#16a34a' : '#6b7280'};
-      font-size: 1.25rem;
+      color: ${props.$isActive ? '#15803d' : '#9ca3af'};
+      font-size: 1.1rem;
       transition: color 0.2s ease;
     }
   `}
 
   &:hover {
-    background: ${props => (props.$isMobile ? '#f9fafb' : 'rgba(255, 255, 255, 0.1)')};
-    color: ${props => (props.$isMobile ? '#16a34a' : 'white')};
+    background: ${props => (props.$isMobile ? '#f9fafb' : 'rgba(255, 255, 255, 0.08)')};
+    color: ${props => (props.$isMobile ? '#15803d' : 'white')};
     text-decoration: none;
-    transform: ${props => (props.$isMobile ? 'translateX(4px)' : 'none')};
+    transform: ${props => (props.$isMobile ? 'translateX(3px)' : 'none')};
     
     svg {
-      color: #16a34a;
+      color: #15803d;
     }
   }
 
   &:active {
-    transform: scale(0.98) ${props => (props.$isMobile ? 'translateX(4px)' : 'none')};
+    transform: scale(0.98) ${props => (props.$isMobile ? 'translateX(3px)' : 'none')};
   }
 `;
 
@@ -232,16 +237,22 @@ const MobileMenuButton = styled.button`
   background: none;
   border: none;
   color: white;
-  font-size: 1.5rem;
+  font-size: 1.3rem;
   cursor: pointer;
-  min-width: 44px;
-  min-height: 44px;
+  min-width: 40px;
+  min-height: 40px;
   padding: 8px;
   border-radius: 8px;
   transition: all 0.2s ease;
+  opacity: 0.9;
 
   &:hover {
     background: rgba(255, 255, 255, 0.1);
+    opacity: 1;
+  }
+
+  &:active {
+    transform: scale(0.95);
   }
 
   @media (max-width: 1024px) {
@@ -251,15 +262,17 @@ const MobileMenuButton = styled.button`
   }
 
   @media (max-width: 480px) {
-    font-size: 1.3rem;
+    font-size: 1.2rem;
     padding: 6px;
+    min-width: 36px;
+    min-height: 36px;
   }
 `;
 
 const AuthButtons = styled.div`
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 0.75rem;
 
   @media (max-width: 1024px) {
     display: none;
@@ -270,73 +283,77 @@ const AuthButton = styled.button<{
   $variant?: 'primary' | 'secondary';
   $isMobile?: boolean;
 }>`
-  padding: ${props => (props.$isMobile ? '14px 16px' : '8px 20px')};
-  border-radius: ${props => (props.$isMobile ? '14px' : '8px')};
+  padding: ${props => (props.$isMobile ? '12px 16px' : '7px 18px')};
+  border-radius: ${props => (props.$isMobile ? '12px' : '8px')};
   font-weight: 600;
   text-decoration: none;
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   text-align: center;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: 6px;
   cursor: pointer;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  font-size: 1rem;
+  border: none;
+  font-size: 0.875rem;
   font-family: inherit;
   width: ${props => (props.$isMobile ? '100%' : 'auto')};
+  letter-spacing: -0.01em;
 
   ${props => {
     if (props.$isMobile) {
       return props.$variant === 'primary'
         ? `
-        background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+        background: #15803d;
         color: white;
-        border: none;
-        box-shadow: 0 4px 12px rgba(22, 163, 74, 0.2);
+        box-shadow: 0 2px 8px rgba(21, 128, 61, 0.2);
         
         &:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 6px 16px rgba(22, 163, 74, 0.3);
+          background: #166534;
+          transform: translateY(-1px);
+          box-shadow: 0 4px 12px rgba(21, 128, 61, 0.25);
           color: white;
         }
       `
         : `
         background: white;
         color: #374151;
-        border: 2px solid #e5e7eb;
+        border: 1.5px solid #e5e7eb;
         
         &:hover {
           background: #f9fafb;
-          border-color: #16a34a;
-          color: #16a34a;
+          border-color: #15803d;
+          color: #15803d;
         }
       `;
     } else {
       return props.$variant === 'primary'
         ? `
         background: white;
-        color: #16a34a;
+        color: #15803d;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         
         &:hover {
-          background: #f0f0f0;
-          color: #15803d;
+          background: #f0fdf4;
+          transform: translateY(-1px);
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
         }
       `
         : `
         background: transparent;
         color: white;
-        border: 1px solid rgba(255, 255, 255, 0.3);
+        border: 1.5px solid rgba(255, 255, 255, 0.25);
         
         &:hover {
-          background: rgba(255, 255, 255, 0.1);
+          background: rgba(255, 255, 255, 0.08);
+          border-color: rgba(255, 255, 255, 0.4);
         }
       `;
     }
   }}
 
   &:active {
-    transform: scale(0.98);
+    transform: scale(0.97) translateY(0);
   }
 `;
 
@@ -344,23 +361,25 @@ const LogoutButton = styled.button<{
   $variant?: 'primary' | 'secondary';
   $isMobile?: boolean;
 }>`
-  padding: ${props => (props.$isMobile ? '14px 16px' : '8px 20px')};
-  border-radius: ${props => (props.$isMobile ? '14px' : '8px')};
+  padding: ${props => (props.$isMobile ? '12px 16px' : '7px 18px')};
+  border-radius: ${props => (props.$isMobile ? '12px' : '8px')};
   font-weight: 600;
   text-decoration: none;
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   text-align: center;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: 6px;
   cursor: pointer;
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  border: none;
   background: transparent;
   color: white;
+  font-size: 0.875rem;
+  font-family: inherit;
 
   &:hover {
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.08);
     color: white;
     text-decoration: none;
   }
@@ -370,32 +389,34 @@ const LogoutButton = styled.button<{
     `
     background: white;
     color: #374151;
-    border: 2px solid #e5e7eb;
+    border: 1.5px solid #e5e7eb;
     width: 100%;
     
     &:hover {
       background: #f9fafb;
-      border-color: #16a34a;
-      color: #16a34a;
+      border-color: #dc2626;
+      color: #dc2626;
       text-decoration: none;
     }
   `}
 
   &:active {
-    transform: scale(0.98);
+    transform: scale(0.97);
   }
 `;
 
-// User Avatar Menu Styles
 const UserMenuContainer = styled.div`
   position: relative;
+  display: flex;
+  align-items: center;
+  gap: 6px;
 `;
 
 const AvatarButton = styled.button`
-  width: 40px;
-  height: 40px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
-  border: 2px solid white;
+  border: 2px solid rgba(255, 255, 255, 0.3);
   background: white;
   cursor: pointer;
   overflow: hidden;
@@ -407,7 +428,12 @@ const AvatarButton = styled.button`
 
   &:hover {
     transform: scale(1.05);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    border-color: rgba(255, 255, 255, 0.6);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  }
+
+  &:active {
+    transform: scale(0.97);
   }
 
   img {
@@ -417,25 +443,39 @@ const AvatarButton = styled.button`
   }
 
   svg {
-    color: #16a34a;
-    font-size: 20px;
+    color: #15803d;
+    font-size: 18px;
   }
 `;
 
 const UserDropdown = styled.div<{ $isOpen: boolean }>`
   position: absolute;
-  top: calc(100% + 8px);
+  top: calc(100% + 10px);
   right: 0;
   background: white;
   border-radius: 12px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.12);
   min-width: 200px;
   opacity: ${props => (props.$isOpen ? '1' : '0')};
   visibility: ${props => (props.$isOpen ? 'visible' : 'hidden')};
-  transform: translateY(${props => (props.$isOpen ? '0' : '-10px')});
-  transition: all 0.2s ease;
+  transform: translateY(${props => (props.$isOpen ? '0' : '-6px')});
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   z-index: 1000;
   overflow: hidden;
+  border: 1px solid rgba(0, 0, 0, 0.04);
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: -6px;
+    right: 14px;
+    width: 12px;
+    height: 12px;
+    background: white;
+    transform: rotate(45deg);
+    border-left: 1px solid rgba(0, 0, 0, 0.04);
+    border-top: 1px solid rgba(0, 0, 0, 0.04);
+  }
 `;
 
 const DropdownItem = styled.button`
@@ -444,17 +484,20 @@ const DropdownItem = styled.button`
   background: none;
   border: none;
   text-align: left;
-  font-size: 0.9rem;
+  font-size: 0.875rem;
   font-weight: 500;
   color: #374151;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.15s ease;
   display: flex;
   align-items: center;
   gap: 10px;
+  position: relative;
+  z-index: 1;
 
   &:hover {
-    background: #f3f4f6;
+    background: #f9fafb;
+    color: #15803d;
   }
 
   &:first-child {
@@ -463,16 +506,37 @@ const DropdownItem = styled.button`
 
   &:last-child {
     border-radius: 0 0 12px 12px;
+    color: #dc2626;
+    
+    &:hover {
+      background: #fef2f2;
+      color: #b91c1c;
+    }
   }
 
   svg {
     font-size: 18px;
-    color: #16a34a;
+    color: #9ca3af;
+    transition: color 0.15s ease;
+  }
+
+  &:hover svg {
+    color: #15803d;
   }
 
   &:last-child svg {
-    color: #dc2626;
+    color: #ef4444;
   }
+
+  &:last-child:hover svg {
+    color: #b91c1c;
+  }
+`;
+
+const Divider = styled.div`
+  height: 1px;
+  background: rgba(0, 0, 0, 0.06);
+  margin: 0 12px;
 `;
 
 const Header: React.FC = () => {
@@ -487,7 +551,6 @@ const Header: React.FC = () => {
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
-    // Close mobile search when opening menu
     if (!isMenuOpen) {
       setIsMobileSearchOpen(false);
     }
@@ -495,7 +558,6 @@ const Header: React.FC = () => {
 
   const toggleMobileSearch = () => {
     setIsMobileSearchOpen(!isMobileSearchOpen);
-    // Close menu when opening mobile search
     if (!isMobileSearchOpen) {
       setIsMenuOpen(false);
     }
@@ -509,7 +571,6 @@ const Header: React.FC = () => {
     setIsUserMenuOpen(false);
   };
 
-  // Close user menu when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (userMenuRef.current && !userMenuRef.current.contains(event.target as Node)) {
@@ -533,17 +594,13 @@ const Header: React.FC = () => {
           <img src='/images/icons/smashly-large-icon.ico' alt='Smashly' />
         </Logo>
 
-        {/* Central Search Bar (Desktop) */}
         <CentralSearchContainer>
           <GlobalSearch onSearchToggle={() => {}} isInHeader={true} isMobileContext={false} />
         </CentralSearchContainer>
 
         <AuthButtons>
           {userProfile ? (
-            <UserMenuContainer
-              ref={userMenuRef}
-              style={{ display: 'flex', alignItems: 'center', gap: '8px' }}
-            >
+            <UserMenuContainer ref={userMenuRef}>
               <NotificationBell />
               <AvatarButton onClick={() => setIsUserMenuOpen(!isUserMenuOpen)} aria-label="Menú de usuario">
                 {userProfile.avatar_url ? (
@@ -562,6 +619,7 @@ const Header: React.FC = () => {
                   <FiUser />
                   Mi cuenta
                 </DropdownItem>
+                <Divider />
                 <DropdownItem
                   onClick={async () => {
                     await signOut();
@@ -586,7 +644,6 @@ const Header: React.FC = () => {
           )}
         </AuthButtons>
 
-        {/* Mobile Elements */}
         <MobileElements>
           <MobileNotificationBell />
           <MobileSearchButton onClick={toggleMobileSearch} aria-label="Buscar">
@@ -597,12 +654,10 @@ const Header: React.FC = () => {
           </MobileMenuButton>
         </MobileElements>
 
-        {/* Mobile Menu Dropdown - Always rendered, toggled via CSS for 60fps */}
         <MobileMenuDropdown
           $isOpen={isMenuOpen || isMobileSearchOpen}
           initial={false}
         >
-          {/* Mobile Search Section */}
           <MobileSearchContainer $isOpen={isMobileSearchOpen}>
             <GlobalSearch
               onSearchToggle={setIsMobileSearchOpen}
@@ -611,7 +666,6 @@ const Header: React.FC = () => {
             />
           </MobileSearchContainer>
 
-          {/* Navigation Section */}
           <div
             style={{
               opacity: isMenuOpen ? 1 : 0,
@@ -654,7 +708,6 @@ const Header: React.FC = () => {
               </NavLink>
             </MobileNavSection>
 
-            {/* Auth Section for Mobile */}
             <MobileNavSection>
               <MobileNavTitle>Cuenta</MobileNavTitle>
               {userProfile ? (
@@ -676,14 +729,14 @@ const Header: React.FC = () => {
                       closeAllMenus();
                       navigate('/');
                     }}
-                    style={{ cursor: 'pointer', marginTop: '0.75rem', width: '100%' }}
+                    style={{ cursor: 'pointer', marginTop: '0.5rem', width: '100%' }}
                   >
                     <FiLogOut style={{ marginRight: '8px' }} />
                     Cerrar sesión
                   </LogoutButton>
                 </>
               ) : (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                   <AuthButton
                     $variant='secondary'
                     $isMobile
