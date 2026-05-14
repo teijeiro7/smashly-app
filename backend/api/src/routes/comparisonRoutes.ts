@@ -1,11 +1,12 @@
 import { Router } from 'express';
 import { ComparisonController } from '../controllers/comparisonController';
 import { authenticateUser } from '../middleware/auth';
+import { comparisonLimiter } from '../middleware/rateLimits';
 
 const router = Router();
 
-// Public route: compare rackets (can be used without auth)
-router.post('/', ComparisonController.compareRackets);
+// Public route: compare rackets (rate limited)
+router.post('/', comparisonLimiter, ComparisonController.compareRackets);
 
 // Protected routes: require authentication
 router.post('/save', authenticateUser, ComparisonController.saveComparison);

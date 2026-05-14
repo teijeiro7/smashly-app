@@ -8,6 +8,7 @@ export interface UserProfile {
   nickname: string;
   full_name?: string;
   avatar_url?: string;
+  current_racket?: string;
   weight?: number;
   height?: number;
   birthdate?: string;
@@ -42,7 +43,11 @@ export class UserProfileService {
    * Nota: El backend ya maneja la verificación de perfiles existentes y nicknames
    * El userId se obtiene del token JWT en el backend
    */
-  static async createUserProfile(nickname: string, fullName?: string): Promise<UserProfile> {
+  static async createUserProfile(
+    nickname: string,
+    fullName?: string,
+    currentRacket?: string
+  ): Promise<UserProfile> {
     try {
       const url = buildApiUrl(API_ENDPOINTS.USERS_PROFILE);
       const response = await fetch(url, {
@@ -52,6 +57,7 @@ export class UserProfileService {
         body: JSON.stringify({
           nickname,
           full_name: fullName || '',
+          current_racket: currentRacket || '',
         }),
       });
 

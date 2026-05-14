@@ -13,6 +13,7 @@ export interface UserProfile {
   nickname: string;
   full_name?: string;
   avatar_url?: string;
+  current_racket?: string;
   peso?: number;
   altura?: number;
   fecha_nacimiento?: string;
@@ -25,6 +26,7 @@ export interface UserProfile {
 export interface CreateUserProfileRequest {
   nickname: string;
   full_name?: string;
+  current_racket?: string;
   peso?: number;
   altura?: number;
   fecha_nacimiento?: string;
@@ -36,6 +38,7 @@ export interface UpdateUserProfileRequest {
   nickname?: string;
   full_name?: string;
   avatar_url?: string;
+  current_racket?: string;
   peso?: number;
   altura?: number;
   fecha_nacimiento?: string;

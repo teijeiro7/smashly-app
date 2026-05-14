@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { UserController } from "../controllers/userController";
 import { authenticateUser, authenticateUser as requireAuth } from "../middleware/auth";
+import { requireAdmin } from "../middleware/requireAdmin";
 import {
   validateBody,
   schemas,
@@ -47,8 +48,8 @@ router.get(
   UserController.searchUsers
 );
 
-// GET /api/users/stats - Get user statistics (admin)
-router.get("/stats", authenticateUser, UserController.getUserStats);
+// GET /api/users/stats - Get user statistics (admin only)
+router.get("/stats", authenticateUser, requireAdmin, UserController.getUserStats);
 
 // GET /api/users/lists - Get all user lists
 router.get("/lists", authenticateUser, ListController.getUserLists);

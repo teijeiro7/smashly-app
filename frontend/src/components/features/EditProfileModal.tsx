@@ -4,6 +4,7 @@ import { FiX, FiSave, FiUser, FiCalendar, FiActivity, FiCamera, FiTrash2 } from 
 import { motion, AnimatePresence } from "framer-motion";
 import { UserProfile } from "../../services/userProfileService";
 import { UploadService } from "../../services/uploadService";
+import { useRackets } from "../../contexts/RacketsContext";
 
 interface EditProfileModalProps {
   isOpen: boolean;
@@ -340,9 +341,11 @@ export const EditProfileModal: React.FC<EditProfileModalProps> = ({
   userProfile,
   onSave,
 }) => {
+  const { rackets, loading: racketsLoading } = useRackets();
   const [formData, setFormData] = useState({
     nickname: "",
     full_name: "",
+    current_racket: "",
     weight: "",
     height: "",
     birthdate: "",
@@ -361,6 +364,7 @@ export const EditProfileModal: React.FC<EditProfileModalProps> = ({
       setFormData({
         nickname: userProfile.nickname || "",
         full_name: userProfile.full_name || "",
+        current_racket: userProfile.current_racket || "",
         weight: userProfile.weight?.toString() || "",
         height: userProfile.height?.toString() || "",
         birthdate: userProfile.birthdate || "",
@@ -474,6 +478,7 @@ export const EditProfileModal: React.FC<EditProfileModalProps> = ({
       const updates: any = {
         nickname: formData.nickname.trim(),
         full_name: formData.full_name.trim() || undefined,
+        current_racket: formData.current_racket || undefined,
         game_level: formData.game_level || undefined,
       };
 
@@ -617,6 +622,28 @@ export const EditProfileModal: React.FC<EditProfileModalProps> = ({
                     disabled={isSubmitting}
                     maxLength={100}
                   />
+                </FormGroup>
+
+                <FormGroup>
+                  <Label htmlFor="current_racket">Pala actual</Label>
+                  <Select
+                    id="current_racket"
+                    name="current_racket"
+                    value={formData.current_racket}
+                    onChange={handleChange}
+                    disabled={isSubmitting || racketsLoading}
+                  >
+                    <option value="">Selecciona tu pala actual</option>
+                    {rackets.map(racket => {
+                      const displayName = `${racket.marca} ${racket.modelo || racket.nombre}`.trim();
+                      return (
+                        <option key={racket.id} value={displayName}>
+                          {displayName}
+                        </option>
+                      );
+                    })}
+                  </Select>
+                  <HelperText>Este dato se utilizará para personalizar recomendaciones futuras</HelperText>
                 </FormGroup>
 
                 <FormGroup>

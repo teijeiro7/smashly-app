@@ -11,9 +11,9 @@ const WizardContainer = styled.div`
   margin: 0 auto;
   padding: 2rem;
   background: white;
-  border-radius: 24px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
-  border: 1px solid rgba(22, 163, 74, 0.1);
+  border-radius: 20px;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(0, 0, 0, 0.06);
 `;
 
 const ProgressBar = styled.div`
@@ -49,7 +49,7 @@ const ProgressFill = styled(motion.div)`
   top: 50%;
   left: 16px;
   height: 4px;
-  background: linear-gradient(90deg, #16a34a, #22c55e);
+  background: linear-gradient(90deg, #15803d, #22c55e);
   transform: translateY(-50%);
   z-index: 1;
   border-radius: 2px;
@@ -66,9 +66,9 @@ const ProgressStep = styled.div<{ $active: boolean; $completed: boolean }>`
   font-size: 0.85rem;
   z-index: 2;
   transition: all 0.3s ease;
-  background: ${props => (props.$active || props.$completed ? '#16a34a' : 'white')};
+  background: ${props => (props.$active || props.$completed ? '#15803d' : 'white')};
   color: ${props => (props.$active || props.$completed ? 'white' : '#9ca3af')};
-  border: 2px solid ${props => (props.$active || props.$completed ? '#16a34a' : '#e5e7eb')};
+  border: 2px solid ${props => (props.$active || props.$completed ? '#15803d' : '#e5e7eb')};
 `;
 
 const QuestionContainer = styled(motion.div)`
@@ -102,33 +102,38 @@ const OptionsGrid = styled.div`
 
 const OptionCard = styled.button<{ $selected: boolean }>`
   padding: 1.25rem;
-  border-radius: 16px;
-  border: 2px solid ${props => (props.$selected ? '#16a34a' : '#e5e7eb')};
+  border-radius: 12px;
+  border: 1.5px solid ${props => (props.$selected ? '#15803d' : '#e5e7eb')};
   background: ${props => (props.$selected ? '#f0fdf4' : 'white')};
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: border-color 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
   text-align: left;
   font-size: 1rem;
   font-weight: 500;
   color: ${props => (props.$selected ? '#15803d' : '#374151')};
+  box-shadow: ${props => props.$selected
+    ? '0 4px 6px -1px rgba(21,128,61,0.12), 0 2px 4px -1px rgba(21,128,61,0.08)'
+    : '0 1px 2px 0 rgba(0,0,0,0.05)'};
 
   &:hover {
-    border-color: #16a34a;
+    border-color: #15803d;
     background: ${props => (props.$selected ? '#f0fdf4' : '#f9fafb')};
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px -1px rgba(21, 128, 61, 0.1), 0 2px 4px -1px rgba(21, 128, 61, 0.06);
   }
 `;
 
 const Input = styled.input`
   width: 100%;
   padding: 1rem;
-  border-radius: 12px;
-  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
   background: white;
   color: #1f2937;
   font-size: 1rem;
-  transition: all 0.2s;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+
+  &::placeholder { color: #9ca3af; }
 
   &:focus {
     outline: none;
@@ -140,14 +145,16 @@ const Input = styled.input`
 const TextArea = styled.textarea`
   width: 100%;
   padding: 1rem;
-  border-radius: 12px;
-  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
   background: white;
   color: #1f2937;
   font-size: 1rem;
   min-height: 100px;
   resize: vertical;
-  transition: all 0.2s;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+
+  &::placeholder { color: #9ca3af; }
 
   &:focus {
     outline: none;
@@ -177,21 +184,25 @@ const NavButton = styled.button<{ $primary?: boolean }>`
   border: none;
   font-weight: 600;
   cursor: pointer;
-  background: ${props => (props.$primary ? '#16a34a' : '#f3f4f6')};
+  background: ${props => (props.$primary ? '#15803d' : '#f3f4f6')};
   color: ${props => (props.$primary ? 'white' : '#4b5563')};
-  transition: all 0.2s;
+  transition: background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
   font-size: 1rem;
   flex: 1;
 
   &:hover {
-    background: ${props => (props.$primary ? '#15803d' : '#e5e7eb')};
+    background: ${props => (props.$primary ? '#166534' : '#e5e7eb')};
     transform: translateY(-1px);
+    box-shadow: ${props => props.$primary
+      ? '0 10px 15px -3px rgba(21,128,61,0.3), 0 4px 6px -2px rgba(21,128,61,0.15)'
+      : '0 1px 2px 0 rgba(0,0,0,0.05)'};
   }
 
   &:disabled {
     opacity: 0.5;
     cursor: not-allowed;
     transform: none;
+    box-shadow: none;
   }
 `;
 
@@ -230,12 +241,12 @@ const CheckboxLabel = styled.label`
   color: #374151;
 
   &:hover {
-    border-color: #16a34a;
+    border-color: #15803d;
     background: #f9fafb;
   }
 
   input {
-    accent-color: #16a34a;
+    accent-color: #15803d;
     width: 20px;
     height: 20px;
   }

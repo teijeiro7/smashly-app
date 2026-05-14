@@ -4,6 +4,38 @@ import { RagService } from '../services/ragService';
 import logger from '../config/logger';
 import { AuthRequest } from '../types';
 
+function normalizeFormData(data: any): any {
+  if (!data || typeof data !== 'object') return data;
+
+  const normalized = { ...data };
+
+  if (normalized.style !== undefined && normalized.play_style === undefined) {
+    normalized.play_style = normalized.style;
+    delete normalized.style;
+  }
+  if (normalized.weakest_shot !== undefined && normalized.weak_shot === undefined) {
+    normalized.weak_shot = normalized.weakest_shot;
+    delete normalized.weakest_shot;
+  }
+  if (normalized.goals !== undefined && normalized.objectives === undefined) {
+    normalized.objectives = normalized.goals;
+    delete normalized.goals;
+  }
+  if (normalized.likes_current_racket !== undefined && normalized.current_racket_likes === undefined) {
+    normalized.current_racket_likes = normalized.likes_current_racket;
+    delete normalized.likes_current_racket;
+  }
+  if (normalized.dislikes_current_racket !== undefined && normalized.current_racket_dislikes === undefined) {
+    normalized.current_racket_dislikes = normalized.dislikes_current_racket;
+    delete normalized.dislikes_current_racket;
+  }
+  if (typeof normalized.years_playing === 'string') {
+    normalized.years_playing = parseInt(normalized.years_playing, 10) || 0;
+  }
+
+  return normalized;
+}
+
 export class RecommendationController {
   static async generate(req: Request, res: Response) {
     try {
@@ -13,7 +45,8 @@ export class RecommendationController {
         return res.status(400).json({ error: 'Missing type or data' });
       }
 
-      const result = await RecommendationService.generateRecommendation(type, data);
+      const normalizedData = normalizeFormData(data);
+      const result = await RecommendationService.generateRecommendation(type, normalizedData);
       return res.json(result);
     } catch (error: unknown) {
       logger.error('Error in generate recommendation controller:', error);
@@ -35,7 +68,8 @@ export class RecommendationController {
         return res.status(400).json({ error: 'Missing type or data' });
       }
 
-      const result = await RagService.generateRecommendation(type, data);
+      const normalizedData = normalizeFormData(data);
+      const result = await RagService.generateRecommendation(type, normalizedData);
       return res.json(result);
     } catch (error: unknown) {
       logger.error('Error in generate RAG recommendation controller:', error);

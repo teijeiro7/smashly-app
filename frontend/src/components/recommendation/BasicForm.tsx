@@ -10,11 +10,11 @@ const FormContainer = styled.div`
   background: white;
   border-radius: 24px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
-  border: 1px solid rgba(22, 163, 74, 0.1);
+  border: 1px solid rgba(21, 128, 61, 0.1);
 `;
 
 const SectionTitle = styled.h3`
-  color: #16a34a;
+  color: #15803d;
   font-size: 1.1rem;
   margin: 1.5rem 0 1rem 0;
   padding-bottom: 0.5rem;
@@ -64,12 +64,12 @@ const RadioLabel = styled.label`
   transition: all 0.2s;
 
   &:hover {
-    border-color: #16a34a;
+    border-color: #15803d;
     background: #f0fdf4;
   }
 
   input:checked + & {
-    border-color: #16a34a;
+    border-color: #15803d;
     background: #f0fdf4;
   }
 `;
@@ -90,8 +90,8 @@ const Select = styled.select`
 
   &:focus {
     outline: none;
-    border-color: #16a34a;
-    box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.1);
+    border-color: #15803d;
+    box-shadow: 0 0 0 3px rgba(21, 128, 61, 0.1);
   }
 `;
 
@@ -107,8 +107,8 @@ const Input = styled.input`
 
   &:focus {
     outline: none;
-    border-color: #16a34a;
-    box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.1);
+    border-color: #15803d;
+    box-shadow: 0 0 0 3px rgba(21, 128, 61, 0.1);
   }
 `;
 
@@ -125,7 +125,7 @@ const Button = styled.button<{ $primary?: boolean }>`
   border: none;
   font-weight: 600;
   cursor: pointer;
-  background: ${props => (props.$primary ? '#16a34a' : '#f3f4f6')};
+  background: ${props => (props.$primary ? '#15803d' : '#f3f4f6')};
   color: ${props => (props.$primary ? 'white' : '#4b5563')};
   transition: all 0.2s;
   font-size: 1rem;

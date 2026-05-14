@@ -121,9 +121,9 @@ const AuthBanner = styled.div`
 `;
 
 const AuthCard = styled.div`
-  background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+  background: #f0fdf4;
   border: 1px solid var(--color-gray-200);
-  border-radius: 20px;
+    border-radius: 16px;
   padding: 2.5rem;
   text-align: center;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
@@ -137,7 +137,7 @@ const AuthCard = styled.div`
     right: -50%;
     width: 300px;
     height: 300px;
-    background: radial-gradient(circle, rgba(22, 163, 74, 0.05) 0%, transparent 70%);
+    background: radial-gradient(circle, rgba(21, 128, 61, 0.05) 0%, transparent 70%);
     border-radius: 50%;
   }
 
@@ -162,7 +162,7 @@ const AuthLockIcon = styled.div`
   justify-content: center;
   width: 32px;
   height: 32px;
-  background: rgba(22, 101, 52, 0.1);
+  background: rgba(21, 128, 61, 0.1);
   border-radius: 8px;
   color: #166534;
   font-size: 1rem;
@@ -208,7 +208,7 @@ const AuthButton = styled.a<{ $variant?: 'primary' | 'secondary' }>`
   font-size: 0.9375rem;
   font-weight: 600;
   text-decoration: none;
-  border-radius: 12px;
+  border-radius: 8px;
   transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 
   ${props =>
@@ -216,17 +216,17 @@ const AuthButton = styled.a<{ $variant?: 'primary' | 'secondary' }>`
       ? `
     background: var(--color-primary);
     color: white;
-    box-shadow: 0 4px 12px rgba(22, 163, 74, 0.25);
+    box-shadow: 0 4px 12px rgba(21, 128, 61, 0.25);
     
     &:hover {
       background: var(--color-primary-dark);
       transform: translateY(-2px);
-      box-shadow: 0 6px 16px rgba(22, 163, 74, 0.35);
+      box-shadow: 0 6px 16px rgba(21, 128, 61, 0.35);
     }
   `
       : `
     background: white;
-    color: #166534;
+    color: #15803d;
     border: 1px solid var(--color-gray-200);
     
     &:hover {
@@ -265,7 +265,7 @@ const MainGrid = styled.div`
 // Left Column: Gallery
 const GallerySection = styled.div`
   background: white;
-  border-radius: 24px;
+  border-radius: 16px;
   padding: 2rem;
   display: flex;
   flex-direction: column;
@@ -275,11 +275,12 @@ const GallerySection = styled.div`
   width: 100%;
   min-width: 0;
   min-height: 600px;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-  transition: box-shadow 0.3s ease;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
 
   &:hover {
-    box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    transform: translateY(-2px);
   }
 
   @media (max-width: 768px) {
@@ -387,7 +388,7 @@ const Thumbnail = styled.img<{ $isActive: boolean }>`
   width: 70px;
   height: 70px;
   object-fit: contain;
-  border-radius: 12px;
+  border-radius: 8px;
   border: 2px solid ${props => (props.$isActive ? 'var(--color-primary)' : 'var(--color-gray-200)')};
   background: ${props => (props.$isActive ? '#f0fdf4' : 'white')};
   cursor: pointer;
@@ -560,10 +561,10 @@ const RatingRow = styled.div`
 
 const PriceCard = styled.div`
   background: white;
-  border-radius: 20px;
+  border-radius: 16px;
   padding: 1.5rem;
   border: 1px solid var(--color-gray-200);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 `;
 
 const BestPriceLabel = styled.div`
@@ -636,12 +637,12 @@ const PrimaryButton = styled.a`
   padding: 1rem 1.25rem;
   background: var(--color-primary);
   color: white;
-  border-radius: 12px;
+  border-radius: 8px;
   font-weight: 700;
   font-size: 1.125rem;
   text-decoration: none;
   transition: background-color 0.2s, transform 0.2s, box-shadow 0.2s;
-  box-shadow: 0 4px 12px rgba(22, 163, 74, 0.3);
+  box-shadow: 0 4px 12px rgba(21, 128, 61, 0.3);
   position: relative;
   overflow: hidden;
 
@@ -659,7 +660,7 @@ const PrimaryButton = styled.a`
   &:hover {
     background: var(--color-primary-dark);
     transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(22, 163, 74, 0.4);
+    box-shadow: 0 6px 16px rgba(21, 128, 61, 0.4);
     color: white;
     text-decoration: none;
 
@@ -679,7 +680,7 @@ const AlertButton = styled.button`
   background: white;
   color: var(--color-gray-700);
   border: 1px solid var(--color-gray-200);
-  border-radius: 12px;
+  border-radius: 8px;
   font-weight: 600;
   font-size: 1rem;
   cursor: pointer;
@@ -722,12 +723,12 @@ const AlertButton = styled.button`
 `;
 
 const ComparisonOnlyCard = styled.div`
-  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  background: #f8fafc;
   border: 1px solid var(--color-gray-200);
-  border-radius: 20px;
+  border-radius: 16px;
   padding: 2rem;
   text-align: center;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
@@ -801,18 +802,19 @@ const SpecIconWrapper = styled.div`
 const SpecCard = styled.div`
   background: white;
   padding: 1rem;
-  border-radius: 12px;
+  border-radius: 10px;
   border: 1px solid var(--color-gray-100);
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
   display: flex;
   flex-direction: row;
   align-items: center;
   gap: 0.75rem;
-  transition: border-color 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
   cursor: default;
 
   &:hover {
-    border-color: var(--color-primary);
-    box-shadow: 0 4px 12px rgba(22, 163, 74, 0.12);
+    border-color: rgba(21, 128, 61, 0.3);
+    box-shadow: 0 4px 6px -1px rgba(21, 128, 61, 0.1), 0 2px 4px -1px rgba(21, 128, 61, 0.06);
     transform: translateY(-2px);
 
     ${SpecIconWrapper} {
@@ -852,22 +854,14 @@ const H3 = styled.h3`
   display: flex;
   align-items: center;
   gap: 0.75rem;
-
-  &::before {
-    content: '';
-    width: 4px;
-    height: 24px;
-    background: var(--color-primary);
-    border-radius: 2px;
-  }
 `;
 
 const PerformanceContainer = styled.div`
   background: white;
-  border-radius: 24px;
+  border-radius: 16px;
   padding: 2rem;
   margin-top: 3rem;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 `;
 
 const PerformanceGrid = styled.div`
@@ -938,7 +932,7 @@ const CompareTable = styled.div`
   background: white;
   border-radius: 16px;
   overflow: hidden;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
   margin-top: 3rem;
 `;
 
@@ -960,8 +954,8 @@ const CompareRow = styled.div<{ $isBestPrice?: boolean }>`
       props.$isBestPrice
         ? 'linear-gradient(90deg, #dcfce7 0%, #bbf7d0 100%)'
         : 'var(--color-gray-50)'};
-    transform: translateY(-2px);
-    box-shadow: inset 4px 0 0 var(--color-primary);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(21, 128, 61, 0.08);
   }
 
   &:last-child {
@@ -979,7 +973,7 @@ const BestPriceBadge = styled.span`
   position: absolute;
   top: 0.75rem;
   right: 1rem;
-  background: linear-gradient(135deg, #166534 0%, #16a34a 100%);
+  background: linear-gradient(135deg, #166534 0%, #15803d 100%);
   color: white;
   font-size: 0.625rem;
   font-weight: 700;
@@ -987,7 +981,7 @@ const BestPriceBadge = styled.span`
   letter-spacing: 0.05em;
   padding: 4px 8px;
   border-radius: 4px;
-  box-shadow: 0 2px 4px rgba(22, 163, 74, 0.3);
+  box-shadow: 0 2px 4px rgba(21, 128, 61, 0.3);
 
   @media (max-width: 768px) {
     position: static;
@@ -1287,7 +1281,7 @@ const RacketDetailPage: React.FC = () => {
           padding: 'clamp(2rem, 5vw, 3rem)',
           maxWidth: '480px',
           width: '100%',
-          boxShadow: '0 10px 40px rgba(22, 163, 74, 0.08)',
+          boxShadow: '0 10px 40px rgba(21, 128, 61, 0.08)',
           border: '1px solid #dcfce7',
           textAlign: 'center'
         }}>
@@ -1320,7 +1314,7 @@ const RacketDetailPage: React.FC = () => {
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: '0.5rem',
-                background: '#16a34a',
+                background: '#15803d',
                 color: 'white',
                 padding: '0.75rem 1.5rem',
                 borderRadius: '10px',
@@ -1333,7 +1327,7 @@ const RacketDetailPage: React.FC = () => {
                 e.currentTarget.style.transform = 'translateY(-2px)';
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.background = '#16a34a';
+                e.currentTarget.style.background = '#15803d';
                 e.currentTarget.style.transform = 'translateY(0)';
               }}
             >
@@ -1356,8 +1350,8 @@ const RacketDetailPage: React.FC = () => {
                 transition: 'all 0.2s ease'
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.borderColor = '#16a34a';
-                e.currentTarget.style.color = '#16a34a';
+                e.currentTarget.style.borderColor = '#15803d';
+                e.currentTarget.style.color = '#15803d';
                 e.currentTarget.style.transform = 'translateY(-2px)';
               }}
               onMouseLeave={(e) => {

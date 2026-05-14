@@ -1,13 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { RecommendationService } from '../../../services/recommendationService';
-import * as authUtils from '../../../utils/authUtils';
 
 // Mock fetch
 global.fetch = vi.fn();
-
-vi.mock('../../../utils/authUtils', () => ({
-  getAuthToken: vi.fn(),
-}));
 
 describe('RecommendationService', () => {
   beforeEach(() => {
@@ -86,8 +81,6 @@ describe('RecommendationService', () => {
 
   describe('save', () => {
     it('should save recommendation', async () => {
-      vi.mocked(authUtils.getAuthToken).mockReturnValue('test-token');
-
       const formData = { weight: 70, height: 175 };
       const result = { recommendations: [], explanation: 'Test' };
       const savedRecommendation = { id: 'rec-1', ...result };
@@ -104,9 +97,7 @@ describe('RecommendationService', () => {
         expect.stringContaining('/api/v1/recommendations/save'),
         expect.objectContaining({
           method: 'POST',
-          headers: expect.objectContaining({
-            Authorization: 'Bearer test-token',
-          }),
+          credentials: 'include',
         })
       );
     });
@@ -114,8 +105,6 @@ describe('RecommendationService', () => {
 
   describe('getLast', () => {
     it('should get last recommendation', async () => {
-      vi.mocked(authUtils.getAuthToken).mockReturnValue('test-token');
-
       const mockRecommendation = {
         id: 'rec-1',
         type: 'basic',
@@ -130,11 +119,16 @@ describe('RecommendationService', () => {
       const result = await RecommendationService.getLast();
 
       expect(result).toEqual(mockRecommendation);
+      expect(global.fetch).toHaveBeenCalledWith(
+        expect.stringContaining('/api/v1/recommendations/last'),
+        expect.objectContaining({
+          method: 'GET',
+          credentials: 'include',
+        })
+      );
     });
 
     it('should return null if no recommendation', async () => {
-      vi.mocked(authUtils.getAuthToken).mockReturnValue('test-token');
-
       (global.fetch as any).mockResolvedValueOnce({
         ok: false,
         status: 404,

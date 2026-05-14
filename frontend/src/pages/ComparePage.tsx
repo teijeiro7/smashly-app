@@ -8,7 +8,7 @@ import { useAuth } from '../contexts/AuthContext';
 const Container = styled.div`
   min-height: 100dvh;
   background:
-    radial-gradient(circle at top right, rgba(22, 163, 74, 0.08), transparent 42%),
+    radial-gradient(circle at top right, rgba(21, 128, 61, 0.08), transparent 42%),
     linear-gradient(150deg, #f8faf8 0%, #edf7ef 45%, #e6f4e7 100%);
   padding: 1rem 1rem calc(6.5rem + env(safe-area-inset-bottom));
 
@@ -19,12 +19,11 @@ const Container = styled.div`
 
 const Header = styled.div`
   background: white;
-  border-bottom: 1px solid #e5e7eb;
   border-radius: 24px;
   max-width: 1200px;
   margin: 0 auto;
   padding: 2.5rem 1.5rem;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
   text-align: center;
 
   @media (max-width: 768px) {
@@ -40,7 +39,7 @@ const Title = styled.h1`
   margin-bottom: 1rem;
 
   .highlight {
-    color: #16a34a;
+    color: #15803d;
   }
 
   @media (max-width: 768px) {
@@ -77,19 +76,19 @@ const SecondaryButton = styled.button`
   gap: 0.5rem;
   padding: 0.75rem 1.5rem;
   min-height: 44px;
-  background: white;
-  color: #16a34a;
+  background: transparent;
+  color: #15803d;
   border: 2px solid #16a34a;
   border-radius: 12px;
   font-weight: 600;
-  font-size: 1rem;
+  font-size: 0.875rem;
   cursor: pointer;
-  transition: background-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+  transition: background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
 
   &:hover {
-    background: #f0fdf4;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(22, 163, 74, 0.2);
+    background: rgba(22, 163, 74, 0.05);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px -1px rgba(21, 128, 61, 0.15);
   }
 `;
 
@@ -110,29 +109,29 @@ const MainContent = styled.div`
 
 const Card = styled(motion.div)`
   background: white;
-  border-radius: 24px;
+  border-radius: 20px;
   padding: 3rem 2rem;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
-  border: 1px solid rgba(22, 163, 74, 0.1);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  border: 1px solid rgba(0, 0, 0, 0.06);
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
   cursor: pointer;
-  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
   position: relative;
   overflow: hidden;
   min-height: 320px;
 
   &:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 20px 40px rgba(22, 163, 74, 0.15);
-    border-color: #16a34a;
+    transform: translateY(-4px);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    border-color: rgba(21, 128, 61, 0.3);
 
     .icon-container {
-      background: #16a34a;
+      background: #15803d;
       color: white;
-      transform: scale(1.1);
+      transform: scale(1.08);
     }
 
     .arrow-icon {
@@ -143,7 +142,7 @@ const Card = styled(motion.div)`
 
   @media (max-width: 768px) {
     padding: 1.75rem 1rem;
-    border-radius: 18px;
+    border-radius: 16px;
     min-height: 260px;
     text-align: left;
     align-items: flex-start;
@@ -155,7 +154,7 @@ const IconContainer = styled.div`
   height: 80px;
   border-radius: 20px;
   background: #f0fdf4;
-  color: #16a34a;
+  color: #15803d;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -192,7 +191,7 @@ const ActionButton = styled.div`
   align-items: center;
   gap: 0.5rem;
   font-weight: 600;
-  color: #16a34a;
+  color: #15803d;
   font-size: 1.125rem;
 `;
 

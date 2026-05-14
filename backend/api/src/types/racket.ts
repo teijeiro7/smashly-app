@@ -83,6 +83,9 @@ export interface Racket {
   created_at?: string;
   updated_at?: string;
 
+  // Ownership
+  store_id?: string | null;
+
   // Computed fields for compatibility with existing code
   current_price?: number;
   original_price?: number | null;

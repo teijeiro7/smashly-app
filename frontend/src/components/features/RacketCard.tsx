@@ -8,12 +8,12 @@ import { API_URL } from '../../config/api';
 // Styled Components
 const RacketCardContainer = styled.li<{ $view: 'grid' | 'list'; $index: number }>`
   background: white;
-  border-radius: 16px;
+  border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
   cursor: pointer;
-  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
-  border: 1px solid rgba(22, 163, 74, 0.1);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid #e5e7eb;
   contain: layout style paint;
   display: ${props => (props.$view === 'list' ? 'flex' : 'flex')};
   flex-direction: ${props => (props.$view === 'list' ? 'row' : 'column')};
@@ -33,13 +33,10 @@ const RacketCardContainer = styled.li<{ $view: 'grid' | 'list'; $index: number }
     }
   }
 
-  /* Disable animation on mobile if needed, but CSS is usually fast enough. 
-     Keeping it simple for now. */
-
   &:hover {
     transform: translateY(-4px);
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
-    border-color: #16a34a;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    border-color: #15803d;
   }
 `;
 
@@ -103,7 +100,7 @@ const RacketInfo = styled.div<{ $view: 'grid' | 'list' }>`
 const RacketBrand = styled.div`
   font-size: 0.875rem;
   font-weight: 600;
-  color: #16a34a;
+  color: #15803d;
   margin-bottom: 0.25rem;
 `;
 
@@ -132,7 +129,7 @@ const PriceContainer = styled.div<{ $view: 'grid' | 'list' }>`
 const CurrentPrice = styled.div`
   font-size: 1.25rem;
   font-weight: 700;
-  color: #16a34a;
+  color: #15803d;
 `;
 
 const OriginalPrice = styled.div`
@@ -162,7 +159,7 @@ const ActionButtons = styled.div<{ $view: 'grid' | 'list' }>`
 
 const ViewDetailsButton = styled.button`
   flex: 1;
-  background: #16a34a;
+  background: #15803d;
   color: white;
   border: none;
   padding: 0.75rem 1rem;
@@ -174,10 +171,10 @@ const ViewDetailsButton = styled.button`
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  transition: background-color 0.2s ease, transform 0.2s ease;
+  transition: background-color 0.2s cubic-bezier(0.4, 0, 0.2, 1), transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 
   &:hover {
-    background: #15803d;
+    background: #166534;
     transform: translateY(-1px);
   }
 `;

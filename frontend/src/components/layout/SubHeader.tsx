@@ -7,18 +7,10 @@ import { useAuth } from '../../contexts/AuthContext';
 const SubHeaderContainer = styled.div`
   background: white;
   border-bottom: 1px solid #e5e7eb;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
   position: sticky;
-  top: calc(72px + env(safe-area-inset-top, 0));
+  top: calc(64px + env(safe-area-inset-top, 0));
   z-index: 320;
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-
-  @media (hover: none) and (pointer: coarse) {
-    backdrop-filter: none;
-    -webkit-backdrop-filter: none;
-    background: rgba(255, 255, 255, 0.98);
-  }
 
   @media (max-width: 1024px) {
     display: none;
@@ -26,25 +18,21 @@ const SubHeaderContainer = styled.div`
 `;
 
 const SubHeaderContent = styled.div`
-  max-width: 1500px;
+  max-width: 1400px;
   margin: 0 auto;
-  padding: 0 clamp(20px, 5vw, 80px);
+  padding: 0 clamp(16px, 4vw, 48px);
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 48px;
+  height: 44px;
   width: 100%;
 
-  @media (max-width: 1600px) {
-    padding: 0 clamp(20px, 3vw, 60px);
-  }
-
   @media (max-width: 1200px) {
-    padding: 0 clamp(20px, 2vw, 40px);
+    padding: 0 clamp(16px, 3vw, 32px);
   }
 
   @media (max-width: 768px) {
-    display: none; /* Hide on mobile since navigation is in mobile menu */
+    display: none;
   }
 `;
 
@@ -58,25 +46,25 @@ const NavItem = styled(Link)<{ $isActive: boolean }>`
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  color: ${props => (props.$isActive ? '#16a34a' : '#6b7280')};
+  color: ${props => (props.$isActive ? '#15803d' : '#6b7280')};
   text-decoration: none;
   font-weight: ${props => (props.$isActive ? '600' : '500')};
   font-size: 0.875rem;
   padding: 6px 12px;
   border-radius: 6px;
-  transition: all 0.2s ease;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
 
   &:hover {
-    color: #16a34a;
-    background: #f8fdf8;
+    color: #15803d;
+    background: #f0fdf4;
     text-decoration: none;
   }
 
   ${props =>
     props.$isActive &&
     `
-    background: #f0f9f0;
+    background: #f0fdf4;
     
     &::after {
       content: '';
@@ -86,7 +74,7 @@ const NavItem = styled(Link)<{ $isActive: boolean }>`
       transform: translateX(-50%);
       width: 20px;
       height: 2px;
-      background: #16a34a;
+      background: #15803d;
       border-radius: 1px;
     }
   `}

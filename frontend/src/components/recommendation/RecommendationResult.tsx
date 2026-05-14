@@ -39,9 +39,8 @@ const AnalysisCard = styled.div`
   border-radius: 16px;
   padding: 0;
   margin-bottom: 3rem;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
-  border: 1px solid #e5e7eb;
-  border-left: 4px solid #16a34a;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  border: 1px solid rgba(0, 0, 0, 0.06);
   overflow: hidden;
 `;
 
@@ -57,7 +56,7 @@ const AnalysisHeader = styled.div`
 const IconWrapper = styled.div`
   width: 40px;
   height: 40px;
-  background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+  background: linear-gradient(135deg, #15803d 0%, #15803d 100%);
   border-radius: 10px;
   display: flex;
   align-items: center;
@@ -121,8 +120,8 @@ const RacketCard = styled.div`
 
   &:hover {
     transform: translateY(-5px);
-    border-color: #16a34a;
-    box-shadow: 0 20px 40px rgba(22, 163, 74, 0.15);
+    border-color: #15803d;
+    box-shadow: 0 20px 40px rgba(21, 128, 61, 0.15);
   }
 `;
 
@@ -157,12 +156,12 @@ const RacketBrand = styled.div`
 const RacketPrice = styled.div`
   font-size: 1.3rem;
   font-weight: 700;
-  color: #16a34a;
+  color: #15803d;
   margin-top: 0.5rem;
 `;
 
 const MatchScore = styled.div`
-  background: #16a34a;
+  background: #15803d;
   color: white;
   padding: 0.4rem 0.9rem;
   border-radius: 20px;
@@ -199,7 +198,7 @@ const Section = styled.div`
 const SectionTitle = styled.h5`
   font-size: 0.85rem;
   font-weight: 700;
-  color: #16a34a;
+  color: #15803d;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   margin: 0 0 0.75rem 0;
@@ -226,7 +225,7 @@ const MetricBadge = styled.div<{ $certified?: boolean }>`
   align-items: center;
   padding: 0.5rem 0.75rem;
   background: ${props => (props.$certified ? '#f0fdf4' : '#f9fafb')};
-  border: 1px solid ${props => (props.$certified ? '#16a34a' : '#e5e7eb')};
+  border: 1px solid ${props => (props.$certified ? '#15803d' : '#e5e7eb')};
   border-radius: 8px;
   min-width: 70px;
 `;
@@ -242,7 +241,7 @@ const MetricLabel = styled.div`
 const MetricValue = styled.div<{ $certified?: boolean }>`
   font-size: 1.1rem;
   font-weight: 700;
-  color: ${props => (props.$certified ? '#16a34a' : '#1f2937')};
+  color: ${props => (props.$certified ? '#15803d' : '#1f2937')};
 `;
 
 const SafetyBadge = styled.div<{ $safe: boolean }>`
@@ -251,7 +250,7 @@ const SafetyBadge = styled.div<{ $safe: boolean }>`
   gap: 0.5rem;
   padding: 0.5rem 1rem;
   background: ${props => (props.$safe ? '#f0fdf4' : '#fef2f2')};
-  border: 1px solid ${props => (props.$safe ? '#16a34a' : '#ef4444')};
+  border: 1px solid ${props => (props.$safe ? '#15803d' : '#ef4444')};
   border-radius: 8px;
   font-size: 0.85rem;
   font-weight: 600;
@@ -284,21 +283,21 @@ const CertificationNote = styled.div`
 const ViewButton = styled(Link)`
   display: block;
   text-align: center;
-  background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+  background: linear-gradient(135deg, #15803d 0%, #15803d 100%);
   color: white;
   padding: 0.75rem;
   border-radius: 12px;
   text-decoration: none;
   font-weight: 600;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 6px rgba(22, 163, 74, 0.2);
+  box-shadow: 0 4px 6px rgba(21, 128, 61, 0.2);
   margin-top: auto;
 
   &:hover {
     background: linear-gradient(135deg, #15803d 0%, #14532d 100%);
     color: white;
     transform: translateY(-2px);
-    box-shadow: 0 6px 12px rgba(22, 163, 74, 0.3);
+    box-shadow: 0 6px 12px rgba(21, 128, 61, 0.3);
     text-decoration: none;
   }
 `;
@@ -315,7 +314,7 @@ const Button = styled.button<{ $primary?: boolean }>`
   border: none;
   font-weight: 600;
   cursor: pointer;
-  background: ${props => (props.$primary ? '#16a34a' : 'white')};
+  background: ${props => (props.$primary ? '#15803d' : 'white')};
   color: ${props => (props.$primary ? 'white' : '#4b5563')};
   border: ${props => (props.$primary ? 'none' : '1px solid #e5e7eb')};
   transition: all 0.2s;

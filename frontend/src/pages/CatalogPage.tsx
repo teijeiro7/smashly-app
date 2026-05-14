@@ -21,18 +21,10 @@ const Container = styled.div`
 `;
 
 const Header = styled.div`
-  background: rgba(255, 255, 255, 0.92);
+  background: white;
   border-bottom: 1px solid #e5e7eb;
-  padding: clamp(1.2rem, 3.5vw, 2rem) 0;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-
-  @media (hover: none) and (pointer: coarse) {
-    backdrop-filter: none;
-    -webkit-backdrop-filter: none;
-    background: rgba(255, 255, 255, 0.98);
-  }
+  padding: clamp(1.5rem, 4vw, 2.5rem) 0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 `;
 
 const HeaderContent = styled.div`
@@ -43,17 +35,15 @@ const HeaderContent = styled.div`
 `;
 
 const Title = styled.h1`
-  font-size: 3rem;
+  font-size: clamp(2rem, 5vw, 3rem);
   font-weight: 800;
   color: #1f2937;
-  margin-bottom: 1rem;
+  margin-bottom: 0.75rem;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
 
   .highlight {
-    color: #16a34a;
-  }
-
-  @media (max-width: 768px) {
-    font-size: 2rem;
+    color: #15803d;
   }
 `;
 
@@ -87,7 +77,7 @@ const StatItem = styled.div`
 const StatNumber = styled.div`
   font-size: 1.5rem;
   font-weight: 700;
-  color: #16a34a;
+  color: #15803d;
 `;
 
 const StatLabel = styled.div`
@@ -103,11 +93,11 @@ const MainContent = styled.div`
 
 const FiltersSection = styled.div`
   background: white;
-  border-radius: 16px;
+  border-radius: 12px;
   padding: clamp(1rem, 2vw, 1.5rem);
-  margin-bottom: 2rem;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-  border: 1px solid rgba(22, 163, 74, 0.1);
+  margin-bottom: 1.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
+  border: 1px solid #e5e7eb;
 `;
 
 const FiltersRow = styled.div`
@@ -136,15 +126,15 @@ const SearchInput = styled.input`
   width: 100%;
   min-height: 46px;
   padding: 0.875rem 1rem 0.875rem 2.75rem;
-  border: 2px solid #e5e7eb;
-  border-radius: 12px;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 8px;
   font-size: 0.875rem;
-  transition: all 0.2s ease;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 
   &:focus {
     outline: none;
-    border-color: #16a34a;
-    box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.1);
+    border-color: #15803d;
+    box-shadow: 0 0 0 3px rgba(21, 128, 61, 0.1);
   }
 
   &::placeholder {
@@ -164,20 +154,21 @@ const FilterButton = styled.button<{ $active?: boolean }>`
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  min-height: 44px;
-  padding: 0.7rem 1rem;
-  border: 2px solid ${props => (props.$active ? '#16a34a' : '#e5e7eb')};
-  border-radius: 12px;
-  background: ${props => (props.$active ? '#f0f9ff' : 'white')};
-  color: ${props => (props.$active ? '#16a34a' : '#6b7280')};
+  min-height: 40px;
+  padding: 0.5rem 1rem;
+  border: 1.5px solid ${props => (props.$active ? '#15803d' : '#e5e7eb')};
+  border-radius: 8px;
+  background: ${props => (props.$active ? '#f0fdf4' : 'white')};
+  color: ${props => (props.$active ? '#15803d' : '#6b7280')};
   font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 
   &:hover {
-    border-color: #16a34a;
-    color: #16a34a;
+    border-color: #15803d;
+    color: #15803d;
+    background: ${props => (props.$active ? '#f0fdf4' : '#f9fafb')};
   }
 
   @media (max-width: 768px) {
@@ -187,38 +178,34 @@ const FilterButton = styled.button<{ $active?: boolean }>`
 `;
 
 const FilterSelect = styled.select`
-  min-height: 44px;
-  padding: 0.875rem 1rem;
-  border: 2px solid #e5e7eb;
-  border-radius: 12px;
+  min-height: 40px;
+  padding: 0.5rem 2.5rem 0.5rem 1rem;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 8px;
   background: white;
-  color: #6b7280;
+  color: #374151;
   font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.2s ease;
-
-  /* Custom arrow to control its position */
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   -webkit-appearance: none;
   -moz-appearance: none;
   appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
-  background-position: right 1rem center; /* move arrow a bit left */
-  background-size: 20px;
-  padding-right: 2.5rem; /* ensure text doesn't overlap the arrow */
+  background-position: right 0.75rem center;
+  background-size: 16px;
 
   &:hover {
-    border-color: #16a34a;
-    color: #16a34a;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%2316a34a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+    border-color: #15803d;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2315803d' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
   }
 
   &:focus {
     outline: none;
-    border-color: #16a34a;
-    box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.1);
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%2316a34a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+    border-color: #15803d;
+    box-shadow: 0 0 0 3px rgba(21, 128, 61, 0.1);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2315803d' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
   }
 
   @media (max-width: 768px) {
@@ -234,23 +221,23 @@ const AdvancedFiltersToggle = styled.button<{ $active: boolean }>`
   padding: 0.75rem 1rem;
   margin-top: 1rem;
   width: 100%;
-  border: 2px dashed ${props => (props.$active ? '#16a34a' : '#e5e7eb')};
-  border-radius: 12px;
+  border: 1.5px dashed ${props => (props.$active ? '#15803d' : '#e5e7eb')};
+  border-radius: 8px;
   background: ${props => (props.$active ? '#f0fdf4' : 'white')};
-  color: ${props => (props.$active ? '#16a34a' : '#6b7280')};
+  color: ${props => (props.$active ? '#15803d' : '#6b7280')};
   font-size: 0.875rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
   &:hover {
-    border-color: #16a34a;
-    color: #16a34a;
+    border-color: #15803d;
+    color: #15803d;
     background: #f0fdf4;
   }
 
   svg:last-child {
-    transition: transform 0.3s ease;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     transform: ${props => (props.$active ? 'rotate(180deg)' : 'rotate(0deg)')};
   }
 `;
@@ -273,9 +260,9 @@ const AdvancedFiltersGrid = styled.div`
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 1rem;
   padding: 1rem;
-  background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
-  border-radius: 12px;
-  border: 2px solid #d1fae5;
+  background: #f9fafb;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
 
   @media (max-width: 768px) {
     grid-template-columns: 1fr;
@@ -334,13 +321,13 @@ const ViewButton = styled.button<{ $active: boolean }>`
   padding: 0.5rem;
   border: none;
   border-radius: 6px;
-  background: ${props => (props.$active ? '#16a34a' : 'transparent')};
+  background: ${props => (props.$active ? '#15803d' : 'transparent')};
   color: ${props => (props.$active ? 'white' : '#6b7280')};
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 
   &:hover {
-    color: ${props => (props.$active ? 'white' : '#16a34a')};
+    color: ${props => (props.$active ? 'white' : '#15803d')};
   }
 `;
 
@@ -355,7 +342,7 @@ const SortSelect = styled.select`
 
   &:focus {
     outline: none;
-    border-color: #16a34a;
+    border-color: #15803d;
   }
 
   @media (max-width: 768px) {
@@ -380,40 +367,52 @@ const RacketsGrid = styled.ul<{ $view: 'grid' | 'list' }>`
 const EmptyState = styled.div`
   text-align: center;
   padding: 4rem 2rem;
-  color: #6b7280;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e5e7eb;
 `;
 
 const EmptyIcon = styled.div`
-  font-size: 4rem;
-  margin-bottom: 1rem;
+  font-size: 3rem;
+  margin-bottom: 1.5rem;
+  opacity: 0.5;
 `;
 
 const EmptyTitle = styled.h3`
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: #374151;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #1f2937;
   margin-bottom: 0.5rem;
 `;
 
 const EmptyDescription = styled.p`
   font-size: 1rem;
   color: #6b7280;
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem;
+  line-height: 1.6;
 `;
 
 const ClearFiltersButton = styled.button`
-  background: #16a34a;
+  background: #15803d;
   color: white;
   border: none;
-  padding: 0.75rem 1.5rem;
+  padding: 0.625rem 1.25rem;
   border-radius: 8px;
   font-size: 0.875rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 
   &:hover {
-    background: #15803d;
+    background: #166534;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(21, 128, 61, 0.2);
+  }
+
+  &:active {
+    transform: translateY(0);
   }
 `;
 
@@ -423,10 +422,10 @@ const FloatingPanel = styled(motion.div)`
   bottom: 2rem;
   right: 2rem;
   background: white;
-  border-radius: 16px;
+  border-radius: 12px;
   padding: 1rem 1.5rem;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-  border: 2px solid #16a34a;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  border: 1.5px solid #15803d;
   z-index: 50;
 
   @media (max-width: 768px) {
@@ -449,7 +448,7 @@ const PanelText = styled.div`
 `;
 
 const CompareButton = styled.button`
-  background: #16a34a;
+  background: #15803d;
   color: white;
   border: none;
   padding: 0.5rem 1rem;
@@ -457,10 +456,11 @@ const CompareButton = styled.button`
   font-size: 0.875rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 
   &:hover {
-    background: #15803d;
+    background: #166534;
+    transform: translateY(-1px);
   }
 `;
 
@@ -976,10 +976,10 @@ rackets,
             gap: '1rem',
           }}
         >
-          <motion.div
+            <motion.div
             animate={{ rotate: 360 }}
             transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
-            style={{ color: '#16a34a' }}
+            style={{ color: '#15803d' }}
           >
             <FiGrid size={48} />
           </motion.div>
