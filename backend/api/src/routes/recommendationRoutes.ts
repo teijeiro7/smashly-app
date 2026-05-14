@@ -4,7 +4,7 @@ import { authenticateUser as authenticate } from '../middleware/auth';
 import { requireAdmin } from '../middleware/requireAdmin';
 import { aiLimiter } from '../middleware/rateLimits';
 
-const router = Router();
+const router: Router = Router();
 
 // Auth + per-user rate limit on AI endpoints
 router.post('/generate', authenticate, aiLimiter, RecommendationController.generate);

@@ -3,7 +3,7 @@ import { authenticateUser } from "../middleware/auth";
 import { validatePagination } from "../middleware/validation";
 import { storeController as StoreController } from "../controllers/storeController";
 
-const router = Router();
+const router: Router = Router();
 
 // Public — anyone can browse stores
 router.get("/", validatePagination, StoreController.getAllStores);

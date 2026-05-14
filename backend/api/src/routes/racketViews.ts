@@ -2,7 +2,7 @@ import { Router } from "express";
 import { RacketViewController } from "../controllers/racketViewController";
 import { authenticateUser } from "../middleware/auth";
 
-const router = Router();
+const router: Router = Router();
 
 // Todas las rutas requieren autenticación
 router.use(authenticateUser);

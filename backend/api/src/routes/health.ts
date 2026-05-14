@@ -2,7 +2,7 @@ import { Router, Request, Response } from "express";
 import { testSupabaseConnection } from "../config/supabase";
 import logger from "../config/logger";
 
-const router = Router();
+const router: Router = Router();
 
 function getErrorMessage(error: unknown): string {
   if (error instanceof Error) {

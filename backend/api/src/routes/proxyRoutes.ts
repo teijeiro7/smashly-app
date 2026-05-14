@@ -3,7 +3,7 @@ import axios from 'axios';
 import logger from '../config/logger';
 import { proxyLimiter } from '../middleware/rateLimits';
 
-const router = Router();
+const router: Router = Router();
 
 /**
  * Allowlist of trusted image domains for the proxy.

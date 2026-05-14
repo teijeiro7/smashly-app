@@ -3,7 +3,7 @@ import { ComparisonController } from '../controllers/comparisonController';
 import { authenticateUser } from '../middleware/auth';
 import { comparisonLimiter } from '../middleware/rateLimits';
 
-const router = Router();
+const router: Router = Router();
 
 // Public route: compare rackets (rate limited)
 router.post('/', comparisonLimiter, ComparisonController.compareRackets);

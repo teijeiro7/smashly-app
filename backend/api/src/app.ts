@@ -32,7 +32,7 @@ import fs from 'fs';
 validateConfig();
 
 // Crear la aplicación Express
-const app = express();
+const app: express.Application = express();
 
 // Middleware de seguridad
 app.use(

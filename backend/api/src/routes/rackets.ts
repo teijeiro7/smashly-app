@@ -10,7 +10,7 @@ import {
   validateSearchFilters,
 } from '../middleware/validation';
 
-const router = Router();
+const router: Router = Router();
 
 // GET /api/rackets - Gets all rackets or with pagination
 router.get('/', optionalAuth, validatePagination, RacketController.getAllRackets);

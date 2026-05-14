@@ -4,7 +4,7 @@ import { GoogleAuthController } from '../controllers/googleAuthController';
 import { validateBody, schemas } from '../middleware/validation';
 import { authenticateUser as requireAuth } from '../middleware/auth';
 
-const router = Router();
+const router: Router = Router();
 
 // // POST /api/auth/login - Login
 router.post('/login', AuthController.login);

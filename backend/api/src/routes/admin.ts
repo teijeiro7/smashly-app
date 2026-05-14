@@ -5,7 +5,7 @@ import { authenticateUser } from '../middleware/auth';
 import { requireAdmin } from '../middleware/requireAdmin';
 import { validatePagination } from '../middleware/validation';
 
-const router = Router();
+const router: Router = Router();
 
 // All admin routes require authentication and admin role
 router.use(authenticateUser);

@@ -7,7 +7,7 @@ import { Router } from "express";
 import { ReviewController } from "../controllers/reviewController";
 import { authenticateUser } from "../middleware/auth";
 
-const router = Router();
+const router: Router = Router();
 
 // ==========================================
 // PUBLIC ROUTES (no authentication)

@@ -10,7 +10,7 @@ import {
 } from "../middleware/validation";
 import { ListController } from "../controllers/listController";
 
-const router = Router();
+const router: Router = Router();
 
 // GET /api/users/profile - Gets the authenticated user's profile
 router.get("/profile", requireAuth, UserController.getUserProfile);

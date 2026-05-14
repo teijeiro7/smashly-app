@@ -3,7 +3,7 @@ import multer from 'multer';
 import { UploadController } from '../controllers/uploadController';
 import { authenticateUser } from '../middleware/auth';
 
-const router = Router();
+const router: Router = Router();
 
 // Configurar multer para manejar archivos en memoria
 const storage = multer.memoryStorage();
