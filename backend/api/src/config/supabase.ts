@@ -2,6 +2,8 @@ import logger from '../config/logger';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import * as dotenv from 'dotenv';
 import ws from 'ws';
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const wsTransport = ws as any;
 
 // Cargar variables de entorno
 dotenv.config();
@@ -48,7 +50,7 @@ export const supabase: SupabaseClient =
           },
         },
         realtime: {
-          transport: ws,
+          transport: wsTransport,
           params: {
             eventsPerSecond: 10,
           },
@@ -56,7 +58,7 @@ export const supabase: SupabaseClient =
       })
     : createClient('https://placeholder.supabase.co', 'placeholder-key', {
         auth: { autoRefreshToken: false, persistSession: false, detectSessionInUrl: false },
-        realtime: { transport: ws },
+        realtime: { transport: wsTransport },
       });
 
 // Anon client for user authentication operations (login, signup, password reset, etc.)
@@ -73,7 +75,7 @@ export const supabaseAnon: SupabaseClient | null =
             'X-Client-Info': 'smashly-api-anon@1.0.0',
           },
         },
-        realtime: { transport: ws },
+        realtime: { transport: wsTransport },
       })
     : null;
 
@@ -91,7 +93,7 @@ export const supabaseAdmin: SupabaseClient | null =
             'X-Client-Info': 'smashly-api-admin@1.0.0',
           },
         },
-        realtime: { transport: ws },
+        realtime: { transport: wsTransport },
       })
     : null;
 
