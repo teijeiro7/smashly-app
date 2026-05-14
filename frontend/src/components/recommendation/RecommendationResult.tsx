@@ -510,7 +510,7 @@ export const RecommendationResult: React.FC<Props> = ({
                 )}
 
               {/* Community Data */}
-              {racket.community_data && racket.community_data.user_rating && (
+              {racket.community_data?.user_rating && (
                 <Section>
                   <SectionTitle>👥 Valoración de la Comunidad</SectionTitle>
                   <CommunityRating>

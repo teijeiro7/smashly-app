@@ -252,7 +252,7 @@ const RacketCardComponent: React.FC<RacketCardProps> = memo(
       }
     }, [isHovered]);
 
-    if (!racket || !racket.nombre) {
+    if (!racket?.nombre) {
       return null;
     }
 

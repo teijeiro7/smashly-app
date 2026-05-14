@@ -4,10 +4,8 @@ import { VitePWA } from 'vite-plugin-pwa';
 import path from 'path';
 
 export default defineConfig(({ mode }) => ({
-  // Strip console.* in production builds
   esbuild: {
-    drop: mode === 'production' ? ['console', 'debugger'] : [],
-    // Minify specifically for React
+    drop: mode === 'production' ? ['debugger'] : [],
     minifyIdentifiers: mode === 'production',
     minifySyntax: mode === 'production',
     minifyWhitespace: mode === 'production',
@@ -125,10 +123,17 @@ export default defineConfig(({ mode }) => ({
     },
   },
   build: {
+    // Use terser to drop ALL console.* statements in production
+    minify: 'terser',
+    terserOptions: {
+      compress: {
+        drop_console: mode === 'production', // Drops console.log, console.error, console.warn, console.info
+        drop_debugger: mode === 'production',
+      },
+    },
     // No sourcemaps in production
     sourcemap: false,
     // Minify output
-    minify: "esbuild",
     target: 'es2020',
     // Reduce chunk size limit to force more splitting
     chunkSizeWarningLimit: 500,

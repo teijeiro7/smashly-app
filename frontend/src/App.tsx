@@ -1,5 +1,4 @@
-import { lazy, Suspense } from 'react';
-import React from 'react';
+import React, { lazy, Suspense } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import { AnimatePresence } from 'framer-motion';
 
@@ -13,13 +12,13 @@ import ErrorBoundary from './components/ErrorBoundary';
 import ProtectedRoute from './components/ProtectedRoute';
 import { FloatingCompareButton } from './components/common/FloatingCompareButton';
 import { AuthProvider } from './contexts/AuthContext';
-import { AuthModalProvider } from './contexts/AuthModalContext';
+import { AuthModalProvider, useAuthModal } from './contexts/AuthModalContext';
 import { NotificationProvider } from './contexts/NotificationContext';
 import AuthModal from './components/auth/AuthModal';
-import { useAuthModal } from './contexts/AuthModalContext';
 import { RouteLoadingFallback, CatalogSkeleton } from './components/common/LoadingFallbacks';
 import { PWAInstallPrompt } from './components/pwa/PWAInstallPrompt';
 import { BackgroundTaskPopup } from './components/common/BackgroundTaskPopup';
+import { logger } from './utils/logger';
 
 // Code split routes - load on demand
 const HomePage = lazy(() => import('./pages/HomePage'));
@@ -63,7 +62,7 @@ class LazyChunkErrorBoundary extends React.Component<
   }
 
   componentDidCatch(error: Error) {
-    console.error('Lazy chunk load error:', error);
+    logger.error('Lazy chunk load error:', error);
   }
 
   handleRetry = () => {

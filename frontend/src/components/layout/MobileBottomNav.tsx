@@ -193,7 +193,7 @@ const MobileBottomNav: React.FC = () => {
 
   const homePath = isAuthenticated && user?.role?.toLowerCase() === 'player' ? '/dashboard' : '/';
 
-  const hasCompleteProfile = userProfile && userProfile.game_level && userProfile.game_level !== '';
+  const hasCompleteProfile = userProfile?.game_level && userProfile.game_level !== '';
 
   const handleProfileClick = () => {
     if (!isAuthenticated) {

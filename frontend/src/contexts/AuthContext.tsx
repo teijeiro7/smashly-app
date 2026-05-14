@@ -3,6 +3,7 @@ import { UserProfile, UserProfileService } from '../services/userProfileService'
 import { forceCleanAuthStorage, setAuthToken, removeAuthToken } from '../utils/authUtils';
 import { API_ENDPOINTS, buildApiUrl } from '../config/api';
 import { GoogleAuthService } from '../services/googleAuthService';
+import { logger } from '../utils/logger';
 
 // Interfaces para TypeScript
 interface AuthContextType {
@@ -68,7 +69,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const profile = await UserProfileService.getUserProfile();
 
       if (!profile) {
-        console.warn('No profile found for authenticated user. User needs to complete profile setup.');
+        logger.warn('No profile found for authenticated user. User needs to complete profile setup.');
         setUser(null);
         setUserProfile(null);
         return profile;
@@ -88,7 +89,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         setUserProfile(null);
         clearAuthStorage();
       } else {
-        console.error('Error loading user profile:', error);
+        logger.error('Error loading user profile:', error);
         setUser(null);
         setUserProfile(null);
       }
@@ -101,7 +102,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       try {
         await loadUserProfile();
       } catch (error) {
-        console.error('Error during auth initialization:', error);
+        logger.error('Error during auth initialization:', error);
         setUser(null);
         setUserProfile(null);
       } finally {
@@ -262,7 +263,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           headers: { 'Content-Type': 'application/json' },
         });
       } catch (logoutError) {
-        console.warn('Error calling logout endpoint:', logoutError);
+        logger.warn('Error calling logout endpoint:', logoutError);
       }
 
       setUser(null);

@@ -358,7 +358,7 @@ const SavedComparisonPage: React.FC = () => {
       const { RacketPdfGenerator } = await import('../services/pdfGenerator');
       const generator = new RacketPdfGenerator();
       await generator.generatePDF({
-        rackets: rackets,
+        rackets,
         comparison: comparisonResult,
         proxyUrlBase: API_URL,
       });

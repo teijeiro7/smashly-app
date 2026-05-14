@@ -205,7 +205,7 @@ export class RacketPdfGenerator {
     autoTable(this.doc, {
       startY: this.currentY,
       head: [head],
-      body: body,
+      body,
       theme: 'grid',
       styles: {
         font: 'helvetica',
@@ -377,7 +377,7 @@ export class RacketPdfGenerator {
     const parts = text.split(/\*\*(.*?)\*\*/g);
 
     // Necesitamos lógica de word-wrap manual porque jsPDF no soporta mix styles en multiline automático
-    let lineHeight = fontSize * 0.5; // Espaciado aprox
+    const lineHeight = fontSize * 0.5; // Espaciado aprox
 
     // Aplanamos en palabras para procesar saltos de línea
     // Cada 'part' alterna entre normal (índice par) y negrita (índice impar)
@@ -469,7 +469,7 @@ export class RacketPdfGenerator {
   ): Promise<Record<number, string>> {
     const loaded: Record<number, string> = {};
     const promises = rackets.map(async r => {
-      if (!r.imagenes || !r.imagenes[0]) return;
+      if (!r.imagenes?.[0]) return;
       try {
         const url = r.imagenes[0].startsWith('http')
           ? `${proxyUrlBase}/api/v1/proxy/image?url=${encodeURIComponent(r.imagenes[0])}`

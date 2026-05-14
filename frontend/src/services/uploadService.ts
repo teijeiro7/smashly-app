@@ -46,7 +46,7 @@ export class UploadService {
 
       const response = await fetch(url, {
         method: 'POST',
-        headers: headers,
+        headers,
         body: formData,
       });
 

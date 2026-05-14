@@ -1,5 +1,6 @@
 import React, { Component, ErrorInfo, ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { logger } from '../utils/logger';
 
 interface Props {
   children: ReactNode;
@@ -21,13 +22,13 @@ class ErrorBoundaryClass extends Component<Props & { navigate: (to: string) => v
   }
 
   public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    console.error('Error capturado por ErrorBoundary:', error, errorInfo);
+    logger.error('Error capturado por ErrorBoundary:', error, errorInfo);
   }
 
   private handleGoToError = () => {
     this.props.navigate(
-      '/error?type=500&message=' +
-        encodeURIComponent(this.state.error?.message || 'Error desconocido')
+      `/error?type=500&message=${ 
+        encodeURIComponent(this.state.error?.message || 'Error desconocido')}`
     );
   };
 

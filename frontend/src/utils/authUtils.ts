@@ -1,3 +1,5 @@
+import { logger } from './logger';
+
 /**
  * Utilidades para el manejo de autenticación y limpieza de tokens
  *
@@ -82,7 +84,7 @@ export const forceCleanAuthStorage = (): void => {
         }
       });
     } catch (cookieError) {
-      console.warn('Error cleaning cookies:', cookieError);
+      logger.warn('Error cleaning cookies:', cookieError);
     }
 
     // const totalKeysRemoved = localKeysToRemove.length + sessionKeysToRemove.length;
@@ -92,7 +94,7 @@ export const forceCleanAuthStorage = (): void => {
 
     return;
   } catch (error) {
-    console.error('❌ Error during force clean of auth storage:', error);
+    logger.error('❌ Error during force clean of auth storage:', error);
 
     // Fallback: intentar limpiar las claves más comunes
     try {
@@ -113,9 +115,9 @@ export const forceCleanAuthStorage = (): void => {
         }
       });
 
-      console.log('🔄 Fallback cleanup completed');
+      logger.log('🔄 Fallback cleanup completed');
     } catch (fallbackError) {
-      console.error('❌ Even fallback cleanup failed:', fallbackError);
+      logger.error('❌ Even fallback cleanup failed:', fallbackError);
     }
   }
 };
@@ -164,7 +166,7 @@ export const detectOrphanedTokens = (): string[] => {
     }
 
     if (orphanedKeys.length > 0) {
-      console.warn(
+      logger.warn(
         `🔍 Detected ${orphanedKeys.length} potential orphaned auth keys:`,
         orphanedKeys
       );
@@ -172,7 +174,7 @@ export const detectOrphanedTokens = (): string[] => {
 
     return orphanedKeys;
   } catch (error) {
-    console.error('Error detecting orphaned tokens:', error);
+    logger.error('Error detecting orphaned tokens:', error);
     return [];
   }
 };
@@ -181,27 +183,27 @@ export const detectOrphanedTokens = (): string[] => {
  * Función de diagnóstico para verificar el estado de autenticación
  */
 export const diagnoseAuthState = (): void => {
-  console.group('🔍 Auth State Diagnosis');
+  logger.group('🔍 Auth State Diagnosis');
 
   try {
     const orphanedKeys = detectOrphanedTokens();
 
-    console.log('📊 Storage Analysis:');
-    console.log(`- LocalStorage keys: ${localStorage.length}`);
-    console.log(`- SessionStorage keys: ${sessionStorage.length}`);
-    console.log(`- Orphaned auth keys: ${orphanedKeys.length}`);
+    logger.log('📊 Storage Analysis:');
+    logger.log(`- LocalStorage keys: ${localStorage.length}`);
+    logger.log(`- SessionStorage keys: ${sessionStorage.length}`);
+    logger.log(`- Orphaned auth keys: ${orphanedKeys.length}`);
 
     if (orphanedKeys.length > 0) {
-      console.log('🚨 Orphaned keys found:', orphanedKeys);
-      console.log('💡 Consider calling forceCleanAuthStorage() to clean them');
+      logger.log('🚨 Orphaned keys found:', orphanedKeys);
+      logger.log('💡 Consider calling forceCleanAuthStorage() to clean them');
     } else {
-      console.log('✅ No orphaned auth keys detected');
+      logger.log('✅ No orphaned auth keys detected');
     }
   } catch (error) {
-    console.error('❌ Error during diagnosis:', error);
+    logger.error('❌ Error during diagnosis:', error);
   }
 
-  console.groupEnd();
+  logger.groupEnd();
 };
 
 // Función que se puede llamar desde la consola del navegador para debug
