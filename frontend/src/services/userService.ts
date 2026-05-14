@@ -4,6 +4,7 @@ import {
   getCommonHeaders,
   ApiResponse,
 } from "../config/api";
+import { logger } from "../utils/logger";
 
 // Interfaz para el perfil de usuario
 export interface UserProfile {
@@ -80,7 +81,7 @@ export class UserService {
 
       return await handleApiResponse<UserProfile>(response);
     } catch (error: any) {
-      console.error("Error fetching user profile:", error);
+      logger.error("Error fetching user profile:", error);
       if (error.message?.includes("404")) {
         return null;
       }
@@ -104,7 +105,7 @@ export class UserService {
 
       return await handleApiResponse<UserProfile>(response);
     } catch (error: any) {
-      console.error("Error creating user profile:", error);
+      logger.error("Error creating user profile:", error);
       throw error;
     }
   }
@@ -125,7 +126,7 @@ export class UserService {
 
       return await handleApiResponse<UserProfile>(response);
     } catch (error: any) {
-      console.error("Error updating user profile:", error);
+      logger.error("Error updating user profile:", error);
       throw error;
     }
   }
@@ -143,7 +144,7 @@ export class UserService {
 
       return await handleApiResponse<number[]>(response);
     } catch (error: any) {
-      console.error("Error fetching favorites:", error);
+      logger.error("Error fetching favorites:", error);
       throw error;
     }
   }
@@ -162,7 +163,7 @@ export class UserService {
 
       await handleApiResponse<void>(response);
     } catch (error: any) {
-      console.error("Error adding favorite:", error);
+      logger.error("Error adding favorite:", error);
       throw error;
     }
   }
@@ -180,7 +181,7 @@ export class UserService {
 
       await handleApiResponse<void>(response);
     } catch (error: any) {
-      console.error("Error removing favorite:", error);
+      logger.error("Error removing favorite:", error);
       throw error;
     }
   }

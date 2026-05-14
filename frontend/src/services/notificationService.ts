@@ -1,6 +1,7 @@
 import { API_URL } from "../config/api";
 import { getAuthToken } from "../utils/authUtils";
 import { Notification, NotificationFilters } from "../types/notification";
+import { logger } from "../utils/logger";
 
 const NOTIFICATIONS_STORAGE_KEY = "smashly_notifications_cache";
 const NOTIFICATIONS_UNREAD_KEY = "smashly_notifications_unread";
@@ -10,7 +11,7 @@ export class NotificationService {
     try {
       localStorage.setItem(NOTIFICATIONS_STORAGE_KEY, JSON.stringify(notifications));
     } catch (error) {
-      console.error("Error saving notifications to localStorage:", error);
+      logger.error("Error saving notifications to localStorage:", error);
     }
   }
 
@@ -19,7 +20,7 @@ export class NotificationService {
       const data = localStorage.getItem(NOTIFICATIONS_STORAGE_KEY);
       return data ? JSON.parse(data) : [];
     } catch (error) {
-      console.error("Error reading notifications from localStorage:", error);
+      logger.error("Error reading notifications from localStorage:", error);
       return [];
     }
   }
@@ -28,7 +29,7 @@ export class NotificationService {
     try {
       localStorage.setItem(NOTIFICATIONS_UNREAD_KEY, String(count));
     } catch (error) {
-      console.error("Error saving unread count to localStorage:", error);
+      logger.error("Error saving unread count to localStorage:", error);
     }
   }
 
@@ -37,7 +38,7 @@ export class NotificationService {
       const count = localStorage.getItem(NOTIFICATIONS_UNREAD_KEY);
       return count ? parseInt(count, 10) : 0;
     } catch (error) {
-      console.error("Error reading unread count from localStorage:", error);
+      logger.error("Error reading unread count from localStorage:", error);
       return 0;
     }
   }
@@ -74,7 +75,7 @@ export class NotificationService {
       this.saveToLocalStorage(notifications);
       return notifications;
     } catch (error) {
-      console.error("Error fetching notifications:", error);
+      logger.error("Error fetching notifications:", error);
       return this.getFromLocalStorage();
     }
   }
@@ -103,7 +104,7 @@ export class NotificationService {
       this.saveUnreadCount(data.count);
       return data.count;
     } catch (error) {
-      console.error("Error fetching unread count:", error);
+      logger.error("Error fetching unread count:", error);
       return this.getUnreadCountFromStorage();
     }
   }
@@ -141,7 +142,7 @@ export class NotificationService {
 
       return true;
     } catch (error) {
-      console.error("Error marking notification as read:", error);
+      logger.error("Error marking notification as read:", error);
       return false;
     }
   }
@@ -175,7 +176,7 @@ export class NotificationService {
 
       return data.markedCount || 0;
     } catch (error) {
-      console.error("Error marking all notifications as read:", error);
+      logger.error("Error marking all notifications as read:", error);
       return 0;
     }
   }
@@ -202,16 +203,16 @@ export class NotificationService {
         body: JSON.stringify({ type, title, message, data }),
       });
 
-      console.log('Notification response status:', response.status);
+      logger.log('Notification response status:', response.status);
       
       if (!response.ok) {
         const errorData = await response.json();
-        console.error('Error creating notification:', errorData);
+        logger.error('Error creating notification:', errorData);
         throw new Error("Error al crear la notificación");
       }
 
       const notification = await response.json();
-      console.log('Notification created:', notification);
+      logger.log('Notification created:', notification);
       
       const localNotifications = this.getFromLocalStorage();
       const updatedNotifications = [notification, ...localNotifications];
@@ -222,7 +223,7 @@ export class NotificationService {
 
       return notification;
     } catch (error) {
-      console.error("Error creating notification:", error);
+      logger.error("Error creating notification:", error);
       return null;
     }
   }
@@ -261,7 +262,7 @@ export class NotificationService {
 
       return true;
     } catch (error) {
-      console.error("Error deleting notification:", error);
+      logger.error("Error deleting notification:", error);
       return false;
     }
   }
@@ -271,7 +272,7 @@ export class NotificationService {
       localStorage.removeItem(NOTIFICATIONS_STORAGE_KEY);
       localStorage.removeItem(NOTIFICATIONS_UNREAD_KEY);
     } catch (error) {
-      console.error("Error clearing notification localStorage:", error);
+      logger.error("Error clearing notification localStorage:", error);
     }
   }
 }

@@ -1,4 +1,5 @@
 import { API_ENDPOINTS, buildApiUrl, getCommonHeaders, ApiResponse } from '../config/api';
+import { logger } from '../utils/logger';
 
 // Interfaz para el perfil de usuario
 export interface UserProfile {
@@ -55,10 +56,10 @@ export class UserProfileService {
       });
 
       const profile = await handleApiResponse<UserProfile>(response);
-      console.log('User profile created successfully:', profile);
+      logger.log('User profile created successfully:', profile);
       return profile;
     } catch (error: any) {
-      console.error('Error creating user profile:', error);
+      logger.error('Error creating user profile:', error);
       if (error.message?.includes('nickname')) {
         throw new Error(`El nickname '${nickname}' ya no está disponible`);
       }
@@ -80,7 +81,7 @@ export class UserProfileService {
       });
 
       if (response.status === 404) {
-        console.log('User profile not found');
+        logger.log('User profile not found');
         return null;
       }
 
@@ -93,7 +94,7 @@ export class UserProfileService {
           error.message.toLowerCase().includes('expired'));
 
       if (!isAuthError) {
-        console.error('Error fetching user profile:', error);
+        logger.error('Error fetching user profile:', error);
       }
 
       if (error.message?.includes('404')) {
@@ -121,7 +122,7 @@ export class UserProfileService {
 
       return await handleApiResponse<UserProfile>(response);
     } catch (error: any) {
-      console.error('Error updating user profile:', error);
+      logger.error('Error updating user profile:', error);
       throw new Error(error.message || 'Error inesperado al actualizar el perfil de usuario');
     }
   }
@@ -135,10 +136,10 @@ export class UserProfileService {
     try {
       // TODO: Implementar endpoint en backend para verificar disponibilidad
       // Por ahora asumimos que está disponible hasta que se intente usar
-      console.warn('isNicknameAvailable: Esta funcionalidad debe implementarse en el backend');
+      logger.warn('isNicknameAvailable: Esta funcionalidad debe implementarse en el backend');
       return true;
     } catch (error: any) {
-      console.error('Error checking nickname availability:', error);
+      logger.error('Error checking nickname availability:', error);
       throw new Error(error.message || 'Error al verificar disponibilidad del nickname');
     }
   }
@@ -159,7 +160,7 @@ export class UserProfileService {
 
       await handleApiResponse<void>(response);
     } catch (error: any) {
-      console.error('Error deleting user profile:', error);
+      logger.error('Error deleting user profile:', error);
       throw new Error(error.message || 'Error al eliminar el perfil de usuario');
     }
   }

@@ -1,5 +1,6 @@
 import { Racket } from '../types/racket';
 import { API_ENDPOINTS, buildApiUrl, getCommonHeaders, ApiResponse } from '../config/api';
+import { logger } from '../utils/logger';
 
 // ── Tipos para historial de precios ────────────────────────────────────────────
 export interface PricePoint {
@@ -55,7 +56,7 @@ export class RacketService {
 
       return await handleApiResponse<Racket[]>(response);
     } catch (error: any) {
-      console.error('Error fetching rackets from API:', error);
+      logger.error('Error fetching rackets from API:', error);
       throw error;
     }
   }
@@ -78,7 +79,7 @@ export class RacketService {
       const data = await handleApiResponse<any>(response);
       return data.items || data;
     } catch (error: any) {
-      console.error('Error fetching rackets with pagination:', error);
+      logger.error('Error fetching rackets with pagination:', error);
       throw error;
     }
   }
@@ -100,7 +101,7 @@ export class RacketService {
 
       return await handleApiResponse<Racket>(response);
     } catch (error: any) {
-      console.error('Error fetching racket by ID:', error);
+      logger.error('Error fetching racket by ID:', error);
       if (error.message?.includes('404')) {
         return null;
       }
@@ -125,7 +126,7 @@ export class RacketService {
 
       return await handleApiResponse<Racket>(response);
     } catch (error: any) {
-      console.error('Error fetching racket by name:', error);
+      logger.error('Error fetching racket by name:', error);
       return null;
     }
   }
@@ -160,7 +161,7 @@ export class RacketService {
 
       return await handleApiResponse<any>(response);
     } catch (error: any) {
-      console.error('Error searching rackets:', error);
+      logger.error('Error searching rackets:', error);
       throw error;
     }
   }
@@ -178,7 +179,7 @@ export class RacketService {
 
       return await handleApiResponse<Racket[]>(response);
     } catch (error: any) {
-      console.error('Error fetching rackets by brand:', error);
+      logger.error('Error fetching rackets by brand:', error);
       throw error;
     }
   }
@@ -196,7 +197,7 @@ export class RacketService {
 
       return await handleApiResponse<Racket[]>(response);
     } catch (error: any) {
-      console.error('Error fetching bestseller rackets:', error);
+      logger.error('Error fetching bestseller rackets:', error);
       throw error;
     }
   }
@@ -214,7 +215,7 @@ export class RacketService {
 
       return await handleApiResponse<Racket[]>(response);
     } catch (error: any) {
-      console.error('Error fetching rackets on sale:', error);
+      logger.error('Error fetching rackets on sale:', error);
       throw error;
     }
   }
@@ -232,7 +233,7 @@ export class RacketService {
 
       return await handleApiResponse<string[]>(response);
     } catch (error: any) {
-      console.error('Error fetching brands:', error);
+      logger.error('Error fetching brands:', error);
       throw error;
     }
   }
@@ -248,7 +249,7 @@ export class RacketService {
       const data = await response.json();
       return data?.data?.version || 'unknown';
     } catch (error: any) {
-      console.warn('Error fetching catalog version:', error);
+      logger.warn('Error fetching catalog version:', error);
       return 'unknown';
     }
   }
@@ -274,7 +275,7 @@ export class RacketService {
       if (localVersion === serverVersion && localData) {
         try {
           const parsed = JSON.parse(localData);
-          console.log(`⚡ Catálogo cargado desde localStorage (${parsed.length} palas, versión: ${serverVersion})`);
+          logger.log(`⚡ Catálogo cargado desde localStorage (${parsed.length} palas, versión: ${serverVersion})`);
           return parsed;
         } catch {
           // Datos corruptos, ignorar
@@ -284,22 +285,22 @@ export class RacketService {
       }
 
       // 3. Versión diferente o sin caché → fetch de API
-      console.log('🔄 Versión de catálogo cambiada, recargando desde API...');
+      logger.log('🔄 Versión de catálogo cambiada, recargando desde API...');
       const rackets = await this.getAllRackets();
 
       // 4. Guardar en localStorage
       try {
         localStorage.setItem(CACHE_KEY, JSON.stringify(rackets));
         localStorage.setItem(VERSION_KEY, serverVersion);
-        console.log(`💾 Catálogo guardado en localStorage (${rackets.length} palas)`);
+        logger.log(`💾 Catálogo guardado en localStorage (${rackets.length} palas)`);
       } catch (e) {
-        console.warn('No se pudo guardar en localStorage (posiblemente quota excedida):', e);
+        logger.warn('No se pudo guardar en localStorage (posiblemente quota excedida):', e);
       }
 
       return rackets;
     } catch (error: any) {
       // Fallback: si falla el version check, cargar normal
-      console.warn('Error en carga cacheada, fallback a API directa:', error);
+      logger.warn('Error en carga cacheada, fallback a API directa:', error);
       return this.getAllRackets();
     }
   }
@@ -327,7 +328,7 @@ export class RacketService {
         brands: number;
       }>(response);
     } catch (error: any) {
-      console.error('Error fetching stats:', error);
+      logger.error('Error fetching stats:', error);
       throw error;
     }
   }
@@ -346,7 +347,7 @@ export class RacketService {
 
       return await handleApiResponse<Racket>(response);
     } catch (error: any) {
-      console.error('Error updating racket:', error);
+      logger.error('Error updating racket:', error);
       throw error;
     }
   }
@@ -367,7 +368,7 @@ export class RacketService {
         throw new Error(errorData.message || `Error: ${response.status}`);
       }
     } catch (error: any) {
-      console.error('Error deleting racket:', error);
+      logger.error('Error deleting racket:', error);
       throw error;
     }
   }
@@ -396,7 +397,7 @@ export class RacketService {
       const result = await response.json();
       return result.data;
     } catch (error: any) {
-      console.error('Error in bulkUpdateRackets:', error);
+      logger.error('Error in bulkUpdateRackets:', error);
       throw error;
     }
   }
@@ -424,7 +425,7 @@ export class RacketService {
 
       return await handleApiResponse<PriceHistoryResult>(response);
     } catch (error: any) {
-      console.error('Error fetching price history:', error);
+      logger.error('Error fetching price history:', error);
       return null;
     }
   }

@@ -9,6 +9,7 @@ import React, {
 } from "react";
 import { RacketService } from "../services/racketService";
 import { Racket } from "../types/racket";
+import { logger } from "../utils/logger";
 
 // Interfaz para el contexto
 interface RacketsContextType {
@@ -58,10 +59,10 @@ export const RacketsProvider: React.FC<RacketsProviderProps> = ({
       // Usar carga cacheada: checkea versión, carga de localStorage si coincide, API si cambió
       const data = await RacketService.getAllRacketsCached();
       setRackets(data);
-      console.log(`Loaded ${data.length} rackets (cached: ${!!localStorage.getItem('smashly_catalog_version')})`);
+      logger.log(`Loaded ${data.length} rackets (cached: ${!!localStorage.getItem('smashly_catalog_version')})`);
     } catch (error: any) {
       setError(error.message || "Error al cargar las palas");
-      console.error("Error fetching rackets:", error);
+      logger.error("Error fetching rackets:", error);
     } finally {
       setLoading(false);
     }
@@ -99,10 +100,10 @@ export const RacketsProvider: React.FC<RacketsProviderProps> = ({
       RacketService.getCatalogVersion().then(serverVersion => {
         const localVersion = localStorage.getItem('smashly_catalog_version');
         if (localVersion !== serverVersion) {
-          console.log('Catálogo desactualizado, recargando...');
+          logger.log('Catálogo desactualizado, recargando...');
           fetchRackets();
         }
-      }).catch(console.error);
+      }).catch((err) => logger.error('Error checking catalog version:', err));
     } else {
       // Sin caché local, cargar desde API
       fetchRackets();

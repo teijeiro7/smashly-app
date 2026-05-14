@@ -658,7 +658,7 @@ const CompareRacketsPage: React.FC = () => {
         const lists = await ListService.getUserLists();
         const favoritasList = lists.find(list => list.name === 'Favoritas');
 
-        if (favoritasList && favoritasList.racket_count && favoritasList.racket_count > 0) {
+        if (favoritasList?.racket_count && favoritasList.racket_count > 0) {
           const listWithRackets = await ListService.getListById(favoritasList.id);
           // Limitar a 6 favoritos para mostrar
           setFavoriteRackets(listWithRackets.rackets?.slice(0, 6) || []);

@@ -1200,7 +1200,7 @@ const RacketDetailPage: React.FC = () => {
   }, [catalogLoading, rackets.length, loadAttempted, racket, loading, error, loadRacket]);
 
   useEffect(() => {
-    if (racket && racket.id && isAuthenticated) {
+    if (racket?.id && isAuthenticated) {
       RacketViewService.recordView(racket.id).catch(console.error);
     }
   }, [racket, isAuthenticated]);
@@ -1251,7 +1251,7 @@ const RacketDetailPage: React.FC = () => {
   };
 
   const radarData = React.useMemo(() => {
-    if (!racket || !racket.radar_potencia) return null;
+    if (!racket?.radar_potencia) return null;
     return [
       {
         racketId: racket.id || 0,

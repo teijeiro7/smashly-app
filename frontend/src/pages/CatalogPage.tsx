@@ -618,7 +618,7 @@ const CatalogPage: React.FC = () => {
           
           if (result?.data) {
             // Apply local sorting since API returns sorted by relevance
-            let sorted = [...result.data];
+            const sorted = [...result.data];
             try {
               sorted.sort((a, b) => {
                 switch (sortBy) {
