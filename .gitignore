@@ -307,7 +307,6 @@ yarn.lock
 .pnp.*
 
 # pnpm
-pnpm-lock.yaml
 .pnpm-debug.log*
 
 # ===================================

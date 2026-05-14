@@ -4,9 +4,11 @@
 FROM node:20-alpine AS frontend-builder
 WORKDIR /app/frontend
 
+RUN npm install -g pnpm
+
 # Install frontend dependencies
-COPY frontend/package.json frontend/package-lock.json ./
-RUN npm ci
+COPY frontend/package.json frontend/pnpm-lock.yaml ./
+RUN pnpm install --frozen-lockfile
 
 # Set build arguments for Vite
 ARG VITE_SUPABASE_URL
@@ -35,21 +37,23 @@ COPY frontend/ ./
 COPY public/ /app/public/
 
 # Build static assets
-RUN npm run build
+RUN pnpm run build
 
 # --- Backend build stage ---
 FROM node:20-alpine AS backend-builder
 WORKDIR /app/backend/api
 
+RUN npm install -g pnpm
+
 # Install backend dependencies (including dev deps for build)
-COPY backend/api/package.json backend/api/package-lock.json ./
-RUN npm ci
+COPY backend/api/package.json backend/api/pnpm-lock.yaml ./
+RUN pnpm install --frozen-lockfile
 
 # Copy backend source
 COPY backend/api/ ./
 
 # Build TypeScript to dist
-RUN npm run build
+RUN pnpm run build
 
 # --- Runtime stage ---
 FROM node:20-alpine AS runtime
@@ -58,10 +62,12 @@ WORKDIR /app/backend/api
 # Install runtime packages
 RUN apk add --no-cache openssl curl
 
-# Copy production dependencies only (need package-lock.json for npm ci)
+RUN npm install -g pnpm
+
+# Copy production dependencies only
 COPY backend/api/package.json ./package.json
-COPY backend/api/package-lock.json ./package-lock.json
-RUN npm ci --omit=dev
+COPY backend/api/pnpm-lock.yaml ./pnpm-lock.yaml
+RUN pnpm install --frozen-lockfile --prod
 
 # Copy compiled backend
 COPY --from=backend-builder /app/backend/api/dist ./dist
