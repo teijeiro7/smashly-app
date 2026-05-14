@@ -150,6 +150,9 @@ importers:
       vitest:
         specifier: ^3.2.4
         version: 3.2.4(@types/debug@4.1.13)(@types/node@25.7.0)(@vitest/ui@3.2.4)(jsdom@23.2.0)(terser@5.47.1)
+      workbox-window:
+        specifier: ^7.0.0
+        version: 7.4.1
 
 packages:
 
