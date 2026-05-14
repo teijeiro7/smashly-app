@@ -1,9 +1,10 @@
-import { Router } from 'express';
+import { Router, Request, Response } from 'express';
 import { AdminController } from '../controllers/adminController';
 import { AdminRacketController } from '../controllers/adminRacketController';
 import { authenticateUser } from '../middleware/auth';
 import { requireAdmin } from '../middleware/requireAdmin';
 import { validatePagination } from '../middleware/validation';
+import { CacheService } from '../services/cacheService';
 
 const router: Router = Router();
 
@@ -16,6 +17,11 @@ router.use(requireAdmin);
  * Gets dashboard metrics
  */
 router.get('/metrics', AdminController.getMetrics);
+
+router.post('/cache/invalidate', (_req: Request, res: Response) => {
+  CacheService.invalidateCatalog();
+  res.json({ ok: true, message: 'Catalog cache invalidated' });
+});
 
 /**
  * GET /api/v1/admin/users

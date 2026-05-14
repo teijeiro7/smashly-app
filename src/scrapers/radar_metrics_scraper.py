@@ -1,4 +1,4 @@
-"""
+﻿"""
 radar_metrics_scraper.py — Extrae métricas radar verificadas desde fuentes externas.
 
 Fuentes:
@@ -282,7 +282,12 @@ def _build_slug(name: str) -> str:
             .replace(' ', '-')
             .replace('/', '-'))
     
-    # Eliminar palabras vacías
+    # Strip parenthetical suffixes like "(pala)" and non-alphanumeric chars
+    slug = re.sub(r'\([^)]*\)', '', slug)
+    slug = re.sub(r'[^a-z0-9\s-]', '', slug)
+    slug = re.sub(r'\s+', '-', slug.strip())
+
+        # Eliminar palabras vacías
     parts = [p for p in slug.split('-') if p and p not in STOP_WORDS]
     
     return '-'.join(parts)
