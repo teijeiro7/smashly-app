@@ -113,6 +113,7 @@ jobs:
         with:
           sparse-checkout: |
             src/
+            backend/
           sparse-checkout-cone-mode: false
 
       - name: Set up Python
@@ -121,8 +122,13 @@ jobs:
           python-version: '3.10'
           cache: pip
 
-      - name: Install dependencies
+      - name: Install Python dependencies
         run: pip install -r src/scrapers/requirements.txt
+
+      - name: Install Node dependencies
+        run: |
+          cd backend/api
+          pnpm install
 
       - name: Run Full Sync
         run: |
@@ -153,9 +159,9 @@ jobs:
             echo "dedupe_failed=true" >> $GITHUB_ENV
           fi
 
-      - name: Sync Radar Metrics
+      - name: Sync Radar Metrics (External Sources)
         run: |
-          echo "Scraping radar metrics for new rackets..."
+          echo "Scraping radar metrics from PadelZoom/TuMejorPala..."
           set +e
           python3 -m src.scrapers.sync_radar_metrics >> radar-metrics.log 2>&1
           EXIT_CODE=$?
@@ -163,6 +169,19 @@ jobs:
           cat radar-metrics.log
           if [ $EXIT_CODE -ne 0 ]; then
             echo "metrics_failed=true" >> $GITHUB_ENV
+          fi
+
+      - name: Sync Radar Metrics (Fallback Algorithm)
+        run: |
+          echo "Running fallback algorithm for remaining rackets..."
+          cd backend/api
+          set +e
+          npx ts-node src/scripts/populate-radar-metrics.ts >> fallback-metrics.log 2>&1
+          EXIT_CODE=$?
+          set -e
+          cat fallback-metrics.log
+          if [ $EXIT_CODE -ne 0 ]; then
+            echo "fallback_failed=true" >> $GITHUB_ENV
           fi
 
       - name: Commit and push changes
@@ -174,7 +193,7 @@ jobs:
           git push || echo "Push failed"
 
       - name: Send failure notification
-        if: env.sync_failed == 'true' || env.dedupe_failed == 'true' || env.metrics_failed == 'true'
+        if: env.sync_failed == 'true' || env.dedupe_failed == 'true' || env.metrics_failed == 'true' || env.fallback_failed == 'true'
         run: |
           echo "📧 Enviando notificación de fallo a ${{ env.EMAIL_TO }}"
           curl -s -X POST https://api.resend.com/emails \
@@ -184,5 +203,5 @@ jobs:
               "from": "Smashly <onboarding@resend.dev>",
               "to": ["${{ env.EMAIL_TO }}"],
               "subject": "[Smashly] Monthly Sync - FALLO",
-              "text": "El sync mensual ha fallado (catalog, deduplicación o radar metrics). Por favor revisa los logs."
+              "text": "El sync mensual ha fallado (catalog, deduplicación, radar metrics externo o fallback). Por favor revisa los logs."
             }' || echo "Notification failed"
