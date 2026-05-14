@@ -49,7 +49,7 @@ const COLORS = ['#16a34a', '#3b82f6', '#f59e0b'];
 
 // Tooltip personalizado
 const CustomTooltip = memo(({ active, payload, metrics }: any) => {
-  if (!active || !payload || !payload.length) {
+  if (!active || !payload?.length) {
     return null;
   }
 

@@ -279,9 +279,9 @@ export const PriceHistoryChart: React.FC<PriceHistoryChartProps> = ({
                   boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
                   fontSize: '0.8rem',
                 }}
-                formatter={(value: number, name: string) => [
-                  `${value.toFixed(2)}€`,
-                  STORE_LABELS[name] || name,
+                formatter={(value) => [
+                  `${Number(value).toFixed(2)}€`,
+                  STORE_LABELS[value as string] || value,
                 ]}
               />
               <Legend
