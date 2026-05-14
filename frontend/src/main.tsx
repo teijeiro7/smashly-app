@@ -7,6 +7,16 @@ import { Toaster } from 'sileo';
 import { BrowserRouter } from 'react-router-dom';
 import { registerSW } from 'virtual:pwa-register';
 import App from './App.tsx';
+import { logger } from './utils/logger';
+
+// Global error handlers - capture uncaught errors
+window.addEventListener('error', (event) => {
+  logger.error('Unhandled error:', event.error);
+});
+
+window.addEventListener('unhandledrejection', (event) => {
+  logger.error('Unhandled promise rejection:', event.reason);
+});
 
 // Create a client
 const queryClient = new QueryClient({
@@ -21,7 +31,7 @@ const queryClient = new QueryClient({
 registerSW({
   immediate: true,
   onOfflineReady() {
-    console.info('Smashly is ready to work offline.');
+    logger.info('Smashly is ready to work offline.');
   },
 });
 
