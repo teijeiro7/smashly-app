@@ -243,7 +243,7 @@ export class RacketController {
         return;
       }
 
-      const filters = this.buildSearchFilters(req.query);
+      const filters = RacketController.buildSearchFilters(req.query);
       const page = parseInt(req.query.page as string) || 0;
       const limit = parseInt(req.query.limit as string) || 50;
 
@@ -279,8 +279,8 @@ export class RacketController {
       const page = parseInt(req.query.page as string) || 0;
       const limit = parseInt(req.query.limit as string) || 50;
 
-      const filters = this.buildSearchFilters(req.query);
-      const sort = this.buildSortOptions(req.query);
+      const filters = RacketController.buildSearchFilters(req.query);
+      const sort = RacketController.buildSortOptions(req.query);
 
       logger.info('Applied filters:', filters);
       const result = await RacketService.getFilteredRackets(filters, sort, page, limit);

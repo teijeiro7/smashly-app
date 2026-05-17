@@ -17,15 +17,16 @@ const supabaseAnonKey = process.env.SUPABASE_ANON_KEY;
 const isTestEnvironment =
   process.env.NODE_ENV === 'test' || process.env.JEST_WORKER_ID !== undefined;
 
-// Validate that environment variables are available (except in tests)
+// Allow local startup without Supabase credentials; features that need them
+// will fail when their dedicated getters are used.
 if (!isTestEnvironment) {
   if (!supabaseUrl) {
-    throw new Error('SUPABASE_URL environment variable is required');
+    logger.warn('SUPABASE_URL is not set; using a placeholder Supabase client for startup');
   }
 
   if (!supabaseServiceKey && !supabaseAnonKey) {
-    throw new Error(
-      'Either SUPABASE_SERVICE_ROLE_KEY or SUPABASE_ANON_KEY environment variable is required'
+    logger.warn(
+      'Neither SUPABASE_SERVICE_ROLE_KEY nor SUPABASE_ANON_KEY is set; Supabase-dependent features will be unavailable'
     );
   }
 }

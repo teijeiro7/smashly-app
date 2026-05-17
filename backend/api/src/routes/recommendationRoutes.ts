@@ -6,6 +6,12 @@ import { aiLimiter } from '../middleware/rateLimits';
 
 const router: Router = Router();
 
+// Debug: log every request hitting this router
+router.use((req, _res, next) => {
+  console.log(`[recommendations router] ${req.method} ${req.path}`);
+  next();
+});
+
 // Auth + per-user rate limit on AI endpoints
 router.post('/generate', authenticate, aiLimiter, RecommendationController.generate);
 router.post('/generate-rag', authenticate, aiLimiter, RecommendationController.generateWithRAG);
