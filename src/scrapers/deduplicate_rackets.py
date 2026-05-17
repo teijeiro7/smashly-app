@@ -1,421 +1,268 @@
 #!/usr/bin/env python3
 """
-Script de mantenimiento: Limpieza + Deduplicación rigurosa.
-Fase 1: Filtra packs/bundles y corrige marcas incorrectas.
-Fase 2: Usa Fingerprinting (hard filter + fuzzy) para fusionar duplicados sin mezclar años/variantes.
+deduplicate_rackets.py — One-shot deduplication of rackets table in Supabase.
+
+Merges duplicate rackets caused by "(pala)" suffix, "brand-brand-" slug bugs,
+and "carb-on" vs "carbon" spelling variations.
+
+For each duplicate group:
+  1. Pick canonical entry (prefer more prices, then cleaner slug)
+  2. Transfer prices + images from duplicates to canonical
+  3. Take radar metrics from the most trusted entry (most prices)
+  4. Delete duplicate entries
+
+Usage:
+  python -m src.scrapers.deduplicate_rackets --dry-run
+  python -m src.scrapers.deduplicate_rackets
 """
-import json
+
 import re
-from datetime import datetime
-from collections import defaultdict
-from pathlib import Path
-from thefuzz import fuzz
+import os
+import argparse
 
-# ============================================================================
-# CONFIGURACIÓN
-# ============================================================================
+from dotenv import load_dotenv
+from supabase import create_client, Client
 
-RACKETS_FILE = 'rackets.json'
-BACKUP_FOLDER = '../../backups/rackets'
+load_dotenv()
 
-# Marcas conocidas (ordenadas por longitud desc para matching prioritario)
-KNOWN_BRANDS = sorted([
-    'Adidas', 'Babolat', 'Black Crown', 'Bullpadel', 'Drop Shot', 'Dunlop',
-    'Enebe', 'Head', 'Joma', 'Kombat', 'LOK', 'Nox', 'Oxdog', 'Royal Padel',
-    'Siux', 'Softee', 'StarVie', 'Vibor-a', 'Wilson', 'Varlion', 'Vairo',
-    'Akkeron', 'Prince', 'Tecnifibre', 'Slazenger', 'Legend', 'Harlem',
-    'Puma', 'Mystica', 'K-Swiss', 'Just Ten', 'Orygen', 'RS',
-], key=len, reverse=True)
+SUPABASE_URL = os.environ["SUPABASE_URL"]
+SUPABASE_KEY = os.environ["SUPABASE_SERVICE_ROLE_KEY"]
 
-# Correcciones de marcas parciales/incorrectas
-BRAND_CORRECTIONS = {
-    'Drop': 'Drop Shot',
-    'Black': 'Black Crown',
-    'Royal': 'Royal Padel',
-    'Star Vie': 'StarVie',
-    'Starvie': 'StarVie',
-    'Vibor-A': 'Vibor-a',
-}
-
-# Brands que indican que la entrada NO es una pala
-EXCLUDED_BRANDS = {'Pack', 'Tripack', 'Mini'}
-
-# Nombres de jugadores que son ENDORSEMENT (se eliminan del nombre del modelo)
-# Ordenados por longitud desc para evitar matches parciales ("Dal Bianco" antes que "Bianco")
-PLAYER_NAMES = sorted([
-    # Hombres
-    'Agustín Tapia', 'Agustin Tapia', 'A. Tapia', 'A Tapia',
-    'Juan Lebrón', 'Juan Lebron', 'J. Lebrón', 'J. Lebron', 'J Lebron', 'Lebrón', 'Lebron',
-    'Ale Galán', 'Ale Galan', 'Alejandro Galán', 'Alejandro Galan',
-    'Paquito Navarro',
-    'Juan Tello',
-    'Franco Stupaczuk', 'Franco Stupa', 'Stupa',
-    'Fede Chingotto', 'Federico Chingotto',
-    'Juan M. Díaz', 'Juan Martín Díaz', 'Juan Martin Diaz',
-    'Martín Di Nenno', 'Martin Di Nenno', 'Di Nenno',
-    'Álex Ruiz', 'Alex Ruiz',
-    'Maxi Arce',
-    'Seba Nerone', 'Sebastian Nerone',
-    'Tino Libaak',
-    'Álex Chozas', 'Alex Chozas',
-    'Mike Yanguas', 'Yanguas',
-    'Franco Dal Bianco', 'Dal Bianco',
-    'Leo Augsburger', 'Leo Ausburger',
-    'Edu Alonso',
-    'Jon Sanz',
-    'Pablo Lima',
-    'Miguel Lamperti',
-    'Lucas Campagnolo',
-    'Javi Garrido',
-    'Pablo Cardona',
-    'Juanlu Esbri',
-    'Sanyo Gutiérrez', 'Sanyo Gutierrez',
-    'Momo González', 'Momo Gonzalez',
-    'Javi Leal',
-    # Mujeres
-    'Martita Ortega', 'Marta Ortega',
-    'Patty Llaguno',
-    'Alejandra Salazar',
-    'Bea González', 'Bea Gonzalez',
-    'Sofía Araujo', 'Sofia Araujo',
-    'Aranzazu Osoro',
-    'Ari Sánchez', 'Ari Sanchez',
-    'Claudia Fernández', 'Claudia Fernandez',
-    'Paula Josemaría', 'Paula Josemaria',
-    'Vero Virseda',
-    'Delfi Brea',
-    'Fernando Belasteguín', 'Fernando Belasteguin',
-], key=len, reverse=True)
-
-# Jugadores cuyo nombre ES el modelo (NO se eliminan)
-MODEL_PLAYER_NAMES = {'coello', 'bela'}
-
-# Términos que indican que la entrada es para niños/junior (se excluyen)
-JUNIOR_TERMS = ['junior', ' jr ', ' jr$', ' kid ', ' kids ', ' boy ', ' girl ', ' mini ']
-
-# ============================================================================
-# LÓGICA DE FINGERPRINTING (Replicada de RacketManager para consistencia)
-# ============================================================================
-
-def extract_features(name: str):
-    """Extrae características clave para comparación estricta."""
-    name_lower = name.lower()
-    
-    year_match = re.search(r'\b(202[3-7])\b', name_lower)
-    year = year_match.group(1) if year_match else None
-
-    critical_suffixes = [
-        "woman", "w", "light", "lite", "air", "junior", "jr", 
-        "hybrid", "ctrl", "control", "attack", "comfort", "cmf", "master",
-        "limited", "ltd", "pro", "team", "elite"
+STORES = ["padelnuestro", "padelmarket", "padelproshop"]
+STORE_PRICE_COLS = [
+    col
+    for store in STORES
+    for col in [
+        f"{store}_actual_price", f"{store}_original_price",
+        f"{store}_discount_percentage", f"{store}_link",
     ]
-    found_suffixes = sorted([s for s in critical_suffixes if f" {s} " in f" {name_lower} " or f"-{s}" in name_lower])
+]
+RADAR_COLS = ["radar_potencia", "radar_control", "radar_manejabilidad", "radar_punto_dulce", "radar_salida_bola"]
 
-    k_factor = re.search(r'\b(\d{1,2}[kK])\b', name_lower)
-    material_k = k_factor.group(1).lower() if k_factor else None
-    
-    # Extraer dígitos de versión (ST2, ST3, V3, etc.) como discriminador
-    version_match = re.search(r'\b(?:st|v|ver|gen)(\d+)\b', name_lower)
-    version = version_match.group(0) if version_match else None
-    
-    # Clean name for fuzzy
-    clean_name = name_lower
-    clean_name = re.sub(r'\b202[0-9]\b', '', clean_name)
-    for w in ['pala', 'padel', 'racket', 'de', 'para']:
-        clean_name = clean_name.replace(w, '')
-    clean_name = re.sub(r'[^\w\s]', '', clean_name).strip()
+# Player edition suffixes that mark distinct product variants — do NOT merge across these
+VARIANT_SUFFIXES = ["fdb", "woman", "w", "light", "lite", "junior", "jr"]
 
-    hard_signature = f"{year}|{'-'.join(found_suffixes)}|{material_k}|{version}"
-    
-    return {
-        "year": year,
-        "suffixes": found_suffixes,
-        "material_k": material_k,
-        "version": version,
-        "clean_name": clean_name,
-        "hard_signature": hard_signature
-    }
 
-# ============================================================================
-# FASE 1: LIMPIEZA (Filtrado + Corrección de marcas)
-# ============================================================================
+def normalize_name_base(s: str) -> str:
+    """
+    Normalize racket name WITHOUT stripping year.
+    Used as grouping key — different years = different products.
+    """
+    if not s:
+        return ""
+    s = s.lower().strip()
+    s = re.sub(r"\s*\([^)]*\)\s*", " ", s)   # strip (pala), (padel), etc.
+    s = re.sub(r"\bpala\b", "", s)
+    s = re.sub(r"(?<=\w)-(?=\w)", "", s)       # carb-on → carbon
+    s = re.sub(r"\s+", " ", s).strip()
+    return s
 
-def extract_brand_from_model(model_name: str) -> str:
-    """Intenta extraer la marca del nombre del modelo."""
-    model_upper = model_name.upper()
-    for brand in KNOWN_BRANDS:
-        if brand.upper() in model_upper:
-            return brand
-    return 'Unknown'
 
-def correct_brand(brand: str, model_name: str) -> str:
-    """Corrige marcas incorrectas o parciales."""
-    if brand in BRAND_CORRECTIONS:
-        return BRAND_CORRECTIONS[brand]
-    if brand in ('Unknown', 'Pala', ''):
-        return extract_brand_from_model(model_name)
-    return brand
+def extract_year(s: str) -> str | None:
+    m = re.search(r"\b(202\d)\b", s or "")
+    return m.group(1) if m else None
 
-def should_exclude(key: str, entry: dict) -> bool:
-    """Determina si una entrada debe ser excluida (packs, bundles, junior, etc.)."""
-    brand = entry.get('brand', '')
-    model = entry.get('model', '').lower()
-    padded_model = f" {model} "  # Pad para buscar palabras completas
-    
-    if brand in EXCLUDED_BRANDS:
-        return True
-    if key.startswith('pala-pala-'):
-        return True
-    
-    # Detectar packs/bundles por nombre
-    pack_terms = ['pack ', 'tripack', ' + ', 'conjunto', 'kit ']
-    if any(term in model for term in pack_terms):
-        return True
-    
-    # Detectar junior/kids/boy/girl
-    junior_terms = [' junior ', ' jr ', ' kid ', ' kids ', ' boy ', ' girl ', ' mini ']
-    if any(term in padded_model for term in junior_terms):
-        return True
-    # También buscar en la key por si el model no lo tiene
-    key_lower = key.lower()
-    if any(term.strip() in key_lower.split('-') for term in [' junior', ' jr', ' kid', ' kids', ' boy', ' girl', ' mini']):
-        return True
-    
-    return False
 
-def remove_player_names(model_name: str) -> str:
-    """Elimina nombres de jugadores endorsement del modelo.
-    Respeta los nombres que SON el modelo (ej: Coello, Bela)."""
-    result = model_name
-    
-    for player in PLAYER_NAMES:
-        # Crear patrón que busca el nombre del jugador como palabra completa (case insensitive)
-        # Precedido opcionalmente por "by" o "-"
-        pattern = r'(?:\s+by)?\s+' + re.escape(player) + r'\b'
-        result = re.sub(pattern, '', result, flags=re.IGNORECASE)
-    
-    # Eliminar "by" suelto que pueda quedar al final
-    result = re.sub(r'\s+by\s*$', '', result, flags=re.IGNORECASE)
-    
-    # Limpiar espacios dobles
-    result = re.sub(r'\s+', ' ', result).strip()
-    
-    return result
+def get_variant_suffix(name: str) -> str:
+    """Return variant suffix if present (fdb, woman, etc.), else empty string."""
+    n = normalize_name_base(name)
+    for suffix in VARIANT_SUFFIXES:
+        if re.search(rf"\b{re.escape(suffix)}\b", n):
+            return suffix
+    return ""
 
-def clean_model_name(model_name: str) -> str:
-    """Limpia prefijos/sufijos innecesarios del nombre del modelo."""
-    model = re.sub(r'^(pala\s+(de\s+)?padel\s+|pala\s+test\s+|pala\s+)', '', model_name, flags=re.IGNORECASE)
-    model = re.sub(r'\s*\(pala\)\s*$', '', model, flags=re.IGNORECASE)
-    model = re.sub(r'\s+-\s*pala\s*$', '', model, flags=re.IGNORECASE)
-    model = re.sub(r'\s+pala\s*$', '', model, flags=re.IGNORECASE)
-    
-    # Eliminar nombres de jugadores endorsement
-    model = remove_player_names(model)
-    
-    model = re.sub(r'\s+', ' ', model).strip()
-    return model
 
-def phase_clean(data: dict) -> dict:
-    """Fase 1: Filtra entradas inválidas y corrige marcas."""
-    cleaned = {}
-    stats = defaultdict(int)
-    
-    for key, entry in data.items():
-        if should_exclude(key, entry):
-            stats['excluded'] += 1
+def score_entry(row: dict) -> int:
+    """Higher = better canonical. Prices > radar completeness > clean slug > images."""
+    score = 0
+    price_count = 0
+    for store in STORES:
+        if row.get(f"{store}_actual_price") is not None:
+            score += 10
+            price_count += 1
+    # Bonus for having all radar metrics
+    radar_complete = all(row.get(c) is not None for c in RADAR_COLS)
+    if radar_complete:
+        score += 5
+    slug = row.get("slug", "")
+    brand = row.get("brand", "").lower().replace(" ", "-")
+    if brand and slug.startswith(f"{brand}-{brand}-"):
+        score -= 5
+    if slug.endswith("-pala") or "-pala-" in slug:
+        score -= 3
+    score += len(row.get("images") or [])
+    return score
+
+
+def fetch_all_rackets(client: Client) -> list:
+    rows = []
+    page_size = 1000
+    page = 0
+    while True:
+        cols = (
+            "id, slug, name, brand, model, images, specs, description, "
+            "on_offer, comparison_only, discontinued, "
+            + ", ".join(STORE_PRICE_COLS + RADAR_COLS)
+        )
+        result = client.table("rackets").select(cols).range(page * page_size, (page + 1) * page_size - 1).execute()
+        chunk = result.data or []
+        rows.extend(chunk)
+        if len(chunk) < page_size:
+            break
+        page += 1
+    return rows
+
+
+def find_duplicate_groups(rows: list) -> list:
+    """
+    Group rows into duplicate sets.
+
+    Rules:
+    - Different years (both explicit) → different products, do NOT merge
+    - One has year, other lacks year → same product, DO merge
+    - "carb-on" vs "carbon" → normalized to same base, DO merge
+    - Different variant suffixes (fdb/woman/etc.) → different products, do NOT merge
+    """
+    # First pass: group by (brand, base_name_without_year, variant)
+    pre_groups: dict = {}
+    for r in rows:
+        name_raw = r.get("model") or r.get("name", "") or ""
+        base = normalize_name_base(name_raw)
+        # Remove year from base for pre-grouping key
+        base_no_year = re.sub(r"\b202\d\b", "", base).strip()
+        variant = get_variant_suffix(name_raw)
+        brand = r.get("brand", "").lower().strip()
+        key = (brand, base_no_year, variant)
+        pre_groups.setdefault(key, []).append(r)
+
+    # Second pass: within each pre-group, sub-divide by year compatibility
+    # Entries with the same year merge; entries without a year merge with same-year group
+    final_groups: list = []
+    for entries in pre_groups.values():
+        if len(entries) < 2:
             continue
-        
-        # Corregir marca
-        original_brand = entry.get('brand', '')
-        model = entry.get('model', '')
-        corrected_brand = correct_brand(original_brand, model)
-        
-        if corrected_brand != original_brand:
-            stats[f'brand_fix:{original_brand}->{corrected_brand}'] += 1
-            entry['brand'] = corrected_brand
-        
-        # Limpiar nombre del modelo
-        original_model = model
-        entry['model'] = clean_model_name(model)
-        
-        if entry['model'] != original_model:
-            # Detectar si se eliminó un jugador
-            cleaned_lower = entry['model'].lower()
-            original_lower = original_model.lower()
-            if len(cleaned_lower) < len(original_lower) - 5:  # Cambio significativo
-                stats['player_removed'] += 1
-        
-        cleaned[key] = entry
-    
-    # Reporte
-    print(f"\n--- FASE 1: LIMPIEZA ---")
-    print(f"  Entradas excluidas (packs/junior/bundles): {stats['excluded']}")
-    print(f"  Nombres de jugador eliminados: {stats.get('player_removed', 0)}")
-    brand_fixes = {k: v for k, v in stats.items() if k.startswith('brand_fix:')}
-    if brand_fixes:
-        print(f"  Marcas corregidas:")
-        for fix, count in sorted(brand_fixes.items()):
-            label = fix.replace('brand_fix:', '  ')
-            print(f"    {label}: {count}")
-    print(f"  Entradas tras limpieza: {len(cleaned)}")
-    
-    return cleaned
 
-# ============================================================================
-# FASE 2: FUNCIONES DE MERGE
-# ============================================================================
+        year_buckets: dict = {}   # year_str → list of entries
+        no_year: list = []
 
-def create_backup():
-    timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-    backup_path = Path(BACKUP_FOLDER)
-    backup_path.mkdir(parents=True, exist_ok=True)
-    backup_file = backup_path / f'rackets_dedupe_{timestamp}.json'
-    
-    with open(RACKETS_FILE, 'r', encoding='utf-8') as f:
-        data = json.load(f)
-    with open(backup_file, 'w', encoding='utf-8') as f:
-        json.dump(data, f, ensure_ascii=False, indent=2)
-    print(f"  Backup: {backup_file}")
-    return backup_file
-
-def merge_entries(entries):
-    """Fusiona entradas manteniendo la información más rica."""
-    entries.sort(key=lambda x: (len(x[1].get('specs', {})), len(x[1].get('images', []))), reverse=True)
-    
-    base_id, base_data = entries[0]
-    merged = base_data.copy()
-    
-    # Fusionar Specs
-    for _, entry in entries[1:]:
-        for k, v in entry.get('specs', {}).items():
-            if k not in merged['specs'] or merged['specs'][k] == 'Desconocido':
-                merged['specs'][k] = v
-    
-    # Fusionar Images (evitar duplicados)
-    existing_imgs = set(merged.get('images', []))
-    for _, entry in entries[1:]:
-        for img in entry.get('images', []):
-            if img not in existing_imgs:
-                merged['images'].append(img)
-                existing_imgs.add(img)
-
-    # Fusionar Precios
-    prices_map = {}
-    for p in merged.get('prices', []):
-        prices_map[p['store']] = p
-    for _, entry in entries[1:]:
-        for p in entry.get('prices', []):
-            store = p['store']
-            if store not in prices_map:
-                prices_map[store] = p
-            elif p.get('last_updated', '') > prices_map[store].get('last_updated', ''):
-                prices_map[store] = p
-    merged['prices'] = list(prices_map.values())
-    
-    # Nombre: Preferir el que tenga año si el base no lo tiene
-    if extract_features(merged['model'])['year'] is None:
-        for _, entry in entries[1:]:
-            if extract_features(entry['model'])['year']:
-                merged['model'] = entry['model']
-                break
-                
-    return merged
-
-# ============================================================================
-# FASE 2: DEDUPLICACIÓN (Fingerprint + Fuzzy)
-# ============================================================================
-
-def phase_deduplicate(data: dict) -> dict:
-    """Fase 2: Agrupa por brand+signature y fusiona con fuzzy match."""
-    buckets = defaultdict(list)
-    
-    for rid, entry in data.items():
-        brand = entry.get('brand', 'Unknown').lower().strip()
-        features = extract_features(entry.get('model', ''))
-        bucket_key = f"{brand}|{features['hard_signature']}"
-        buckets[bucket_key].append((rid, entry, features))
-
-    new_data = {}
-    merges_count = 0
-
-    for key, items in buckets.items():
-        if len(items) == 1:
-            new_data[items[0][0]] = items[0][1]
-            continue
-            
-        sub_groups = []
-        used_indices = set()
-        
-        for i in range(len(items)):
-            if i in used_indices: continue
-            
-            current_group = [items[i]]
-            used_indices.add(i)
-            
-            for j in range(i + 1, len(items)):
-                if j in used_indices: continue
-                
-                score = fuzz.token_sort_ratio(items[i][2]['clean_name'], items[j][2]['clean_name'])
-                
-                if score > 88:
-                    current_group.append(items[j])
-                    used_indices.add(j)
-            
-            sub_groups.append(current_group)
-        
-        for group in sub_groups:
-            if len(group) > 1:
-                entries_to_merge = [(x[0], x[1]) for x in group]
-                merged_entry = merge_entries(entries_to_merge)
-                final_id = entries_to_merge[0][0]
-                new_data[final_id] = merged_entry
-                merges_count += 1
-                
-                stores = [s['store'] for s in merged_entry.get('prices', [])]
-                print(f"  Fusionados ({len(group)}): {[x[1]['model'] for x in group]} -> {merged_entry['model']} [{', '.join(stores)}]")
+        for e in entries:
+            yr = extract_year(e.get("model") or e.get("name") or "")
+            if yr:
+                year_buckets.setdefault(yr, []).append(e)
             else:
-                new_data[group[0][0]] = group[0][1]
+                no_year.append(e)
 
-    print(f"\n--- FASE 2: DEDUPLICACIÓN ---")
-    print(f"  Grupos fusionados: {merges_count}")
-    
-    return new_data
+        if not year_buckets:
+            # All entries lack year — merge them all
+            if len(no_year) > 1:
+                final_groups.append(no_year)
+        elif len(year_buckets) == 1:
+            # One year group + possibly no-year entries → merge all
+            yr = next(iter(year_buckets))
+            combined = year_buckets[yr] + no_year
+            if len(combined) > 1:
+                final_groups.append(combined)
+        else:
+            # Multiple distinct years: never cross-merge year groups
+            # No-year entries get attached to each year group independently
+            # (if ambiguous, conservatively skip no-year attachment)
+            for yr, yr_entries in year_buckets.items():
+                # Only merge no-year entries if there is exactly one year group they could belong to
+                if len(year_buckets) == 1:
+                    combined = yr_entries + no_year
+                else:
+                    combined = yr_entries
+                if len(combined) > 1:
+                    final_groups.append(combined)
+            # No-year entries that are ambiguous across multiple year groups: skip
+            if no_year and len(year_buckets) > 1:
+                pass  # too ambiguous to auto-merge
 
-# ============================================================================
-# MAIN
-# ============================================================================
+    return final_groups
 
-def main():
-    print("=" * 60)
-    print("LIMPIEZA + DEDUPLICACIÓN ESTRICTA")
-    print("=" * 60)
-    
-    create_backup()
-    
-    with open(RACKETS_FILE, 'r', encoding='utf-8') as f:
-        data = json.load(f)
-    
-    initial_count = len(data)
-    
-    # Fase 1: Limpieza
-    cleaned_data = phase_clean(data)
-    
-    # Fase 2: Deduplicación
-    final_data = phase_deduplicate(cleaned_data)
-    
-    # Guardar
-    with open(RACKETS_FILE, 'w', encoding='utf-8') as f:
-        json.dump(final_data, f, ensure_ascii=False, indent=2)
 
-    # Reporte final
-    print(f"\n{'=' * 60}")
-    print(f"RESULTADO FINAL")
-    print(f"{'=' * 60}")
-    print(f"  Inicial:    {initial_count}")
-    print(f"  Excluidas:  {initial_count - len(cleaned_data)}")
-    print(f"  Fusionadas: {len(cleaned_data) - len(final_data)}")
-    print(f"  Final:      {len(final_data)}")
-    print(f"  Reducción:  {initial_count - len(final_data)} ({100*(initial_count - len(final_data))/initial_count:.1f}%)")
+def run(dry_run: bool):
+    client = create_client(SUPABASE_URL, SUPABASE_KEY)
+    print("Fetching rackets...")
+    rows = fetch_all_rackets(client)
+    print(f"Total: {len(rows)}")
 
-if __name__ == '__main__':
-    main()
+    groups = find_duplicate_groups(rows)
+    print(f"Duplicate groups: {len(groups)}\n")
+
+    merged = 0
+    deleted = 0
+
+    for group in groups:
+        group.sort(key=score_entry, reverse=True)
+        canonical = group[0]
+        duplicates = group[1:]
+
+        print(f"[{canonical.get('brand')}] canonical id={canonical['id']} slug={canonical['slug']}")
+
+        price_update: dict = {}
+        merged_images = list(canonical.get("images") or [])
+        merged_images_set = set(merged_images)
+
+        # Find entry with most prices for radar source (most reliable data)
+        all_entries = [canonical] + duplicates
+        radar_source = max(all_entries, key=lambda r: sum(1 for s in STORES if r.get(f"{s}_actual_price") is not None))
+
+        for dup in duplicates:
+            print(f"  merge <- id={dup['id']} slug={dup['slug']}")
+            for store in STORES:
+                price_col = f"{store}_actual_price"
+                if canonical.get(price_col) is None and dup.get(price_col) is not None:
+                    for col in [f"{store}_actual_price", f"{store}_original_price",
+                                f"{store}_discount_percentage", f"{store}_link"]:
+                        price_update[col] = dup.get(col)
+            for img in (dup.get("images") or []):
+                if img and img not in merged_images_set:
+                    merged_images.append(img)
+                    merged_images_set.add(img)
+
+        canonical_update: dict = {}
+        if price_update:
+            canonical_update.update(price_update)
+        if merged_images != (canonical.get("images") or []):
+            canonical_update["images"] = merged_images
+
+        # Sync radar from most-trusted entry if canonical differs or lacks values
+        if radar_source["id"] != canonical["id"]:
+            for col in RADAR_COLS:
+                src_val = radar_source.get(col)
+                can_val = canonical.get(col)
+                if src_val is not None and src_val != can_val:
+                    canonical_update[col] = src_val
+                    print(f"  radar {col}: {can_val} → {src_val} (from id={radar_source['id']})")
+
+        name_raw = canonical.get("name") or canonical.get("model") or ""
+        name_clean = re.sub(r"\s*\(pala\)\s*", " ", name_raw, flags=re.IGNORECASE).strip()
+        if name_clean != name_raw:
+            canonical_update["name"] = name_clean
+            canonical_update["model"] = name_clean
+
+        if canonical_update:
+            if not dry_run:
+                client.table("rackets").update(canonical_update).eq("id", canonical["id"]).execute()
+            print(f"  updated canonical: {list(canonical_update.keys())}")
+            merged += 1
+
+        for dup in duplicates:
+            if not dry_run:
+                client.table("rackets").delete().eq("id", dup["id"]).execute()
+            print(f"  deleted id={dup['id']} slug={dup['slug']}")
+            deleted += 1
+
+        print()
+
+    print(f"Done. Canonicals updated: {merged} | Duplicates deleted: {deleted}")
+    if dry_run:
+        print("(DRY-RUN — no changes written)")
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--dry-run", action="store_true", help="Preview without writing")
+    args = parser.parse_args()
+    run(dry_run=args.dry_run)
