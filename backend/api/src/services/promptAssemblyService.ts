@@ -1,9 +1,6 @@
 import { BasicFormData, AdvancedFormData } from '../types/recommendation';
 
 export class PromptAssemblyService {
-  /**
-   * Construye el prompt RAG enriquecido con el contexto recuperado.
-   */
   static buildRecommendationPrompt(context: {
     userProfile: BasicFormData | AdvancedFormData;
     retrievedRackets: Array<{
@@ -33,66 +30,138 @@ export class PromptAssemblyService {
       totalCatalog,
     } = context;
 
+    const isAdvanced = 'play_style' in userProfile;
+    const adv = userProfile as AdvancedFormData;
+
+    // ── Perfil completo ──────────────────────────────────────────────────────
+    const budget =
+      typeof userProfile.budget === 'object' && 'min' in (userProfile.budget as any)
+        ? `${(userProfile.budget as any).min}-${(userProfile.budget as any).max}€`
+        : `${userProfile.budget}€`;
+
+    const profileLines: string[] = [
+      `- Nivel: ${userProfile.level}`,
+      `- Lesiones / limitaciones: ${userProfile.injuries || 'ninguna'}`,
+      `- Presupuesto: ${budget}`,
+      userProfile.touch_preference ? `- Tacto preferido: ${userProfile.touch_preference}` : '',
+      userProfile.gender ? `- Género: ${userProfile.gender}` : '',
+      userProfile.physical_condition ? `- Condición física: ${userProfile.physical_condition}` : '',
+      userProfile.current_racket ? `- Pala actual: ${userProfile.current_racket}` : '',
+    ];
+
+    if (isAdvanced) {
+      profileLines.push(
+        `- Estilo de juego: ${adv.play_style || 'polivalente'}`,
+        adv.position ? `- Posición en pista: ${adv.position}` : '',
+        adv.years_playing ? `- Años jugando: ${adv.years_playing}` : '',
+        adv.best_shot ? `- Mejor golpe: ${adv.best_shot}` : '',
+        adv.weak_shot ? `- Golpe a mejorar: ${adv.weak_shot}` : '',
+        adv.weight_preference ? `- Preferencia de peso: ${adv.weight_preference}` : '',
+        adv.balance_preference ? `- Preferencia de balance: ${adv.balance_preference}` : '',
+        adv.shape_preference ? `- Preferencia de forma: ${adv.shape_preference}` : '',
+        adv.current_racket_likes
+          ? `- Lo que le gusta de su pala actual: ${adv.current_racket_likes}`
+          : '',
+        adv.current_racket_dislikes
+          ? `- Lo que NO le gusta de su pala actual: ${adv.current_racket_dislikes}`
+          : '',
+        adv.objectives?.length ? `- Objetivos: ${adv.objectives.join(', ')}` : '',
+        adv.characteristic_priorities?.length
+          ? `- PRIORIDADES (orden 1=más importante): ${adv.characteristic_priorities.map((p, i) => `${i + 1}. ${p}`).join(', ')}`
+          : '',
+      );
+    }
+
+    const profileSection = profileLines.filter(l => l).join('\n');
+
+    // ── Criterios de puntuación para match_score ─────────────────────────────
+    let scoringSection: string;
+    if (isAdvanced && adv.characteristic_priorities?.length) {
+      const weights = [30, 25, 20, 15, 10];
+      const priorityWeights = adv.characteristic_priorities
+        .map((p, i) => `  - ${p}: ${weights[i] ?? 5}%`)
+        .join('\n');
+      scoringSection = `CRITERIOS DE PUNTUACIÓN (match_score 0-100):
+Prioridades del usuario (total 75%):
+${priorityWeights}
+Seguridad biomecánica (15%) — especialmente si hay lesiones.
+Ajuste de presupuesto (10%) — penaliza si supera el rango.`;
+    } else {
+      scoringSection = `CRITERIOS DE PUNTUACIÓN (match_score 0-100):
+- Similitud semántica al perfil: 40%
+- Seguridad biomecánica y confort: 30%
+- Ajuste de presupuesto: 20%
+- Preferencia de tacto/forma: 10%`;
+    }
+
+    // ── Sección de conocimiento de dominio ───────────────────────────────────
     const knowledgeSection =
       knowledgeContext.length > 0
-        ? `CONOCIMIENTO DE DOMINIO RELEVANTE:\n---\n${knowledgeContext.map(k => k.content).join('\n---\n')}\n---\n`
+        ? `CONOCIMIENTO DE DOMINIO (materiales, biomecánica, técnica):
+---
+${knowledgeContext.map(k => k.content).join('\n---\n')}
+---`
         : '';
 
+    // ── Palas candidatas ─────────────────────────────────────────────────────
     const racketsSection = retrievedRackets
       .map((r, i) => {
-        return `--- PALA ${i + 1} (Relevancia: ${(r.similarity * 100).toFixed(1)}%) ---\nID: ${r.racketId}\n${r.content}\n--- FIN PALA ${i + 1} ---`;
+        return `--- CANDIDATA ${i + 1} (Similitud: ${(r.similarity * 100).toFixed(1)}%) ---
+ID: ${r.racketId}
+${r.content}
+--- FIN CANDIDATA ${i + 1} ---`;
       })
       .join('\n\n');
 
+    // ── Reviews de comunidad ─────────────────────────────────────────────────
     const reviewsSection =
       relevantReviews.length > 0
-        ? `EXPERIENCIA DE LA COMUNIDAD (Reviews reales):\n${relevantReviews.map(rv => `- ${rv.content}`).join('\n')}`
-        : 'No hay reviews disponibles para estas palas.';
-
-    // Perfil formateado
-    const profileSummary = `
-- Nivel: ${userProfile.level}
-- Lesiones: ${userProfile.injuries}
-- Presupuesto: ${typeof userProfile.budget === 'object' ? `${userProfile.budget.min}-${userProfile.budget.max}€` : userProfile.budget}
-- Tacto preferido: ${userProfile.touch_preference || 'No especificado'}
-${'play_style' in userProfile ? `- Estilo de juego: ${userProfile.play_style}\n- Prioridades: ${userProfile.characteristic_priorities?.join(', ')}` : ''}
-    `.trim();
+        ? `EXPERIENCIA DE LA COMUNIDAD (reviews reales de jugadores):
+${relevantReviews.map(rv => `• ${rv.content}`).join('\n')}`
+        : '';
 
     return `CONTEXTO DEL SISTEMA:
-Eres "Smashly AI", un motor de recomendación experto en palas de pádel. Tu tarea es recomendar las 3 mejores palas basándote basándote EN LOS DATOS proporcionados.
+Eres "Smashly AI", motor experto en palas de pádel. Debes recomendar las 3 mejores palas
+basándote ÚNICAMENTE en los datos proporcionados. Seguridad biomecánica es no negociable.
 
 ${knowledgeSection}
 
 PERFIL DEL USUARIO:
-${profileSummary}
+${profileSection}
 
-PALAS CANDIDATAS (Pre-filtradas por seguridad biomecánica):
-De un catálogo de ${totalCatalog} palas, ${safeRacketCount} son seguras para este usuario.
-Aquí tienes las ${retrievedRackets.length} más relevantes según su perfil:
+${scoringSection}
+
+PALAS CANDIDATAS (pre-filtradas por seguridad biomecánica):
+De ${totalCatalog} palas totales, ${safeRacketCount} son seguras para este perfil.
+Estas son las ${retrievedRackets.length} más relevantes semánticamente:
 
 ${racketsSection}
 
 ${reviewsSection}
 
 INSTRUCCIONES DE SALIDA:
-1. Selecciona EXACTAMENTE 3 palas de las proporcionadas arriba.
-2. Genera un JSON con la siguiente estructura:
+1. Selecciona EXACTAMENTE 3 palas de las candidatas de arriba (usa su ID exacto).
+2. Ordénalas de mayor a menor match_score.
+3. Responde SOLO con este JSON (sin markdown, sin texto adicional):
+
 {
+  "_reasoning": "Analiza paso a paso: qué necesita este jugador → qué palas cumplen sus prioridades en orden → por qué descartas las demás → veredicto final.",
   "rackets": [
     {
-      "id": <id_de_la_pala>,
-      "match_score": <puntuación_de_0_a_100>,
-      "reason": "<explicación de por qué es ideal basándote en sus specs y reviews>",
-      "priority_alignment": "<cómo encaja con sus prioridades de juego>",
-      "biomechanical_fit": "<por qué es segura para sus lesiones o perfil físico>",
-      "preference_match": "<cómo encaja con su preferencia de tacto/estética>"
+      "id": <id_exacto_de_la_pala>,
+      "match_score": <0-100 según criterios arriba>,
+      "reason": "<por qué es ideal, citando specs y métricas concretas>",
+      "priority_alignment": "<cómo encaja con sus prioridades en orden>",
+      "biomechanical_fit": "<por qué es segura para sus lesiones/físico>",
+      "preference_match": "<tacto, forma, peso — cómo cuadra con sus gustos>"
     }
   ],
-  "analysis": "<un resumen ejecutivo de por qué estas palas son las mejores para él, máx 150 palabras>"
+  "analysis": "<resumen ejecutivo máx 120 palabras: por qué estas 3, qué gana cada perfil de jugador>"
 }
 
-IMPORTANTE: No inventes datos. Si no tienes reviews para una pala, no las menciones. No recomiendes palas que no estén en la lista de candidatos.
-
-RESPONDE SOLO CON EL JSON.`;
+RESTRICCIONES CRÍTICAS:
+- Solo palas de la lista de candidatas (IDs exactos).
+- No inventes métricas ni specs. Si no tienes datos, no los menciones.
+- Si el usuario tiene lesiones, las 3 palas DEBEN ser seguras biomecánicamente.`;
   }
 }
