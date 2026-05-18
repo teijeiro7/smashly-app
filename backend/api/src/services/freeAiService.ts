@@ -4,7 +4,7 @@ export class FreeAiService {
   constructor() {}
 
   private get baseUrl(): string {
-    return process.env.FREE_AI_API_URL || 'http://localhost:3001';
+    return process.env.FREE_AI_API_URL || 'https://free-ai-api.teijeiroparga2004.workers.dev';
   }
 
   async generateContent(prompt: string): Promise<string> {
@@ -20,6 +20,8 @@ export class FreeAiService {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           messages: [{ role: 'user', content: prompt }],
+          max_tokens: 6000,
+          temperature: 0.3,
         }),
         signal: controller.signal,
       });
