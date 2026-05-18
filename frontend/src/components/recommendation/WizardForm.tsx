@@ -1,99 +1,85 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FiChevronRight, FiChevronLeft, FiCheck } from 'react-icons/fi';
+import { FiChevronRight, FiChevronLeft } from 'react-icons/fi';
 import { BasicFormData, AdvancedFormData } from '../../types/recommendation';
 import { PriceRangeSlider } from './PriceRangeSlider';
 import { RacketSearchInput, RacketSearchResult } from './RacketSearchInput';
 
 const WizardContainer = styled.div`
-  max-width: 600px;
+  max-width: 640px;
   margin: 0 auto;
   padding: 2rem;
-  background: white;
+  background: #ffffff;
   border-radius: 20px;
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
   border: 1px solid rgba(0, 0, 0, 0.06);
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.02),
+    0 4px 8px rgba(0, 0, 0, 0.03),
+    0 12px 24px rgba(0, 0, 0, 0.04),
+    0 24px 48px rgba(0, 0, 0, 0.06);
+`;
+
+const ProgressBarContainer = styled.div`
+  margin-bottom: 2.5rem;
 `;
 
 const ProgressBar = styled.div`
-  display: flex;
-  align-items: center;
-  margin-bottom: 2rem;
   position: relative;
-  overflow-x: auto;
-  scroll-behavior: smooth;
-  padding: 8px 4px;
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-
-  &::-webkit-scrollbar {
-    display: none;
-  }
-`;
-
-const ProgressTrack = styled.div`
-  position: absolute;
-  top: 50%;
-  left: 16px;
-  right: 16px;
   height: 4px;
-  background: #e5e7eb;
-  transform: translateY(-50%);
-  z-index: 0;
+  background: #e2e8f0;
   border-radius: 2px;
+  overflow: hidden;
 `;
 
-const ProgressFill = styled(motion.div)`
-  position: absolute;
-  top: 50%;
-  left: 16px;
-  height: 4px;
-  background: linear-gradient(90deg, #15803d, #22c55e);
-  transform: translateY(-50%);
-  z-index: 1;
+const ProgressFill = styled.div`
+  height: 100%;
+  background: #15803d;
   border-radius: 2px;
+  transition: width 0.3s ease;
 `;
 
-const ProgressStep = styled.div<{ $active: boolean; $completed: boolean }>`
-  min-width: 36px;
-  height: 36px;
-  border-radius: 50%;
+const ProgressCounter = styled.div`
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  justify-content: center;
+  margin-top: 0.75rem;
+`;
+
+const ProgressText = styled.span`
+  font-size: 0.8rem;
   font-weight: 600;
-  font-size: 0.85rem;
-  z-index: 2;
-  transition: all 0.3s ease;
-  background: ${props => (props.$active || props.$completed ? '#15803d' : 'white')};
-  color: ${props => (props.$active || props.$completed ? 'white' : '#9ca3af')};
-  border: 2px solid ${props => (props.$active || props.$completed ? '#15803d' : '#e5e7eb')};
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 `;
 
 const QuestionContainer = styled(motion.div)`
-  min-height: 300px;
+  min-height: 280px;
 `;
 
 const QuestionTitle = styled.h2`
-  font-size: 1.5rem;
+  font-size: 1.4rem;
   font-weight: 700;
-  color: #1f2937;
-  margin-bottom: 0.5rem;
+  color: #0f172a;
+  margin-bottom: 0.4rem;
   text-align: center;
+  letter-spacing: -0.01em;
+  line-height: 1.3;
 `;
 
 const QuestionSubtitle = styled.p`
-  font-size: 0.95rem;
-  color: #6b7280;
+  font-size: 0.9rem;
+  color: #64748b;
   margin-bottom: 2rem;
   text-align: center;
+  line-height: 1.5;
 `;
 
 const OptionsGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 1rem;
+  gap: 0.75rem;
 
   @media (max-width: 480px) {
     grid-template-columns: 1fr;
@@ -101,65 +87,67 @@ const OptionsGrid = styled.div`
 `;
 
 const OptionCard = styled.button<{ $selected: boolean }>`
-  padding: 1.25rem;
+  padding: 1rem 1.25rem;
   border-radius: 12px;
-  border: 1.5px solid ${props => (props.$selected ? '#15803d' : '#e5e7eb')};
-  background: ${props => (props.$selected ? '#f0fdf4' : 'white')};
+  border: 1.5px solid ${props => (props.$selected ? '#15803d' : '#e2e8f0')};
+  background: ${props => (props.$selected ? '#f8fafc' : '#ffffff')};
   cursor: pointer;
-  transition: border-color 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+  transition: border-color 0.15s ease, background-color 0.15s ease, transform 0.15s ease;
   text-align: left;
-  font-size: 1rem;
+  font-size: 0.95rem;
   font-weight: 500;
-  color: ${props => (props.$selected ? '#15803d' : '#374151')};
-  box-shadow: ${props => props.$selected
-    ? '0 4px 6px -1px rgba(21,128,61,0.12), 0 2px 4px -1px rgba(21,128,61,0.08)'
-    : '0 1px 2px 0 rgba(0,0,0,0.05)'};
+  color: ${props => (props.$selected ? '#0f172a' : '#334155')};
 
   &:hover {
-    border-color: #15803d;
-    background: ${props => (props.$selected ? '#f0fdf4' : '#f9fafb')};
+    border-color: ${props => (props.$selected ? '#111111' : '#94a3b8')};
+    background: ${props => (props.$selected ? '#f8fafc' : '#f8fafc')};
     transform: translateY(-1px);
-    box-shadow: 0 4px 6px -1px rgba(21, 128, 61, 0.1), 0 2px 4px -1px rgba(21, 128, 61, 0.06);
+  }
+
+  &:active {
+    transform: scale(0.98);
   }
 `;
 
 const Input = styled.input`
   width: 100%;
-  padding: 1rem;
-  border-radius: 8px;
-  border: 1px solid #d1d5db;
-  background: white;
-  color: #1f2937;
-  font-size: 1rem;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  padding: 0.85rem 1rem;
+  border-radius: 12px;
+  border: 1.5px solid #e2e8f0;
+  background: #ffffff;
+  color: #0f172a;
+  font-size: 0.95rem;
+  font-weight: 500;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
 
-  &::placeholder { color: #9ca3af; }
+  &::placeholder { color: #94a3b8; }
 
   &:focus {
     outline: none;
-    border-color: #16a34a;
-    box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.1);
+    border-color: #111111;
+    box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.06);
   }
 `;
 
 const TextArea = styled.textarea`
   width: 100%;
-  padding: 1rem;
-  border-radius: 8px;
-  border: 1px solid #d1d5db;
-  background: white;
-  color: #1f2937;
-  font-size: 1rem;
+  padding: 0.85rem 1rem;
+  border-radius: 12px;
+  border: 1.5px solid #e2e8f0;
+  background: #ffffff;
+  color: #0f172a;
+  font-size: 0.95rem;
+  font-weight: 500;
   min-height: 100px;
   resize: vertical;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
 
-  &::placeholder { color: #9ca3af; }
+  &::placeholder { color: #94a3b8; }
 
   &:focus {
     outline: none;
-    border-color: #16a34a;
-    box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.1);
+    border-color: #111111;
+    box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.06);
   }
 `;
 
@@ -170,8 +158,8 @@ const SliderContainer = styled.div`
 const NavigationButtons = styled.div`
   display: flex;
   justify-content: space-between;
-  margin-top: 2rem;
-  gap: 1rem;
+  margin-top: 2.5rem;
+  gap: 0.75rem;
 `;
 
 const NavButton = styled.button<{ $primary?: boolean }>`
@@ -179,30 +167,32 @@ const NavButton = styled.button<{ $primary?: boolean }>`
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  padding: 0.875rem 1.5rem;
+  padding: 0.85rem 1.5rem;
   border-radius: 12px;
   border: none;
   font-weight: 600;
   cursor: pointer;
-  background: ${props => (props.$primary ? '#15803d' : '#f3f4f6')};
-  color: ${props => (props.$primary ? 'white' : '#4b5563')};
-  transition: background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
-  font-size: 1rem;
+  background: ${props => (props.$primary ? '#15803d' : '#f1f5f9')};
+  color: ${props => (props.$primary ? '#ffffff' : '#475569')};
+  transition: background-color 0.15s ease, transform 0.15s ease, color 0.15s ease;
+  font-size: 0.95rem;
   flex: 1;
+  letter-spacing: -0.01em;
+  min-height: 48px;
 
   &:hover {
-    background: ${props => (props.$primary ? '#166534' : '#e5e7eb')};
+    background: ${props => (props.$primary ? '#333333' : '#e2e8f0')};
     transform: translateY(-1px);
-    box-shadow: ${props => props.$primary
-      ? '0 10px 15px -3px rgba(21,128,61,0.3), 0 4px 6px -2px rgba(21,128,61,0.15)'
-      : '0 1px 2px 0 rgba(0,0,0,0.05)'};
+  }
+
+  &:active {
+    transform: scale(0.98);
   }
 
   &:disabled {
-    opacity: 0.5;
+    opacity: 0.4;
     cursor: not-allowed;
     transform: none;
-    box-shadow: none;
   }
 `;
 
@@ -210,11 +200,14 @@ const OptionalBadge = styled.span`
   display: inline-block;
   margin-left: 0.5rem;
   padding: 0.2rem 0.5rem;
-  background: #f3f4f6;
-  color: #6b7280;
-  font-size: 0.75rem;
-  font-weight: 500;
-  border-radius: 4px;
+  background: #f1f5f9;
+  color: #64748b;
+  font-size: 0.7rem;
+  font-weight: 600;
+  border-radius: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  vertical-align: middle;
 `;
 
 const CheckboxGroup = styled.div`
@@ -233,22 +226,24 @@ const CheckboxLabel = styled.label`
   gap: 0.75rem;
   padding: 1rem;
   border-radius: 12px;
-  border: 2px solid #e5e7eb;
-  background: white;
+  border: 1.5px solid #e2e8f0;
+  background: #ffffff;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
   font-weight: 500;
-  color: #374151;
+  color: #334155;
+  font-size: 0.95rem;
 
   &:hover {
-    border-color: #15803d;
-    background: #f9fafb;
+    border-color: #94a3b8;
+    background: #f8fafc;
   }
 
   input {
-    accent-color: #15803d;
-    width: 20px;
-    height: 20px;
+    accent-color: #111111;
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
   }
 `;
 
@@ -555,16 +550,6 @@ const ADVANCED_QUESTIONS: Question[] = [
 export const WizardForm: React.FC<WizardFormProps> = ({ mode, onSubmit, isLoading }) => {
   const questions = mode === 'basic' ? BASIC_QUESTIONS : ADVANCED_QUESTIONS;
   const [currentIndex, setCurrentIndex] = useState(0);
-  const progressBarRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (progressBarRef.current) {
-      const activeElement = progressBarRef.current.children[currentIndex + 2] as HTMLElement;
-      if (activeElement) {
-        activeElement.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
-      }
-    }
-  }, [currentIndex]);
 
   const getInitialData = () => {
     if (mode === 'basic') {
@@ -650,15 +635,15 @@ export const WizardForm: React.FC<WizardFormProps> = ({ mode, onSubmit, isLoadin
 
   return (
     <WizardContainer>
-      <ProgressBar ref={progressBarRef}>
-        <ProgressTrack />
-        <ProgressFill style={{ width: `${progress}%` }} />
-        {questions.map((q, idx) => (
-          <ProgressStep key={q.id} $active={idx === currentIndex} $completed={idx < currentIndex}>
-            {idx < currentIndex ? <FiCheck size={16} /> : idx + 1}
-          </ProgressStep>
-        ))}
-      </ProgressBar>
+      <ProgressBarContainer>
+        <ProgressBar>
+          <ProgressFill style={{ width: `${progress}%` }} />
+        </ProgressBar>
+        <ProgressCounter>
+          <ProgressText>Pregunta {currentIndex + 1} de {questions.length}</ProgressText>
+          <ProgressText>{Math.round(progress)}%</ProgressText>
+        </ProgressCounter>
+      </ProgressBarContainer>
 
       <AnimatePresence mode='wait'>
         <QuestionContainer
@@ -666,7 +651,7 @@ export const WizardForm: React.FC<WizardFormProps> = ({ mode, onSubmit, isLoadin
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
           exit={{ opacity: 0, x: -20 }}
-          transition={{ duration: 0.3 }}
+          transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
         >
           <QuestionTitle>
             {currentQuestion.title}
