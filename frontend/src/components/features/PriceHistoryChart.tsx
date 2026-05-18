@@ -191,7 +191,7 @@ export const PriceHistoryChart: React.FC<PriceHistoryChartProps> = ({
       const point: Record<string, any> = { date: formatDate(date) };
       historyData.stores.forEach(s => {
         const match = s.history.find(p => p.date === date);
-        point[s.store] = match ? match.price : undefined;
+        point[s.store] = match ? match.price : null;
       });
       return point;
     });
@@ -279,9 +279,9 @@ export const PriceHistoryChart: React.FC<PriceHistoryChartProps> = ({
                   boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
                   fontSize: '0.8rem',
                 }}
-                formatter={(value) => [
+                formatter={(value, name) => [
                   `${Number(value).toFixed(2)}€`,
-                  STORE_LABELS[value as string] || value,
+                  STORE_LABELS[name as string] || name,
                 ]}
               />
               <Legend
@@ -300,7 +300,8 @@ export const PriceHistoryChart: React.FC<PriceHistoryChartProps> = ({
                   strokeWidth={2.5}
                   fill={`url(#grad-${s.store})`}
                   fillOpacity={1}
-                  dot={false}
+                  dot={{ r: 3, strokeWidth: 2, fill: '#fff' }}
+                  activeDot={{ r: 5, strokeWidth: 2 }}
                   connectNulls
                   animationDuration={800}
                 />

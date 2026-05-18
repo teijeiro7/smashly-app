@@ -10,6 +10,7 @@ import { reviewService } from '../../services/reviewService';
 import type { ReviewComment, ReviewWithDetails } from '../../types/review';
 import { useAuth } from '../../contexts/AuthContext';
 import { ReviewForm } from './ReviewForm';
+import { FiHeart, FiMessageSquare } from 'react-icons/fi';
 
 interface ReviewItemProps {
   review: ReviewWithDetails;
@@ -226,11 +227,16 @@ export const ReviewItem: React.FC<ReviewItemProps> = ({
       <Footer>
         <FooterActions>
           <LikeButton onClick={handleLike} liked={isLiked} disabled={!user}>
-            {isLiked ? '❤️' : '🤍'} {likes > 0 ? likes : 'Te ha sido útil?'}
+            <FiHeart
+              fill={isLiked ? 'currentColor' : 'none'}
+              style={{ width: '1rem', height: '1rem', flexShrink: 0 }}
+            />
+            {likes > 0 ? likes : 'Te ha sido útil?'}
           </LikeButton>
 
           <CommentToggleButton onClick={handleShowComments} active={showComments}>
-            💬 {review.comments_count > 0 ? `${review.comments_count} Respuestas` : 'Responder'}
+            <FiMessageSquare style={{ width: '1rem', height: '1rem', flexShrink: 0 }} />
+            {review.comments_count > 0 ? `${review.comments_count} Respuestas` : 'Responder'}
           </CommentToggleButton>
         </FooterActions>
 

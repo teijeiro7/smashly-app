@@ -151,35 +151,35 @@ const RacketRadarChart: React.FC<RacketRadarChartProps> = ({ metrics }) => {
       {
         metric: 'Potencia',
         ...metrics.reduce((acc, racket, idx) => {
-          acc[`pala${idx + 1}`] = racket.radarData?.potencia || 0;
+          acc[`pala${idx + 1}`] = Number(racket.radarData?.potencia) || 0;
           return acc;
         }, {} as any),
       },
       {
         metric: 'Control',
         ...metrics.reduce((acc, racket, idx) => {
-          acc[`pala${idx + 1}`] = racket.radarData?.control || 0;
+          acc[`pala${idx + 1}`] = Number(racket.radarData?.control) || 0;
           return acc;
         }, {} as any),
       },
       {
         metric: 'Salida de Bola',
         ...metrics.reduce((acc, racket, idx) => {
-          acc[`pala${idx + 1}`] = racket.radarData?.salidaDeBola || 0;
+          acc[`pala${idx + 1}`] = Number(racket.radarData?.salidaDeBola) || 0;
           return acc;
         }, {} as any),
       },
       {
         metric: 'Manejabilidad',
         ...metrics.reduce((acc, racket, idx) => {
-          acc[`pala${idx + 1}`] = racket.radarData?.manejabilidad || 0;
+          acc[`pala${idx + 1}`] = Number(racket.radarData?.manejabilidad) || 0;
           return acc;
         }, {} as any),
       },
       {
         metric: 'Punto Dulce',
         ...metrics.reduce((acc, racket, idx) => {
-          acc[`pala${idx + 1}`] = racket.radarData?.puntoDulce || 0;
+          acc[`pala${idx + 1}`] = Number(racket.radarData?.puntoDulce) || 0;
           return acc;
         }, {} as any),
       },
