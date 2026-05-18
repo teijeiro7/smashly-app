@@ -262,18 +262,21 @@ export class RacketFilterService {
 
   /**
    * Filter by player level
+   * Includes rackets with null/empty level to avoid filtering out everything
    */
   private static filterByLevel(rackets: Racket[], level: string): Racket[] {
     const levelMap: Record<string, string[]> = {
-      principiante: ['principiante', 'iniciación', 'fácil', 'intermedio', 'polivalente'],
-      intermedio: ['intermedio', 'polivalente', 'avanzado'],
-      avanzado: ['avanzado', 'pro', 'competición', 'profesional', 'intermedio'],
+      principiante: ['principiante', 'iniciación', 'fácil', 'intermedio', 'polivalente', 'todos'],
+      intermedio: ['intermedio', 'polivalente', 'avanzado', 'todos'],
+      avanzado: ['avanzado', 'pro', 'competición', 'profesional', 'intermedio', 'todos'],
     };
 
     const acceptedLevels = levelMap[level.toLowerCase()] || [];
 
     return rackets.filter((r: any) => {
       const racketLevel = (r.caracteristicas_nivel_de_juego || '').toLowerCase();
+      // Include rackets without level data (null/empty) to avoid filtering out everything
+      if (!racketLevel) return true;
       return acceptedLevels.some(lvl => racketLevel.includes(lvl));
     });
   }
@@ -306,12 +309,15 @@ export class RacketFilterService {
       const forma = (r.caracteristicas_forma || '').toLowerCase();
       const balance = (r.caracteristicas_balance || '').toLowerCase();
 
+      // If no shape/balance data available, include the racket
+      if (!forma && !balance) return true;
+
       if (playStyle.includes('ofensivo') || playStyle.includes('atacante')) {
         // Offensive players: diamond shape, high balance
         return forma.includes('diamante') || balance.includes('alto');
       } else if (playStyle.includes('defensivo') || playStyle.includes('control')) {
         // Defensive players: round shape, low balance
-        return forma.includes('redonda') || balance.includes('bajo');
+        return forma.includes('redonda') || balance.includes('bajo') || forma.includes('lágrima');
       } else {
         // Balanced players: any shape
         return true;
