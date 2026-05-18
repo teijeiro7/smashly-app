@@ -12,9 +12,9 @@ router.use((req, _res, next) => {
   next();
 });
 
-// Auth + per-user rate limit on AI endpoints
-router.post('/generate', authenticate, aiLimiter, RecommendationController.generate);
-router.post('/generate-rag', authenticate, aiLimiter, RecommendationController.generateWithRAG);
+// Public AI endpoints (rate limited by IP for guests, by user ID when authenticated)
+router.post('/generate', aiLimiter, RecommendationController.generate);
+router.post('/generate-rag', aiLimiter, RecommendationController.generateWithRAG);
 
 // Protected routes
 router.post('/save', authenticate, RecommendationController.save);
