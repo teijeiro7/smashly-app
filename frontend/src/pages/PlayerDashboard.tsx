@@ -510,7 +510,7 @@ export const PlayerDashboard: React.FC = () => {
       <MaxWidth>
         {/* Hero Section */}
         <HeroSection>
-          <Greeting>¡Hola, {user?.full_name || 'Jugador'}! 👋</Greeting>
+          <Greeting>¡Hola, {user?.full_name || 'Jugador'}!</Greeting>
           <SubGreeting>Bienvenido de vuelta a Smashly</SubGreeting>
           <Stats>
             <Stat>
