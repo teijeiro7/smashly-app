@@ -19,8 +19,8 @@ router.use(requireAdmin);
 router.get('/metrics', AdminController.getMetrics);
 
 router.post('/cache/invalidate', (_req: Request, res: Response) => {
-  CacheService.invalidateCatalog();
-  res.json({ ok: true, message: 'Catalog cache invalidated' });
+  CacheService.clearAll();
+  res.json({ ok: true, message: 'Cache cleared' });
 });
 
 /**
