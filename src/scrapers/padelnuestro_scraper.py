@@ -5,7 +5,7 @@ import ssl
 import asyncio
 from typing import Dict, List, Optional
 from urllib.parse import urlparse
-from .base_scraper import BaseScraper, Product, clean_price, normalize_specs
+from .base_scraper import BaseScraper, Product, clean_price, normalize_specs, is_junior_racket
 
 
 class PadelNuestroScraper(BaseScraper):
@@ -332,241 +332,216 @@ class PadelNuestroScraper(BaseScraper):
 
         return price, original_price
 
-    async def scrape_product(self, url: str) -> Optional[Product]:
-        """Scrape product data using GraphQL with structured spec fields."""
+    _COMMON_BRANDS = [
+        "Nox", "Bullpadel", "Adidas", "Siux", "Head", "Babolat",
+        "StarVie", "Varlion", "Kuikma", "Wilson", "Drop Shot",
+        "Black Crown", "Royal Padel", "Vairo", "Dunlop", "Puma",
+        "Tecnifibre", "Kelme", "Asics", "Joma", "Enebe",
+        "Vibora", "Víbora", "Wingpadel", "J'hayber",
+        "Softee", "Akkeron", "Eme", "Cartri",
+    ]
+
+    def _fetch_html(self, url: str) -> Optional[str]:
+        """Fetch page HTML via plain HTTP (sync)."""
+        req = urllib.request.Request(
+            url,
+            headers={
+                "User-Agent": (
+                    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
+                    "AppleWebKit/537.36 (KHTML, like Gecko) "
+                    "Chrome/122.0.0.0 Safari/537.36"
+                ),
+                "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+                "Accept-Language": "es-ES,es;q=0.9",
+            },
+        )
+        ctx = ssl.create_default_context()
+        ctx.check_hostname = False
+        ctx.verify_mode = ssl.CERT_NONE
         try:
-            parsed = urlparse(url)
-            path = parsed.path
-            # Limpia .html legacy por si acaso
-            if path.endswith(".html"):
-                path = path[:-5]
+            with urllib.request.urlopen(req, timeout=20, context=ctx) as resp:
+                raw = resp.read()
+                enc = resp.headers.get("Content-Encoding", "")
+                if enc == "gzip":
+                    import gzip
+                    raw = gzip.decompress(raw)
+                return raw.decode("utf-8", errors="replace")
+        except Exception as e:
+            print(f"[PadelNuestro] HTTP error for {url}: {e}")
+            return None
 
-            parts = path.strip("/").split("/")
-            url_key = parts[-1]
+    def _extract_product_from_html(self, html: str, url: str) -> Optional[Product]:
+        """Extract product data from page HTML using JSON-LD + data attributes."""
+        # ── JSON-LD: name, brand, description, image, final price ─────
+        name: Optional[str] = None
+        brand: str = "Unknown"
+        description_html: str = ""
+        image: str = ""
+        price: float = 0.0
+        original_price: Optional[float] = None
 
-            # ── GraphQL fields for padel racket specs ──────────────────
-            spec_fields = " ".join(self._FIELD_TO_SPEC.keys())
+        for m in re.finditer(
+            r'<script[^>]+type=["\']application/ld\+json["\'][^>]*>(.*?)</script>',
+            html,
+            re.DOTALL | re.IGNORECASE,
+        ):
+            try:
+                data = json.loads(m.group(1))
+                if data.get("@type") == "Product":
+                    name = data.get("name")
+                    brand_obj = data.get("brand", {})
+                    if isinstance(brand_obj, dict):
+                        brand = brand_obj.get("name", "Unknown")
+                    elif isinstance(brand_obj, str):
+                        brand = brand_obj
+                    description_html = data.get("description", "")
+                    image = data.get("image", "")
+                    offers = data.get("offers", {})
+                    if isinstance(offers, list):
+                        offers = offers[0]
+                    raw_price = offers.get("price")
+                    if raw_price is not None:
+                        price = float(str(raw_price).replace(",", "."))
+                    break
+            except Exception:
+                continue
 
-            query = f"""
-            {{
-              products(filter: {{url_key: {{eq: "{url_key}"}}}}) {{
-                items {{
-                  name
-                  sku
-                  url_key
-                  price_range {{
-                    minimum_price {{
-                      final_price {{ value }}
-                      regular_price {{ value }}
-                    }}
-                  }}
-                  media_gallery {{ url }}
-                  description {{ html }}
-                  {spec_fields}
-                }}
-              }}
-            }}
-            """
+        if not name:
+            return None
+        if is_junior_racket(name):
+            print(f"[PadelNuestro] Skipping junior racket: {name}")
+            return None
+
+        # ── Original price from data-price-type=oldPrice ──────────────
+        old_prices = re.findall(
+            r'data-price-type=["\']oldPrice["\'][^>]*data-price-amount=["\']([0-9]+(?:[.,][0-9]+)?)["\']',
+            html,
+        )
+        if not old_prices:
+            old_prices = re.findall(
+                r'data-price-amount=["\']([0-9]+(?:[.,][0-9]+)?)["\'][^>]*data-price-type=["\']oldPrice["\']',
+                html,
+            )
+        if old_prices:
+            old_val = float(old_prices[0].replace(",", "."))
+            if old_val > price:
+                original_price = old_val
+
+        # ── Images: media_gallery from inline JS ──────────────────────
+        images: List[str] = []
+        gallery_matches = re.findall(
+            r'"full"\s*:\s*"(https://www\.padelnuestro\.com/media/catalog/product/[^"]+)"',
+            html,
+        )
+        if gallery_matches:
+            seen = set()
+            for img_url in gallery_matches:
+                if img_url not in seen:
+                    images.append(img_url)
+                    seen.add(img_url)
+        if not images and image:
+            # Use the JSON-LD image but strip the small thumbnail params
+            images = [re.sub(r'\?.*$', '', image)]
+            image = images[0]
+        elif images:
+            image = images[0]
+
+        # ── Specs from description HTML ───────────────────────────────
+        specs = self._parse_specs_from_html(description_html)
+        specs = normalize_specs(specs)
+
+        # Fallback brand from name
+        if brand == "Unknown" and name:
+            name_upper = name.upper()
+            for b in self._COMMON_BRANDS:
+                if b.upper() in name_upper:
+                    brand = b
+                    break
+            if brand == "Unknown":
+                brand = name.split(" ")[0].title()
+
+        return Product(
+            url=url,
+            name=name,
+            price=price,
+            original_price=original_price,
+            brand=brand,
+            image=image,
+            images=images,
+            specs=specs,
+            description=description_html,
+        )
+
+    async def scrape_product(self, url: str) -> Optional[Product]:
+        """Scrape product data from HTML page using JSON-LD."""
+        try:
+            # Normalise URL (strip .html suffix)
+            if url.endswith(".html"):
+                url = url[:-5]
 
             loop = asyncio.get_event_loop()
-            response = await loop.run_in_executor(None, self._fetch_graphql, query)
-
-            if not response:
-                # GraphQL bloqueado (403) — intentar HTML fallback para obtener precio
-                print(f"[PadelNuestro] GraphQL vacío para {url_key}, intentando HTML...")
-                price_data = await loop.run_in_executor(
-                    None, self._scrape_price_from_html, url
-                )
-                if price_data:
-                    price_val, original_val = price_data
-                    print(f"[PadelNuestro] HTML fallback OK: {price_val} € ({url_key})")
-                    return Product(
-                        url=url,
-                        name=url_key.replace("-", " ").title(),
-                        price=float(price_val),
-                        original_price=float(original_val) if original_val else None,
-                        brand="Unknown",
-                        image="",
-                        images=[],
-                        specs={},
-                        description="",
-                    )
-                print(f"[PadelNuestro] Sin precio para {url_key}")
+            html = await loop.run_in_executor(None, self._fetch_html, url)
+            if not html:
+                print(f"[PadelNuestro] No HTML for {url}")
                 return None
 
-            if "errors" in response:
-                print(f"[PadelNuestro] GraphQL errors: {response.get('errors')}")
-                return None
-
-            items = response.get("data", {}).get("products", {}).get("items", [])
-            print(f"[PadelNuestro] Response for {url_key}: found {len(items)} items")
-
-            if not items:
-                print(f"[PadelNuestro] API could not find product by key: {url_key}")
-                return None
-
-            item = items[0]
-            name = item.get("name")
-
-            # ── URL canónica (sin .html) ───────────────────────────────
-            resolved_key = item.get("url_key") or url_key
-            canonical_url = f"https://www.padelnuestro.com/{resolved_key}"
-
-            # Price
-            price_info = item.get("price_range", {}).get("minimum_price", {})
-            price = price_info.get("final_price", {}).get("value", 0.0)
-            regular = price_info.get("regular_price", {}).get("value")
-            original_price = regular if regular and regular > price else None
-
-            # Images
-            gallery = item.get("media_gallery", [])
-            images = [img.get("url") for img in gallery if img.get("url")]
-            image = images[0] if images else ""
-
-            # ── Specs: structured GraphQL fields (priority) ────────────
-            specs: Dict[str, str] = {}
-            for field, spec_name in self._FIELD_TO_SPEC.items():
-                label = self._resolve_option(field, item.get(field))
-                if label:
-                    specs[spec_name] = label
-
-            # ── Specs: fallback to HTML parsing for missing fields ─────
-            description_html = item.get("description", {}).get("html", "")
-            html_specs = self._parse_specs_from_html(description_html)
-            for k, v in html_specs.items():
-                if k not in specs:
-                    specs[k] = v
-
-            # Brand - Extract from product name
-            brand = "Unknown"
-            if name:
-                common_brands = [
-                    "Nox", "Bullpadel", "Adidas", "Siux", "Head", "Babolat",
-                    "StarVie", "Varlion", "Kuikma", "Wilson", "Drop Shot",
-                    "Black Crown", "Royal Padel", "Vairo", "Dunlop", "Puma",
-                    "Tecnifibre", "Kelme", "Asics", "Joma", "Enebe",
-                    "Vibora", "Víbora", "Wingpadel", "J'hayber",
-                    "Softee", "Akkeron", "Eme", "Cartri",
-                ]
-                name_upper = name.upper()
-                for b in common_brands:
-                    if b.upper() in name_upper:
-                        brand = b
-                        break
-                if brand == "Unknown":
-                    brand = name.split(" ")[0].title()
-
-            specs = normalize_specs(specs)
-
-            return Product(
-                url=canonical_url,
-                name=name,
-                price=float(price),
-                original_price=float(original_price) if original_price else None,
-                brand=brand,
-                image=image,
-                images=images,
-                specs=specs,
-                description=description_html,
-            )
+            product = self._extract_product_from_html(html, url)
+            if not product:
+                print(f"[PadelNuestro] Could not parse product from {url}")
+            return product
 
         except Exception as e:
             print(f"[PadelNuestro] Error scraping product {url}: {e}")
             return None
 
+    def _fetch_category_page(self, page_num: int) -> List[str]:
+        """Fetch one category page and return product URLs (sync)."""
+        page_url = f"https://www.padelnuestro.com/palas-padel?p={page_num}"
+        html = self._fetch_html(page_url)
+        if not html:
+            return []
+        # product-item-link hrefs appear in initial HTML (server-rendered)
+        links = re.findall(r'class="product-item-link"[^>]*href="([^"]+)"', html)
+        links += re.findall(r'href="([^"]+)"[^>]*class="product-item-link"', html)
+        return list(dict.fromkeys(links))  # dedupe, preserve order
+
     async def scrape_category(self, url: str) -> List[str]:
-        """Scrape product URLs using GraphQL, filtering invisible variants."""
-        product_urls = []
+        """Scrape product URLs by paginating the category HTML pages."""
+        _EXCLUDE = {
+            "zapatilla", "paletero", "mochila", "camiseta", "pantalon",
+            "falda", "gorra", "calcetin", "funda", "overgrip", "protector",
+        }
+
+        product_urls: List[str] = []
+        seen: set = set()
         page_num = 1
-        page_size = 50
-        category_id = "6"  # Palas
+        max_pages = 40
 
-        exclude_terms = [
-            "zapatilla",
-            "paletero",
-            "mochila",
-            "camiseta",
-            "pantalon",
-            "falda",
-            "gorra",
-            "calcetin",
-            "funda",
-            "overgrip",
-            "protector",
-        ]
+        print("[PadelNuestro] Scraping category via HTML pagination...")
 
-        print(f"[PadelNuestro] Using GraphQL Category {category_id}...")
-
-        while True:
-            if page_num > 40:
+        loop = asyncio.get_event_loop()
+        while page_num <= max_pages:
+            links = await loop.run_in_executor(
+                None, self._fetch_category_page, page_num
+            )
+            if not links:
+                print(f"[PadelNuestro] Page {page_num}: no products. Done.")
                 break
 
-            # Query GraphQL para obtener productos de la categoría
-            query = f"""
-            {{
-              products(filter: {{category_id: {{eq: "{category_id}"}}}}, pageSize: {page_size}, currentPage: {page_num}) {{
-                total_count
-                items {{
-                  name
-                  url_key
-                  url_suffix
-                  url_rewrites {{
-                    url
-                  }}
-                }}
-              }}
-            }}
-            """
+            added = 0
+            for link in links:
+                slug = link.rstrip("/").split("/")[-1].lower()
+                if any(term in slug for term in _EXCLUDE):
+                    continue
+                if link not in seen:
+                    product_urls.append(link)
+                    seen.add(link)
+                    added += 1
 
-            try:
-                loop = asyncio.get_event_loop()
-                response = await loop.run_in_executor(None, self._fetch_graphql, query)
-
-                data = response.get("data", {}).get("products", {})
-                items = data.get("items", [])
-                total_count = data.get("total_count", 0)
-
-                if not items:
-                    break
-
-                for item in items:
-                    name = item.get("name", "").lower()
-                    if any(term in name for term in exclude_terms):
-                        continue
-
-                    full_url = None
-
-                    # 1. Preferencia: Usar url_rewrites (URL pública real, sin .html)
-                    rewrites = item.get("url_rewrites")
-                    if rewrites and len(rewrites) > 0:
-                        slug = rewrites[0].get("url")
-                        if slug:
-                            slug = slug.rstrip("/")
-                            if slug.endswith(".html"):
-                                slug = slug[:-5]
-                            full_url = (
-                                f"https://www.padelnuestro.com/{slug.lstrip('/')}"
-                            )
-
-                    # 2. Fallback: url_key directamente (sin sufijo)
-                    if not full_url and item.get("url_key"):
-                        slug = item["url_key"]
-                        full_url = f"https://www.padelnuestro.com/{slug}"
-
-                    if full_url and full_url not in product_urls:
-                        product_urls.append(full_url)
-
-                print(
-                    f"[PadelNuestro] Page {page_num}: Found {len(items)} items. Saved {len(product_urls)}"
-                )
-
-                if page_num * page_size >= total_count:
-                    break
-
-                page_num += 1
-
-            except Exception as e:
-                print(f"[PadelNuestro] Error on page {page_num}: {e}")
-                break
+            print(
+                f"[PadelNuestro] Page {page_num}: {len(links)} found, "
+                f"{added} added. Total: {len(product_urls)}"
+            )
+            page_num += 1
 
         return product_urls

@@ -28,6 +28,16 @@ load_dotenv()
 SUPABASE_URL = os.environ["SUPABASE_URL"]
 SUPABASE_KEY = os.environ["SUPABASE_SERVICE_ROLE_KEY"]
 
+_JUNIOR_PATTERN = re.compile(
+    r'\b(junior|jr|kid|kids|ni[ñn]o|ni[ñn]a|infantil|bambini|bambino)\b',
+    re.IGNORECASE,
+)
+
+
+def is_junior_racket(name: str) -> bool:
+    return bool(_JUNIOR_PATTERN.search(name or ""))
+
+
 STORES = ["padelnuestro", "padelmarket", "padelproshop"]
 STORE_PRICE_COLS = [
     col
@@ -186,6 +196,18 @@ def run(dry_run: bool):
     print("Fetching rackets...")
     rows = fetch_all_rackets(client)
     print(f"Total: {len(rows)}")
+
+    # Remove junior/kid rackets from DB and exclude from dedup
+    junior_rows = [r for r in rows if is_junior_racket(r.get("name") or r.get("model") or "")]
+    adult_rows = [r for r in rows if not is_junior_racket(r.get("name") or r.get("model") or "")]
+    if junior_rows:
+        print(f"\nJunior rackets to delete: {len(junior_rows)}")
+        for r in junior_rows:
+            print(f"  delete id={r['id']} name={r.get('name') or r.get('model')}")
+            if not dry_run:
+                client.table("rackets").delete().eq("id", r["id"]).execute()
+        print()
+    rows = adult_rows
 
     groups = find_duplicate_groups(rows)
     print(f"Duplicate groups: {len(groups)}\n")

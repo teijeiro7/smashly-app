@@ -123,6 +123,16 @@ def normalize_spec_value(key: str, value: str) -> str:
     
     return value
 
+_JUNIOR_PATTERN = re.compile(
+    r'\b(junior|jr|kid|kids|ni[ñn]o|ni[ñn]a|infantil|bambini|bambino)\b',
+    re.IGNORECASE,
+)
+
+def is_junior_racket(name: str) -> bool:
+    """Return True if the racket name indicates a children's/junior product."""
+    return bool(_JUNIOR_PATTERN.search(name or ""))
+
+
 def normalize_specs(specs: Dict[str, str]) -> Dict[str, str]:
     normalized = {}
     for key, value in specs.items():

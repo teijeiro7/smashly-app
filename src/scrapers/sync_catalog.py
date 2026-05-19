@@ -458,7 +458,7 @@ async def run_full_sync(
                 print(f"  ⚙️  Limitado a {limit} productos.")
 
             # --- Procesamiento Concurrente ---
-            MAX_CONCURRENT_SCRAPES = 5
+            MAX_CONCURRENT_SCRAPES = 2
             semaphore = asyncio.Semaphore(MAX_CONCURRENT_SCRAPES)
 
             async def ScrapeAndMerge(url, idx):
