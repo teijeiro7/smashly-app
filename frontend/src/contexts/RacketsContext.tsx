@@ -47,9 +47,7 @@ export const RacketsProvider: React.FC<RacketsProviderProps> = ({
       return cached ? JSON.parse(cached) : [];
     } catch { return []; }
   });
-  const [loading, setLoading] = useState<boolean>(() => {
-    return !localStorage.getItem('smashly_catalog');
-  });
+  const [loading, setLoading] = useState<boolean>(() => !localStorage.getItem('smashly_catalog'));
   const [error, setError] = useState<string | null>(null);
 
   const fetchRackets = useCallback(async (): Promise<void> => {
@@ -69,9 +67,8 @@ export const RacketsProvider: React.FC<RacketsProviderProps> = ({
   }, []);
 
   const refreshRackets = useCallback(async (): Promise<void> => {
-    // refresh forza recarga del servidor (invalida caché local)
     localStorage.removeItem('smashly_catalog');
-    localStorage.removeItem('smashly_catalog_version');
+    localStorage.removeItem('smashly_catalog_etag');
     await fetchRackets();
   }, [fetchRackets]);
 
@@ -95,19 +92,8 @@ export const RacketsProvider: React.FC<RacketsProviderProps> = ({
   }, [rackets]);
 
   useEffect(() => {
-    // Si ya tenemos datos en localStorage, validar versión en background
-    if (rackets.length > 0) {
-      RacketService.getCatalogVersion().then(serverVersion => {
-        const localVersion = localStorage.getItem('smashly_catalog_version');
-        if (localVersion !== serverVersion) {
-          logger.log('Catálogo desactualizado, recargando...');
-          fetchRackets();
-        }
-      }).catch((err) => logger.error('Error checking catalog version:', err));
-    } else {
-      // Sin caché local, cargar desde API
-      fetchRackets();
-    }
+    // Single ETag-aware request: 304 if unchanged (uses localStorage), 200 if changed
+    fetchRackets();
   }, []);
 
   const value = useMemo<RacketsContextType>(() => ({

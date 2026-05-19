@@ -628,6 +628,7 @@ const UpdatedTime = styled.div`
 `;
 
 const PrimaryButton = styled.a`
+  margin-top: 1.5rem;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1512,7 +1513,16 @@ const RacketDetailPage: React.FC = () => {
                   <SaveBadge>-{Math.round(lowestPrice.discount)}%</SaveBadge>
                 )}
               </PriceRow>
-              <UpdatedTime>Precio actualizado: hace un momento</UpdatedTime>
+              <UpdatedTime>
+                Precio actualizado:{' '}
+                {racket.updated_at
+                  ? new Date(racket.updated_at).toLocaleDateString('es-ES', {
+                      day: 'numeric',
+                      month: 'long',
+                      year: 'numeric',
+                    })
+                  : 'hace un momento'}
+              </UpdatedTime>
 
               <PrimaryButton
                 href={lowestPrice?.link || '#'}
