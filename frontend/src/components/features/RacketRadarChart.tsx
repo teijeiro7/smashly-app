@@ -26,14 +26,6 @@ const ChartContainer = styled.div`
   transform: translateZ(0);
 `;
 
-const ChartTitle = styled.h3`
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: #1f2937;
-  margin-bottom: 1rem;
-  text-align: center;
-`;
-
 const ChartSubtitle = styled.div`
   font-size: 0.875rem;
   color: #6b7280;
@@ -192,7 +184,6 @@ const RacketRadarChart: React.FC<RacketRadarChartProps> = ({ metrics }) => {
 
   return (
     <ChartContainer>
-      <ChartTitle>Análisis de Rendimiento</ChartTitle>
       <ChartSubtitle>
         <span>Puntaje 1-10</span>
         <span

@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { FaChartLine } from 'react-icons/fa';
 import {
   Area,
   AreaChart,
@@ -105,12 +106,14 @@ const STORE_COLORS: Record<string, string> = {
   padelmarket:  '#16a34a',
   padelnuestro: '#2563eb',
   padelproshop: '#d97706',
+  otras:       '#8b5cf6', // Agregado: color para tiendas restantes
 };
 
 const STORE_LABELS: Record<string, string> = {
   padelmarket:  'Padel Market',
   padelnuestro: 'Padel Nuestro',
   padelproshop: 'Padel Pro Shop',
+  otras:       'Otras tiendas', // Agregado: label para tiendas restantes
 };
 
 const DAY_OPTIONS = [30, 60, 90, 180];
@@ -178,6 +181,9 @@ export const PriceHistoryChart: React.FC<PriceHistoryChartProps> = ({
   }, [historyData]);
 
   // Construir datos para Recharts: un punto por fecha con precio de cada tienda
+  // Las tiendas que no son padelmarket, padelnuestro ni padelproshop se agrupan en "otras"
+  const MAIN_STORES = ['padelmarket', 'padelnuestro', 'padelproshop'];
+
   const chartData = useMemo(() => {
     if (!historyData || historyData.stores.length === 0) return null;
 
@@ -186,13 +192,40 @@ export const PriceHistoryChart: React.FC<PriceHistoryChartProps> = ({
     historyData.stores.forEach(s => s.history.forEach(p => allDates.add(p.date)));
     const sortedDates = Array.from(allDates).sort();
 
+    // Agregar tiendas no-main a "otras"
+    const otherStorePrices: Record<string, Record<string, number>> = {};
+
     // Para cada fecha, obtener el precio de cada tienda (o null si no hay dato)
     return sortedDates.map(date => {
       const point: Record<string, any> = { date: formatDate(date) };
+
       historyData.stores.forEach(s => {
         const match = s.history.find(p => p.date === date);
-        point[s.store] = match ? match.price : null;
+        const price = match ? match.price : null;
+
+        if (MAIN_STORES.includes(s.store)) {
+          point[s.store] = price;
+        } else {
+          // Acumular en "otras"
+          if (!otherStorePrices[date]) otherStorePrices[date] = {};
+          if (price !== null) {
+            // Si ya hay un precio para esa fecha en "otras", mantener el más bajo
+            if (otherStorePrices[date]['otras'] !== undefined) {
+              otherStorePrices[date]['otras'] = Math.min(otherStorePrices[date]['otras'], price);
+            } else {
+              otherStorePrices[date]['otras'] = price;
+            }
+          }
+        }
       });
+
+      // Asignar precios de "otras"
+      if (otherStorePrices[date]) {
+        point['otras'] = otherStorePrices[date]['otras'] ?? null;
+      } else {
+        point['otras'] = null;
+      }
+
       return point;
     });
   }, [historyData]);
@@ -205,7 +238,7 @@ export const PriceHistoryChart: React.FC<PriceHistoryChartProps> = ({
     <ChartContainer>
       <Header>
         <div>
-          <Title>📉 Historial de Precios</Title>
+          <Title><FaChartLine /> Historial de Precios</Title>
           <PriceRow>
             <CurrentPrice>{currentPrice.toFixed(2)}€</CurrentPrice>
             <PriceBadge variant={badgeVariant}>{badgeLabel}</PriceBadge>
@@ -236,7 +269,7 @@ export const PriceHistoryChart: React.FC<PriceHistoryChartProps> = ({
 
       {!loading && !hasRealData && (
         <EmptyState>
-          <span style={{ fontSize: '1.5rem' }}>📊</span>
+          <span style={{ fontSize: '1.5rem' }}><FaChartLine /></span>
           <span>Aún no hay historial de precios acumulado.</span>
           <span style={{ fontSize: '0.75rem' }}>
             Se registrará automáticamente con cada actualización del catálogo.
@@ -249,12 +282,18 @@ export const PriceHistoryChart: React.FC<PriceHistoryChartProps> = ({
           <ResponsiveContainer>
             <AreaChart data={chartData} margin={{ top: 4, right: 4, bottom: 0, left: 0 }}>
               <defs>
-                {historyData.stores.map(s => (
+                {/* Gradientes para tiendas principales */}
+                {historyData.stores.filter(s => MAIN_STORES.includes(s.store)).map(s => (
                   <linearGradient key={s.store} id={`grad-${s.store}`} x1="0" y1="0" x2="0" y2="1">
                     <stop offset="5%"  stopColor={STORE_COLORS[s.store] || '#6b7280'} stopOpacity={0.15} />
                     <stop offset="95%" stopColor={STORE_COLORS[s.store] || '#6b7280'} stopOpacity={0} />
                   </linearGradient>
                 ))}
+                {/* Gradiente para "otras" tiendas */}
+                <linearGradient id="grad-otras" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%"  stopColor={STORE_COLORS['otras'] || '#8b5cf6'} stopOpacity={0.15} />
+                  <stop offset="95%" stopColor={STORE_COLORS['otras'] || '#8b5cf6'} stopOpacity={0} />
+                </linearGradient>
               </defs>
 
               <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f3f4f6" />
@@ -291,21 +330,24 @@ export const PriceHistoryChart: React.FC<PriceHistoryChartProps> = ({
                 wrapperStyle={{ fontSize: '0.75rem', paddingTop: '0.5rem' }}
               />
 
-              {historyData.stores.map(s => (
-                <Area
-                  key={s.store}
-                  type="monotone"
-                  dataKey={s.store}
-                  stroke={STORE_COLORS[s.store] || '#6b7280'}
-                  strokeWidth={2.5}
-                  fill={`url(#grad-${s.store})`}
-                  fillOpacity={1}
-                  dot={{ r: 3, strokeWidth: 2, fill: '#fff' }}
-                  activeDot={{ r: 5, strokeWidth: 2 }}
-                  connectNulls
-                  animationDuration={800}
-                />
-              ))}
+              {historyData.stores.map(s => {
+                const dataKey = MAIN_STORES.includes(s.store) ? s.store : 'otras';
+                return (
+                  <Area
+                    key={s.store}
+                    type="monotone"
+                    dataKey={dataKey}
+                    stroke={STORE_COLORS[dataKey] || '#6b7280'}
+                    strokeWidth={2.5}
+                    fill={`url(#grad-${dataKey})`}
+                    fillOpacity={1}
+                    dot={{ r: 3, strokeWidth: 2, fill: '#fff' }}
+                    activeDot={{ r: 5, strokeWidth: 2 }}
+                    connectNulls
+                    animationDuration={800}
+                  />
+                );
+              })}
             </AreaChart>
           </ResponsiveContainer>
         </div>

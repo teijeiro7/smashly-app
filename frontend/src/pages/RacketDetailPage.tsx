@@ -41,7 +41,6 @@ import {
   StoreLabel,
 } from '../components/common/SpecIcons';
 import RacketRadarChart from '../components/features/RacketRadarChart';
-import { StorePriceComparison } from '../components/features/StorePriceComparison';
 
 // --- Styled Components ---
 
@@ -846,15 +845,6 @@ const SpecValue = styled.span`
   font-weight: 600;
 `;
 
-const H3 = styled.h3`
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: var(--color-gray-900);
-  margin-bottom: 1rem;
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-`;
 
 const PerformanceContainer = styled.div`
   background: white;
@@ -1099,6 +1089,24 @@ const StickyCTA = styled.a`
 
   &:active {
     transform: scale(0.98);
+  }
+`;
+
+const SectionTitle = styled.h2`
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-gray-900);
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+
+  &::before {
+    content: '';
+    width: 4px;
+    height: 24px;
+    background: var(--color-primary);
+    border-radius: 2px;
   }
 `;
 
@@ -1526,7 +1534,7 @@ const RacketDetailPage: React.FC = () => {
       <LowerGrid $fullWidth={!isAuthenticated}>
         {/* Lower Left: Specs */}
         <div>
-          <H3>Especificaciones Técnicas</H3>
+          <SectionTitle>Especificaciones Técnicas</SectionTitle>
           <SpecsGrid>
             <SpecCard>
               <SpecIconWrapper>
@@ -1620,8 +1628,8 @@ const RacketDetailPage: React.FC = () => {
 
       {radarData && (
         <div style={{ maxWidth: '1400px', margin: '3rem auto', padding: '0 2rem' }}>
+          <SectionTitle>Análisis de Rendimiento</SectionTitle>
           <PerformanceContainer>
-            <H3>Análisis de Rendimiento</H3>
             <PerformanceGrid>
               <ChartWrapper>
                 <RacketRadarChart metrics={radarData} />
@@ -1684,17 +1692,11 @@ const RacketDetailPage: React.FC = () => {
         </div>
       )}
 
-      {/* Solo mostramos el comparador si la pala está disponible */}
-      {!racket.solo_comparacion && (
-        <div style={{ maxWidth: '1400px', margin: '3rem auto', padding: '0 2rem' }}>
-          <StorePriceComparison racket={racket} isAuthenticated={isAuthenticated} />
-        </div>
-      )}
 
       {/* Price Comparison - Only show for authenticated users */}
       {isAuthenticated && (
         <div style={{ maxWidth: '1400px', margin: '3rem auto', padding: '0 2rem' }}>
-          <H3>Comparar Precios</H3>
+          <SectionTitle>Comparar Precios</SectionTitle>
           <CompareTable>
             {availablePrices.map((store, index) => {
               const isBestPrice =

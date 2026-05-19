@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { useAuth } from '../contexts/AuthContext';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { QuickActionCard } from '../components/dashboard/QuickActionCard';
-import { FaLightbulb, FaBalanceScale, FaChartBar, FaUser } from 'react-icons/fa';
+import { FaLightbulb, FaBalanceScale, FaChartBar, FaUser, FaBullseye, FaHeart, FaFire, FaStar } from 'react-icons/fa';
 import { RacketService } from '../services/racketService';
 import { RacketViewService, RecentlyViewedRacket } from '../services/racketViewService';
 import { Racket } from '../types/racket';
@@ -99,6 +99,9 @@ const SectionTitle = styled.h2`
   font-weight: 700;
   color: #1f2937;
   margin: 0 0 1.5rem 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 `;
 
 const QuickActionsGrid = styled.div`
@@ -526,7 +529,7 @@ export const PlayerDashboard: React.FC = () => {
 
         {/* Quick Actions */}
         <Section>
-          <SectionTitle>🎯 Accesos Rápidos</SectionTitle>
+          <SectionTitle><FaBullseye /> Accesos Rápidos</SectionTitle>
           <QuickActionsGrid>
             {quickActions.map((action, index) => (
               <QuickActionCard key={index} {...action} />
@@ -537,7 +540,7 @@ export const PlayerDashboard: React.FC = () => {
         {/* Favorites Preview */}
         {favorites.length > 0 && (
           <Section>
-            <SectionTitle>❤️ Tus Favoritas</SectionTitle>
+            <SectionTitle><FaHeart /> Tus Favoritas</SectionTitle>
             <RacketsGrid>
               {favorites.map(racket => (
                 <RacketCard
@@ -560,7 +563,7 @@ export const PlayerDashboard: React.FC = () => {
         {/* Recently Viewed Rackets */}
         {recentlyViewed.length > 0 && (
           <Section>
-            <SectionTitle>👁️ Últimas Palas Vistas</SectionTitle>
+            <SectionTitle><FaStar /> Últimas Palas Vistas</SectionTitle>
             <RacketsGrid>
               {recentlyViewed.slice(0, 4).map(racket => (
                 <RacketCard
@@ -582,7 +585,7 @@ export const PlayerDashboard: React.FC = () => {
         {/* Offers */}
         {offers.length > 0 && (
           <Section>
-            <SectionTitle>🔥 Ofertas que te pueden interesar</SectionTitle>
+            <SectionTitle><FaFire /> Ofertas que te pueden interesar</SectionTitle>
             <RacketsGrid>
               {offers.map(racket => (
                 <RacketCard
@@ -647,7 +650,7 @@ export const PlayerDashboard: React.FC = () => {
 
         {hasRecommendation && (
           <Section>
-            <SectionTitle>🆕 Tus próximas palas</SectionTitle>
+            <SectionTitle><FaStar /> Tus próximas palas</SectionTitle>
             <RecommendationsGrid>
               {lastRecommendation!.recommendation_result.rackets.slice(0, 3).map((racket, index) => (
                 <RecommendedRacketCard key={racket.id}>
