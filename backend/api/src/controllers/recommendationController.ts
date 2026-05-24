@@ -41,8 +41,18 @@ export class RecommendationController {
     try {
       const { type, data } = req.body;
 
-      if (!type || !data) {
-        return res.status(400).json({ error: 'Missing type or data' });
+      // Validate request body
+      if (!type || !data || typeof data !== 'object' || Object.keys(data).length === 0) {
+        return res.status(400).json({ error: 'Missing or invalid type or data' });
+      }
+
+      // Validate required fields
+      const requiredFields = ['level', 'budget'];
+      const missingFields = requiredFields.filter(field => !data[field]);
+      if (missingFields.length > 0) {
+        return res.status(400).json({ 
+          error: `Missing required fields: ${missingFields.join(', ')}` 
+        });
       }
 
       const normalizedData = normalizeFormData(data);

@@ -12,11 +12,13 @@ export class RecommendationService {
       headers: {
         'Content-Type': 'application/json',
       },
+      credentials: 'include',
       body: JSON.stringify({ type, data }),
     });
 
     if (!response.ok) {
-      throw new Error('Error generating recommendation');
+      const body = await response.json().catch(() => ({}));
+      throw new Error(body.error || body.message || `Error ${response.status} generating recommendation`);
     }
 
     return response.json();

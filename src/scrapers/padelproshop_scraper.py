@@ -1,9 +1,19 @@
 import json
 import re
+import ssl
+import time
+import random
 import urllib.request
+import urllib.error
 import asyncio
 from typing import Dict, List, Optional
-from .base_scraper import BaseScraper, Product, clean_price, normalize_specs
+from .base_scraper import BaseScraper, Product, clean_price, normalize_specs, normalize_spec_name, is_junior_racket
+
+def _ssl_ctx() -> ssl.SSLContext:
+    ctx = ssl.create_default_context()
+    ctx.check_hostname = False
+    ctx.verify_mode = ssl.CERT_NONE
+    return ctx
 
 class PadelProShopScraper(BaseScraper):
     """Scraper for PadelProShop online store.
@@ -14,25 +24,47 @@ class PadelProShopScraper(BaseScraper):
 
     def _fetch_api_page(self, collection_path: str, page_num: int) -> list:
         """Fetch a single page of products from the Shopify JSON API (sync)."""
+        time.sleep(random.uniform(2.0, 4.0))
         api_url = f"https://padelproshop.com{collection_path}/products.json?limit=250&page={page_num}"
         req = urllib.request.Request(api_url, headers={
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
             'Accept': 'application/json',
         })
-        with urllib.request.urlopen(req, timeout=30) as resp:
-            data = json.loads(resp.read().decode('utf-8'))
-        return data.get('products', [])
+        for attempt in range(3):
+            try:
+                with urllib.request.urlopen(req, timeout=30, context=_ssl_ctx()) as resp:
+                    data = json.loads(resp.read().decode('utf-8'))
+                return data.get('products', [])
+            except urllib.error.HTTPError as e:
+                if e.code == 403 and attempt < 2:
+                    wait = 30 * (attempt + 1)
+                    print(f"[PadelProShop] 403 on category page {page_num}, retrying in {wait}s...")
+                    time.sleep(wait)
+                    continue
+                raise
+        return []
 
     def _fetch_product_json(self, handle: str) -> dict:
         """Fetch a single product's full data from the Shopify JSON API (sync)."""
+        time.sleep(random.uniform(3.0, 5.0))
         api_url = f"https://padelproshop.com/products/{handle}.json"
         req = urllib.request.Request(api_url, headers={
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
             'Accept': 'application/json',
         })
-        with urllib.request.urlopen(req, timeout=30) as resp:
-            data = json.loads(resp.read().decode('utf-8'))
-        return data.get('product', {})
+        for attempt in range(3):
+            try:
+                with urllib.request.urlopen(req, timeout=30, context=_ssl_ctx()) as resp:
+                    data = json.loads(resp.read().decode('utf-8'))
+                return data.get('product', {})
+            except urllib.error.HTTPError as e:
+                if e.code == 403 and attempt < 2:
+                    wait = 30 * (attempt + 1)
+                    print(f"[PadelProShop] 403 on {handle}, retrying in {wait}s...")
+                    time.sleep(wait)
+                    continue
+                raise
+        return {}
 
     # Palabras clave de forma y su valor normalizado
     _SHAPE_KEYWORDS = [
@@ -143,6 +175,9 @@ class PadelProShopScraper(BaseScraper):
         name = product_data.get('title')
         if not name:
             return None
+        if is_junior_racket(name):
+            print(f"[PadelProShop] Skipping junior racket: {name}")
+            return None
 
         # Price
         variants = product_data.get('variants') if isinstance(product_data.get('variants'), list) else []
@@ -187,7 +222,7 @@ class PadelProShopScraper(BaseScraper):
             try:
                 loop = asyncio.get_event_loop()
                 req = urllib.request.Request(url, headers={'User-Agent': self.user_agent})
-                with urllib.request.urlopen(req, timeout=15) as resp:
+                with urllib.request.urlopen(req, timeout=15, context=_ssl_ctx()) as resp:
                     full_html = resp.read().decode('utf-8')
                 
                 # Parse metadata/theme specific specs from HTML

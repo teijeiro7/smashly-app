@@ -26,6 +26,13 @@ export const config: ApiConfig = {
 
 // Validar configuración crítica
 export function validateConfig(): void {
+  if (process.env.NODE_ENV !== "production") {
+    logger.warn(
+      "Running without strict Supabase validation in development; set SUPABASE_URL and a Supabase key for full functionality"
+    );
+    return;
+  }
+
   const requiredEnvVars = ["SUPABASE_URL"];
 
   const missingVars = requiredEnvVars.filter(

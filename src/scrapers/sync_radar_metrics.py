@@ -23,7 +23,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 import dotenv
 from supabase import create_client, Client
 
-from radar_metrics_scraper import scrape_pala_metrics
+from src.scrapers.radar_metrics_scraper import scrape_pala_metrics
 
 dotenv.load_dotenv()
 

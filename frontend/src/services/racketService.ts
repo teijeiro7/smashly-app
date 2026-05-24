@@ -239,69 +239,54 @@ export class RacketService {
   }
 
   /**
-   * Obtiene la versión actual del catálogo (hash ligero)
-   * Sirve para decidir si recargar datos del servidor o usar caché local
-   */
-  static async getCatalogVersion(): Promise<string> {
-    try {
-      const url = buildApiUrl(API_ENDPOINTS.RACKETS_VERSION);
-      const response = await fetch(url, { credentials: 'include' });
-      const data = await response.json();
-      return data?.data?.version || 'unknown';
-    } catch (error: any) {
-      logger.warn('Error fetching catalog version:', error);
-      return 'unknown';
-    }
-  }
-
-  /**
-   * Obtiene todas las palas con soporte de caché local (localStorage)
-   * - Primero checkea versión del servidor
-   * - Si la versión coincide con la local → carga desde localStorage (instantáneo)
-   * - Si cambió → fetch de API, guarda en localStorage, retorna
+   * Obtiene todas las palas con caché ETag:
+   * - Envía If-None-Match con el ETag guardado
+   * - 304 → devuelve localStorage (sin descargar el catálogo)
+   * - 200 → guarda nuevo ETag + catálogo en localStorage, retorna
    */
   static async getAllRacketsCached(): Promise<Racket[]> {
     const CACHE_KEY = 'smashly_catalog';
-    const VERSION_KEY = 'smashly_catalog_version';
+    const ETAG_KEY = 'smashly_catalog_etag';
+
+    const storedETag = localStorage.getItem(ETAG_KEY);
+    const storedData = localStorage.getItem(CACHE_KEY);
+
+    const headers: HeadersInit = { ...getCommonHeaders() };
+    if (storedETag && storedData) {
+      (headers as Record<string, string>)['If-None-Match'] = storedETag;
+    }
 
     try {
-      // 1. Obtener versión del servidor (request ligero)
-      const serverVersion = await this.getCatalogVersion();
+      const url = buildApiUrl(API_ENDPOINTS.RACKETS);
+      const response = await fetch(url, { headers });
 
-      // 2. Checkear versión local
-      const localVersion = localStorage.getItem(VERSION_KEY);
-      const localData = localStorage.getItem(CACHE_KEY);
-
-      if (localVersion === serverVersion && localData) {
-        try {
-          const parsed = JSON.parse(localData);
-          logger.log(`⚡ Catálogo cargado desde localStorage (${parsed.length} palas, versión: ${serverVersion})`);
-          return parsed;
-        } catch {
-          // Datos corruptos, ignorar
-          localStorage.removeItem(CACHE_KEY);
-          localStorage.removeItem(VERSION_KEY);
-        }
+      if (response.status === 304 && storedData) {
+        const parsed = JSON.parse(storedData) as Racket[];
+        logger.log(`⚡ Catálogo desde localStorage (${parsed.length} palas, ETag hit)`);
+        return parsed;
       }
 
-      // 3. Versión diferente o sin caché → fetch de API
-      logger.log('🔄 Versión de catálogo cambiada, recargando desde API...');
-      const rackets = await this.getAllRackets();
+      const data = await handleApiResponse<Racket[]>(response);
+      const newETag = response.headers.get('ETag') || '';
 
-      // 4. Guardar en localStorage
       try {
-        localStorage.setItem(CACHE_KEY, JSON.stringify(rackets));
-        localStorage.setItem(VERSION_KEY, serverVersion);
-        logger.log(`💾 Catálogo guardado en localStorage (${rackets.length} palas)`);
+        localStorage.setItem(CACHE_KEY, JSON.stringify(data));
+        if (newETag) localStorage.setItem(ETAG_KEY, newETag);
       } catch (e) {
-        logger.warn('No se pudo guardar en localStorage (posiblemente quota excedida):', e);
+        logger.warn('localStorage quota exceeded:', e);
       }
 
-      return rackets;
+      logger.log(`💾 Catálogo actualizado (${data.length} palas)`);
+      return data;
     } catch (error: any) {
-      // Fallback: si falla el version check, cargar normal
-      logger.warn('Error en carga cacheada, fallback a API directa:', error);
-      return this.getAllRackets();
+      // Fallback to stale localStorage data rather than failing completely
+      if (storedData) {
+        try {
+          return JSON.parse(storedData) as Racket[];
+        } catch {}
+      }
+      logger.error('Error fetching catalog:', error);
+      throw error;
     }
   }
 
@@ -341,6 +326,7 @@ export class RacketService {
       const url = buildApiUrl(API_ENDPOINTS.RACKETS_BY_ID(id));
       const response = await fetch(url, {
         method: 'PUT',
+        credentials: 'include',
         headers: getCommonHeaders(),
         body: JSON.stringify(updates),
       });
@@ -360,6 +346,7 @@ export class RacketService {
       const url = buildApiUrl(API_ENDPOINTS.RACKETS_BY_ID(id));
       const response = await fetch(url, {
         method: 'DELETE',
+        credentials: 'include',
         headers: getCommonHeaders(),
       });
 
@@ -385,6 +372,7 @@ export class RacketService {
       const url = buildApiUrl(API_ENDPOINTS.RACKETS_BULK_UPDATE);
       const response = await fetch(url, {
         method: 'POST',
+        credentials: 'include',
         headers: getCommonHeaders(),
         body: JSON.stringify({ field, oldValue, newValue }),
       });

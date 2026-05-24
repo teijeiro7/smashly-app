@@ -61,6 +61,10 @@ def normalize_paddle_name(raw_name: str) -> str:
 
     name = raw_name.strip().lower()
 
+    # 0. Eliminar tokens de ruido envueltos en paréntesis: "(pala)", "(padel)", etc.
+    for noise in sorted(_NOISE_TOKENS, key=len, reverse=True):
+        name = re.sub(rf'\s*\({re.escape(noise)}\)\s*', ' ', name).strip()
+
     # 1. Eliminar prefijos/sufijos de tienda (orden importa: más largos primero)
     for noise in sorted(_NOISE_TOKENS, key=len, reverse=True):
         # Al principio
@@ -116,9 +120,12 @@ def normalize_for_comparison(raw_name: str) -> str:
     # Normalizar versiones decimales: "1.0" → "1"
     name = re.sub(r"\.0\b", "", name)
 
-    # Eliminar puntuación (conservar guiones internos entre letras/números)
-    name = re.sub(r"(?<!\w)-(?!\w)", " ", name)   # guiones no internos → espacio
-    name = re.sub(r"[^\w\s-]", "", name)
+    # Colapsar guiones internos entre letras/números: "carb-on" → "carbon"
+    # Solo para comparación, nunca para almacenamiento
+    name = re.sub(r"(?<=\w)-(?=\w)", "", name)
+
+    # Eliminar puntuación restante (guiones no internos ya no existen)
+    name = re.sub(r"[^\w\s]", "", name)
 
     # Colapsar y strip
     name = re.sub(r"\s+", " ", name).strip()

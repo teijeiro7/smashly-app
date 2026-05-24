@@ -2,6 +2,8 @@ import axios, { AxiosInstance } from 'axios';
 import { Racket, UserFormData, ComparisonResult } from '../types/racket';
 import logger from '../config/logger';
 import { freeAiService } from './freeAiService';
+import { EmbeddingService } from './embeddingService';
+import { VectorStoreService } from './vectorStoreService';
 
 // Interfaz para la respuesta de OpenRouter
 interface OpenRouterResponse {
@@ -117,7 +119,7 @@ export class OpenRouterService {
               content: prompt,
             },
           ],
-          temperature: 0.7,
+          temperature: 0.3,
           max_tokens: 4000,
         });
 
@@ -168,19 +170,71 @@ export class OpenRouterService {
   }
 
   /**
-   * Compara palas usando sistema híbrido con formato estructurado
+   * Recupera knowledge chunks + reviews relevantes para las palas a comparar.
+   * Si falla, retorna vacío para no bloquear la comparación.
+   */
+  private async retrieveComparisonRAGContext(rackets: Racket[]): Promise<{
+    knowledge: string;
+    reviews: string;
+  }> {
+    try {
+      const queryText = rackets
+        .map((r: any) =>
+          [
+            r.nombre || r.name,
+            r.caracteristicas_forma,
+            r.caracteristicas_nucleo,
+            r.caracteristicas_cara,
+            r.caracteristicas_balance,
+          ]
+            .filter(Boolean)
+            .join(' ')
+        )
+        .join(' versus ');
+
+      const queryEmbedding = await EmbeddingService.embed(queryText);
+      const racketIds = rackets.map((r: any) => r.id).filter(Boolean) as number[];
+
+      const [knowledgeChunks, reviews] = await Promise.all([
+        VectorStoreService.searchKnowledge(queryEmbedding, { limit: 5, threshold: 0.3 }),
+        racketIds.length > 0
+          ? VectorStoreService.searchRelevantReviews(queryEmbedding, {
+              limit: 6,
+              racketIds,
+            })
+          : Promise.resolve([]),
+      ]);
+
+      return {
+        knowledge: knowledgeChunks.map(k => k.content).join('\n---\n'),
+        reviews: reviews.map(r => r.content).join('\n'),
+      };
+    } catch (error) {
+      logger.warn('RAG context retrieval for comparison failed, proceeding without:', error);
+      return { knowledge: '', reviews: '' };
+    }
+  }
+
+  /**
+   * Compara palas usando sistema híbrido con formato estructurado y contexto RAG
    */
   async compareRackets(rackets: Racket[], userProfile?: UserFormData): Promise<ComparisonResult> {
     if (!rackets || rackets.length < 2) {
       throw new Error('Se necesitan al menos 2 palas para comparar');
     }
 
+    // RAG: recuperar knowledge + reviews antes del prompt
+    const ragContext = await this.retrieveComparisonRAGContext(rackets);
+    logger.info(
+      `📥 Comparison RAG: ${ragContext.knowledge ? 'knowledge loaded' : 'no knowledge'}, ${ragContext.reviews ? 'reviews loaded' : 'no reviews'}`
+    );
+
     // Construir información de las palas de forma optimizada
     const racketsInfo = this.buildRacketsInfo(rackets);
     const userContext = this.buildUserContext(userProfile);
 
-    // Construir un único prompt que incluya tanto la comparación textual como las métricas
-    const combinedPrompt = this.buildCombinedPrompt(rackets, racketsInfo, userContext);
+    // Construir prompt enriquecido con contexto RAG
+    const combinedPrompt = this.buildCombinedPrompt(rackets, racketsInfo, userContext, ragContext);
 
     // 1. Intentar con Free AI API
     try {
@@ -231,7 +285,7 @@ export class OpenRouterService {
               content: prompt,
             },
           ],
-          temperature: 0.7,
+          temperature: 0.3,
           max_tokens: 4000,
         });
 
@@ -347,21 +401,49 @@ Preferencias: ${userProfile.preferences || 'No especificadas'}
 `;
   }
 
-  private buildCombinedPrompt(rackets: Racket[], racketsInfo: string, userContext: string): string {
+  private buildCombinedPrompt(
+    rackets: Racket[],
+    racketsInfo: string,
+    userContext: string,
+    ragContext?: { knowledge: string; reviews: string }
+  ): string {
+    const knowledgeSection =
+      ragContext?.knowledge
+        ? `CONOCIMIENTO DE DOMINIO (materiales, biomecánica, técnica):
+---
+${ragContext.knowledge}
+---`
+        : '';
+
+    const reviewsSection =
+      ragContext?.reviews
+        ? `EXPERIENCIA DE LA COMUNIDAD (reviews reales de jugadores):
+${ragContext.reviews
+  .split('\n')
+  .filter(l => l.trim())
+  .map(l => `• ${l}`)
+  .join('\n')}`
+        : '';
+
     return `CONTEXTO DEL SISTEMA:
-Eres "Smashly AI", un ex-jugador profesional de pádel, entrenador de élite y experto en biomecánica y materiales de palas (carbono 3K/12K/18K, fibra de vidrio, gomas EVA Soft/Hard).
-Tu objetivo es realizar un análisis técnico profundo y comparativo entre las palas solicitadas.
+Eres "Smashly AI", ex-jugador profesional de pádel, entrenador de élite y experto en biomecánica y materiales (carbono 3K/12K/18K, fibra de vidrio, gomas EVA Soft/Hard).
+Realiza un análisis técnico profundo y comparativo entre las palas solicitadas.
 
 REGLAS DE DOMINIO (PÁDEL):
-- Palas Diamante: Balance alto, máximo estrés en el brazo (riesgo de epicondilitis), potencia pura, punto dulce pequeño y superior. Para jugadores ofensivos.
-- Palas Redondas: Balance bajo, máxima manejabilidad y control, punto dulce amplio y centrado.
+- Palas Diamante: Balance alto, máximo estrés en el brazo (riesgo de epicondilitis), potencia pura, punto dulce pequeño y superior. Para jugadores ofensivos avanzados.
+- Palas Redondas: Balance bajo, máxima manejabilidad y control, punto dulce amplio y centrado. Ideales con lesiones.
 - Palas Lágrima/Gota: Polivalentes, balance medio.
-- Materiales: Carbono 18K es más rígido (menos salida de bola a baja velocidad, más potencia en golpes fuertes) que el 3K o Fibra de Vidrio. Gomas Hard aportan control y potencia en bloqueos; Soft aportan salida de bola y confort.
+- Materiales: Carbono 18K más rígido (potencia en golpes fuertes, menos confort) que 3K o Fibra de Vidrio. Gomas Hard = control + potencia en bloqueos; Soft = salida de bola + confort.
+- Peso: Más pesado = más potencia pero más fatiga. Ligero = más manejabilidad.
 
-DATOS DE ENTRADA:
+${knowledgeSection}
+
+DATOS DE LAS PALAS A COMPARAR:
 ${racketsInfo}
 
 ${userContext}
+
+${reviewsSection}
 
 INSTRUCCIONES DE SALIDA (JSON ESTRICTO):
 Debes generar un único objeto JSON válido sin texto markdown adicional fuera de él. Su estructura DEBE ser EXACTAMENTE esta:

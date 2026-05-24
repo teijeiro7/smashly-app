@@ -1,7 +1,6 @@
 import { supabase } from '../config/supabase';
 import { Racket, SearchFilters, SortOptions, PaginatedResponse } from '../types';
 import logger from '../config/logger';
-import { CacheService } from './cacheService';
 
 function normalizeSpecKey(key: string): string {
   return key
@@ -413,37 +412,9 @@ export class RacketService {
    * Obtiene todas las palas desde caché o base de datos
    * Usa caché en RAM para servir respuestas rápidas si el catálogo no ha cambiado
    */
-  static async getAllRackets(forceRefresh: boolean = false): Promise<Racket[]> {
-    // Intentar servir desde caché a menos que se fuerce refresco
-    if (!forceRefresh) {
-      const cached = CacheService.getCatalog();
-      if (cached) {
-        logger.info(`⚡ Catálogo servido desde caché (${cached.length} palas)`);
-        return cached;
-      }
-    }
-
+  static async getAllRackets(): Promise<Racket[]> {
     try {
       logger.info('🔄 Cargando catálogo desde Supabase...');
-
-      // First, get view counts for all rackets
-      const { data: viewCounts, error: viewError } = await supabase
-        .from('racket_views')
-        .select('racket_id')
-        .order('racket_id');
-
-      if (viewError) {
-        logger.warn('Error fetching view counts, continuing without them:', viewError);
-      }
-
-      // Count views per racket
-      const viewCountMap = new Map<number, number>();
-      if (viewCounts) {
-        viewCounts.forEach((view: any) => {
-          const count = viewCountMap.get(view.racket_id) || 0;
-          viewCountMap.set(view.racket_id, count + 1);
-        });
-      }
 
       const { data, error, count } = await supabase
         .from('rackets')
@@ -456,13 +427,8 @@ export class RacketService {
         throw new Error(`Error al cargar las palas desde Supabase: ${error.message}`);
       }
 
-      logger.info(
-        `Successfully loaded ${
-          data?.length || 0
-        } rackets from Supabase (total in DB: ${count || 0})`
-      );
+      logger.info(`Loaded ${data?.length || 0} rackets (total in DB: ${count || 0})`);
 
-      // If there are more records than we got, use pagination
       let allData = data || [];
       if (count && data && count > data.length) {
         logger.info(`Fetching remaining ${count - data.length} rackets...`);
@@ -470,22 +436,8 @@ export class RacketService {
         logger.info(`Final count: ${allData.length} rackets loaded`);
       }
 
-      // Add view counts to each racket
-      const dataWithViews = allData.map((racket: any) => ({
-        ...racket,
-        view_count: viewCountMap.get(racket.id) || 0,
-      }));
-
-      // Sort by view count (most viewed first)
-      dataWithViews.sort((a, b) => (b.view_count || 0) - (a.view_count || 0));
-
-      const processedData = processRacketData(dataWithViews);
-      const result = processedData.map(mapToFrontendFormat);
-
-      // Guardar en caché para próximas requests
-      CacheService.setCatalog(result);
-
-      return result;
+      const processedData = processRacketData(allData);
+      return processedData.map(mapToFrontendFormat);
     } catch (error: unknown) {
       logger.error('Failed to connect to Supabase:', error);
       throw error;
@@ -493,37 +445,27 @@ export class RacketService {
   }
 
   /**
-   * Obtiene la versión actual del catálogo (hash del max updated_at)
-   * Sirve para que el frontend sepa si debe recargar o usar datos cacheados
+   * Computes a lightweight ETag for the catalog.
+   * Used by the controller to return 304 when nothing changed.
+   * Single query: max(updated_at) + total count.
    */
-  static async getCatalogVersion(): Promise<string> {
-    // Check cached version first
-    const cachedVersion = CacheService.getCatalogVersion();
-    if (cachedVersion) return cachedVersion;
-
+  static async getCatalogETag(): Promise<string> {
     try {
-      const { data, error } = await supabase
-        .from('rackets')
-        .select('updated_at', { count: 'exact', head: false })
-        .order('updated_at', { ascending: false })
-        .limit(1);
-
-      if (error) {
-        logger.warn('Error fetching catalog version:', error);
-        return 'unknown';
-      }
-
-      const latestUpdate = data?.[0]?.updated_at || new Date().toISOString();
-      const totalResult = await supabase
-        .from('rackets')
-        .select('id', { count: 'exact', head: true });
-
-      const version = `${latestUpdate}_${totalResult.count || 0}`;
-      CacheService.setCatalogVersion(version);
-      return version;
-    } catch (error: unknown) {
-      logger.error('Error getting catalog version:', error);
-      return 'unknown';
+      const [{ data }, countResult] = await Promise.all([
+        supabase
+          .from('rackets')
+          .select('updated_at')
+          .order('updated_at', { ascending: false })
+          .limit(1),
+        supabase
+          .from('rackets')
+          .select('id', { count: 'exact', head: true }),
+      ]);
+      const latestUpdate = data?.[0]?.updated_at || '';
+      const total = countResult.count || 0;
+      return `"${latestUpdate}_${total}"`;
+    } catch {
+      return `"${Date.now()}"`;
     }
   }
 
@@ -627,10 +569,6 @@ export class RacketService {
     }
 
     const processedData = processRacketData([data]);
-
-    // Invalidar caché porque el catálogo cambió
-    CacheService.invalidateCatalog();
-
     return mapToFrontendFormat(processedData[0]);
   }
 
@@ -644,9 +582,6 @@ export class RacketService {
       logger.error(`Error deleting racket ${id}:`, error);
       throw new Error(`Error al eliminar la pala: ${error.message}`);
     }
-
-    // Invalidar caché porque el catálogo cambió
-    CacheService.invalidateCatalog();
   }
 
   /**
@@ -1040,12 +975,6 @@ export class RacketService {
       }
 
       logger.info(`Actualización masiva completada: ${updatedCount} palas actualizadas.`);
-
-      // Invalidar caché porque el catálogo cambió
-      if (updatedCount > 0) {
-        CacheService.invalidateCatalog();
-      }
-
       return updatedCount;
     } catch (error: unknown) {
       logger.error('Error in bulkUpdateRackets:', error);

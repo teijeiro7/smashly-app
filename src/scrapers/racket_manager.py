@@ -160,19 +160,21 @@ class RacketManager:
 
     def _extract_features(self, name: str) -> dict:
         name_lower = name.lower()
-        
+        # Collapse internal hyphens for suffix/feature detection: "carb-on" → "carbon"
+        name_norm = re.sub(r"(?<=\w)-(?=\w)", "", name_lower)
+
         # Year
-        year_match = re.search(r'\b(202[3-7])\b', name_lower)
+        year_match = re.search(r'\b(202[3-7])\b', name_norm)
         year = year_match.group(1) if year_match else None
 
         # Suffixes
         critical_suffixes = [
-            "woman", "w", "light", "lite", "air", "junior", "jr", 
+            "woman", "w", "light", "lite", "air", "junior", "jr",
             "hybrid", "ctrl", "control", "attack", "comfort", "cmf", "master",
-            "limited", "ltd", "pro", "team", "elite", "flow",
-            "12k", "18k", "24k", "3k", "carbon" # Treat materials as suffixes too for safety
+            "limited", "ltd", "pro", "team", "elite", "flow", "fdb",
+            "12k", "18k", "24k", "3k", "carbon",
         ]
-        found_suffixes = {s for s in critical_suffixes if f" {s} " in f" {name_lower} " or f"-{s}" in name_lower}
+        found_suffixes = {s for s in critical_suffixes if f" {s} " in f" {name_norm} " or f"-{s}" in name_norm}
 
         # Clean Name
         clean_name = self._normalize_name_for_comparison(name)
@@ -275,7 +277,7 @@ class RacketManager:
                 # Update Master Model Name if incoming is cleaner (heuristic: shorter is usually cleaner for masters)
                 # But we prefer names with Year.
                 existing_entry = self.data[slug]
-                
+
                 # Logic: If current has no year, but new one does, take new name.
                 existing_feats = self._extract_features(existing_entry['model'])
                 if not existing_feats['year'] and input_features['year']:
@@ -283,38 +285,36 @@ class RacketManager:
                 # Logic: If both have year (or neither), prefer the one WITHOUT player name (cleaner)
                 elif len(p_name) < len(existing_entry['model']):
                      # Simple heuristic: shorter often means less marketing fluff
-                     pass 
+                     pass
 
-            # Clean "Unknown" from slug generation
-            slug_brand = p_brand if p_brand != "Unknown" else "generic"
-            
-            # Evitar marca duplicada en el slug: 
-            # Si p_name ya empieza por la marca, no la volvemos a añadir como prefijo.
-            brand_prefix = slug_brand.lower()
-            model_lower = p_name.lower()
-            
-            if model_lower.startswith(brand_prefix):
-                # Ya contiene la marca
-                slug = slugify_paddle("", p_name) 
             else:
-                slug = slugify_paddle(slug_brand, p_name)
+                # No match found — create new entry
+                slug_brand = p_brand if p_brand != "Unknown" else "generic"
 
-            counter = 1
-            original_slug = slug
-            while slug in self.data:
-                slug = f"{original_slug}-{counter}"
-                counter += 1
-            
-            print(f"New Racket: {p_name} [{slug}]")
-            self.data[slug] = {
-                "id": slug,
-                "brand": p_brand,
-                "model": p_name,
-                "description": p_dict.get('description', ''),
-                "specs": {},
-                "images": [],
-                "prices": []
-            }
+                brand_prefix = slug_brand.lower()
+                model_lower = p_name.lower()
+
+                if model_lower.startswith(brand_prefix):
+                    slug = slugify_paddle("", p_name)
+                else:
+                    slug = slugify_paddle(slug_brand, p_name)
+
+                counter = 1
+                original_slug = slug
+                while slug in self.data:
+                    slug = f"{original_slug}-{counter}"
+                    counter += 1
+
+                print(f"New Racket: {p_name} [{slug}]")
+                self.data[slug] = {
+                    "id": slug,
+                    "brand": p_brand,
+                    "model": p_name,
+                    "description": p_dict.get('description', ''),
+                    "specs": {},
+                    "images": [],
+                    "prices": []
+                }
         
         racket_entry = self.data[slug]
         self.url_map[p_url] = slug

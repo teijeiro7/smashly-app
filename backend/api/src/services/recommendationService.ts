@@ -13,6 +13,7 @@ import { OpenRouterService } from './openRouterService';
 import { CacheService } from './cacheService';
 import { RacketFilterService } from './racketFilterService';
 import { TesteaMetricsService } from './testeaMetricsService';
+import { PromptCompressionService } from './promptCompressionService';
 
 export class RecommendationService {
   /**
@@ -52,20 +53,57 @@ export class RecommendationService {
         throw new Error('No rackets match your criteria. Please adjust your filters.');
       }
 
-      // 4. Limit to top 20 safest/most relevant rackets for faster AI response
-      const MAX_RACKETS_FOR_AI = 20;
+      // 4. Use compact prompt format to avoid Worker resource limits
+      // Send up to 12 rackets in compressed format (smaller than 15 full rackets)
+      const MAX_RACKETS_FOR_AI = 12;
       const limitedRackets = filteredRackets.slice(0, MAX_RACKETS_FOR_AI);
+      
+      // 5. Build compressed prompt for AI selection
+      const prompt = PromptCompressionService.buildCompactSelectionPrompt(limitedRackets, data);
+      const promptSize = Buffer.byteLength(prompt, 'utf8');
+      logger.info(`🤖 Sending ${limitedRackets.length} rackets in compressed format (${promptSize} bytes)`);
+      
+      let aiResult: any = null;
+      let lastError: Error | null = null;
+      const maxRetries = 3;
+      
+      for (let attempt = 1; attempt <= maxRetries; attempt++) {
+        try {
+          const aiResponse = await OpenRouterService.generateContent(prompt);
 
-      // 5. Build strategic prompt with Testea metrics
-      const prompt = this.buildStrategicPrompt(limitedRackets, data);
+          // Save AI response for debugging
+          const fs = require('fs');
+          const path = require('path');
+          const debugDir = path.join(__dirname, '../../debug-ai-responses');
+          if (!fs.existsSync(debugDir)) {
+            fs.mkdirSync(debugDir, { recursive: true });
+          }
+          const timestamp = Date.now();
+          fs.writeFileSync(
+            path.join(debugDir, `ai-response-raw-${timestamp}.txt`),
+            aiResponse
+          );
+          logger.info(`📝 AI response saved to debug-ai-responses/ai-response-raw-${timestamp}.txt`);
 
-      // 6. Call OpenRouter with strategic prompt
-      logger.info(`🤖 Sending ${limitedRackets.length} safe rackets to AI with strategic prompt`);
-      const aiResponse = await OpenRouterService.generateContent(prompt);
-
-      // 6. Parse response
-      const aiResult = this.parseJsonResponse(aiResponse);
-      logger.info(`🤖 AI recommended ${aiResult.rackets?.length || 0} rackets`);
+          // Parse response
+          aiResult = this.parseJsonResponse(aiResponse);
+          logger.info(`🤖 AI recommended ${aiResult.rackets?.length || 0} rackets`);
+          break; // Success, exit retry loop
+        } catch (error) {
+          lastError = error instanceof Error ? error : new Error(String(error));
+          logger.warn(`⚠️ AI response parse failed (attempt ${attempt}/${maxRetries}): ${lastError.message}`);
+          
+          if (attempt < maxRetries) {
+            logger.info(`🔄 Retrying in ${attempt * 2}s...`);
+            await new Promise(resolve => setTimeout(resolve, attempt * 2000));
+          }
+        }
+      }
+      
+      if (!aiResult) {
+        logger.error('❌ All AI retry attempts failed');
+        throw lastError || new Error('Failed to get valid AI response after retries');
+      }
 
       // 7. Enrich AI recommendations with Testea metrics and biomechanical safety
       const enrichedRackets = await this.enrichRecommendations(
@@ -109,6 +147,7 @@ export class RecommendationService {
   /**
    * Extracts and parses the first JSON object from an AI response.
    * Handles common wrappers like markdown fences or leading/trailing prose.
+   * Includes fallback parsing for truncated responses.
    */
   private static parseJsonResponse(responseText: string): any {
     const cleanedText = responseText
@@ -131,14 +170,74 @@ export class RecommendationService {
     try {
       return JSON.parse(candidate);
     } catch (error) {
+      // Try to fix common JSON truncation issues
+      const fixedJson = this.attemptJsonRepair(candidate);
+      if (fixedJson) {
+        logger.warn('⚠️ JSON was malformed but successfully repaired');
+        return fixedJson;
+      }
+
+      // Save raw response for debugging
+      const fs = require('fs');
+      const path = require('path');
+      const debugDir = path.join(__dirname, '../../debug-ai-responses');
+      if (!fs.existsSync(debugDir)) {
+        fs.mkdirSync(debugDir, { recursive: true });
+      }
+      const timestamp = Date.now();
+      fs.writeFileSync(
+        path.join(debugDir, `ai-response-failed-${timestamp}.json`),
+        JSON.stringify({
+          timestamp: new Date().toISOString(),
+          error: error instanceof Error ? error.message : String(error),
+          rawResponse: responseText,
+          cleanedText: cleanedText,
+          candidate: candidate,
+        }, null, 2)
+      );
+
       logger.error('❌ Failed to parse AI response JSON', {
         message: error instanceof Error ? error.message : String(error),
         previewStart: candidate.slice(0, 500),
         previewEnd: candidate.slice(Math.max(0, candidate.length - 500)),
         length: candidate.length,
+        debugFile: `ai-response-failed-${timestamp}.json`,
       });
       throw new Error('Failed to parse AI response');
     }
+  }
+
+  /**
+   * Attempts to repair truncated or malformed JSON
+   */
+  private static attemptJsonRepair(jsonStr: string): any | null {
+    let attempts = [
+      jsonStr,
+      // Try closing unclosed arrays
+      jsonStr.replace(/,(\s*[}\]])/g, '$1'),
+      // Try adding missing closing brackets
+      jsonStr + ']}',
+      // Try removing trailing commas
+      jsonStr.replace(/,(\s*[[\{])/g, '$1'),
+    ];
+
+    // Try to find the last complete racket object and close the JSON
+    const racketMatches = jsonStr.match(/\{[^{}]*"id"\s*:\s*\d+[^{}]*\}/g);
+    if (racketMatches && racketMatches.length > 0) {
+      const lastCompleteRacket = racketMatches[racketMatches.length - 1];
+      const index = jsonStr.lastIndexOf(lastCompleteRacket) + lastCompleteRacket.length;
+      attempts.push(jsonStr.slice(0, index) + ']}');
+    }
+
+    for (const attempt of attempts) {
+      try {
+        return JSON.parse(attempt);
+      } catch {
+        continue;
+      }
+    }
+
+    return null;
   }
 
   /**
@@ -324,7 +423,9 @@ RESPONDE SOLO CON EL JSON:`;
 
     // Calculate safe weight range
     const safeWeightRange = this.calculateSafeWeightRange(profile);
-    const weightAppropriate = peso >= safeWeightRange.min && peso <= safeWeightRange.max;
+    // Only check weight if data is available (rackets already passed biomechanical filter)
+    // If peso is null/undefined, assume it's safe since it passed the filter
+    const weightAppropriate = racket.peso ? (peso >= safeWeightRange.min && peso <= safeWeightRange.max) : true;
 
     // Check balance appropriateness
     const balanceAppropriate = hasInjuries ? !balance.includes('alto') : true;

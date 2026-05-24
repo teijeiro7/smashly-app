@@ -20,10 +20,10 @@ const PopupContainer = styled(motion.div)<{ $minimized: boolean }>`
   border-radius: ${props => (props.$minimized ? '50%' : '20px')};
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
   z-index: 1000;
-  overflow: ${props => (props.$minimized ? 'visible' : 'hidden')};
+  overflow: hidden;
   border: ${props => (props.$minimized ? 'none' : '2px solid #e5e7eb')};
   cursor: ${props => (props.$minimized ? 'pointer' : 'default')};
-  transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  will-change: transform, opacity;
 
   @media (max-width: 768px) {
     right: 8px;
@@ -35,12 +35,13 @@ const PopupContainer = styled(motion.div)<{ $minimized: boolean }>`
 
 const CircularProgress = styled.svg<{ $status: string }>`
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 88px;
-  height: 88px;
-  transform: rotate(-90deg);
-  filter: drop-shadow(0 0 8px rgba(22, 163, 74, 0.3));
+  top: 50%;
+  left: 50%;
+  width: 76px;
+  height: 76px;
+  transform: translate(-50%, -50%) rotate(-90deg);
+  filter: drop-shadow(0 0 6px rgba(22, 163, 74, 0.2));
+  pointer-events: none;
 
   circle {
     fill: none;
@@ -59,8 +60,8 @@ const CircularProgress = styled.svg<{ $status: string }>`
         : props.$status === 'error'
           ? '#dc2626'
           : 'url(#animatedGradient)'};
-    stroke-dasharray: 251.2;
-    stroke-dashoffset: 251.2;
+    stroke-dasharray: 220;
+    stroke-dashoffset: 220;
     transition: stroke-dashoffset 0.5s ease;
   }
 `;
@@ -442,7 +443,7 @@ export const BackgroundTaskPopup: React.FC = () => {
     return visibleTask.status === 'running' ? 'Buscando...' : 'Recomendar';
   };
 
-  const circumference = 2 * Math.PI * 40; // radio = 40
+  const circumference = 2 * Math.PI * 35; // radio = 35
   const progressOffset = circumference - (circumference * (visibleTask.progress || 0)) / 100;
 
   return (
@@ -453,15 +454,13 @@ export const BackgroundTaskPopup: React.FC = () => {
         animate={{
           opacity: 1,
           y: 0,
-          scale: minimized && visibleTask.status === 'completed' ? [1, 1.05, 1] : 1,
+          scale: 1,
         }}
         exit={{ opacity: 0, y: 100, scale: 0.8 }}
         transition={{
           y: { type: 'spring', stiffness: 300, damping: 25 },
           opacity: { duration: 0.2 },
-          scale: minimized && visibleTask.status === 'completed' 
-            ? { duration: 2, repeat: Infinity, ease: "easeInOut" }
-            : { type: 'spring', stiffness: 300, damping: 25 }
+          scale: { type: 'spring', stiffness: 300, damping: 25 }
         }}
       >
         {minimized ? (
@@ -497,12 +496,12 @@ export const BackgroundTaskPopup: React.FC = () => {
                     </stop>
                   </linearGradient>
                 </defs>
-                <circle className='background' cx='44' cy='44' r='40' />
+                <circle className='background' cx='38' cy='38' r='35' />
                 <motion.circle
                   className='progress'
-                  cx='44'
-                  cy='44'
-                  r='40'
+                  cx='38'
+                  cy='38'
+                  r='35'
                   initial={{ strokeDashoffset: circumference }}
                   animate={{
                     strokeDashoffset: progressOffset,
@@ -511,8 +510,8 @@ export const BackgroundTaskPopup: React.FC = () => {
                     strokeDashoffset: { duration: 0.5 },
                   }}
                   style={{
-                    strokeDasharray: circumference,
-                    strokeDashoffset: progressOffset,
+                    strokeDasharray: `${circumference}px`,
+                    strokeDashoffset: `${progressOffset}px`,
                   }}
                 />
               </CircularProgress>
@@ -523,26 +522,15 @@ export const BackgroundTaskPopup: React.FC = () => {
               <MinimizedIcon
                 animate={
                   visibleTask.status === 'running'
-                    ? {
-                        rotate: 360,
-                      }
-                    : visibleTask.status === 'completed'
-                      ? {
-                          scale: [1, 1.2, 1],
-                        }
-                      : {}
+                    ? { rotate: 360 }
+                    : {}
                 }
                 transition={
                   visibleTask.status === 'running'
-                    ? {
-                        duration: 2,
-                        repeat: Infinity,
-                        ease: 'linear',
-                      }
-                    : {
-                        duration: 0.5,
-                      }
+                    ? { duration: 2, repeat: Infinity, ease: 'linear' }
+                    : { duration: 0.3 }
                 }
+                style={{ willChange: 'transform' }}
               >
                 {getTaskIcon()}
               </MinimizedIcon>

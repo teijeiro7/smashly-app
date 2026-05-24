@@ -201,6 +201,7 @@ app.get('/', (req, res) => {
 
 // Middleware para manejar rutas no encontradas
 app.use('*', (req, res) => {
+  console.log(`[404] ${req.method} ${req.originalUrl} — headers: origin=${req.headers.origin} cookie=${req.headers.cookie ? 'present' : 'none'}`);
   res.status(404).json({
     error: 'Endpoint not found',
     message: `Route ${req.originalUrl} not found`,
