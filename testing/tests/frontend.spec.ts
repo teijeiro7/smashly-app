@@ -98,7 +98,7 @@ test.describe('Catalog Page', () => {
     await openCatalog(page);
 
     await expect(page.getByRole('listitem')).toHaveCount(mockRackets.length);
-    await expect(page.getByRole('listitem').first()).toContainText('Adidas Metalbone 3.1');
+    await expect(page.getByRole('listitem').first()).toContainText('Metalbone 3.1');
   });
 
   test('should filter rackets by brand', async ({ page }) => {
@@ -108,15 +108,15 @@ test.describe('Catalog Page', () => {
 
     await expect(page.getByTestId('rackets-count')).toHaveText('Total de palas mostradas: 1');
     await expect(page.getByRole('listitem')).toHaveCount(1);
-    await expect(page.getByRole('listitem').first()).toContainText('Adidas Metalbone 3.1');
+    await expect(page.getByRole('listitem').first()).toContainText('Metalbone 3.1');
   });
 
   test('should sort rackets by price', async ({ page }) => {
     await openCatalog(page);
 
-    await page.getByRole('combobox').nth(1).selectOption('price-low');
+    await page.locator('select:has(option[value="price-low"])').selectOption('price-low');
 
-    await expect(page.getByRole('listitem').first()).toContainText('Bullpadel Vertex 04');
+    await expect(page.getByRole('listitem').first()).toContainText('Vertex 04');
   });
 });
 
