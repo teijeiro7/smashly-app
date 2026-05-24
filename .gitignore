@@ -262,7 +262,6 @@ out/
 .parcel-cache/
 
 # Docker
-.dockerignore
 docker-compose.override.yml
 
 # ===================================

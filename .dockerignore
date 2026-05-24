@@ -1,0 +1,10 @@
+# pnpm v11 workspace config — incompatible with pnpm@9 used in Docker
+**/pnpm-workspace.yaml
+
+# Dev artifacts
+node_modules
+**/node_modules
+**/.env
+**/dist
+**/coverage
+**/.cache
