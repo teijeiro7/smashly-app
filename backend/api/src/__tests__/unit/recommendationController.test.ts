@@ -39,7 +39,7 @@ describe('RecommendationController', () => {
       );
 
       expect(statusMock).toHaveBeenCalledWith(400);
-      expect(jsonMock).toHaveBeenCalledWith({ error: 'Missing type or data' });
+      expect(jsonMock).toHaveBeenCalledWith({ error: 'Missing or invalid type or data' });
     });
 
     it('should call RecommendationService and return result', async () => {
@@ -50,7 +50,7 @@ describe('RecommendationController', () => {
 
       mockRequest.body = {
         type: 'basic',
-        data: { level: 'intermediate' },
+        data: { level: 'intermediate', budget: 200 },
       };
 
       (RecommendationService.generateRecommendation as vi.Mock).mockResolvedValue(mockResult);

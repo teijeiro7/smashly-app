@@ -7,8 +7,10 @@ vi.mock('../../services/racketService', () => ({
   RacketService: {
     getAllRackets: vi.fn(),
     getRacketsWithPagination: vi.fn(),
+    getCatalogETag: vi.fn().mockResolvedValue('"test-etag"'),
     getRacketById: vi.fn(),
     searchRackets: vi.fn(),
+    searchRacketsFuzzy: vi.fn(),
     getFilteredRackets: vi.fn(),
     getRacketsByBrand: vi.fn(),
     getBestsellerRackets: vi.fn(),
@@ -135,15 +137,16 @@ describe('RacketController.searchRackets', () => {
   });
 
   it('returns matched rackets', async () => {
-    (RacketService.searchRackets as ReturnType<typeof vi.fn>).mockResolvedValueOnce(mockRackets);
+    const fuzzyResult = { data: mockRackets, total: 2 };
+    (RacketService.searchRacketsFuzzy as ReturnType<typeof vi.fn>).mockResolvedValueOnce(fuzzyResult);
     const req = createMockReq({ query: { q: 'ab' } });
     const res = createMockRes();
 
     await RacketController.searchRackets(req as Request, res as Response);
 
-    expect(RacketService.searchRackets).toHaveBeenCalledWith('ab');
+    expect(RacketService.searchRacketsFuzzy).toHaveBeenCalledWith('ab', expect.any(Object), expect.any(Object));
     expect(res.statusCode).toBe(200);
-    expect(res.body.data).toEqual(mockRackets);
+    expect(res.body.data).toEqual(fuzzyResult);
   });
 });
 
