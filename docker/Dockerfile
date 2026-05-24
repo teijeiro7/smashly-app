@@ -4,7 +4,7 @@
 FROM node:20-alpine AS frontend-builder
 WORKDIR /app/frontend
 
-RUN npm install -g pnpm
+RUN npm install -g pnpm@9
 
 # Install frontend dependencies
 COPY frontend/package.json frontend/pnpm-lock.yaml ./
@@ -43,7 +43,7 @@ RUN pnpm run build
 FROM node:20-alpine AS backend-builder
 WORKDIR /app/backend/api
 
-RUN npm install -g pnpm
+RUN npm install -g pnpm@9
 
 # Install backend dependencies (including dev deps for build)
 COPY backend/api/package.json backend/api/pnpm-lock.yaml ./
@@ -62,7 +62,7 @@ WORKDIR /app/backend/api
 # Install runtime packages
 RUN apk add --no-cache openssl curl
 
-RUN npm install -g pnpm
+RUN npm install -g pnpm@9
 
 # Copy production dependencies only
 COPY backend/api/package.json ./package.json
