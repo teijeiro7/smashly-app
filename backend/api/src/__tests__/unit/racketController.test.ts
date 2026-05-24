@@ -29,6 +29,7 @@ function createMockReq(overrides: Partial<Request> = {}): Partial<Request> {
   return {
     params: {},
     query: {},
+    headers: {},
     ...overrides,
   } as Partial<Request>;
 }

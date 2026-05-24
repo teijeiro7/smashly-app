@@ -41,7 +41,7 @@ describe('ProtectedRoute', () => {
   it('should redirect when not authenticated', () => {
     renderWithAuth(<div>Protected Content</div>, { user: null, loading: false });
 
-    expect(mockNavigate).toHaveBeenCalledWith('/error?type=unauthorized');
+    expect(mockNavigate).toHaveBeenCalledWith('/');
   });
 
   it('should render children when authenticated', () => {
