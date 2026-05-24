@@ -198,7 +198,7 @@ describe('RacketService - Integration Tests (with Real DB)', () => {
         const searchResponse = await request(app).get('/api/v1/rackets/search?q=NOX').expect(200);
 
         expect(searchResponse.body).toHaveProperty('success', true);
-        expect(Array.isArray(searchResponse.body.data)).toBe(true);
+        expect(Array.isArray(searchResponse.body.data?.data ?? searchResponse.body.data)).toBe(true);
       }
 
       // Test stats endpoint
