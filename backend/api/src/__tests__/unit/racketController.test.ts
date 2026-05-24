@@ -45,6 +45,8 @@ function createMockRes(): Partial<Response> & { body?: any; statusCode: number }
     return res;
   });
   res.send = vi.fn(() => res);
+  res.set = vi.fn(() => res);
+  res.end = vi.fn(() => res);
   return res;
 }
 

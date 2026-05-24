@@ -71,6 +71,8 @@ describe('RecommendationService', () => {
     it('should handle error', async () => {
       (global.fetch as any).mockResolvedValueOnce({
         ok: false,
+        status: 500,
+        json: async () => ({ error: 'Error generating recommendation' }),
       });
 
       await expect(

@@ -5,6 +5,11 @@ import ProtectedRoute from '../../../components/ProtectedRoute';
 import { AuthContext } from '../../../contexts/AuthContext';
 
 const mockNavigate = vi.fn();
+
+vi.mock('../../../contexts/AuthModalContext', () => ({
+  useAuthModal: () => ({ openLogin: vi.fn(), closeLogin: vi.fn() }),
+}));
+
 vi.mock('react-router-dom', async () => {
   const actual = await vi.importActual('react-router-dom');
   return {
