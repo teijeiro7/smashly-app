@@ -224,7 +224,7 @@ describe('RacketService', () => {
         ok: true,
         json: async () => ({
           success: true,
-          data: mockRackets,
+          data: mockRackets[0],
         }),
       });
 
@@ -235,10 +235,11 @@ describe('RacketService', () => {
 
     it('should return null when no match found', async () => {
       (global.fetch as any).mockResolvedValue({
-        ok: true,
+        ok: false,
+        status: 404,
         json: async () => ({
-          success: true,
-          data: mockRackets,
+          success: false,
+          error: 'Pala no encontrada',
         }),
       });
 
