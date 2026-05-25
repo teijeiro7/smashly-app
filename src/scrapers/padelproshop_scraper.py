@@ -28,8 +28,9 @@ class PadelProShopScraper(BaseScraper):
         time.sleep(random.uniform(2.0, 4.0))
         api_url = f"https://padelproshop.com{collection_path}/products.json?limit=250&page={page_num}"
         req = urllib.request.Request(api_url, headers={
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
             'Accept': 'application/json',
+            'Accept-Language': 'es-ES,es;q=0.9',
         })
         for attempt in range(3):
             try:
@@ -50,8 +51,9 @@ class PadelProShopScraper(BaseScraper):
         time.sleep(random.uniform(3.0, 5.0))
         api_url = f"https://padelproshop.com/products/{handle}.json"
         req = urllib.request.Request(api_url, headers={
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
             'Accept': 'application/json',
+            'Accept-Language': 'es-ES,es;q=0.9',
         })
         for attempt in range(3):
             try:

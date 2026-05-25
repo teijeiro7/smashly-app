@@ -128,8 +128,9 @@ class PadelMarketScraper(BaseScraper):
         time.sleep(random.uniform(0.8, 1.5))
         api_url = f"https://padelmarket.com/es-eu/products/{handle}.json"
         req = urllib.request.Request(api_url, headers={
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
             'Accept': 'application/json',
+            'Accept-Language': 'es-ES,es;q=0.9',
         })
         for attempt in range(3):
             try:
@@ -248,14 +249,26 @@ class PadelMarketScraper(BaseScraper):
 
     def _fetch_api_page(self, collection_path: str, page_num: int) -> list:
         """Fetch a single page of products from the Shopify JSON API (sync, run in executor)."""
+        time.sleep(random.uniform(1.5, 3.0))
         api_url = f"https://padelmarket.com{collection_path}/products.json?limit=250&page={page_num}"
         req = urllib.request.Request(api_url, headers={
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
             'Accept': 'application/json',
+            'Accept-Language': 'es-ES,es;q=0.9',
         })
-        with urllib.request.urlopen(req, timeout=30, context=_ssl_ctx()) as resp:
-            data = json.loads(resp.read().decode('utf-8'))
-        return data.get('products', [])
+        for attempt in range(3):
+            try:
+                with urllib.request.urlopen(req, timeout=30, context=_ssl_ctx()) as resp:
+                    data = json.loads(resp.read().decode('utf-8'))
+                return data.get('products', [])
+            except urllib.error.HTTPError as e:
+                if e.code == 403 and attempt < 2:
+                    wait = 20 * (attempt + 1)
+                    print(f"[PadelMarket] 403 on category page {page_num}, retrying in {wait}s...")
+                    time.sleep(wait)
+                    continue
+                raise
+        return []
 
     async def scrape_category(self, url: str) -> List[str]:
         """Scrape product URLs using the Shopify products.json API.
