@@ -120,7 +120,13 @@ def normalize_spec_value(key: str, value: str) -> str:
     if 'núcleo' in key_lower or 'goma' in key_lower:
         if 'eva' in value.lower(): return value.replace('eva', 'EVA').replace('Eva', 'EVA')
         if 'foam' in value.lower(): return value.replace('foam', 'Foam').replace('FOAM', 'Foam')
-    
+
+    if 'perfil' in key_lower:
+        m = re.search(r'(\d+(?:[.,]\d+)?)', value)
+        if m:
+            return m.group(1).replace(',', '.') + ' mm'
+        return value
+
     return value
 
 _JUNIOR_PATTERN = re.compile(

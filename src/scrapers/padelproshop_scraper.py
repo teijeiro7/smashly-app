@@ -147,6 +147,12 @@ class PadelProShopScraper(BaseScraper):
             if match:
                 specs['Peso'] = match.group(1) + " g"
 
+        # Perfil / grosor
+        if 'Perfil' not in specs:
+            match = re.search(r'(?:perfil|grosor|espesor|thickness)[:\s]+(\d+(?:[.,]\d+)?)\s*mm', text, re.IGNORECASE)
+            if match:
+                specs['Perfil'] = match.group(1).replace(',', '.') + ' mm'
+
         return specs
 
     async def scrape_product(self, url: str) -> Optional[Product]:
@@ -158,7 +164,7 @@ class PadelProShopScraper(BaseScraper):
             return None
         
         try:
-            loop = asyncio.get_event_loop()
+            loop = asyncio.get_running_loop()
             product_data = await loop.run_in_executor(
                 None, self._fetch_product_json, handle
             )
@@ -220,7 +226,7 @@ class PadelProShopScraper(BaseScraper):
         # Si no se encontró Forma en el JSON (body_html), intentamos descargar el HTML completo
         if 'Forma' not in specs:
             try:
-                loop = asyncio.get_event_loop()
+                loop = asyncio.get_running_loop()
                 req = urllib.request.Request(url, headers={'User-Agent': self.user_agent})
                 with urllib.request.urlopen(req, timeout=15, context=_ssl_ctx()) as resp:
                     full_html = resp.read().decode('utf-8')

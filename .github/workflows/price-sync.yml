@@ -125,10 +125,15 @@ jobs:
       - name: Install Python dependencies
         run: pip install -r src/scrapers/requirements.txt
 
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
       - name: Install Node dependencies
         run: |
           cd backend/api
-          pnpm install
+          pnpm install --frozen-lockfile
 
       - name: Run Full Sync
         run: |

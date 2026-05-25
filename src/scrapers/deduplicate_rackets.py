@@ -52,6 +52,25 @@ RADAR_COLS = ["radar_potencia", "radar_control", "radar_manejabilidad", "radar_p
 # Player edition suffixes that mark distinct product variants — do NOT merge across these
 VARIANT_SUFFIXES = ["fdb", "woman", "w", "light", "lite", "junior", "jr"]
 
+_BRAND_ALIASES: dict = {
+    "vibor-a": "vibor-a",
+    "vibora": "vibor-a",
+    "víbora": "vibor-a",
+    "starvie": "starvie",
+    "star vie": "starvie",
+    "dropshot": "drop shot",
+    "drop shot": "drop shot",
+    "blackcrown": "black crown",
+    "black crown": "black crown",
+    "royal padel": "royal padel",
+    "royalpadel": "royal padel",
+}
+
+
+def normalize_brand(brand: str) -> str:
+    """Normalize brand name to canonical form for deduplication."""
+    return _BRAND_ALIASES.get(brand.lower().strip(), brand.lower().strip())
+
 
 def normalize_name_base(s: str) -> str:
     """
@@ -141,7 +160,7 @@ def find_duplicate_groups(rows: list) -> list:
         # Remove year from base for pre-grouping key
         base_no_year = re.sub(r"\b202\d\b", "", base).strip()
         variant = get_variant_suffix(name_raw)
-        brand = r.get("brand", "").lower().strip()
+        brand = normalize_brand(r.get("brand", ""))
         key = (brand, base_no_year, variant)
         pre_groups.setdefault(key, []).append(r)
 

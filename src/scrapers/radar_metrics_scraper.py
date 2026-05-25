@@ -221,35 +221,26 @@ def _scrape_tumejorpala(pala_name: str) -> Optional[RadarMetrics]:
 
 def _parse_tumejorpala_scores(html: str) -> Optional[RadarMetrics]:
     """Parsea métricas desde HTML de TuMejorPala."""
-    metrics_map: dict[str, float] = {}
-    
-    # Buscar patrones de puntuación
-    patterns = [
-        # Patrón: "Potencia" seguido de número
-        r'(?:potencia|power)[\s:]*([0-9]+(?:[.,][0-9]+)?)',
-        r'(?:control)[\s:]*([0-9]+(?:[.,][0-9]+)?)',
-        r'(?:manejabilidad|maneabilidad)[\s:]*([0-9]+(?:[.,][0-9]+)?)',
-        r'(?:salida\s+de\s+bola|exit)[\s:]*([0-9]+(?:[.,][0-9]+)?)',
-        r'(?:punto\s+dulce|sweet\s+spot)[\s:]*([0-9]+(?:[.,][0-9]+)?)',
+    key_patterns = [
+        ('potencia',      r'(?:potencia|power)[\s:]*([0-9]+(?:[.,][0-9]+)?)'),
+        ('control',       r'(?:control)[\s:]*([0-9]+(?:[.,][0-9]+)?)'),
+        ('manejabilidad', r'(?:manejabilidad|maneabilidad)[\s:]*([0-9]+(?:[.,][0-9]+)?)'),
+        ('salida_bola',   r'(?:salida\s+de\s+bola|exit)[\s:]*([0-9]+(?:[.,][0-9]+)?)'),
+        ('punto_dulce',   r'(?:punto\s+dulce|sweet\s+spot)[\s:]*([0-9]+(?:[.,][0-9]+)?)'),
     ]
-    
-    for pattern in patterns:
+
+    metrics_map: dict[str, float] = {}
+    for key, pattern in key_patterns:
         matches = re.findall(pattern, html, re.IGNORECASE)
         if matches:
-            # Asumir que el primer match corresponde al primer tipo de métrica no asignada
-            for key, pattern in zip(['potencia', 'control', 'manejabilidad', 'salida_bola', 'punto_dulce'], patterns):
-                if key not in metrics_map:
-                    key_matches = re.findall(pattern, html, re.IGNORECASE)
-                    if key_matches:
-                        val = to_number(key_matches[0])
-                        if val is not None:
-                            metrics_map[key] = val
-    
-    # Verificar que tenemos todas las métricas
+            val = to_number(matches[0])
+            if val is not None:
+                metrics_map[key] = val
+
     required = ['potencia', 'control', 'manejabilidad', 'salida_bola', 'punto_dulce']
     if not all(k in metrics_map for k in required):
         return None
-    
+
     return RadarMetrics(
         potencia=metrics_map['potencia'],
         control=metrics_map['control'],

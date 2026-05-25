@@ -58,6 +58,12 @@ class PadelMarketScraper(BaseScraper):
         if match:
             specs['Peso'] = match.group(1) + " g"
 
+        # Perfil / grosor
+        if 'Perfil' not in specs:
+            match = re.search(r'(?:perfil|grosor|espesor|thickness)[:\s]+(\d+(?:[.,]\d+)?)\s*mm', html, re.IGNORECASE)
+            if match:
+                specs['Perfil'] = match.group(1).replace(',', '.') + ' mm'
+
         return specs
 
     def _fetch_product_json(self, handle: str) -> dict:
@@ -91,7 +97,7 @@ class PadelMarketScraper(BaseScraper):
             return None
         
         try:
-            loop = asyncio.get_event_loop()
+            loop = asyncio.get_running_loop()
             product_data = await loop.run_in_executor(
                 None, self._fetch_product_json, handle
             )
@@ -160,8 +166,8 @@ class PadelMarketScraper(BaseScraper):
                 
                 more_specs = self._parse_specs_from_html(full_html)
                 specs.update(more_specs)
-            except:
-                pass
+            except Exception as e:
+                print(f"[PadelMarket] HTML fallback error for {handle}: {e}")
 
         # Final shape inference from cumulative text if still missing
         if 'Forma' not in specs:

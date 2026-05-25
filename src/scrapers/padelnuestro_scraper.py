@@ -239,6 +239,14 @@ class PadelNuestroScraper(BaseScraper):
             elif "iniciación" in val.lower():
                 specs["Nivel"] = "Iniciación"
 
+        # 7. Perfil
+        match = re.search(
+            r'(?:perfil|grosor|espesor|thickness)[:\s]+(\d+(?:[.,]\d+)?)\s*mm',
+            text, re.IGNORECASE
+        )
+        if match:
+            specs["Perfil"] = match.group(1).replace(",", ".") + " mm"
+
         return specs
 
     def _scrape_price_from_html(self, url: str) -> Optional[tuple]:
@@ -472,14 +480,39 @@ class PadelNuestroScraper(BaseScraper):
             description=description_html,
         )
 
+    def _scrape_specs_via_graphql(self, url_key: str) -> Dict[str, str]:
+        """Fetch structured padel spec attributes via Magento GraphQL API."""
+        fields = " ".join(self._FIELD_TO_SPEC.keys())
+        query = (
+            '{ products(filter: {url_key: {eq: "%s"}}) { items { %s } } }'
+            % (url_key, fields)
+        )
+        data = self._fetch_graphql(query)
+        specs: Dict[str, str] = {}
+        try:
+            items = data.get("data", {}).get("products", {}).get("items", [])
+            if not items:
+                return specs
+            item = items[0]
+            for field, spec_key in self._FIELD_TO_SPEC.items():
+                raw_val = item.get(field)
+                if raw_val is None:
+                    continue
+                label = self._resolve_option(field, raw_val)
+                if label:
+                    specs[spec_key] = label
+        except Exception as e:
+            print(f"[PadelNuestro] GraphQL spec parse error for {url_key}: {e}")
+        return specs
+
     async def scrape_product(self, url: str) -> Optional[Product]:
-        """Scrape product data from HTML page using JSON-LD."""
+        """Scrape product data from HTML page using JSON-LD, enriched with GraphQL specs."""
         try:
             # Normalise URL (strip .html suffix)
             if url.endswith(".html"):
                 url = url[:-5]
 
-            loop = asyncio.get_event_loop()
+            loop = asyncio.get_running_loop()
             html = await loop.run_in_executor(None, self._fetch_html, url)
             if not html:
                 print(f"[PadelNuestro] No HTML for {url}")
@@ -488,6 +521,19 @@ class PadelNuestroScraper(BaseScraper):
             product = self._extract_product_from_html(html, url)
             if not product:
                 print(f"[PadelNuestro] Could not parse product from {url}")
+                return None
+
+            # Enrich with GraphQL structured spec attributes (option-ID → label)
+            url_key = url.rstrip("/").split("/")[-1]
+            graphql_specs = await loop.run_in_executor(
+                None, self._scrape_specs_via_graphql, url_key
+            )
+            for k, v in graphql_specs.items():
+                if v and k not in product.specs:
+                    product.specs[k] = v
+            if graphql_specs:
+                product.specs = normalize_specs(product.specs)
+
             return product
 
         except Exception as e:
@@ -519,7 +565,7 @@ class PadelNuestroScraper(BaseScraper):
 
         print("[PadelNuestro] Scraping category via HTML pagination...")
 
-        loop = asyncio.get_event_loop()
+        loop = asyncio.get_running_loop()
         while page_num <= max_pages:
             links = await loop.run_in_executor(
                 None, self._fetch_category_page, page_num
