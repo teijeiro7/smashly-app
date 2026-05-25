@@ -1,3 +1,4 @@
+import html as _html
 import json
 import re
 import urllib.request
@@ -119,15 +120,18 @@ class PadelNuestroScraper(BaseScraper):
                 "Content-Type": "application/json",
                 "Accept": "application/json, text/plain, */*",
                 "Accept-Language": "es-ES,es;q=0.9,en;q=0.8",
-                "Accept-Encoding": "gzip, deflate, br",
+                "Accept-Encoding": "gzip, deflate",
                 "Store": "es",
                 "Origin": "https://www.padelnuestro.com",
                 "Referer": "https://www.padelnuestro.com/palas-padel",
                 "Connection": "keep-alive",
+                "Sec-Fetch-Site": "same-origin",
+                "Sec-Fetch-Mode": "cors",
+                "Sec-Fetch-Dest": "empty",
                 "User-Agent": (
                     "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
                     "AppleWebKit/537.36 (KHTML, like Gecko) "
-                    "Chrome/122.0.0.0 Safari/537.36"
+                    "Chrome/124.0.0.0 Safari/537.36"
                 ),
             },
         )
@@ -162,8 +166,9 @@ class PadelNuestroScraper(BaseScraper):
         if not body_html:
             return specs
 
+        text = _html.unescape(body_html)
         text = (
-            body_html.replace("&nbsp;", " ")
+            text.replace("&nbsp;", " ")
             .replace("<br>", " ")
             .replace("</p>", " ")
             .replace("<p>", " ")
@@ -202,42 +207,53 @@ class PadelNuestroScraper(BaseScraper):
         if match:
             specs["Peso"] = match.group(1) + " g"
 
-        # 4. Núcleo/Goma
+        # 4. Núcleo/Goma — accepts "núcleo de goma EVA X", "goma EVA X", "núcleo EVA X"
         match = re.search(
-            r"(?:goma|núcleo|core)\s+(?:de\s+)?([a-zA-Z0-9\s]+?)(?:(?=\.|,)|$)",
+            r"(?:núcleo|goma|core)\s+(?:de\s+goma\s+|de\s+)?([A-Za-záéíóúÁÉÍÓÚñÑ0-9][A-Za-záéíóúÁÉÍÓÚñÑ0-9 ]+?)(?=[,.]|\s+con\s|\s+y\s|$)",
             text,
             re.IGNORECASE,
         )
+        if match:
+            val = match.group(1).strip()
+            if len(val) < 35 and any(kw in val.lower() for kw in ["eva", "foam", "goma", "poly", "soft"]):
+                specs["Núcleo"] = val.title()
+
+        # 5. Cara/Material — "caras de Black Carbon 12K", "fabricada con carbono 24K"
+        match = re.search(
+            r"cara(?:s)?\s+(?:de\s+)?"
+            r"((?:[A-Za-záéíóúÁÉÍÓÚñÑ0-9]+\s+)*(?:carbono|carbon|fibra[\w ]+|grafeno)(?:\s+\d+[kK])?)",
+            text, re.IGNORECASE,
+        )
+        if not match:
+            match = re.search(
+                r"(?:fabricad[ao]s?\s+con|material\s+(?:de\s+)?)"
+                r"((?:[A-Za-záéíóúÁÉÍÓÚñÑ0-9]+\s+)*(?:carbono|carbon|fibra[\w ]+|grafeno)(?:\s+\d+[kK])?)",
+                text, re.IGNORECASE,
+            )
         if match:
             val = match.group(1).strip()
             if len(val) < 40:
-                specs["Núcleo"] = val.title()
+                specs["Cara"] = val.title()
 
-        # 5. Cara/Material
+        # 5b. Acabado — "acabado rugoso", "acabado mate", "relieve 3D"
         match = re.search(
-            r"(?:caras|superficie|fabricad[ao]s?)\s+(?:de\s+|con\s+)?(carbono\s+[0-9]+[kK]|fibra de vidrio|carbono)",
+            r"acabado\s+(rugoso|liso|mate|brillante|3D|relieve|arenoso|s[aá]ndwich)",
             text,
             re.IGNORECASE,
         )
         if match:
-            specs["Cara"] = match.group(1).title()
+            specs["Acabado"] = match.group(1).title()
 
         # 6. Nivel
-        match = re.search(
-            r"jugador(?:es)?\s+(?:de\s+)?(?:nivel\s+)?([a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+)",
-            text,
-            re.IGNORECASE,
-        )
-        if match:
-            val = match.group(1).strip()
-            if "avanzado" in val.lower():
-                specs["Nivel"] = "Avanzado"
-            elif "intermedio" in val.lower():
-                specs["Nivel"] = "Intermedio"
-            elif "profesional" in val.lower():
-                specs["Nivel"] = "Profesional/Avanzado"
-            elif "iniciación" in val.lower():
-                specs["Nivel"] = "Iniciación"
+        text_l_nivel = text.lower()
+        if "profesional" in text_l_nivel and ("jugador" in text_l_nivel or "nivel" in text_l_nivel):
+            specs["Nivel"] = "Profesional"
+        elif "avanzado" in text_l_nivel and ("jugador" in text_l_nivel or "nivel" in text_l_nivel):
+            specs["Nivel"] = "Avanzado"
+        elif "intermedio" in text_l_nivel and ("jugador" in text_l_nivel or "nivel" in text_l_nivel):
+            specs["Nivel"] = "Intermedio"
+        elif ("iniciaci" in text_l_nivel or "principiante" in text_l_nivel) and ("jugador" in text_l_nivel or "nivel" in text_l_nivel):
+            specs["Nivel"] = "Iniciación"
 
         # 7. Perfil
         match = re.search(

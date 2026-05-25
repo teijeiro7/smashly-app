@@ -1,3 +1,4 @@
+import html as _html
 import json
 import re
 import ssl
@@ -53,14 +54,70 @@ class PadelMarketScraper(BaseScraper):
             if key and val:
                 specs[normalize_spec_name(key)] = val
 
-        # Weight regex
-        match = re.search(r'(\d{3}\s*[-–]\s*\d{3})\s*(?:gr|gramos|g)', html, re.IGNORECASE)
-        if match:
-            specs['Peso'] = match.group(1) + " g"
+        # Unescape and clean text for further extraction
+        text = _html.unescape(html)
+        text = text.replace('&nbsp;', ' ').replace('<br>', ' ').replace('</p>', ' ').replace('<p>', ' ')
+        text = re.sub(r'<[^>]+>', '', text)
+        text = re.sub(r'\s+', ' ', text).strip()
+        text_l = text.lower()
+
+        # Forma
+        if 'Forma' not in specs:
+            shape = self._infer_shape_from_text(text)
+            if shape:
+                specs['Forma'] = shape
+
+        # Balance
+        if 'Balance' not in specs:
+            match = re.search(r'balance\s+([a-zA-ZáéíóúÁÉÍÓÚñÑ]+)', text, re.IGNORECASE)
+            if match:
+                specs['Balance'] = match.group(1).title()
+
+        # Peso
+        if 'Peso' not in specs:
+            match = re.search(r'(\d{3}\s*[-–]\s*\d{3})\s*(?:gr|gramos|g)', text, re.IGNORECASE)
+            if match:
+                specs['Peso'] = match.group(1) + " g"
+
+        # Cara/Material
+        if 'Cara' not in specs:
+            match = re.search(
+                r'(?:(?:con|de)\s+)?'
+                r'((?:black\s+)?(?:carbono|carbon|fibra\s+de\s+(?:carbono|vidrio)|grafeno)'
+                r'(?:\s+\d+[kK])?)',
+                text, re.IGNORECASE
+            )
+            if match:
+                val = match.group(1).strip()
+                if len(val) < 40:
+                    specs['Cara'] = val.title()
+
+        # Núcleo
+        if 'Núcleo' not in specs:
+            match = re.search(
+                r'(?:n[uú]cleo|goma|core)\s+(?:de\s+goma\s+|de\s+)?'
+                r'([A-Za-záéíóúÁÉÍÓÚñÑ0-9][A-Za-záéíóúÁÉÍÓÚñÑ0-9 ]+?(?:eva|foam|poly)(?:\s+[A-Za-z]+)?)',
+                text, re.IGNORECASE
+            )
+            if match:
+                val = match.group(1).strip()
+                if len(val) < 30:
+                    specs['Núcleo'] = val.title()
+
+        # Nivel
+        if 'Nivel' not in specs:
+            if 'profesional' in text_l and ('jugador' in text_l or 'nivel' in text_l):
+                specs['Nivel'] = 'Profesional'
+            elif 'avanzado' in text_l and ('jugador' in text_l or 'nivel' in text_l):
+                specs['Nivel'] = 'Avanzado'
+            elif 'intermedio' in text_l and ('jugador' in text_l or 'nivel' in text_l):
+                specs['Nivel'] = 'Intermedio'
+            elif ('iniciaci' in text_l or 'principiante' in text_l) and ('jugador' in text_l or 'nivel' in text_l):
+                specs['Nivel'] = 'Iniciación'
 
         # Perfil / grosor
         if 'Perfil' not in specs:
-            match = re.search(r'(?:perfil|grosor|espesor|thickness)[:\s]+(\d+(?:[.,]\d+)?)\s*mm', html, re.IGNORECASE)
+            match = re.search(r'(?:perfil|grosor|espesor|thickness)[:\s]+(\d+(?:[.,]\d+)?)\s*mm', text, re.IGNORECASE)
             if match:
                 specs['Perfil'] = match.group(1).replace(',', '.') + ' mm'
 
