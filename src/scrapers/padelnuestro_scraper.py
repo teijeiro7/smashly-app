@@ -12,6 +12,8 @@ from .base_scraper import BaseScraper, Product, clean_price, normalize_specs, is
 class PadelNuestroScraper(BaseScraper):
     """Scraper for PadelNuestro online store using GraphQL API."""
 
+    _graphql_blocked: bool = False  # class-level flag: skip GraphQL after first 403
+
     # ── Magento option‑ID → human‑readable label mappings ──────────────
     _ATTR_OPTIONS: Dict[str, Dict[str, str]] = {
         "padelracket_balance": {
@@ -153,9 +155,17 @@ class PadelNuestroScraper(BaseScraper):
                         import brotli
                         raw = brotli.decompress(raw)
                     except ImportError:
-                        pass  # Si no está brotli, intentar decodificar igualmente
+                        pass
                 data = json.loads(raw.decode("utf-8"))
                 return data if data is not None else {}
+        except urllib.error.HTTPError as e:
+            if e.code == 403:
+                if not PadelNuestroScraper._graphql_blocked:
+                    print("[PadelNuestro] GraphQL blocked (403) — falling back to HTML-only parsing")
+                    PadelNuestroScraper._graphql_blocked = True
+            else:
+                print(f"[PadelNuestro] GraphQL Error: {e}")
+            return {}
         except Exception as e:
             print(f"[PadelNuestro] GraphQL Error: {e}")
             return {}
@@ -498,6 +508,8 @@ class PadelNuestroScraper(BaseScraper):
 
     def _scrape_specs_via_graphql(self, url_key: str) -> Dict[str, str]:
         """Fetch structured padel spec attributes via Magento GraphQL API."""
+        if PadelNuestroScraper._graphql_blocked:
+            return {}
         fields = " ".join(self._FIELD_TO_SPEC.keys())
         query = (
             '{ products(filter: {url_key: {eq: "%s"}}) { items { %s } } }'

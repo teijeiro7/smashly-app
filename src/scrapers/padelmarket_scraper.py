@@ -138,6 +138,8 @@ class PadelMarketScraper(BaseScraper):
                     data = json.loads(resp.read().decode('utf-8'))
                 return data.get('product', {})
             except urllib.error.HTTPError as e:
+                if e.code == 404:
+                    return {}  # product removed from store
                 if e.code == 403 and attempt < 2:
                     wait = 10 * (attempt + 1)
                     print(f"[PadelMarket] 403 on {handle}, retrying in {wait}s...")
