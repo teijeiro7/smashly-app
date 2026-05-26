@@ -69,6 +69,12 @@ class PadelProShopScraper(BaseScraper):
                     time.sleep(wait)
                     continue
                 raise
+            except urllib.error.URLError as e:
+                if attempt < 2:
+                    time.sleep(5 * (attempt + 1))
+                    continue
+                print(f"[PadelProShop] Network error for {handle}: {e.reason}")
+                return {}
         return {}
 
     # Palabras clave de forma y su valor normalizado

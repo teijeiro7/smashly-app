@@ -146,6 +146,12 @@ class PadelMarketScraper(BaseScraper):
                     time.sleep(wait)
                     continue
                 raise
+            except urllib.error.URLError as e:
+                if attempt < 2:
+                    time.sleep(5 * (attempt + 1))
+                    continue
+                print(f"[PadelMarket] Network error for {handle}: {e.reason}")
+                return {}
         return {}
 
     async def scrape_product(self, url: str) -> Optional[Product]:

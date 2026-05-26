@@ -394,6 +394,11 @@ class PadelNuestroScraper(BaseScraper):
         ctx.verify_mode = ssl.CERT_NONE
         try:
             with urllib.request.urlopen(req, timeout=20, context=ctx) as resp:
+                # Detect redirect to category page (discontinued product)
+                final_url = resp.url.split("?")[0].rstrip("/")
+                req_url = url.split("?")[0].rstrip("/")
+                if final_url != req_url:
+                    return None  # redirected → discontinued, skip silently
                 raw = resp.read()
                 enc = resp.headers.get("Content-Encoding", "")
                 if enc == "gzip":
@@ -543,12 +548,10 @@ class PadelNuestroScraper(BaseScraper):
             loop = asyncio.get_running_loop()
             html = await loop.run_in_executor(None, self._fetch_html, url)
             if not html:
-                print(f"[PadelNuestro] No HTML for {url}")
-                return None
+                return None  # redirect (discontinued) or fetch error — already logged
 
             product = self._extract_product_from_html(html, url)
             if not product:
-                print(f"[PadelNuestro] Could not parse product from {url}")
                 return None
 
             # Enrich with GraphQL structured spec attributes (option-ID → label)
