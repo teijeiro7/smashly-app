@@ -28,7 +28,7 @@ const Header = styled.div`
 
   @media (max-width: 768px) {
     border-radius: 18px;
-    padding: 1.75rem 1rem;
+    padding: 1.25rem 1rem;
   }
 `;
 
@@ -141,11 +141,15 @@ const Card = styled(motion.div)`
   }
 
   @media (max-width: 768px) {
-    padding: 1.75rem 1rem;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    grid-template-rows: auto auto auto;
+    column-gap: 1.25rem;
+    padding: 1.5rem;
     border-radius: 16px;
-    min-height: 260px;
+    min-height: 160px;
     text-align: left;
-    align-items: flex-start;
+    align-content: center;
   }
 `;
 
@@ -163,11 +167,15 @@ const IconContainer = styled.div`
   transition: background-color 0.3s ease, color 0.3s ease, transform 0.3s ease;
 
   @media (max-width: 768px) {
-    width: 64px;
-    height: 64px;
-    border-radius: 16px;
-    font-size: 2rem;
-    margin-bottom: 1rem;
+    width: 56px;
+    height: 56px;
+    border-radius: 14px;
+    font-size: 1.75rem;
+    margin-bottom: 0;
+    grid-column: 1;
+    grid-row: 1 / 4;
+    align-self: center;
+    justify-self: center;
   }
 `;
 
@@ -176,6 +184,13 @@ const CardTitle = styled.h2`
   font-weight: 700;
   color: #1f2937;
   margin-bottom: 1rem;
+
+  @media (max-width: 768px) {
+    font-size: 1.25rem;
+    margin-bottom: 0.375rem;
+    grid-column: 2;
+    grid-row: 1;
+  }
 `;
 
 const CardDescription = styled.p`
@@ -184,6 +199,13 @@ const CardDescription = styled.p`
   margin-bottom: 2rem;
   line-height: 1.6;
   flex-grow: 1;
+
+  @media (max-width: 768px) {
+    font-size: 0.875rem;
+    margin-bottom: 0.625rem;
+    grid-column: 2;
+    grid-row: 2;
+  }
 `;
 
 const ActionButton = styled.div`
@@ -193,6 +215,12 @@ const ActionButton = styled.div`
   font-weight: 600;
   color: #15803d;
   font-size: 1.125rem;
+
+  @media (max-width: 768px) {
+    font-size: 0.875rem;
+    grid-column: 2;
+    grid-row: 3;
+  }
 `;
 
 const ArrowIcon = styled(FiArrowRight)`
