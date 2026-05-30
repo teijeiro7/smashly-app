@@ -428,19 +428,20 @@ class PadelNuestroScraper(BaseScraper):
                 original_price = old_val
 
         # ── Images: media_gallery from inline JS ──────────────────────
+        # Magento serializes URLs with escaped slashes (https:\/\/...) inside JS strings.
         images: List[str] = []
         gallery_matches = re.findall(
-            r'"full"\s*:\s*"(https://www\.padelnuestro\.com/media/catalog/product/[^"]+)"',
+            r'"full"\s*:\s*"(https:\\/\\/www\\.padelnuestro\\.com\\/media\\/catalog\\/product\\/[^"]+)"',
             html,
         )
         if gallery_matches:
-            seen = set()
+            seen: set = set()
             for img_url in gallery_matches:
-                if img_url not in seen:
-                    images.append(img_url)
-                    seen.add(img_url)
+                clean_url = re.sub(r'\?.*$', '', img_url.replace('\\/', '/'))
+                if clean_url not in seen:
+                    images.append(clean_url)
+                    seen.add(clean_url)
         if not images and image:
-            # Use the JSON-LD image but strip the small thumbnail params
             images = [re.sub(r'\?.*$', '', image)]
             image = images[0]
         elif images:
