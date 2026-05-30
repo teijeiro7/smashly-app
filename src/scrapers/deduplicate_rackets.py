@@ -19,6 +19,7 @@ Usage:
 import re
 import os
 import argparse
+import unicodedata
 
 from dotenv import load_dotenv
 from supabase import create_client, Client
@@ -52,6 +53,28 @@ RADAR_COLS = ["radar_potencia", "radar_control", "radar_manejabilidad", "radar_p
 # Player edition suffixes that mark distinct product variants — do NOT merge across these
 VARIANT_SUFFIXES = ["fdb", "woman", "w", "light", "lite", "junior", "jr"]
 
+# Country name translations: some stores name editions in Spanish, others in English.
+# Normalize all to canonical English so duplicates resolve to the same key.
+_COUNTRY_MAP: dict[str, str] = {
+    "españa": "spain", "espana": "spain",
+    "italia": "italy",
+    "mexico": "mexico", "méxico": "mexico",
+    "holanda": "netherlands",
+    "alemania": "germany",
+    "francia": "france",
+    "belgica": "belgium", "bélgica": "belgium",
+    "inglaterra": "england",
+    "eeuu": "usa",
+}
+_COUNTRY_RE = re.compile(
+    r'\b(' + '|'.join(re.escape(k) for k in _COUNTRY_MAP) + r')\b',
+    re.IGNORECASE,
+)
+
+
+def _strip_accents(s: str) -> str:
+    return ''.join(c for c in unicodedata.normalize('NFD', s) if unicodedata.category(c) != 'Mn')
+
 
 def normalize_name_base(s: str) -> str:
     """
@@ -61,12 +84,15 @@ def normalize_name_base(s: str) -> str:
     if not s:
         return ""
     s = s.lower().strip()
+    s = _strip_accents(s)
     s = re.sub(r"\s*\([^)]*\)\s*", " ", s)   # strip (pala), (padel), etc.
     s = re.sub(r"\bpala\b", "", s)
     s = re.sub(r"(?<=\w)-(?=\w)", "", s)       # carb-on → carbon
     s = re.sub(r"\s+by\s+[a-z]+(?:\s+[a-z]+)*", "", s)  # strip "by agustin tapia" player attributions
-    # Strip material descriptors added inconsistently by stores (e.g. one store adds "alum", another doesn't)
+    # Strip material descriptors added inconsistently by stores
     s = re.sub(r"\b(alum|aluminio)\b", "", s)
+    # Normalize country names: stores use local language (españa, italia...) or English (spain, italy...)
+    s = _COUNTRY_RE.sub(lambda m: _COUNTRY_MAP[_strip_accents(m.group(0).lower())], s)
     s = re.sub(r"\s+", " ", s).strip()
     return s
 
