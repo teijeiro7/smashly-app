@@ -64,6 +64,9 @@ def normalize_name_base(s: str) -> str:
     s = re.sub(r"\s*\([^)]*\)\s*", " ", s)   # strip (pala), (padel), etc.
     s = re.sub(r"\bpala\b", "", s)
     s = re.sub(r"(?<=\w)-(?=\w)", "", s)       # carb-on → carbon
+    s = re.sub(r"\s+by\s+[a-z]+(?:\s+[a-z]+)*", "", s)  # strip "by agustin tapia" player attributions
+    # Strip material descriptors added inconsistently by stores (e.g. one store adds "alum", another doesn't)
+    s = re.sub(r"\b(alum|aluminio)\b", "", s)
     s = re.sub(r"\s+", " ", s).strip()
     return s
 
@@ -191,11 +194,51 @@ def find_duplicate_groups(rows: list) -> list:
     return final_groups
 
 
+def _strip_pala_noise(s: str) -> str:
+    """Remove store noise: (pala) suffix, leading/trailing 'pala' word."""
+    if not s:
+        return s
+    s = re.sub(r"\s*\(pala\)\s*", " ", s, flags=re.IGNORECASE).strip()
+    s = re.sub(r"(?i)^pala\s+", "", s).strip()
+    s = re.sub(r"(?i)\s+pala$", "", s).strip()
+    return s
+
+
+def _clean_pala_names(client: Client, rows: list, dry_run: bool) -> int:
+    """Strip stray (pala) noise from name/model fields. Returns count of rows fixed."""
+    fixed = 0
+    for r in rows:
+        name_clean = _strip_pala_noise(r.get("name") or "")
+        model_clean = _strip_pala_noise(r.get("model") or "")
+        updates: dict = {}
+        if name_clean != (r.get("name") or ""):
+            updates["name"] = name_clean
+        if model_clean != (r.get("model") or ""):
+            updates["model"] = model_clean
+        if updates:
+            print(f"  clean id={r['id']} '{r.get('name')}' → '{name_clean}'")
+            if not dry_run:
+                client.table("rackets").update(updates).eq("id", r["id"]).execute()
+            fixed += 1
+    return fixed
+
+
 def run(dry_run: bool):
     client = create_client(SUPABASE_URL, SUPABASE_KEY)
     print("Fetching rackets...")
     rows = fetch_all_rackets(client)
     print(f"Total: {len(rows)}")
+
+    # Strip (pala) noise from names before any other processing
+    print("\nCleaning (pala) noise from names...")
+    cleaned = _clean_pala_names(client, rows, dry_run)
+    if cleaned:
+        print(f"  Fixed: {cleaned} rackets")
+        # Re-fetch so subsequent steps work with clean names
+        if not dry_run:
+            rows = fetch_all_rackets(client)
+    else:
+        print("  No names needed cleaning.")
 
     # Remove junior/kid rackets from DB and exclude from dedup
     junior_rows = [r for r in rows if is_junior_racket(r.get("name") or r.get("model") or "")]
