@@ -107,8 +107,18 @@ const FiltersRow = styled.div`
   flex-wrap: wrap;
 
   @media (max-width: 768px) {
-    flex-direction: column;
-    align-items: stretch;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas:
+      "search search"
+      "brand  brand"
+      "offers clear";
+    gap: 0.75rem;
+
+    & > *:nth-child(1) { grid-area: search; }
+    & > *:nth-child(2) { grid-area: offers; }
+    & > *:nth-child(3) { grid-area: brand; }
+    & > *:nth-child(4) { grid-area: clear; }
   }
 `;
 
@@ -470,10 +480,18 @@ const ClearFiltersIconButton = styled(FilterButton)`
   padding: 0;
   justify-content: center;
 
+  .clear-label {
+    display: none;
+  }
+
   @media (max-width: 768px) {
     width: 100%;
     min-width: 0;
     padding: 0.7rem 1rem;
+
+    .clear-label {
+      display: inline;
+    }
   }
 `;
 
@@ -1047,6 +1065,7 @@ rackets,
 
             <ClearFiltersIconButton onClick={clearFilters}>
               <FiX />
+              <span className="clear-label">Limpiar</span>
             </ClearFiltersIconButton>
           </FiltersRow>
 

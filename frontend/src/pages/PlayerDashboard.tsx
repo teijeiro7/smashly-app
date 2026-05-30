@@ -32,15 +32,32 @@ const MaxWidth = styled.div`
 `;
 
 const HeroSection = styled.div`
-  background: white;
+  background: linear-gradient(135deg, #ffffff 60%, #f0fdf4 100%);
   border-radius: 24px;
   padding: clamp(1.25rem, 3vw, 3rem);
   margin-bottom: 2rem;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-  border: 1px solid rgba(22, 163, 74, 0.1);
+  border: 1px solid rgba(22, 163, 74, 0.15);
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #16a34a, #4ade80);
+    border-radius: 24px 24px 0 0;
+  }
 
   @media (max-width: 768px) {
     border-radius: 18px;
+
+    &::before {
+      border-radius: 18px 18px 0 0;
+    }
   }
 `;
 
@@ -51,7 +68,7 @@ const Greeting = styled.h1`
   margin: 0 0 0.5rem 0;
 
   @media (max-width: 768px) {
-    font-size: 2rem;
+    font-size: 1.75rem;
   }
 `;
 
@@ -59,6 +76,11 @@ const SubGreeting = styled.p`
   font-size: 1.125rem;
   color: #6b7280;
   margin: 0 0 1.5rem 0;
+
+  @media (max-width: 768px) {
+    font-size: 0.95rem;
+    margin-bottom: 1.25rem;
+  }
 `;
 
 const Stats = styled.div`
@@ -69,18 +91,30 @@ const Stats = styled.div`
   @media (max-width: 768px) {
     display: grid;
     grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
   }
 `;
 
 const Stat = styled.div`
   display: flex;
   flex-direction: column;
+
+  @media (max-width: 768px) {
+    background: rgba(22, 163, 74, 0.06);
+    border: 1px solid rgba(22, 163, 74, 0.15);
+    border-radius: 14px;
+    padding: 0.875rem 1rem;
+  }
 `;
 
 const StatValue = styled.span`
   font-size: 2rem;
   font-weight: 700;
   color: #16a34a;
+
+  @media (max-width: 768px) {
+    font-size: 1.5rem;
+  }
 `;
 
 const StatLabel = styled.span`
@@ -88,6 +122,10 @@ const StatLabel = styled.span`
   color: #6b7280;
   text-transform: uppercase;
   letter-spacing: 0.05em;
+
+  @media (max-width: 768px) {
+    font-size: 0.75rem;
+  }
 `;
 
 const Section = styled.section`
@@ -109,6 +147,11 @@ const QuickActionsGrid = styled.div`
   grid-template-columns: repeat(auto-fit, minmax(min(230px, 100%), 1fr));
   gap: 1rem;
   margin-bottom: 2rem;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+  }
 `;
 
 const RacketsGrid = styled.div`

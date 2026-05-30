@@ -144,6 +144,7 @@ const MobileMenuDropdown = styled(motion.div)<{ $isOpen: boolean }>`
   overflow: hidden;
   max-height: min(85dvh, 720px);
   overflow-y: auto;
+  height: auto;
   border: 1px solid rgba(0, 0, 0, 0.04);
   border-top: none;
   
@@ -668,9 +669,7 @@ const Header: React.FC = () => {
 
           <div
             style={{
-              opacity: isMenuOpen ? 1 : 0,
-              transition: 'opacity 0.2s ease',
-              pointerEvents: isMenuOpen ? 'auto' : 'none',
+              display: isMenuOpen ? 'block' : 'none',
             }}
           >
             <MobileNavSection>

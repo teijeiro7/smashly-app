@@ -19,11 +19,13 @@ const DropdownContainer = styled.div`
   z-index: 1000;
   overflow: hidden;
 
-  @media (max-width: 480px) {
-    left: 16px;
-    right: 16px;
+  @media (max-width: 1024px) {
+    position: fixed;
+    top: calc(56px + env(safe-area-inset-top, 0));
+    left: 12px;
+    right: 12px;
     width: auto;
-    max-width: calc(100dvw - 32px);
+    max-width: calc(100dvw - 24px);
   }
 `;
 

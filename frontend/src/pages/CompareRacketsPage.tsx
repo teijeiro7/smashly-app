@@ -371,6 +371,11 @@ const ActionButton = styled.button<{ variant?: 'secondary' }>`
 const MarkdownContent = styled.div`
   line-height: 1.7;
   color: #374151;
+  font-size: 0.875rem;
+
+  @media (max-width: 768px) {
+    font-size: 0.8125rem;
+  }
 
   h1,
   h2,
@@ -380,9 +385,17 @@ const MarkdownContent = styled.div`
     margin-bottom: 1rem;
   }
 
-  h3 {
+  h2 {
     font-size: 1.25rem;
+  }
+
+  h3 {
+    font-size: 1.125rem;
     color: #15803d;
+  }
+
+  h4 {
+    font-size: 1rem;
   }
 
   ul,
@@ -709,6 +722,7 @@ const CompareRacketsPage: React.FC = () => {
           <ComparisonTable
             data={comparisonResult.comparisonTable}
             metrics={comparisonMetrics || []}
+            rackets={selectedRackets}
           />
         ) : (
           comparisonResult.comparisonTable && (
