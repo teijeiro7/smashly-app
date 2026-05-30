@@ -121,6 +121,16 @@ export default defineConfig(({ mode }) => ({
         changeOrigin: true,
       },
     },
+    watch: {
+      ignored: [
+        '**/node_modules/**',
+        '**/backend/**',
+        '**/testing/**',
+        '**/.git/**',
+        '**/public/videos/**',
+        '**/public/images/readme-images/**',
+      ],
+    },
   },
   build: {
     // Use terser to drop ALL console.* statements in production
