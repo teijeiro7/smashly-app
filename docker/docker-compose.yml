@@ -1,6 +1,6 @@
 services:
   app:
-    image: "teijeiro7/smashlyapp:0.1"
+    image: "teijeiro7/smashlyapp:4.0"
     build:
       context: ..
       dockerfile: docker/Dockerfile
