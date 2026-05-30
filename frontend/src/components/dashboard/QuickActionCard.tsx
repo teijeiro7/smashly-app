@@ -28,6 +28,15 @@ const Card = styled(motion.div)`
       transform: scale(1.1);
     }
   }
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 1.25rem 1rem;
+    gap: 0.625rem;
+    border-radius: 16px;
+  }
 `;
 
 const IconContainer = styled.div`
@@ -41,6 +50,14 @@ const IconContainer = styled.div`
   justify-content: center;
   font-size: 1.75rem;
   transition: all 0.3s ease;
+
+  @media (max-width: 768px) {
+    width: 48px;
+    height: 48px;
+    min-width: 48px;
+    border-radius: 12px;
+    font-size: 1.25rem;
+  }
 `;
 
 const Title = styled.h3`
@@ -48,6 +65,11 @@ const Title = styled.h3`
   font-weight: 700;
   color: #1f2937;
   margin: 0;
+
+  @media (max-width: 768px) {
+    font-size: 0.875rem;
+    line-height: 1.3;
+  }
 `;
 
 const Description = styled.p`
@@ -55,6 +77,10 @@ const Description = styled.p`
   color: #6b7280;
   margin: 0;
   line-height: 1.5;
+
+  @media (max-width: 768px) {
+    display: none;
+  }
 `;
 
 interface QuickActionCardProps {

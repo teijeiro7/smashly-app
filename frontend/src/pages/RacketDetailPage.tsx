@@ -81,13 +81,9 @@ const Breadcrumbs = styled.div`
 
   @media (max-width: 768px) {
     padding: 0.75rem 1rem;
-    overflow-x: auto;
+    display: block;
+    overflow: hidden;
     white-space: nowrap;
-    scrollbar-width: none;
-
-    &::-webkit-scrollbar {
-      display: none;
-    }
   }
 
   a {
@@ -102,10 +98,12 @@ const Breadcrumbs = styled.div`
 
 const CurrentBreadcrumb = styled.span`
   color: var(--color-gray-900);
-  max-width: min(56vw, 320px);
+  display: inline-block;
+  max-width: min(40vw, 320px);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  vertical-align: bottom;
 `;
 
 const AuthBanner = styled.div`
@@ -248,6 +246,7 @@ const MainGrid = styled.div`
 
   @media (max-width: 768px) {
     padding: 0 1rem;
+    margin-top: 1rem;
   }
 
   @media (max-width: 1200px) {
@@ -297,6 +296,10 @@ const MainImage = styled.img`
   object-fit: contain;
   margin-bottom: 2rem;
   cursor: zoom-in;
+
+  @media (max-width: 768px) {
+    margin-bottom: 0;
+  }
   transition:
     transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
     opacity 0.3s ease;
@@ -954,8 +957,8 @@ const CompareRow = styled.div<{ $isBestPrice?: boolean }>`
   }
 
   @media (max-width: 768px) {
-    grid-template-columns: 1fr;
-    gap: 1rem;
+    grid-template-columns: 1fr auto;
+    gap: 0.25rem 0.75rem;
     padding: 1rem;
   }
 `;
@@ -976,7 +979,9 @@ const BestPriceBadge = styled.span`
 
   @media (max-width: 768px) {
     position: static;
-    margin-bottom: 0.5rem;
+    grid-column: 1 / -1;
+    grid-row: 1;
+    margin-bottom: 0;
   }
 `;
 
@@ -989,6 +994,11 @@ const ShippingInfo = styled.div`
   svg {
     color: var(--color-primary);
   }
+
+  @media (max-width: 768px) {
+    grid-column: 1 / -1;
+    grid-row: 3;
+  }
 `;
 
 const PriceText = styled.div<{ $isBestPrice?: boolean }>`
@@ -997,6 +1007,15 @@ const PriceText = styled.div<{ $isBestPrice?: boolean }>`
   color: ${props => (props.$isBestPrice ? 'var(--color-primary)' : 'var(--color-gray-800)')};
   text-align: right;
   transition: color 0.2s, font-size 0.2s;
+
+  @media (max-width: 768px) {
+    grid-column: 2;
+    grid-row: 2;
+    align-self: center;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+  }
 `;
 
 const ShopButton = styled.a`
@@ -1004,6 +1023,11 @@ const ShopButton = styled.a`
   border: 1px solid var(--color-gray-200);
   color: var(--color-gray-800);
   padding: 0.5rem 1rem;
+
+  @media (max-width: 768px) {
+    grid-column: 1 / -1;
+    grid-row: 4;
+  }
   border-radius: 8px;
   font-weight: 600;
   text-decoration: none;
