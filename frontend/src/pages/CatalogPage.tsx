@@ -310,6 +310,12 @@ const ResultsToolbar = styled.div`
     display: flex;
     flex-wrap: nowrap;
     gap: 0.5rem;
+
+    & > button {
+      width: auto;
+      flex-shrink: 0;
+      white-space: nowrap;
+    }
   }
 `;
 
@@ -320,6 +326,9 @@ const ViewToggle = styled.div`
   border-radius: 8px;
   padding: 0.125rem;
   background: white;
+  min-height: 46px;
+  align-items: center;
+  flex-shrink: 0;
 
   @media (max-width: 768px) {
     justify-content: center;
@@ -327,9 +336,9 @@ const ViewToggle = styled.div`
 `;
 
 const ViewButton = styled.button<{ $active: boolean }>`
-  min-width: 44px;
-  min-height: 46px;
-  padding: 0.5rem;
+  min-width: 36px;
+  height: 36px;
+  padding: 0.25rem;
   border: none;
   border-radius: 6px;
   background: ${props => (props.$active ? '#15803d' : 'transparent')};
