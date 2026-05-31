@@ -57,11 +57,11 @@ const Logo = styled(Link)`
     transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 
     @media (max-width: 768px) {
-      height: 40px;
+      height: 48px;
     }
 
     @media (max-width: 480px) {
-      height: 36px;
+      height: 44px;
     }
   }
 
