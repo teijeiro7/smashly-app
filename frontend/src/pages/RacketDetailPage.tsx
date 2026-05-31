@@ -1152,6 +1152,7 @@ const RacketDetailPage: React.FC = () => {
   const [showLightbox, setShowLightbox] = useState(false);
   const [showStickyBar, setShowStickyBar] = useState(false);
   const carouselRef = useRef<HTMLDivElement>(null);
+  const touchStartX = useRef<number | null>(null);
   const racketId = searchParams.get('id');
 
   const handleImageError = (e: React.SyntheticEvent<HTMLImageElement>) => {
@@ -1269,6 +1270,22 @@ const RacketDetailPage: React.FC = () => {
       window.removeEventListener('resize', handleScroll);
     };
   }, []);
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (touchStartX.current === null || !racket?.imagenes) return;
+    const delta = touchStartX.current - e.changedTouches[0].clientX;
+    if (Math.abs(delta) < 40) return;
+    if (delta > 0 && selectedImageIndex < racket.imagenes.length - 1) {
+      setSelectedImageIndex(prev => prev + 1);
+    } else if (delta < 0 && selectedImageIndex > 0) {
+      setSelectedImageIndex(prev => prev - 1);
+    }
+    touchStartX.current = null;
+  };
 
   const scrollCarousel = (direction: 'left' | 'right') => {
     if (carouselRef.current) {
@@ -1415,7 +1432,7 @@ const RacketDetailPage: React.FC = () => {
 
       <MainGrid>
         {/* Left: Gallery */}
-        <GallerySection>
+        <GallerySection onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
           <WishlistButton onClick={() => setShowAddToListModal(true)}>
             <FiHeart fill={showAddToListModal ? 'currentColor' : 'none'} />
           </WishlistButton>

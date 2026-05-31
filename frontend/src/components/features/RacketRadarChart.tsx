@@ -51,75 +51,8 @@ const RadarWrapper = styled.div`
   }
 `;
 
-const MetricsSection = styled.div`
-  margin-top: 2rem;
-  display: flex;
-  flex-direction: column;
-  gap: 1.25rem;
-`;
-
-const MetricBlock = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-`;
-
-const MetricLabel = styled.span`
-  font-size: 0.8125rem;
-  font-weight: 700;
-  color: #374151;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-`;
-
-const BarRow = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-`;
-
-const BarDot = styled.div<{ $color: string }>`
-  width: 8px;
-  height: 8px;
-  min-width: 8px;
-  border-radius: 50%;
-  background: ${p => p.$color};
-`;
-
-const BarTrack = styled.div`
-  flex: 1;
-  height: 7px;
-  background: #f3f4f6;
-  border-radius: 4px;
-  overflow: hidden;
-`;
-
-const BarFill = styled.div<{ $value: number; $color: string }>`
-  height: 100%;
-  width: ${p => p.$value * 10}%;
-  background: ${p => p.$color};
-  border-radius: 4px;
-  transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-`;
-
-const BarValue = styled.span`
-  font-size: 0.8125rem;
-  font-weight: 700;
-  color: #1f2937;
-  min-width: 2.5rem;
-  text-align: right;
-`;
-
 // Colores para hasta 3 palas
 const COLORS = ['#16a34a', '#3b82f6', '#f59e0b'];
-
-const METRICS_CONFIG = [
-  { key: 'potencia' as const, label: 'Potencia' },
-  { key: 'control' as const, label: 'Control' },
-  { key: 'manejabilidad' as const, label: 'Manejabilidad' },
-  { key: 'salidaDeBola' as const, label: 'Salida de Bola' },
-  { key: 'puntoDulce' as const, label: 'Punto Dulce' },
-];
 
 // Tooltip personalizado
 const CustomTooltip = memo(({ active, payload, metrics }: any) => {

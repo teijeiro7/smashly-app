@@ -193,7 +193,7 @@ const FilterSelect = styled.select`
   border: 1.5px solid #e5e7eb;
   border-radius: 8px;
   background: white;
-  color: #374151;
+  color: #6b7280;
   font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
@@ -348,6 +348,7 @@ const SortSelect = styled.select`
   border: 1px solid #e5e7eb;
   border-radius: 8px;
   background: white;
+  color: #6b7280;
   font-size: 0.875rem;
   cursor: pointer;
 

@@ -42,13 +42,16 @@ const RacketCardContainer = styled.li<{ $view: 'grid' | 'list'; $index: number }
 
 const RacketImageContainer = styled.div<{ $view: 'grid' | 'list' }>`
   position: relative;
-  height: ${props => (props.$view === 'grid' ? '220px' : '120px')};
-  width: ${props => (props.$view === 'list' ? '120px' : '100%')};
+  height: ${props => (props.$view === 'grid' ? '220px' : 'auto')};
+  width: ${props => (props.$view === 'list' ? '160px' : '100%')};
+  flex-shrink: 0;
+  align-self: ${props => (props.$view === 'list' ? 'stretch' : 'auto')};
   background: white;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 1rem;
+  padding: ${props => (props.$view === 'list' ? '0.75rem' : '1rem')};
+  border-right: ${props => (props.$view === 'list' ? '1px solid #f3f4f6' : 'none')};
   overflow: hidden;
 `;
 
