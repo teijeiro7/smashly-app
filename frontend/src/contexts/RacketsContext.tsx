@@ -69,6 +69,7 @@ export const RacketsProvider: React.FC<RacketsProviderProps> = ({
   const refreshRackets = useCallback(async (): Promise<void> => {
     localStorage.removeItem('smashly_catalog');
     localStorage.removeItem('smashly_catalog_etag');
+    localStorage.removeItem('smashly_catalog_expiry');
     await fetchRackets();
   }, [fetchRackets]);
 

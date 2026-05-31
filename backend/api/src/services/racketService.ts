@@ -407,12 +407,40 @@ async function fetchRemainingRackets(initialData: any[], count: number): Promise
   return allData;
 }
 
+interface CatalogCache {
+  data: Racket[];
+  etag: string;
+  expiresAt: number;
+}
+
+let catalogCache: CatalogCache | null = null;
+
+/** Returns ms until next Sunday 00:00:00 local time. Min 1h to avoid edge cases. */
+function msUntilNextSunday(): number {
+  const now = new Date();
+  const daysUntilSunday = now.getDay() === 0 ? 7 : 7 - now.getDay();
+  const next = new Date(now);
+  next.setDate(now.getDate() + daysUntilSunday);
+  next.setHours(0, 0, 0, 0);
+  return Math.max(next.getTime() - now.getTime(), 60 * 60 * 1000);
+}
+
+/** Returns seconds until next Sunday 00:00:00, for use in Cache-Control max-age. */
+export function secondsUntilNextSunday(): number {
+  return Math.floor(msUntilNextSunday() / 1000);
+}
+
+function isCacheValid(): boolean {
+  return !!(catalogCache && Date.now() < catalogCache.expiresAt);
+}
+
 export class RacketService {
-  /**
-   * Obtiene todas las palas desde caché o base de datos
-   * Usa caché en RAM para servir respuestas rápidas si el catálogo no ha cambiado
-   */
   static async getAllRackets(): Promise<Racket[]> {
+    if (isCacheValid()) {
+      logger.info(`⚡ Catalog from RAM cache (${catalogCache!.data.length} rackets)`);
+      return catalogCache!.data;
+    }
+
     try {
       logger.info('🔄 Cargando catálogo desde Supabase...');
 
@@ -437,7 +465,20 @@ export class RacketService {
       }
 
       const processedData = processRacketData(allData);
-      return processedData.map(mapToFrontendFormat);
+      const rackets = processedData.map(mapToFrontendFormat);
+
+      const latestUpdate = allData.reduce(
+        (max: string, r: any) => (r.updated_at > max ? r.updated_at : max),
+        ''
+      );
+      const etag = `"${latestUpdate}_${allData.length}"`;
+      const expiresAt = Date.now() + msUntilNextSunday();
+
+      catalogCache = { data: rackets, etag, expiresAt };
+      const expiryDate = new Date(expiresAt).toISOString();
+      logger.info(`💾 Catalog cached in RAM (${rackets.length} rackets, expires ${expiryDate})`);
+
+      return rackets;
     } catch (error: unknown) {
       logger.error('Failed to connect to Supabase:', error);
       throw error;
@@ -445,11 +486,13 @@ export class RacketService {
   }
 
   /**
-   * Computes a lightweight ETag for the catalog.
-   * Used by the controller to return 304 when nothing changed.
-   * Single query: max(updated_at) + total count.
+   * Returns ETag from RAM cache if valid (~0ms); falls back to two lightweight Supabase queries.
    */
   static async getCatalogETag(): Promise<string> {
+    if (isCacheValid()) {
+      return catalogCache!.etag;
+    }
+
     try {
       const [{ data }, countResult] = await Promise.all([
         supabase
