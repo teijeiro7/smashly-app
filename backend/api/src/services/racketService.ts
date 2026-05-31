@@ -434,6 +434,15 @@ function isCacheValid(): boolean {
   return !!(catalogCache && Date.now() < catalogCache.expiresAt);
 }
 
+/**
+ * Strips heavy fields not needed for catalog list view.
+ * Detail page always fetches the full racket via getRacketById (numeric ID path).
+ */
+function stripHeavyFields(racket: any): any {
+  const { descripcion, especificaciones, ...rest } = racket;
+  return rest;
+}
+
 export class RacketService {
   static async getAllRackets(): Promise<Racket[]> {
     if (isCacheValid()) {
@@ -465,7 +474,7 @@ export class RacketService {
       }
 
       const processedData = processRacketData(allData);
-      const rackets = processedData.map(mapToFrontendFormat);
+      const rackets = processedData.map(mapToFrontendFormat).map(stripHeavyFields);
 
       const latestUpdate = allData.reduce(
         (max: string, r: any) => (r.updated_at > max ? r.updated_at : max),
