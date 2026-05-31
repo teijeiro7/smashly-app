@@ -102,34 +102,14 @@ const FiltersSection = styled.div`
 
 const FiltersRow = styled.div`
   display: flex;
-  gap: 1rem;
+  gap: 0.75rem;
   align-items: center;
-  flex-wrap: wrap;
-
-  @media (max-width: 768px) {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    grid-template-areas:
-      "search search"
-      "brand  brand"
-      "offers clear";
-    gap: 0.75rem;
-
-    & > *:nth-child(1) { grid-area: search; }
-    & > *:nth-child(2) { grid-area: offers; }
-    & > *:nth-child(3) { grid-area: brand; }
-    & > *:nth-child(4) { grid-area: clear; }
-  }
 `;
 
 const SearchContainer = styled.div`
   flex: 1;
   position: relative;
-  min-width: min(320px, 100%);
-
-  @media (max-width: 768px) {
-    min-width: 100%;
-  }
+  min-width: 0;
 `;
 
 const SearchInput = styled.input`
@@ -253,6 +233,13 @@ const AdvancedFiltersToggle = styled.button<{ $active: boolean }>`
   }
 `;
 
+const QuickFiltersRow = styled.div`
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+`;
+
 const AdvancedFiltersPanel = styled.div<{ $isOpen: boolean }>`
   overflow: hidden;
   margin-top: 1rem;
@@ -266,14 +253,19 @@ const AdvancedFiltersPanel = styled.div<{ $isOpen: boolean }>`
   }
 `;
 
+const FilterGroupLabel = styled.div`
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #9ca3af;
+  margin-bottom: 0.5rem;
+`;
+
 const AdvancedFiltersGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 1rem;
-  padding: 1rem;
-  background: #f9fafb;
-  border-radius: 8px;
-  border: 1px solid #e5e7eb;
+  gap: 0.75rem;
 
   @media (max-width: 768px) {
     grid-template-columns: 1fr;
@@ -487,23 +479,11 @@ const CompareButton = styled.button`
 `;
 
 const ClearFiltersIconButton = styled(FilterButton)`
-  width: 44px;
-  min-width: 44px;
-  padding: 0;
-  justify-content: center;
-
-  .clear-label {
-    display: none;
-  }
+  white-space: nowrap;
+  flex-shrink: 0;
 
   @media (max-width: 768px) {
-    width: 100%;
-    min-width: 0;
-    padding: 0.7rem 1rem;
-
-    .clear-label {
-      display: inline;
-    }
+    width: auto;
   }
 `;
 
@@ -1061,23 +1041,9 @@ rackets,
               />
             </SearchContainer>
 
-            <FilterButton $active={showOffers} onClick={() => setShowOffers(!showOffers)}>
-              <FiTag />
-              Ofertas
-            </FilterButton>
-
-            {/* Filtro de marca como desplegable con estilo de FilterButton */}
-            <FilterSelect value={selectedBrand} onChange={e => setSelectedBrand(e.target.value)}>
-              {uniqueBrands.map(brand => (
-                <option key={brand} value={brand}>
-                  {brand === 'Todas' ? 'Todas las marcas' : brand}
-                </option>
-              ))}
-            </FilterSelect>
-
             <ClearFiltersIconButton onClick={clearFilters}>
               <FiX />
-              <span className="clear-label">Limpiar</span>
+              Limpiar
             </ClearFiltersIconButton>
           </FiltersRow>
 
@@ -1093,6 +1059,28 @@ rackets,
 
           {/* Advanced Filters Panel */}
           <AdvancedFiltersPanel $isOpen={showAdvancedFilters}>
+                <FilterGroupLabel>Filtros generales</FilterGroupLabel>
+                <QuickFiltersRow>
+                  <FilterSelect value={selectedBrand} onChange={e => setSelectedBrand(e.target.value)}>
+                    {uniqueBrands.map(brand => (
+                      <option key={brand} value={brand}>
+                        {brand === 'Todas' ? 'Todas las marcas' : brand}
+                      </option>
+                    ))}
+                  </FilterSelect>
+
+                  <FilterButton $active={showOffers} onClick={() => setShowOffers(!showOffers)}>
+                    <FiTag />
+                    Ofertas
+                  </FilterButton>
+
+                  <FilterButton $active={showAvailableOnly} onClick={() => setShowAvailableOnly(!showAvailableOnly)}>
+                    <FiFilter size={16} />
+                    En Stock
+                  </FilterButton>
+                </QuickFiltersRow>
+
+                <FilterGroupLabel style={{ marginTop: '1rem' }}>Características técnicas</FilterGroupLabel>
                 <AdvancedFiltersGrid>
                   <FilterSelect
                     value={selectedShape}
@@ -1181,14 +1169,6 @@ rackets,
           </ResultsCount>
 
           <ResultsToolbar>
-            <FilterButton
-              $active={showAvailableOnly}
-              onClick={() => setShowAvailableOnly(!showAvailableOnly)}
-            >
-              <FiFilter size={18} />
-              En Stock
-            </FilterButton>
-
             <SortSelect value={sortBy} onChange={e => setSortBy(e.target.value)}>
               <option value='most-viewed'>Más vistas primero</option>
               <option value='name'>Ordenar por nombre</option>
