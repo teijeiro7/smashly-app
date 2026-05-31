@@ -164,7 +164,7 @@ const FilterButton = styled.button<{ $active?: boolean }>`
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  min-height: 40px;
+  min-height: 46px;
   padding: 0.5rem 1rem;
   border: 1.5px solid ${props => (props.$active ? '#15803d' : '#e5e7eb')};
   border-radius: 8px;
@@ -188,7 +188,7 @@ const FilterButton = styled.button<{ $active?: boolean }>`
 `;
 
 const FilterSelect = styled.select`
-  min-height: 40px;
+  min-height: 46px;
   padding: 0.5rem 2.5rem 0.5rem 1rem;
   border: 1.5px solid #e5e7eb;
   border-radius: 8px;
@@ -229,6 +229,7 @@ const AdvancedFiltersToggle = styled.button<{ $active: boolean }>`
   justify-content: center;
   gap: 0.5rem;
   padding: 0.75rem 1rem;
+  min-height: 46px;
   margin-top: 1rem;
   width: 100%;
   border: 1.5px dashed ${props => (props.$active ? '#15803d' : '#e5e7eb')};
@@ -314,10 +315,10 @@ const ResultsToolbar = styled.div`
 
 const ViewToggle = styled.div`
   display: flex;
-  gap: 0.5rem;
+  gap: 0.25rem;
   border: 1px solid #e5e7eb;
   border-radius: 8px;
-  padding: 0.25rem;
+  padding: 0.125rem;
   background: white;
 
   @media (max-width: 768px) {
@@ -327,7 +328,7 @@ const ViewToggle = styled.div`
 
 const ViewButton = styled.button<{ $active: boolean }>`
   min-width: 44px;
-  min-height: 40px;
+  min-height: 46px;
   padding: 0.5rem;
   border: none;
   border-radius: 6px;
@@ -342,7 +343,7 @@ const ViewButton = styled.button<{ $active: boolean }>`
 `;
 
 const SortSelect = styled.select`
-  min-height: 40px;
+  min-height: 46px;
   padding: 0.5rem 1rem;
   border: 1px solid #e5e7eb;
   border-radius: 8px;
