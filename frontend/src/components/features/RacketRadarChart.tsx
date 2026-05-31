@@ -315,26 +315,6 @@ const RacketRadarChart: React.FC<RacketRadarChartProps> = ({ metrics }) => {
       </RadarWrapper>
 
       <Legend metrics={metrics} />
-
-      <MetricsSection>
-        {METRICS_CONFIG.map(({ key, label }) => (
-          <MetricBlock key={key}>
-            <MetricLabel>{label}</MetricLabel>
-            {metrics.map((racket, idx) => {
-              const val = Number(racket.radarData?.[key]) || 0;
-              return (
-                <BarRow key={idx}>
-                  <BarDot $color={COLORS[idx]} />
-                  <BarTrack>
-                    <BarFill $value={val} $color={COLORS[idx]} />
-                  </BarTrack>
-                  <BarValue>{val.toFixed(1)}</BarValue>
-                </BarRow>
-              );
-            })}
-          </MetricBlock>
-        ))}
-      </MetricsSection>
     </ChartContainer>
   );
 };
