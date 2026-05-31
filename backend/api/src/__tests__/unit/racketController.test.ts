@@ -18,6 +18,7 @@ vi.mock('../../services/racketService', () => ({
     getBrands: vi.fn(),
     getStats: vi.fn(),
   },
+  secondsUntilNextSunday: vi.fn().mockReturnValue(604800),
 }));
 
 const mockRackets = [
