@@ -8,13 +8,14 @@ import {
   FiExternalLink,
   FiLoader,
   FiHeart,
-  FiBell,
+  FiBarChart2,
   FiChevronLeft,
   FiChevronRight,
   FiTruck,
   FiLock,
   FiHome,
   FiSearch,
+  FiCheck,
 } from 'react-icons/fi';
 
 import { Link, useSearchParams } from 'react-router-dom';
@@ -40,6 +41,7 @@ import {
   NivelIcon,
   StoreLabel,
 } from '../components/common/SpecIcons';
+import { useComparison } from '../contexts/ComparisonContext';
 import RacketRadarChart from '../components/features/RacketRadarChart';
 
 // --- Styled Components ---
@@ -273,6 +275,7 @@ const GallerySection = styled.div`
   width: 100%;
   min-width: 0;
   min-height: 600px;
+  overflow: hidden;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
   transition: box-shadow 0.2s ease, transform 0.2s ease;
 
@@ -288,7 +291,7 @@ const GallerySection = styled.div`
   }
 `;
 
-const MainImage = styled.img`
+const MainImage = styled.img<{ $entering?: 'left' | 'right' }>`
   width: 100%;
   height: 100%;
   max-height: 450px;
@@ -307,6 +310,22 @@ const MainImage = styled.img`
   &:hover {
     transform: scale(1.02);
     opacity: 0.95;
+  }
+
+  ${props => props.$entering === 'left' && `
+    animation: slideInFromLeft 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+  `}
+  ${props => props.$entering === 'right' && `
+    animation: slideInFromRight 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+  `}
+
+  @keyframes slideInFromLeft {
+    from { opacity: 0; transform: translateX(-40px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+  @keyframes slideInFromRight {
+    from { opacity: 0; transform: translateX(40px); }
+    to { opacity: 1; transform: translateX(0); }
   }
 `;
 
@@ -689,35 +708,12 @@ const AlertButton = styled.button`
   cursor: pointer;
   transition: background-color 0.25s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.25s cubic-bezier(0.4, 0, 0.2, 1), color 0.25s cubic-bezier(0.4, 0, 0.2, 1), transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   margin-top: 1rem;
-  position: relative;
-  overflow: hidden;
-
-  &::before {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 0;
-    height: 0;
-    border-radius: 50%;
-    background: var(--color-gray-100);
-    transform: translate(-50%, -50%);
-    transition:
-      width 0.6s ease,
-      height 0.6s ease;
-  }
-
   &:hover {
     background: var(--color-gray-50);
     border-color: var(--color-primary);
     color: var(--color-primary);
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-
-    &::before {
-      width: 300px;
-      height: 300px;
-    }
   }
 
   &:active {
@@ -1141,6 +1137,7 @@ const RacketDetailPage: React.FC = () => {
   const [searchParams] = useSearchParams();
   const { rackets, loading: catalogLoading } = useRackets();
   const { isAuthenticated } = useAuth();
+  const { addRacket, isRacketInComparison } = useComparison();
 
   const [racket, setRacket] = useState<Racket | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
@@ -1153,6 +1150,7 @@ const RacketDetailPage: React.FC = () => {
   const [showStickyBar, setShowStickyBar] = useState(false);
   const carouselRef = useRef<HTMLDivElement>(null);
   const touchStartX = useRef<number | null>(null);
+  const slideDirectionRef = useRef<'left' | 'right'>('left');
   const racketId = searchParams.get('id');
 
   const handleImageError = (e: React.SyntheticEvent<HTMLImageElement>) => {
@@ -1239,8 +1237,10 @@ const RacketDetailPage: React.FC = () => {
       if (!racket?.imagenes || racket.imagenes.length <= 1) return;
 
       if (e.key === 'ArrowLeft' && selectedImageIndex > 0) {
+        slideDirectionRef.current = 'right';
         setSelectedImageIndex(prev => prev - 1);
       } else if (e.key === 'ArrowRight' && selectedImageIndex < racket.imagenes.length - 1) {
+        slideDirectionRef.current = 'left';
         setSelectedImageIndex(prev => prev + 1);
       }
     };
@@ -1280,8 +1280,10 @@ const RacketDetailPage: React.FC = () => {
     const delta = touchStartX.current - e.changedTouches[0].clientX;
     if (Math.abs(delta) < 40) return;
     if (delta > 0 && selectedImageIndex < racket.imagenes.length - 1) {
+      slideDirectionRef.current = 'left';
       setSelectedImageIndex(prev => prev + 1);
     } else if (delta < 0 && selectedImageIndex > 0) {
+      slideDirectionRef.current = 'right';
       setSelectedImageIndex(prev => prev - 1);
     }
     touchStartX.current = null;
@@ -1437,6 +1439,8 @@ const RacketDetailPage: React.FC = () => {
             <FiHeart fill={showAddToListModal ? 'currentColor' : 'none'} />
           </WishlistButton>
           <MainImage
+            key={selectedImageIndex}
+            $entering={slideDirectionRef.current}
             src={
               ((racket.imagenes?.[selectedImageIndex] || racket.imagenes?.[0])?.startsWith('http')
                 ? `${API_URL}/api/v1/proxy/image?url=${encodeURIComponent(racket.imagenes?.[selectedImageIndex] || racket.imagenes?.[0])}`
@@ -1539,6 +1543,15 @@ const RacketDetailPage: React.FC = () => {
               <AlertButton onClick={() => setShowAddToListModal(true)}>
                 <FiHeart /> Guardar en mis listas
               </AlertButton>
+              <AlertButton
+                onClick={() => racket && addRacket(racket)}
+                disabled={racket ? isRacketInComparison(racket.nombre) : false}
+              >
+                {racket && isRacketInComparison(racket.nombre)
+                  ? <><FiCheck /> Añadida al comparador</>
+                  : <><FiBarChart2 /> Añadir al comparador</>
+                }
+              </AlertButton>
             </ComparisonOnlyCard>
           ) : (
             <PriceCard>
@@ -1574,8 +1587,14 @@ const RacketDetailPage: React.FC = () => {
                 <FiExternalLink />
               </PrimaryButton>
 
-              <AlertButton>
-                <FiBell /> Crear Alerta de Precio
+              <AlertButton
+                onClick={() => racket && addRacket(racket)}
+                disabled={racket ? isRacketInComparison(racket.nombre) : false}
+              >
+                {racket && isRacketInComparison(racket.nombre)
+                  ? <><FiCheck /> Añadida al comparador</>
+                  : <><FiBarChart2 /> Añadir al comparador</>
+                }
               </AlertButton>
             </PriceCard>
           )}

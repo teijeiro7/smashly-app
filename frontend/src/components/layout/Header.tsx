@@ -103,7 +103,7 @@ const MobileSearchButton = styled.button`
   background: none;
   border: none;
   color: white;
-  font-size: 1.1rem;
+  font-size: 1.25rem;
   cursor: pointer;
   min-width: 40px;
   min-height: 40px;
@@ -238,7 +238,7 @@ const MobileMenuButton = styled.button`
   background: none;
   border: none;
   color: white;
-  font-size: 1.3rem;
+  font-size: 1.25rem;
   cursor: pointer;
   min-width: 40px;
   min-height: 40px;

@@ -155,7 +155,16 @@ export default defineConfig(({ mode }) => ({
     reportCompressedSize: true,
     rollupOptions: {
       output: {
-        // More granular chunk splitting for better caching
+        manualChunks: {
+          'vendor-react': ['react', 'react-dom', 'react-router-dom', 'react-is'],
+          'vendor-motion': ['framer-motion'],
+          'vendor-styled': ['styled-components'],
+          'vendor-charts': ['recharts'],
+          'vendor-icons': ['react-icons'],
+          'vendor-query': ['@tanstack/react-query', '@tanstack/react-virtual'],
+          'vendor-supabase': ['@supabase/supabase-js'],
+          'vendor-dnd': ['@dnd-kit/core', '@dnd-kit/sortable', '@dnd-kit/utilities'],
+        },
       },
     },
   },

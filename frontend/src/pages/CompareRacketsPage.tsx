@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { FiSearch, FiX, FiPlus, FiCpu, FiDownload, FiSave, FiCheck, FiHeart } from 'react-icons/fi';
 import { useRackets } from '../contexts/RacketsContext';
 import { useAuth } from '../contexts/AuthContext';
+import { useComparison } from '../contexts/ComparisonContext';
 import { useNotifications } from '../contexts/NotificationContext';
 import { ComparisonService } from '../services/comparisonService';
 import { ListService } from '../services/listService';
@@ -14,6 +15,7 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { sileo } from 'sileo';
 import Fuse from 'fuse.js';
+import { toTitleCase } from '../utils/textUtils';
 import RacketRadarChart from '../components/features/RacketRadarChart';
 import ComparisonTable from '../components/features/ComparisonTable';
 
@@ -609,8 +611,9 @@ const CompareRacketsPage: React.FC = () => {
   const { rackets } = useRackets();
   const { user, isAuthenticated } = useAuth();
   const { addNotification } = useNotifications();
+  const { rackets: comparisonRackets } = useComparison();
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedRackets, setSelectedRackets] = useState<Racket[]>([]);
+  const [selectedRackets, setSelectedRackets] = useState<Racket[]>(() => comparisonRackets);
   const [comparisonResult, setComparisonResult] = useState<ComparisonResult | null>(null);
   const [comparisonMetrics, setComparisonMetrics] = useState<RacketComparisonData[] | null>(null);
   const [loading, setLoading] = useState(false);
@@ -974,7 +977,7 @@ const CompareRacketsPage: React.FC = () => {
                     alt={racket.nombre}
                   />
                   <div>
-                    <div style={{ fontWeight: 600 }}>{racket.nombre}</div>
+                    <div style={{ fontWeight: 600 }}>{toTitleCase(racket.nombre)}</div>
                     <div style={{ fontSize: '0.875rem', color: '#6b7280' }}>{racket.marca}</div>
                   </div>
                 </SearchResultItem>
@@ -1010,7 +1013,7 @@ const CompareRacketsPage: React.FC = () => {
                       alt={racket.nombre}
                     />
                     <FavoriteRacketInfo>
-                      <FavoriteRacketName>{racket.nombre}</FavoriteRacketName>
+                      <FavoriteRacketName>{toTitleCase(racket.nombre)}</FavoriteRacketName>
                       <FavoriteRacketBrand>{racket.marca}</FavoriteRacketBrand>
                     </FavoriteRacketInfo>
                   </FavoriteRacketCard>
@@ -1047,7 +1050,7 @@ const CompareRacketsPage: React.FC = () => {
                 src={racket.imagenes?.[0] || '/placeholder-racket.png'}
                 alt={racket.nombre}
               />
-              <RacketName>{racket.nombre}</RacketName>
+              <RacketName>{toTitleCase(racket.nombre)}</RacketName>
               <RacketBrand>{racket.marca}</RacketBrand>
             </SelectedRacketCard>
           ))}

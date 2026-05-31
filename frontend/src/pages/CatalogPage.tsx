@@ -307,9 +307,9 @@ const ResultsToolbar = styled.div`
 
   @media (max-width: 768px) {
     width: 100%;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 0.65rem;
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 0.5rem;
   }
 `;
 
@@ -358,7 +358,8 @@ const SortSelect = styled.select`
   }
 
   @media (max-width: 768px) {
-    width: 100%;
+    flex: 1;
+    min-width: 0;
   }
 `;
 
@@ -441,7 +442,7 @@ const FloatingPanel = styled(motion.div)`
   z-index: 50;
 
   @media (max-width: 768px) {
-    bottom: 1rem;
+    bottom: calc(78px + env(safe-area-inset-bottom, 0px) + 0.75rem);
     right: 1rem;
     left: 1rem;
   }
