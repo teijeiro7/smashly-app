@@ -243,12 +243,12 @@ const QuickFiltersRow = styled.div`
 const AdvancedFiltersPanel = styled.div<{ $isOpen: boolean }>`
   overflow: hidden;
   margin-top: 1rem;
-  max-height: ${props => props.$isOpen ? '500px' : '0'};
+  max-height: ${props => props.$isOpen ? '1200px' : '0'};
   opacity: ${props => props.$isOpen ? 1 : 0};
-  transition: max-height 0.3s ease, opacity 0.3s ease;
-  
+  transition: max-height 0.4s ease, opacity 0.3s ease;
+
   @media (prefers-reduced-motion: reduce) {
-    max-height: ${props => props.$isOpen ? '500px' : '0'};
+    max-height: ${props => props.$isOpen ? '1200px' : '0'};
     transition: none;
   }
 `;
