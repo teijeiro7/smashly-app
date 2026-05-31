@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { RacketService } from '../services/racketService';
+import { RacketService, secondsUntilNextSunday } from '../services/racketService';
 import { getPriceHistory } from '../services/priceHistoryService';
 import logger from '../config/logger';
 import { SearchFilters, SortOptions, ApiResponse, PaginatedResponse, Racket } from '../types';
@@ -38,7 +38,8 @@ export class RacketController {
         // ETag-based caching: compute version cheaply, skip full fetch on 304
         const etag = await RacketService.getCatalogETag();
         res.set('ETag', etag);
-        res.set('Cache-Control', 'public, max-age=0, must-revalidate');
+        const maxAge = secondsUntilNextSunday();
+        res.set('Cache-Control', `public, max-age=${maxAge}, stale-while-revalidate=86400`);
 
         if (req.headers['if-none-match'] === etag) {
           res.status(304).end();

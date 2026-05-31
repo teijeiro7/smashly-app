@@ -239,14 +239,26 @@ export class RacketService {
   }
 
   /**
-   * Obtiene todas las palas con caché ETag:
-   * - Envía If-None-Match con el ETag guardado
-   * - 304 → devuelve localStorage (sin descargar el catálogo)
-   * - 200 → guarda nuevo ETag + catálogo en localStorage, retorna
+   * Obtiene todas las palas con caché ETag + expiración semanal (domingos):
+   * - Si localStorage tiene datos válidos (no expirados) → envía If-None-Match
+   * - 304 → devuelve localStorage directamente (sin descargar el catálogo)
+   * - 200 → guarda nuevo ETag + catálogo + expiración en localStorage
+   * - Cache-Control max-age del servidor cubre la mayoría de visitas recurrentes sin red
    */
   static async getAllRacketsCached(): Promise<Racket[]> {
     const CACHE_KEY = 'smashly_catalog';
     const ETAG_KEY = 'smashly_catalog_etag';
+    const EXPIRY_KEY = 'smashly_catalog_expiry';
+
+    const storedExpiry = localStorage.getItem(EXPIRY_KEY);
+    const cacheExpired = storedExpiry ? Date.now() > parseInt(storedExpiry, 10) : true;
+
+    // Clear stale cache on Sunday expiry so next fetch gets fresh data
+    if (cacheExpired) {
+      localStorage.removeItem(CACHE_KEY);
+      localStorage.removeItem(ETAG_KEY);
+      localStorage.removeItem(EXPIRY_KEY);
+    }
 
     const storedETag = localStorage.getItem(ETAG_KEY);
     const storedData = localStorage.getItem(CACHE_KEY);
@@ -269,14 +281,22 @@ export class RacketService {
       const data = await handleApiResponse<Racket[]>(response);
       const newETag = response.headers.get('ETag') || '';
 
+      // Expiry = next Sunday 00:00:00
+      const now = new Date();
+      const daysUntilSunday = now.getDay() === 0 ? 7 : 7 - now.getDay();
+      const nextSunday = new Date(now);
+      nextSunday.setDate(now.getDate() + daysUntilSunday);
+      nextSunday.setHours(0, 0, 0, 0);
+
       try {
         localStorage.setItem(CACHE_KEY, JSON.stringify(data));
         if (newETag) localStorage.setItem(ETAG_KEY, newETag);
+        localStorage.setItem(EXPIRY_KEY, String(nextSunday.getTime()));
       } catch (e) {
         logger.warn('localStorage quota exceeded:', e);
       }
 
-      logger.log(`💾 Catálogo actualizado (${data.length} palas)`);
+      logger.log(`💾 Catálogo actualizado (${data.length} palas, expira ${nextSunday.toISOString()})`);
       return data;
     } catch (error: any) {
       // Fallback to stale localStorage data rather than failing completely
