@@ -84,12 +84,13 @@ router.get('/image', proxyLimiter, async (req: Request, res: Response) => {
       });
     }
 
-    // Fetch the image
+    // Fetch the image, forwarding WebP support so origin can serve smaller format
     const response = await axios.get(imageUrl, {
       responseType: 'arraybuffer',
       timeout: 10000,
       headers: {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+        'Accept': 'image/avif,image/webp,image/apng,image/*,*/*;q=0.8',
       },
     });
 
@@ -101,7 +102,7 @@ router.get('/image', proxyLimiter, async (req: Request, res: Response) => {
       'Content-Type': contentType,
       'Access-Control-Allow-Origin': '*',
       'Cross-Origin-Resource-Policy': 'cross-origin',
-      'Cache-Control': 'public, max-age=86400', // Cache for 24 hours
+      'Cache-Control': 'public, max-age=604800, stale-while-revalidate=86400', // 7 days + SWR
     });
 
     // Remove CSP for the image proxy to avoid interference with the parent page

@@ -135,13 +135,17 @@ if (fs.existsSync(staticDir)) {
     express.static(staticDir, {
       setHeaders: (res, filePath) => {
         if (filePath.endsWith('.html')) {
-          // HTML nunca se cachea: asegura que el usuario siempre tiene el último index.html
           res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
           res.setHeader('Pragma', 'no-cache');
           res.setHeader('Expires', '0');
         } else if (/\.(js|css|woff2?|ttf|eot|png|jpg|jpeg|gif|ico|webp|svg)$/.test(filePath)) {
-          // Assets con hash de Vite: inmutables, cachear 1 año
+          // Vite-hashed assets: immutable, 1 year
           res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+        } else if (/\.(webmanifest|json)$/.test(filePath)) {
+          // Manifest and JSON: revalidate daily
+          res.setHeader('Cache-Control', 'public, max-age=86400');
+        } else if (/\.(txt|xml)$/.test(filePath)) {
+          res.setHeader('Cache-Control', 'public, max-age=86400');
         }
       },
     })
