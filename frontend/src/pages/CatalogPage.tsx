@@ -507,7 +507,7 @@ const CatalogPage: React.FC = () => {
   const [selectedBrand, setSelectedBrand] = useState('Todas');
   const [showMostViewed, setShowMostViewed] = useState(false);
   const [showOffers, setShowOffers] = useState(false);
-  const [sortBy, setSortBy] = useState('most-viewed');
+  const [sortBy, setSortBy] = useState('name');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [displayCount, setDisplayCount] = useState(9);
   const [loadingMore, setLoadingMore] = useState(false);
@@ -543,7 +543,7 @@ const CatalogPage: React.FC = () => {
     const hardnessParam = searchParams.get('hardness') || 'Todas';
     const offersParam = searchParams.get('offers');
     const mostViewedParam = searchParams.get('mostViewed');
-    const sortParam = searchParams.get('sort') || 'most-viewed';
+    const sortParam = searchParams.get('sort') || 'name';
 
     setSearchQuery(queryParam);
     setSelectedBrand(brandParam);
@@ -576,7 +576,7 @@ const CatalogPage: React.FC = () => {
     if (showOffers) params.set('offers', 'true');
     if (showMostViewed) params.set('mostViewed', 'true');
     if (showAvailableOnly) params.set('availableOnly', 'true');
-    if (sortBy !== 'most-viewed') params.set('sort', sortBy);
+    if (sortBy !== 'name') params.set('sort', sortBy);
 
     const newUrl = params.toString() ? `?${params.toString()}` : window.location.pathname;
     navigate(newUrl, { replace: true });
@@ -637,6 +637,9 @@ const CatalogPage: React.FC = () => {
               sorted.sort((a, b) => {
                 switch (sortBy) {
                   case 'price-low':
+                    const aComp = a.solo_comparacion ? 1 : 0;
+                    const bComp = b.solo_comparacion ? 1 : 0;
+                    if (aComp !== bComp) return aComp - bComp;
                     const priceA = getLowestPrice(a)?.price || a.precio_actual || 0;
                     const priceB = getLowestPrice(b)?.price || b.precio_actual || 0;
                     return priceA - priceB;
@@ -651,7 +654,7 @@ const CatalogPage: React.FC = () => {
                     if (!a.en_oferta && b.en_oferta) return 1;
                     return 0;
                   default:
-                    return (b.view_count || 0) - (a.view_count || 0);
+                    return (a.modelo || '').localeCompare(b.modelo || '');
                 }
               });
             } catch (error) {
@@ -749,6 +752,9 @@ const CatalogPage: React.FC = () => {
         filtered.sort((a, b) => {
           switch (sortBy) {
             case 'price-low':
+              const aIsComparison = a.solo_comparacion ? 1 : 0;
+              const bIsComparison = b.solo_comparacion ? 1 : 0;
+              if (aIsComparison !== bIsComparison) return aIsComparison - bIsComparison;
               const priceA = getLowestPrice(a)?.price || a.precio_actual || 0;
               const priceB = getLowestPrice(b)?.price || b.precio_actual || 0;
               return priceA - priceB;
@@ -760,10 +766,6 @@ const CatalogPage: React.FC = () => {
               const brandA = a.marca || '';
               const brandB = b.marca || '';
               return brandA.localeCompare(brandB);
-            case 'most-viewed':
-              const viewsA = a.view_count || 0;
-              const viewsB = b.view_count || 0;
-              return viewsB - viewsA;
             case 'offer':
               if (a.en_oferta && !b.en_oferta) return -1;
               if (!a.en_oferta && b.en_oferta) return 1;
@@ -961,7 +963,7 @@ rackets,
     setSelectedBrand('Todas');
     setShowMostViewed(false);
     setShowOffers(false);
-    setSortBy('most-viewed');
+    setSortBy('name');
 
     // Clear advanced filters
     setSelectedShape('Todas');
@@ -1174,7 +1176,6 @@ rackets,
 
           <ResultsToolbar>
             <SortSelect value={sortBy} onChange={e => setSortBy(e.target.value)}>
-              <option value='most-viewed'>Más vistas primero</option>
               <option value='name'>Ordenar por nombre</option>
               <option value='brand'>Ordenar por marca</option>
               <option value='price-low'>Precio: menor a mayor</option>
