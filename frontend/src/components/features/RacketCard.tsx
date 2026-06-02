@@ -15,12 +15,13 @@ const RacketCardContainer = styled.li<{ $view: 'grid' | 'list'; $index: number }
   transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   border: 1px solid #e5e7eb;
   contain: layout style paint;
-  display: ${props => (props.$view === 'list' ? 'flex' : 'flex')};
+  will-change: transform, opacity;
+  display: flex;
   flex-direction: ${props => (props.$view === 'list' ? 'row' : 'column')};
   height: ${props => (props.$view === 'grid' ? '100%' : 'auto')};
-  animation: cardFadeIn 0.4s ease forwards;
-  animation-delay: ${props => Math.min(props.$index * 0.05, 0.5)}s;
-  opacity: 0;
+  animation: ${props => props.$index < 12 ? 'cardFadeIn 0.4s ease forwards' : 'none'};
+  animation-delay: ${props => props.$index < 12 ? `${Math.min(props.$index * 0.05, 0.5)}s` : '0s'};
+  opacity: ${props => props.$index < 12 ? 0 : 1};
 
   @keyframes cardFadeIn {
     from {
@@ -59,12 +60,10 @@ const RacketImage = styled.img`
   max-width: 100%;
   max-height: 100%;
   object-fit: contain;
-  animation: imgFadeIn 0.4s ease-in-out;
-
-  @keyframes imgFadeIn {
-    from { opacity: 0.4; }
-    to { opacity: 1; }
-  }
+  aspect-ratio: 1 / 1;
+  width: 100%;
+  height: 100%;
+  transition: opacity 0.3s ease-in-out;
 `;
 
 const RacketBadge = styled.div<{ $variant: 'bestseller' | 'offer' | 'comparison' }>`
@@ -281,7 +280,6 @@ const RacketCardComponent: React.FC<RacketCardProps> = memo(
       >
         <RacketImageContainer $view={view}>
           <RacketImage
-            key={currentImageIndex}
             src={
               (racket.imagenes?.[currentImageIndex] || racket.imagenes?.[0])?.startsWith('http')
                 ? `${API_URL}/api/v1/proxy/image?url=${encodeURIComponent(racket.imagenes?.[currentImageIndex] || racket.imagenes?.[0])}`
@@ -289,8 +287,11 @@ const RacketCardComponent: React.FC<RacketCardProps> = memo(
             }
             alt={racket.modelo}
             onError={handleImageError}
-            loading="lazy"
-            decoding="async"
+            loading={index < 4 ? 'eager' : 'lazy'}
+            fetchPriority={index === 0 ? 'high' : 'auto'}
+            decoding={index < 4 ? 'sync' : 'async'}
+            width="200"
+            height="200"
           />
           {racket.view_count !== undefined && racket.view_count > 10 && (
             <RacketBadge $variant='bestseller'>

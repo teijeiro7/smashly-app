@@ -1451,6 +1451,9 @@ const RacketDetailPage: React.FC = () => {
             onError={handleImageError}
             onClick={() => setShowLightbox(true)}
             loading='eager'
+            fetchPriority='high'
+            width={450}
+            height={450}
           />
           {racket.imagenes && racket.imagenes.length > 1 && (
             <>
@@ -1481,6 +1484,8 @@ const RacketDetailPage: React.FC = () => {
                         onClick={() => setSelectedImageIndex(index)}
                         onError={handleImageError}
                         loading='lazy'
+                        width={70}
+                        height={70}
                       />
                     ))}
                   </CarouselTrack>
