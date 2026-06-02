@@ -51,13 +51,14 @@ describe('Proxy Routes', () => {
         timeout: 10000,
         headers: {
           'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+          'Accept': 'image/avif,image/webp,image/apng,image/*,*/*;q=0.8',
         },
       });
 
       expect(response.status).toBe(200);
       expect(response.headers['content-type']).toBe('image/jpeg');
       expect(response.headers['access-control-allow-origin']).toBe('*');
-      expect(response.headers['cache-control']).toBe('public, max-age=86400');
+      expect(response.headers['cache-control']).toBe('public, max-age=604800, stale-while-revalidate=86400');
     });
 
     it('should use default content-type when not provided', async () => {
