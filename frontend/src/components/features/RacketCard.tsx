@@ -280,11 +280,13 @@ const RacketCardComponent: React.FC<RacketCardProps> = memo(
       >
         <RacketImageContainer $view={view}>
           <RacketImage
-            src={
-              (racket.imagenes?.[currentImageIndex] || racket.imagenes?.[0])?.startsWith('http')
-                ? `${API_URL}/api/v1/proxy/image?url=${encodeURIComponent(racket.imagenes?.[currentImageIndex] || racket.imagenes?.[0])}`
-                : racket.imagenes?.[currentImageIndex] || racket.imagenes?.[0]
-            }
+            src={(() => {
+              const imageUrl = racket.imagenes?.[currentImageIndex] || racket.imagenes?.[0];
+              if (!imageUrl) return '/placeholder-racket.svg';
+              return imageUrl.startsWith('http')
+                ? `${API_URL}/api/v1/proxy/image?url=${encodeURIComponent(imageUrl)}`
+                : imageUrl;
+            })()}
             alt={racket.modelo}
             onError={handleImageError}
             loading={index < 4 ? 'eager' : 'lazy'}
