@@ -1,4 +1,3 @@
-import { AnimatePresence, motion } from 'framer-motion';
 import React, { useEffect, useState, useRef, useCallback, useMemo } from 'react';
 import { FiGrid, FiList, FiSearch, FiX, FiChevronDown, FiFilter, FiTag } from 'react-icons/fi';
 import { useNavigate, useSearchParams } from 'react-router-dom';
@@ -431,7 +430,7 @@ const ClearFiltersButton = styled.button`
 `;
 
 // Floating comparison panel
-const FloatingPanel = styled(motion.div)`
+const FloatingPanel = styled.div<{ $visible: boolean }>`
   position: fixed;
   bottom: 2rem;
   right: 2rem;
@@ -441,6 +440,11 @@ const FloatingPanel = styled(motion.div)`
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
   border: 1.5px solid #15803d;
   z-index: 50;
+  transform: translateY(${props => (props.$visible ? '0' : '120px')});
+  opacity: ${props => (props.$visible ? 1 : 0)};
+  pointer-events: ${props => (props.$visible ? 'auto' : 'none')};
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
+  will-change: transform, opacity;
 
   @media (max-width: 768px) {
     bottom: calc(78px + env(safe-area-inset-bottom, 0px) + 0.75rem);
@@ -986,13 +990,13 @@ rackets,
             gap: '1rem',
           }}
         >
-            <motion.div
-            animate={{ rotate: 360 }}
-            transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
-            style={{ color: '#15803d' }}
-          >
+          <div style={{
+            color: '#15803d',
+            animation: 'spin 1s linear infinite',
+          }}>
+            <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
             <FiGrid size={48} />
-          </motion.div>
+          </div>
           <div style={{ color: '#6b7280', fontSize: '1.125rem' }}>Cargando catálogo...</div>
         </div>
       </Container>
@@ -1270,23 +1274,15 @@ rackets,
           </>
         )}
       </MainContent>
-      <AnimatePresence>
-        {count > 0 && (
-          <FloatingPanel
-            initial={{ opacity: 0, y: 100 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 100 }}
-          >
-            <PanelContent>
-              <PanelText>
-                {count} pala{count > 1 ? 's' : ''} seleccionada
-                {count > 1 ? 's' : ''} para comparar
-              </PanelText>
-              <CompareButton onClick={goToComparison}>Comparar ahora</CompareButton>
-            </PanelContent>
-          </FloatingPanel>
-        )}
-      </AnimatePresence>
+      <FloatingPanel $visible={count > 0}>
+        <PanelContent>
+          <PanelText>
+            {count} pala{count > 1 ? 's' : ''} seleccionada
+            {count > 1 ? 's' : ''} para comparar
+          </PanelText>
+          <CompareButton onClick={goToComparison}>Comparar ahora</CompareButton>
+        </PanelContent>
+      </FloatingPanel>
       {/* Modal para añadir a listas */}
       {selectedRacket && (
         <AddToListModal
