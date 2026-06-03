@@ -29,8 +29,7 @@ La aplicación está desplegada y lista para usar:
 
 Conoce Smashly en acción:
 
-<video src="public/videos/videoDemoFase3.mp4" controls style="max-width:100%; height:auto; border:1px solid #ddd; border-radius:8px;"></video>
-<p><a href="public/videos/videoDemoFase3.mp4">Abrir video en el navegador</a></p>
+**👉 [Ver demo](https://drive.google.com/file/d/13p10A2KiYgeTcCunGJ9ARxZITATbKbcN/view?usp=sharing)**
 
 ---
 
