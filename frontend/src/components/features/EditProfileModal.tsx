@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import styled from "styled-components";
 import { FiX, FiSave, FiUser, FiCalendar, FiActivity, FiCamera, FiTrash2 } from "react-icons/fi";
+import { GiTennisRacket } from "react-icons/gi";
 import { motion, AnimatePresence } from "framer-motion";
 import { UserProfile } from "../../services/userProfileService";
 import { UploadService } from "../../services/uploadService";
@@ -742,10 +743,10 @@ export const EditProfileModal: React.FC<EditProfileModalProps> = ({
                     disabled={isSubmitting}
                   >
                     <option value="">Selecciona tu nivel</option>
-                    <option value="principiante">Principiante</option>
-                    <option value="intermedio">Intermedio</option>
-                    <option value="avanzado">Avanzado</option>
-                    <option value="profesional">Profesional</option>
+                    <option value="Principiante">Principiante</option>
+                    <option value="Intermedio">Intermedio</option>
+                    <option value="Avanzado">Avanzado</option>
+                    <option value="Profesional">Profesional</option>
                   </Select>
                 </FormGroup>
 
@@ -769,7 +770,7 @@ export const EditProfileModal: React.FC<EditProfileModalProps> = ({
 
               <FormSection>
                 <SectionTitle>
-                  🎾 Preferencias de juego
+                  <GiTennisRacket size={18} /> Preferencias de juego
                 </SectionTitle>
 
                 <InputGroup>

@@ -409,6 +409,14 @@ interface UserProfileFormData {
   birthdate: string;
   game_level: string;
   limitations: string;
+  gender: string;
+  physical_condition: string;
+  position: string;
+  frequency: string;
+  touch_preference: string;
+  balance_preference: string;
+  shape_preference: string;
+  weight_preference: string;
 }
 
 const UserProfilePage: React.FC = () => {
@@ -427,6 +435,14 @@ const UserProfilePage: React.FC = () => {
     birthdate: '',
     game_level: '',
     limitations: '',
+    gender: '',
+    physical_condition: '',
+    position: '',
+    frequency: '',
+    touch_preference: '',
+    balance_preference: '',
+    shape_preference: '',
+    weight_preference: '',
   });
 
   useEffect(() => {
@@ -446,6 +462,14 @@ const UserProfilePage: React.FC = () => {
         birthdate: userProfile.birthdate || '',
         game_level: userProfile.game_level || '',
         limitations: userProfile.limitations?.[0] || '',
+        gender: userProfile.gender || '',
+        physical_condition: userProfile.physical_condition || '',
+        position: userProfile.position || '',
+        frequency: userProfile.frequency || '',
+        touch_preference: userProfile.touch_preference || '',
+        balance_preference: userProfile.balance_preference || '',
+        shape_preference: userProfile.shape_preference || '',
+        weight_preference: userProfile.weight_preference || '',
       });
     }
   }, [userProfile]);
@@ -566,11 +590,20 @@ const UserProfilePage: React.FC = () => {
         birthdate: formData.birthdate || undefined,
         game_level: formData.game_level || undefined,
         limitations: formData.limitations ? [formData.limitations] : undefined,
+        gender: formData.gender || undefined,
+        physical_condition: formData.physical_condition || undefined,
+        position: formData.position || undefined,
+        frequency: formData.frequency || undefined,
+        touch_preference: formData.touch_preference || undefined,
+        balance_preference: formData.balance_preference || undefined,
+        shape_preference: formData.shape_preference || undefined,
+        weight_preference: formData.weight_preference || undefined,
       });
       await refreshUserProfile();
       sileo.success({ title: 'Éxito', description: 'Perfil actualizado correctamente' });
-    } catch (error) {
-      sileo.error({ title: 'Error', description: 'Error al actualizar el perfil' });
+    } catch (error: any) {
+      console.error('Update profile error:', error);
+      sileo.error({ title: 'Error', description: error?.message || 'Error al actualizar el perfil' });
     } finally {
       setSaving(false);
     }
@@ -785,13 +818,134 @@ const UserProfilePage: React.FC = () => {
                           onChange={handleInputChange}
                         >
                           <option value=''>Selecciona tu nivel</option>
-                          <option value='principiante'>Principiante (1.0 - 2.5)</option>
-                          <option value='intermedio'>Intermedio (3.0 - 4.5)</option>
-                          <option value='avanzado'>Avanzado (5.0 - 6.5)</option>
-                          <option value='profesional'>Profesional (7.0+)</option>
+                          <option value='Principiante'>Principiante (1.0 - 2.5)</option>
+                          <option value='Intermedio'>Intermedio (3.0 - 4.5)</option>
+                          <option value='Avanzado'>Avanzado (5.0 - 6.5)</option>
+                          <option value='Profesional'>Profesional (7.0+)</option>
                         </FormSelect>
                         <HelperText>Basado en el sistema de clasificación Playtomic</HelperText>
                       </FormGroup>
+                    </FormSection>
+
+                    <FormSection>
+                      <SectionTitle>
+                        <GiTennisRacket size={18} /> Preferencias de Juego
+                      </SectionTitle>
+                      <FormGrid>
+                        <FormGroup>
+                          <FormLabel htmlFor='gender'>Género</FormLabel>
+                          <FormSelect
+                            id='gender'
+                            name='gender'
+                            value={formData.gender}
+                            onChange={handleInputChange}
+                          >
+                            <option value=''>Selecciona género</option>
+                            <option value='masculino'>Masculino</option>
+                            <option value='femenino'>Femenino</option>
+                          </FormSelect>
+                        </FormGroup>
+                        <FormGroup>
+                          <FormLabel htmlFor='physical_condition'>Condición física</FormLabel>
+                          <FormSelect
+                            id='physical_condition'
+                            name='physical_condition'
+                            value={formData.physical_condition}
+                            onChange={handleInputChange}
+                          >
+                            <option value=''>Selecciona condición</option>
+                            <option value='asiduo'>Asiduo al deporte</option>
+                            <option value='ocasional'>Ocasional</option>
+                          </FormSelect>
+                        </FormGroup>
+                        <FormGroup>
+                          <FormLabel htmlFor='position'>Posición en pista</FormLabel>
+                          <FormSelect
+                            id='position'
+                            name='position'
+                            value={formData.position}
+                            onChange={handleInputChange}
+                          >
+                            <option value=''>Selecciona posición</option>
+                            <option value='reves'>Revés</option>
+                            <option value='drive'>Drive</option>
+                            <option value='ambos'>Indiferente</option>
+                          </FormSelect>
+                        </FormGroup>
+                        <FormGroup>
+                          <FormLabel htmlFor='frequency'>Frecuencia de juego</FormLabel>
+                          <FormSelect
+                            id='frequency'
+                            name='frequency'
+                            value={formData.frequency}
+                            onChange={handleInputChange}
+                          >
+                            <option value=''>Selecciona frecuencia</option>
+                            <option value='1'>1 vez/semana o menos</option>
+                            <option value='2-3'>2-3 veces/semana</option>
+                            <option value='4+'>4+ veces/semana</option>
+                          </FormSelect>
+                        </FormGroup>
+                        <FormGroup>
+                          <FormLabel htmlFor='touch_preference'>Tacto de pala</FormLabel>
+                          <FormSelect
+                            id='touch_preference'
+                            name='touch_preference'
+                            value={formData.touch_preference}
+                            onChange={handleInputChange}
+                          >
+                            <option value=''>Selecciona tacto</option>
+                            <option value='duro'>Duro</option>
+                            <option value='medio'>Medio</option>
+                            <option value='blando'>Blando</option>
+                          </FormSelect>
+                        </FormGroup>
+                        <FormGroup>
+                          <FormLabel htmlFor='weight_preference'>Peso de pala</FormLabel>
+                          <FormSelect
+                            id='weight_preference'
+                            name='weight_preference'
+                            value={formData.weight_preference}
+                            onChange={handleInputChange}
+                          >
+                            <option value=''>No sé</option>
+                            <option value='ligera'>Ligera (&lt;360g)</option>
+                            <option value='media'>Media (360-375g)</option>
+                            <option value='pesada'>Pesada (&gt;375g)</option>
+                          </FormSelect>
+                        </FormGroup>
+                        <FormGroup>
+                          <FormLabel htmlFor='balance_preference'>Balance de pala</FormLabel>
+                          <FormSelect
+                            id='balance_preference'
+                            name='balance_preference'
+                            value={formData.balance_preference}
+                            onChange={handleInputChange}
+                          >
+                            <option value=''>No sé</option>
+                            <option value='bajo'>Bajo (Manejable)</option>
+                            <option value='medio'>Medio (Equilibrado)</option>
+                            <option value='alto'>Alto (Potencia)</option>
+                          </FormSelect>
+                        </FormGroup>
+                        <FormGroup>
+                          <FormLabel htmlFor='shape_preference'>Forma de pala</FormLabel>
+                          <FormSelect
+                            id='shape_preference'
+                            name='shape_preference'
+                            value={formData.shape_preference}
+                            onChange={handleInputChange}
+                          >
+                            <option value=''>No sé</option>
+                            <option value='redonda'>Redonda</option>
+                            <option value='lagrima'>Lágrima</option>
+                            <option value='diamante'>Diamante</option>
+                          </FormSelect>
+                        </FormGroup>
+                      </FormGrid>
+                      <HelperText style={{ marginTop: '0.5rem' }}>
+                        Estas preferencias se usan para pre-rellenar los formularios de recomendación
+                      </HelperText>
                     </FormSection>
 
                     <FormSection>
