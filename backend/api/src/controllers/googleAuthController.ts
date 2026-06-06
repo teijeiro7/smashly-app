@@ -87,15 +87,16 @@ export class GoogleAuthController {
     const now = Math.floor(Date.now() / 1000);
     const expiresIn = 60 * 60; // 1 hour
 
+    const supabaseUrl = process.env.SUPABASE_URL || '';
     const payload = {
-      iss: 'supabase',
+      iss: supabaseUrl ? `${supabaseUrl}/auth/v1` : 'supabase',
       sub: userId,
+      aud: 'authenticated',
       email: email,
       role: 'authenticated',
       aal: 'aal1',
       iat: now,
       exp: now + expiresIn,
-      type: 'access',
     };
 
     const accessToken = jwt.sign(payload, jwtSecret);
@@ -190,19 +191,16 @@ export class GoogleAuthController {
       if (!userId) {
         logger.info('Using manual user creation for access token flow');
 
-        const { data: userList, error: listError } = await admin.auth.admin.listUsers();
+        // Look up user by email via user_profiles (public schema, service role bypasses RLS)
+        const { data: existingProfile } = await admin
+          .from('user_profiles')
+          .select('id')
+          .eq('email', googleUser.email)
+          .maybeSingle();
 
-        if (listError) {
-          logger.error('Error listing users with admin API:', listError);
-        }
-
-        const existingUser = userList?.users?.find(
-          (u: any) => u.email === googleUser.email
-        );
-
-        if (existingUser) {
-          userId = existingUser.id;
-          logger.info('Found existing user:', userId);
+        if (existingProfile?.id) {
+          userId = existingProfile.id;
+          logger.info('Found existing user via profile:', userId);
         } else {
           const { data: newUser, error: createError } = await admin.auth.admin.createUser({
             email: googleUser.email,
@@ -215,19 +213,31 @@ export class GoogleAuthController {
             },
           });
 
-          if (createError || !newUser?.user) {
-            logger.error('Error creating user:', createError);
-            res.status(500).json({
-              success: false,
-              error: 'User creation failed',
-              message: getErrorMessage(createError),
-              timestamp: new Date().toISOString(),
-            } as ApiResponse);
-            return;
+          if (createError) {
+            // User may exist in auth but not have a profile (edge case)
+            if (createError.message?.toLowerCase().includes('already') || createError.message?.toLowerCase().includes('duplicate')) {
+              logger.info('User exists in auth but not in profiles, fetching via listUsers fallback');
+              const { data: userList } = await admin.auth.admin.listUsers({ perPage: 1000 });
+              const found = userList?.users?.find((u: any) => u.email === googleUser.email);
+              if (found) {
+                userId = found.id;
+                logger.info('Found existing auth user via fallback:', userId);
+              }
+            }
+            if (!userId) {
+              logger.error('Error creating user:', createError);
+              res.status(500).json({
+                success: false,
+                error: 'User creation failed',
+                message: getErrorMessage(createError),
+                timestamp: new Date().toISOString(),
+              } as ApiResponse);
+              return;
+            }
+          } else if (newUser?.user) {
+            userId = newUser.user.id;
+            logger.info('Created new user:', userId);
           }
-
-          userId = newUser.user.id;
-          logger.info('Created new user:', userId);
         }
 
         // Create session manually using JWT
