@@ -115,6 +115,13 @@ export interface UserFormData {
   playingStyle?: string;
   experience?: string;
   preferences?: string;
+  // Información física y preferencias
+  currentRacket?: string;
+  gender?: string;
+  physicalCondition?: string;
+  position?: string;
+  frequency?: string;
+  touchPreference?: string;
 }
 
 // Specific types for racket filters and search

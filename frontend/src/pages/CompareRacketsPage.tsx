@@ -839,6 +839,12 @@ const CompareRacketsPage: React.FC = () => {
           playingStyle: undefined,
           experience: undefined,
           preferences: user.limitations?.join(', ') || undefined,
+          currentRacket: user.current_racket || undefined,
+          gender: user.gender || undefined,
+          physicalCondition: user.physical_condition || undefined,
+          position: user.position || undefined,
+          frequency: user.frequency || undefined,
+          touchPreference: user.touch_preference || undefined,
         };
       }
 

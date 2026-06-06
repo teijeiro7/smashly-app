@@ -398,6 +398,12 @@ Estilo: ${userProfile.playingStyle || 'No especificado'}
 Físico: ${userProfile.weight || ''} ${userProfile.height || ''} (Edad: ${userProfile.age || ''})
 Experiencia: ${userProfile.experience || 'No especificada'}
 Preferencias: ${userProfile.preferences || 'No especificadas'}
+Pala actual: ${userProfile.currentRacket || 'No especificada'}
+Género: ${userProfile.gender || 'No especificado'}
+Condición física: ${userProfile.physicalCondition || 'No especificada'}
+Posición: ${userProfile.position || 'No especificada'}
+Frecuencia: ${userProfile.frequency || 'No especificada'}
+Tacto preferido: ${userProfile.touchPreference || 'No especificado'}
 `;
   }
 
