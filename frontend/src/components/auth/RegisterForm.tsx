@@ -34,7 +34,6 @@ import {
   Divider,
   SocialButtons,
   SocialButton,
-  FooterText,
 } from './AuthStyles';
 
 // Local styles for Register specific components
@@ -616,6 +615,24 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess, onLoginClick }) 
           </>
         )}
 
+        <FormGroup>
+          <label style={{ display: 'flex', alignItems: 'flex-start', gap: '0.625rem', cursor: 'pointer', fontSize: '0.875rem', color: '#374151' }}>
+            <input
+              type='checkbox'
+              checked={formData.acceptedTerms}
+              onChange={e => setFormData(p => ({ ...p, acceptedTerms: e.target.checked }))}
+              style={{ marginTop: '0.125rem', accentColor: '#16a34a', width: '1rem', height: '1rem', flexShrink: 0 }}
+            />
+            <span>
+              Acepto los{' '}
+              <TermsLink to='/terms-and-conditions' target='_blank'>Términos de Servicio</TermsLink>
+              {' '}y la{' '}
+              <TermsLink to='/privacy-policy' target='_blank'>Política de Privacidad</TermsLink>
+            </span>
+          </label>
+          {errors.acceptedTerms && <ErrorText>{errors.acceptedTerms}</ErrorText>}
+        </FormGroup>
+
         <SubmitButton type='submit' disabled={loading}>
           {loading ? 'Creando cuenta...' : 'Crear Cuenta'}
         </SubmitButton>
@@ -669,11 +686,6 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess, onLoginClick }) 
         onClose={() => setShowNicknameModal(false)}
       />
 
-      <FooterText>
-        Al continuar, aceptas nuestros{' '}
-        <TermsLink to='/terms-and-conditions'>Términos de Servicio</TermsLink> y{' '}
-        <TermsLink to='/privacy-policy'>Política de Privacidad</TermsLink>.
-      </FooterText>
 
       <StoreRequestModal
         isOpen={showStoreModal}
