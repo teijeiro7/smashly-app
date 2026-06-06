@@ -182,38 +182,18 @@ export class GoogleAuthController {
           logger.info('Created new user:', userId);
         }
 
-        // Generate session via admin generateLink (magiclink type)
-        // This bypasses email restrictions since it uses the service_role key
-        logger.info('[GoogleAuth] Generating magic link for session...');
-        const { data: linkData, error: linkError } =
-          await admin.auth.admin.generateLink({
-            type: 'magiclink',
-            email: googleUser.email,
-          });
+        // Generate session directly via admin createSession (simpler and more reliable)
+        logger.info('[GoogleAuth] Creating session via admin createSession...');
+        const { data: sessionData, error: sessionError } = 
+          await admin.auth.admin.createSession(userId);
 
-        logger.info('[GoogleAuth] generateLink result:', { 
-          hasError: !!linkError, 
-          hasHashedToken: !!linkData?.properties?.hashed_token,
-          linkError: linkError?.message || null
-        });
-
-        if (linkError || !linkData?.properties?.hashed_token) {
-          logger.error('Error generating session link:', linkError);
+        if (sessionError) {
+          logger.error('[GoogleAuth] createSession failed:', sessionError);
+        } else if (sessionData?.session) {
+          session = sessionData.session;
+          logger.info('[GoogleAuth] Session created via createSession');
         } else {
-          // Exchange the hashed_token for a real session via verifyOtp
-          const { data: otpData, error: otpError } = await admin.auth.verifyOtp({
-            token_hash: linkData.properties.hashed_token,
-            type: 'email',
-          });
-
-          if (otpError) {
-            logger.error('[GoogleAuth] verifyOtp failed:', otpError);
-          } else if (otpData.session) {
-            session = otpData.session;
-            logger.info('[GoogleAuth] Session created via verifyOtp');
-          } else {
-            logger.warn('[GoogleAuth] No session returned from verifyOtp');
-          }
+          logger.warn('[GoogleAuth] No session returned from createSession');
         }
       }
 
