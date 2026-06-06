@@ -43,6 +43,14 @@ import {
 } from '../components/common/SpecIcons';
 import { useComparison } from '../contexts/ComparisonContext';
 import RacketRadarChart from '../components/features/RacketRadarChart';
+import SEO from '../components/seo/SEO';
+import {
+  organizationSchema,
+  productSchema,
+  webPageSchema,
+  breadcrumbSchema,
+} from '../utils/seoSchemas';
+import { buildUrl } from '../config/seo';
 
 // --- Styled Components ---
 
@@ -1133,6 +1141,60 @@ const SectionTitle = styled.h2`
 
 // --- Component ---
 
+interface RacketDetailSeoProps {
+  racket: Racket;
+  productUrl: string;
+  productPrice: number | undefined;
+  hasOffers: boolean;
+}
+
+const RacketDetailSeo: React.FC<RacketDetailSeoProps> = ({
+  racket,
+  productUrl,
+  productPrice,
+  hasOffers,
+}) => {
+  const productImage = racket.imagenes?.[0] ?? '';
+  return (
+    <SEO
+      title={`${racket.nombre} — ${toTitleCase(racket.marca)} ${toTitleCase(racket.modelo)} | Smashly`}
+      description={
+        racket.descripcion ||
+        `Descubre la ${racket.nombre}: pala de pádel ${racket.marca} ${racket.modelo}. Compara precios en tiempo real, especificaciones técnicas, opiniones y disponibilidad.`
+      }
+      canonical={productUrl}
+      type='product'
+      image={productImage}
+      imageAlt={`${racket.nombre} - Pala de pádel ${racket.marca}`}
+      extraMeta={[
+        { property: 'product:price:amount', content: productPrice ? String(productPrice) : '' },
+        { property: 'product:price:currency', content: 'EUR' },
+        { property: 'product:availability', content: hasOffers ? 'in stock' : 'out of stock' },
+        { property: 'product:brand', content: racket.marca },
+        { property: 'product:category', content: 'Palas de pádel' },
+      ]}
+      schema={[
+        organizationSchema(),
+        productSchema(racket, productUrl),
+        webPageSchema({
+          name: `${racket.nombre} — Smashly`,
+          description:
+            racket.descripcion ||
+            `Pala de pádel ${racket.marca} ${racket.modelo} analizada en Smashly.`,
+          url: productUrl,
+          image: productImage,
+        }),
+        breadcrumbSchema([
+          { name: 'Inicio', url: buildUrl('/') },
+          { name: 'Catálogo', url: buildUrl('/catalog') },
+          { name: racket.marca, url: buildUrl(`/catalog?brand=${encodeURIComponent(racket.marca)}`) },
+          { name: racket.modelo, url: productUrl },
+        ]),
+      ]}
+    />
+  );
+};
+
 const RacketDetailPage: React.FC = () => {
   const [searchParams] = useSearchParams();
   const { rackets, loading: catalogLoading } = useRackets();
@@ -1424,9 +1486,18 @@ const RacketDetailPage: React.FC = () => {
   const lowestPrice = getLowestPrice(racket);
   const allPrices = getAllStorePrices(racket);
   const availablePrices = allPrices.filter(p => p.available);
+  const productUrl = buildUrl(
+    `/racket-detail?id=${racket.id}&name=${encodeURIComponent(racket.nombre)}`
+  );
 
   return (
     <PageContainer>
+      <RacketDetailSeo
+        racket={racket}
+        productUrl={productUrl}
+        productPrice={lowestPrice?.price}
+        hasOffers={availablePrices.length > 0}
+      />
       <Breadcrumbs>
         <Link to='/'>Home</Link> / <Link to='/catalog'>Palas</Link> / {toTitleCase(racket.marca)} /{' '}
         <CurrentBreadcrumb>{toTitleCase(racket.modelo)}</CurrentBreadcrumb>

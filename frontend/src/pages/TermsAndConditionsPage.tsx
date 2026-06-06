@@ -1,6 +1,9 @@
 import styled from 'styled-components';
 import { Link as RouterLink } from 'react-router-dom';
 import { FiArrowLeft } from 'react-icons/fi';
+import SEO from '../components/seo/SEO';
+import { organizationSchema, webPageSchema } from '../utils/seoSchemas';
+import { buildUrl } from '../config/seo';
 
 const Container = styled.div`
   max-width: 900px;
@@ -95,6 +98,20 @@ const LastUpdated = styled.div`
 export default function TermsAndConditionsPage() {
   return (
     <Container>
+      <SEO
+        title='Términos y Condiciones | Smashly'
+        description='Términos y condiciones de uso de Smashly. Conoce las reglas, derechos y responsabilidades al usar nuestra plataforma de comparación de palas de pádel.'
+        canonical={buildUrl('/terms-and-conditions')}
+        type='website'
+        schema={[
+          organizationSchema(),
+          webPageSchema({
+            name: 'Términos y Condiciones — Smashly',
+            description: 'Términos legales de uso de Smashly.',
+            url: buildUrl('/terms-and-conditions'),
+          }),
+        ]}
+      />
       <Header>
         <BackLink to='/'>
           <FiArrowLeft size={20} />

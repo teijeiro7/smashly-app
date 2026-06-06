@@ -1,44 +1,74 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-
+<urlset
+  xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+  xmlns:image="http://www.google.com/schemas/sitemap-image/1.1"
+  xmlns:xhtml="http://www.w3.org/1999/xhtml"
+>
   <!-- Homepage -->
   <url>
     <loc>https://smashly-app.es/</loc>
-    <lastmod>2026-03-28</lastmod>
-    <priority>1.0</priority>
+    <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+    <image:image>
+      <image:loc>https://smashly-app.es/images/og/smashly-og-1200x630.png</image:loc>
+      <image:title>Smashly — Comparador de Palas de Pádel con IA</image:title>
+      <image:caption>Encuentra tu Pala de Pádel Perfecta con Smashly</image:caption>
+    </image:image>
   </url>
 
   <!-- Catálogo de palas -->
   <url>
     <loc>https://smashly-app.es/catalog</loc>
-    <lastmod>2026-03-28</lastmod>
-    <priority>0.9</priority>
+    <lastmod>2026-06-06</lastmod>
     <changefreq>daily</changefreq>
+    <priority>0.9</priority>
   </url>
 
-  <!-- Mejor pala (recomendador IA) -->
+  <!-- Recomendador IA -->
   <url>
     <loc>https://smashly-app.es/best-racket</loc>
-    <lastmod>2026-03-28</lastmod>
-    <priority>0.9</priority>
+    <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
   </url>
 
   <!-- Comparador de palas -->
   <url>
     <loc>https://smashly-app.es/compare</loc>
-    <lastmod>2026-03-28</lastmod>
-    <priority>0.8</priority>
+    <lastmod>2026-06-06</lastmod>
     <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
   </url>
 
-  <!-- Preguntas frecuentes -->
+  <!-- Comparador con IA -->
+  <url>
+    <loc>https://smashly-app.es/compare-rackets</loc>
+    <lastmod>2026-06-06</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- FAQ -->
   <url>
     <loc>https://smashly-app.es/faq</loc>
-    <lastmod>2026-03-28</lastmod>
-    <priority>0.6</priority>
+    <lastmod>2026-06-06</lastmod>
     <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
   </url>
 
+  <!-- Legal -->
+  <url>
+    <loc>https://smashly-app.es/terms-and-conditions</loc>
+    <lastmod>2026-06-06</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.2</priority>
+  </url>
+
+  <url>
+    <loc>https://smashly-app.es/privacy-policy</loc>
+    <lastmod>2026-06-06</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.2</priority>
+  </url>
 </urlset>

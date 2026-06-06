@@ -1,6 +1,8 @@
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import { FiHome, FiSearch } from 'react-icons/fi';
+import SEO from '../components/seo/SEO';
+import { buildUrl } from '../config/seo';
 
 const Container = styled.div`
   min-height: 70vh;
@@ -95,6 +97,13 @@ const SecondaryBtn = styled(Link)`
 export default function NotFoundPage() {
   return (
     <Container>
+      <SEO
+        title='Página no encontrada (404) | Smashly'
+        description='La página que buscas no existe o ha sido movida. Vuelve al inicio o explora nuestro catálogo de palas de pádel.'
+        canonical={buildUrl('/')}
+        noindex
+        nofollow
+      />
       <Card>
         <Emoji>🎾</Emoji>
         <Title>Página no encontrada</Title>

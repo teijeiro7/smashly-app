@@ -1,6 +1,9 @@
 import styled from 'styled-components';
 import { Link as RouterLink } from 'react-router-dom';
 import { FiArrowLeft } from 'react-icons/fi';
+import SEO from '../components/seo/SEO';
+import { organizationSchema, webPageSchema } from '../utils/seoSchemas';
+import { buildUrl } from '../config/seo';
 
 const Container = styled.div`
   max-width: 900px;
@@ -95,6 +98,20 @@ const LastUpdated = styled.div`
 export default function PrivacyPolicyPage() {
   return (
     <Container>
+      <SEO
+        title='Política de Privacidad | Smashly'
+        description='Política de privacidad de Smashly. Conoce cómo recopilamos, usamos y protegemos tus datos personales en nuestra plataforma de pádel.'
+        canonical={buildUrl('/privacy-policy')}
+        type='website'
+        schema={[
+          organizationSchema(),
+          webPageSchema({
+            name: 'Política de Privacidad — Smashly',
+            description: 'Cómo Smashly protege y gestiona tus datos personales.',
+            url: buildUrl('/privacy-policy'),
+          }),
+        ]}
+      />
       <Header>
         <BackLink to='/'>
           <FiArrowLeft size={20} />

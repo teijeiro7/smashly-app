@@ -5,6 +5,14 @@ import styled, { keyframes } from 'styled-components';
 import RotatingPhrases from '../components/features/RotatingPhrases';
 import { useAuth } from '../contexts/AuthContext';
 import { useInView } from '../hooks/useInView';
+import SEO from '../components/seo/SEO';
+import {
+  organizationSchema,
+  websiteSchema,
+  softwareAppSchema,
+  webPageSchema,
+} from '../utils/seoSchemas';
+import { allKeywords, buildUrl } from '../config/seo';
 
 const heroFadeIn = keyframes`
   from { opacity: 0; transform: translateY(30px); }
@@ -667,6 +675,24 @@ const HomePage: React.FC = () => {
 
   return (
     <Container>
+      <SEO
+        title='Smashly — Encuentra tu Pala de Pádel Perfecta con IA'
+        description='Smashly es el comparador de palas de pádel con IA más completo. Analiza +800 modelos, compara precios en tiempo real en PadelNuestro, PadelMarket y PadelProShop, y descubre la pala perfecta para tu nivel y estilo de juego.'
+        canonical={buildUrl('/')}
+        keywords={allKeywords}
+        type='website'
+        schema={[
+          organizationSchema(),
+          websiteSchema(),
+          softwareAppSchema(),
+          webPageSchema({
+            name: 'Smashly — Comparador de Palas de Pádel con IA',
+            description:
+              'Compara más de 800 palas de pádel con IA. Encuentra la pala perfecta para tu nivel y estilo de juego.',
+            url: buildUrl('/'),
+          }),
+        ]}
+      />
       <HeroSection>
         <HeroContent>
           <Badge>

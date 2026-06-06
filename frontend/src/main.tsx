@@ -5,6 +5,7 @@ import { createRoot } from 'react-dom/client';
 import 'sileo/styles.css';
 import { Toaster } from 'sileo';
 import { BrowserRouter } from 'react-router-dom';
+import { HelmetProvider } from 'react-helmet-async';
 import { registerSW } from 'virtual:pwa-register';
 import App from './App.tsx';
 
@@ -36,12 +37,14 @@ registerSW({ immediate: true });
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
-        <GlobalStyles />
-        <App />
-        <Toaster position='top-center' options={{ duration: 4000 }} />
-      </BrowserRouter>
-    </QueryClientProvider>
+    <HelmetProvider>
+      <QueryClientProvider client={queryClient}>
+        <BrowserRouter>
+          <GlobalStyles />
+          <App />
+          <Toaster position='top-center' options={{ duration: 4000 }} />
+        </BrowserRouter>
+      </QueryClientProvider>
+    </HelmetProvider>
   </StrictMode>
 );

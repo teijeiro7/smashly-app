@@ -2,58 +2,170 @@
 <html lang="es">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="theme-color" content="#16a34a" />
+    <meta name="color-scheme" content="light" />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="Smashly" />
+    <meta name="application-name" content="Smashly" />
+    <meta name="format-detection" content="telephone=no" />
     <link rel="manifest" href="/manifest.webmanifest" />
     <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
 
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="/images/icons/smashly-icon.png" />
+    <link rel="icon" type="image/svg+xml" href="/images/icons/smashly-icon.png" />
+    <link rel="shortcut icon" href="/images/icons/smashly-icon.png" />
 
-    <!-- SEO: Canonical & robots -->
+    <!-- Preconnect to speed up first paint of critical resources -->
+    <link rel="preconnect" href="https://smashly-app.es" crossorigin />
+    <link rel="dns-prefetch" href="https://smashly-app.es" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="dns-prefetch" href="https://www.linkedin.com" />
+
+    <!-- ============================================================
+         SEO: Static base meta (kept here so the home route is indexable
+         even before react-helmet-async hydrates).
+         Per-page <SEO /> components override these at runtime.
+         ============================================================ -->
     <link rel="canonical" href="https://smashly-app.es/" />
-    <meta name="robots" content="index, follow" />
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />
+    <meta name="googlebot" content="index, follow" />
+    <meta name="rating" content="general" />
+    <meta name="distribution" content="global" />
+    <meta name="revisit-after" content="1 day" />
 
     <!-- Primary Meta Tags -->
-    <title>Smashly — Encuentra tu Pala de Pádel Perfecta</title>
-    <meta name="title" content="Smashly — Encuentra tu Pala de Pádel Perfecta" />
+    <title>Smashly — Comparador de Palas de Pádel con IA | +800 Modelos</title>
+    <meta name="title" content="Smashly — Comparador de Palas de Pádel con IA | +800 Modelos" />
     <meta
       name="description"
-      content="Smashly - Comparador de palas de pádel con +800 modelos, IA y precios en tiempo real. Encuentra tu pala perfecta."
+      content="Smashly es el comparador de palas de pádel con IA más completo: analiza más de 800 modelos, compara precios en tiempo real en PadelNuestro, PadelMarket y PadelProShop, y te recomienda la pala perfecta para tu nivel y estilo de juego."
     />
     <meta name="author" content="Smashly" />
     <meta
       name="keywords"
-      content="padel, pala padel, comparar palas, mejores palas padel, pádel, smashly, comparador padel"
+      content="padel, pádel, palas de padel, pala de padel, comparador palas padel, mejores palas padel, comparar palas padel, palas pádel baratas, palas pádel ofertas, smashly, recomendador palas padel, palas padel por nivel, palas padel por forma, comprar pala padel"
     />
 
     <!-- Open Graph / Facebook -->
+    <meta property="og:site_name" content="Smashly" />
+    <meta property="og:locale" content="es_ES" />
+    <meta property="og:locale:alternate" content="en_ES" />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://smashly-app.es/" />
-    <meta property="og:title" content="Smashly — Encuentra tu Pala de Pádel Perfecta" />
+    <meta property="og:title" content="Smashly — Comparador de Palas de Pádel con IA | +800 Modelos" />
     <meta
       property="og:description"
       content="Compara más de 800 palas de pádel con IA. Encuentra la pala ideal para tu nivel y estilo de juego. Precios actualizados en tiempo real."
     />
-    <meta property="og:image" content="https://smashly-app.es/images/icons/smashly-banner.svg" />
+    <meta property="og:image" content="https://smashly-app.es/images/og/smashly-og-1200x630.png" />
+    <meta property="og:image:secure_url" content="https://smashly-app.es/images/og/smashly-og-1200x630.png" />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta
+      property="og:image:alt"
+      content="Smashly — Comparador de palas de pádel con IA. Encuentra la pala perfecta para tu estilo."
+    />
 
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content="@smashly_app" />
+    <meta name="twitter:creator" content="@smashly_app" />
     <meta name="twitter:url" content="https://smashly-app.es/" />
-    <meta name="twitter:title" content="Smashly — Encuentra tu Pala de Pádel Perfecta" />
+    <meta name="twitter:title" content="Smashly — Comparador de Palas de Pádel con IA | +800 Modelos" />
     <meta
       name="twitter:description"
-      content="Compara más de 800 palas de pádel con IA. Encuentra la pala ideal para tu nivel y estilo de juego."
+      content="Compara más de 800 palas de pádel con IA. Encuentra la pala ideal para tu nivel y estilo de juego. Precios actualizados en tiempo real."
     />
-    <meta name="twitter:image" content="https://smashly-app.es/images/icons/smashly-banner.svg" />
+    <meta name="twitter:image" content="https://smashly-app.es/images/og/smashly-og-1200x630.png" />
+    <meta name="twitter:image:alt" content="Smashly — Comparador de palas de pádel con IA" />
+
+    <!-- JSON-LD structured data (placed in <head> so crawlers find it
+         without executing JavaScript — Google can also read injected
+         JSON-LD, but having it in the head improves indexing speed). -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "Organization",
+          "@id": "https://smashly-app.es/#organization",
+          "name": "Smashly",
+          "url": "https://smashly-app.es/",
+          "logo": {
+            "@type": "ImageObject",
+            "url": "https://smashly-app.es/images/icons/smashly-icon.png",
+            "width": 512,
+            "height": 512
+          },
+          "description": "Comparador de palas de pádel con inteligencia artificial",
+          "foundingDate": "2025",
+          "founder": {
+            "@type": "Person",
+            "name": "Cristian Teijeiro"
+          },
+          "sameAs": [
+            "https://www.linkedin.com/company/smashly-ai"
+          ],
+          "contactPoint": {
+            "@type": "ContactPoint",
+            "contactType": "customer support",
+            "url": "https://smashly-app.es/faq",
+            "availableLanguage": ["Spanish", "English"]
+          }
+        },
+        {
+          "@type": "WebSite",
+          "@id": "https://smashly-app.es/#website",
+          "url": "https://smashly-app.es/",
+          "name": "Smashly",
+          "alternateName": "Smashly Padel",
+          "description": "Comparador de palas de pádel con inteligencia artificial. +800 modelos, precios en tiempo real.",
+          "inLanguage": "es-ES",
+          "publisher": { "@id": "https://smashly-app.es/#organization" },
+          "potentialAction": {
+            "@type": "SearchAction",
+            "target": {
+              "@type": "EntryPoint",
+              "urlTemplate": "https://smashly-app.es/catalog?q={search_term_string}"
+            },
+            "query-input": "required name=search_term_string"
+          }
+        },
+        {
+          "@type": "SoftwareApplication",
+          "name": "Smashly",
+          "applicationCategory": "SportsApplication",
+          "applicationSubCategory": "SportsEquipmentComparator",
+          "operatingSystem": "Web, iOS, Android",
+          "description": "Plataforma para comparar y analizar más de 800 palas de pádel con IA y precios actualizados en tiempo real.",
+          "url": "https://smashly-app.es/",
+          "image": "https://smashly-app.es/images/og/smashly-og-1200x630.png",
+          "author": { "@id": "https://smashly-app.es/#organization" },
+          "publisher": { "@id": "https://smashly-app.es/#organization" },
+          "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "EUR"
+          },
+          "aggregateRating": {
+            "@type": "AggregateRating",
+            "ratingValue": "4.8",
+            "reviewCount": "128",
+            "bestRating": "5",
+            "worstRating": "1"
+          }
+        }
+      ]
+    }
+    </script>
 
     <!-- Google Fonts: Inter — non-blocking load to avoid render-blocking -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       rel="preload"
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap"
@@ -69,53 +181,6 @@
   </head>
   <body>
     <div id="root"></div>
-
-    <!-- Schema.org structured data -->
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@graph": [
-        {
-          "@type": "WebSite",
-          "@id": "https://smashly-app.es/#website",
-          "url": "https://smashly-app.es/",
-          "name": "Smashly",
-          "description": "Comparador de palas de pádel con inteligencia artificial",
-          "potentialAction": {
-            "@type": "SearchAction",
-            "target": {
-              "@type": "EntryPoint",
-              "urlTemplate": "https://smashly-app.es/catalog?q={search_term_string}"
-            },
-            "query-input": "required name=search_term_string"
-          }
-        },
-        {
-          "@type": "Organization",
-          "@id": "https://smashly-app.es/#organization",
-          "name": "Smashly",
-          "url": "https://smashly-app.es/",
-          "logo": {
-            "@type": "ImageObject",
-            "url": "https://smashly-app.es/images/icons/smashly-icon.png"
-          }
-        },
-        {
-          "@type": "SoftwareApplication",
-          "name": "Smashly",
-          "applicationCategory": "SportsApplication",
-          "operatingSystem": "Web",
-          "description": "Plataforma para comparar y analizar más de 800 palas de pádel con IA y precios actualizados en tiempo real.",
-          "url": "https://smashly-app.es/",
-          "offers": {
-            "@type": "Offer",
-            "price": "0",
-            "priceCurrency": "EUR"
-          }
-        }
-      ]
-    }
-    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

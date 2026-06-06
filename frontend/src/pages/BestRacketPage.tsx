@@ -14,6 +14,13 @@ import {
 } from '../types/recommendation';
 import { UserProfile } from '../services/userProfileService';
 import { sileo } from 'sileo';
+import SEO from '../components/seo/SEO';
+import {
+  organizationSchema,
+  webPageSchema,
+  breadcrumbSchema,
+} from '../utils/seoSchemas';
+import { buildUrl, allKeywords } from '../config/seo';
 
 const normalizeLevel = (gameLevel?: string): string => {
   const value = (gameLevel || '').toLowerCase();
@@ -366,6 +373,26 @@ export const BestRacketPage: React.FC = () => {
 
   return (
     <PageContainer>
+      <SEO
+        title='Recomendador de Palas de Pádel con IA | Encuentra tu Pala Ideal'
+        description='Responde unas preguntas y nuestra IA te recomendará la pala de pádel perfecta para tu nivel, estilo de juego y presupuesto. Recomendaciones personalizadas en menos de 1 minuto.'
+        canonical={buildUrl('/best-racket')}
+        keywords={allKeywords}
+        type='website'
+        schema={[
+          organizationSchema(),
+          webPageSchema({
+            name: 'Recomendador de Palas de Pádel con IA — Smashly',
+            description:
+              'Recomendador inteligente de palas de pádel basado en tu perfil, nivel y estilo de juego.',
+            url: buildUrl('/best-racket'),
+          }),
+          breadcrumbSchema([
+            { name: 'Inicio', url: buildUrl('/') },
+            { name: 'Recomendador IA', url: buildUrl('/best-racket') },
+          ]),
+        ]}
+      />
       {step !== 'result' && step !== 'completing' && (
         <HeroSection>
           <h1>Encuentra tu Pala Ideal</h1>

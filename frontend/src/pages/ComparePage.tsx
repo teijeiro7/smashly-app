@@ -4,6 +4,13 @@ import { motion } from 'framer-motion';
 import { FiCpu, FiLayers, FiArrowRight, FiBookmark } from 'react-icons/fi';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import SEO from '../components/seo/SEO';
+import {
+  organizationSchema,
+  webPageSchema,
+  breadcrumbSchema,
+} from '../utils/seoSchemas';
+import { buildUrl, allKeywords } from '../config/seo';
 
 const Container = styled.div`
   min-height: 100dvh;
@@ -234,6 +241,25 @@ const ComparePage: React.FC = () => {
 
   return (
     <Container>
+      <SEO
+        title='Compara Palas de Pádel — Encuentra tu Pala Ideal'
+        description='Compara palas de pádel lado a lado: peso, balance, forma, material del núcleo y precio. Encuentra la pala perfecta para tu nivel con el comparador de Smashly.'
+        canonical={buildUrl('/compare')}
+        keywords={allKeywords}
+        type='website'
+        schema={[
+          organizationSchema(),
+          webPageSchema({
+            name: 'Comparador de Palas de Pádel — Smashly',
+            description: 'Compara palas de pádel lado a lado por especificaciones, precio y opiniones.',
+            url: buildUrl('/compare'),
+          }),
+          breadcrumbSchema([
+            { name: 'Inicio', url: buildUrl('/') },
+            { name: 'Comparar', url: buildUrl('/compare') },
+          ]),
+        ]}
+      />
       <Header>
         <Title>
           Encuentra tu <span className='highlight'>Pala Ideal</span>

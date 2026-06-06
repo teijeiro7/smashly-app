@@ -10,6 +10,15 @@ import { Racket } from '../types/racket';
 import { AddToListModal } from '../components/features/AddToListModal';
 import RacketCard from '../components/features/RacketCard';
 import { getLowestPrice } from '../utils/priceUtils';
+import SEO from '../components/seo/SEO';
+import {
+  organizationSchema,
+  websiteSchema,
+  webPageSchema,
+  breadcrumbSchema,
+  catalogItemListSchema,
+} from '../utils/seoSchemas';
+import { buildUrl, allKeywords } from '../config/seo';
 
 // Styled Components
 const Container = styled.div`
@@ -1007,6 +1016,27 @@ rackets,
 
   return (
     <Container>
+      <SEO
+        title='Catálogo de Palas de Pádel | Compara +800 Modelos'
+        description={`Catálogo de palas de pádel con ${totalRackets} modelos de ${uniqueBrands.length - 1} marcas. Compara peso, balance, forma y precio en PadelNuestro, PadelMarket y PadelProShop.`}
+        canonical={buildUrl('/catalog')}
+        keywords={allKeywords}
+        type='website'
+        schema={[
+          organizationSchema(),
+          websiteSchema(),
+          webPageSchema({
+            name: 'Catálogo de Palas de Pádel — Smashly',
+            description: `Catálogo con ${totalRackets} palas de pádel de las mejores marcas. Compara especificaciones y precios.`,
+            url: buildUrl('/catalog'),
+          }),
+          breadcrumbSchema([
+            { name: 'Inicio', url: buildUrl('/') },
+            { name: 'Catálogo', url: buildUrl('/catalog') },
+          ]),
+          catalogItemListSchema(displayedRackets, buildUrl('/catalog')),
+        ]}
+      />
       {/* Header */}
       <Header>
         <HeaderContent>

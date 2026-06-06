@@ -18,6 +18,13 @@ import Fuse from 'fuse.js';
 import { toTitleCase } from '../utils/textUtils';
 import RacketRadarChart from '../components/features/RacketRadarChart';
 import ComparisonTable from '../components/features/ComparisonTable';
+import SEO from '../components/seo/SEO';
+import {
+  organizationSchema,
+  webPageSchema,
+  breadcrumbSchema,
+} from '../utils/seoSchemas';
+import { buildUrl, allKeywords } from '../config/seo';
 
 const Container = styled.div`
   min-height: 100dvh;
@@ -945,6 +952,27 @@ const CompareRacketsPage: React.FC = () => {
 
   return (
     <Container>
+      <SEO
+        title='Comparador de Palas con IA | Análisis Inteligente'
+        description='Compara hasta 3 palas de pádel con análisis de IA. Visualiza peso, balance, forma y material lado a lado y descubre cuál se adapta mejor a tu juego.'
+        canonical={buildUrl('/compare-rackets')}
+        keywords={allKeywords}
+        type='website'
+        schema={[
+          organizationSchema(),
+          webPageSchema({
+            name: 'Comparador de Palas con IA — Smashly',
+            description:
+              'Compara hasta 3 palas de pádel con análisis de Inteligencia Artificial.',
+            url: buildUrl('/compare-rackets'),
+          }),
+          breadcrumbSchema([
+            { name: 'Inicio', url: buildUrl('/') },
+            { name: 'Comparar', url: buildUrl('/compare') },
+            { name: 'Comparador IA', url: buildUrl('/compare-rackets') },
+          ]),
+        ]}
+      />
       <Header>
         <Title>
           Comparador de <span className='highlight'>Palas IA</span>

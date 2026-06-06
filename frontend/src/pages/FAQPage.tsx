@@ -6,6 +6,14 @@ import {
   FiMail,
 } from "react-icons/fi";
 import styled from "styled-components";
+import SEO from "../components/seo/SEO";
+import {
+  organizationSchema,
+  webPageSchema,
+  breadcrumbSchema,
+  faqSchema,
+} from "../utils/seoSchemas";
+import { buildUrl, allKeywords } from "../config/seo";
 
 // Interface for FAQ item structure
 interface FAQItem {
@@ -475,7 +483,28 @@ const FAQPage: React.FC = () => {
 
   return (
     <Container>
-      {/* Hero section */}
+      <SEO
+        title='Preguntas Frecuentes — Smashly | FAQ Pádel'
+        description='Resuelve tus dudas sobre Smashly: comparador, recomendaciones con IA, precios, palas, cuenta y soporte. Todo lo que necesitas saber en un solo lugar.'
+        canonical={buildUrl('/faq')}
+        keywords={allKeywords}
+        type='website'
+        schema={[
+          organizationSchema(),
+          webPageSchema({
+            name: 'Preguntas Frecuentes — Smashly',
+            description: 'Preguntas frecuentes sobre Smashly y el mundo del pádel.',
+            url: buildUrl('/faq'),
+          }),
+          breadcrumbSchema([
+            { name: 'Inicio', url: buildUrl('/') },
+            { name: 'FAQ', url: buildUrl('/faq') },
+          ]),
+          faqSchema(
+            faqData.map(f => ({ question: f.question, answer: f.answer }))
+          ),
+        ]}
+      />
       <HeroSection>
         <MainTitle>
           Preguntas <HighlightText>Frecuentes</HighlightText>

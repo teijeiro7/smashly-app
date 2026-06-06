@@ -1,19 +1,75 @@
+# Smashly — robots.txt
+# https://smashly-app.es
+
+# === General rules for all crawlers ===
 User-agent: *
 Allow: /
+Allow: /catalog
+Allow: /best-racket
 Allow: /compare
-Disallow: /admin/
+Allow: /compare-rackets
+Allow: /racket-detail
+Allow: /faq
+Allow: /shared/
+
+# Disallow authenticated/private areas and admin
 Disallow: /admin
+Disallow: /admin/
 Disallow: /profile
+Disallow: /profile/
 Disallow: /comparisons
 Disallow: /comparisons/
+Disallow: /lists/
+Disallow: /dashboard
 Disallow: /api/
+Disallow: /*.json$
+Disallow: /*?*utm_*
 
-Sitemap: https://smashly-app.es/sitemap.xml
+# Crawl-delay to avoid hammering the server
+Crawl-delay: 1
 
-# Google
+# === Bing (extra-permissive) ===
+User-agent: Bingbot
+Allow: /
+
+# === Google (explicit) ===
 User-agent: Googlebot
 Allow: /
 
-# Bing
-User-agent: Bingbot
+User-agent: Googlebot-Image
 Allow: /
+
+# === AI / LLM crawlers (allow for AI search visibility) ===
+User-agent: GPTBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+User-agent: CCBot
+Allow: /
+
+User-agent: Applebot-Extended
+Allow: /
+
+# === Block bad/scraping bots ===
+User-agent: AhrefsBot
+Disallow: /
+
+User-agent: SemrushBot
+Disallow: /
+
+User-agent: DotBot
+Disallow: /
+
+User-agent: MJ12bot
+Disallow: /
+
+# === Sitemaps ===
+Sitemap: https://smashly-app.es/sitemap.xml
