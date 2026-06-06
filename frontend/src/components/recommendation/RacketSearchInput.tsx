@@ -180,6 +180,13 @@ export const RacketSearchInput: React.FC<RacketSearchInputProps> = ({
   }, []);
 
   useEffect(() => {
+    if (!isFocused) {
+      setQuery(value ? `${value.marca} ${value.name}`.trim() : '');
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [value?.name, value?.marca]);
+
+  useEffect(() => {
     if (query.trim().length >= 2) {
       const searchResults = searchRackets(query);
       const mappedResults: RacketSearchResult[] = searchResults.slice(0, 5).map(r => ({
@@ -275,19 +282,6 @@ export const RacketSearchInput: React.FC<RacketSearchInputProps> = ({
           </ResultsDropdown>
         )}
 
-        {isFocused && query.length > 0 && results.length > 0 && (
-          <ResultsDropdown
-            initial={{ opacity: 0, y: -8 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -8 }}
-            transition={{ duration: 0.15 }}
-            style={{ maxHeight: 'none' }}
-          >
-            <ManualEntryHint onClick={handleManualEntry} style={{ cursor: 'pointer' }}>
-              + O añadir manualmente: "{query}"
-            </ManualEntryHint>
-          </ResultsDropdown>
-        )}
       </AnimatePresence>
     </SearchContainer>
   );
