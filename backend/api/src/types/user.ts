@@ -12,6 +12,15 @@ export interface UserProfile {
   birthdate?: string; // fecha_nacimiento en la base de datos
   game_level?: string; // nivel_juego en la base de datos
   limitations?: string[]; // limitaciones en la base de datos (array)
+  // Player preferences
+  gender?: string;
+  physical_condition?: string;
+  position?: string;
+  frequency?: string;
+  touch_preference?: string;
+  balance_preference?: string;
+  shape_preference?: string;
+  weight_preference?: string;
   created_at?: string;
   updated_at?: string;
 }
@@ -27,6 +36,14 @@ export interface CreateUserProfileRequest {
   birthdate?: string;
   game_level?: string;
   limitations?: string[];
+  gender?: string;
+  physical_condition?: string;
+  position?: string;
+  frequency?: string;
+  touch_preference?: string;
+  balance_preference?: string;
+  shape_preference?: string;
+  weight_preference?: string;
 }
 
 // Interface for updating a user profile
@@ -40,6 +57,14 @@ export interface UpdateUserProfileRequest {
   birthdate?: string;
   game_level?: string;
   limitations?: string[];
+  gender?: string;
+  physical_condition?: string;
+  position?: string;
+  frequency?: string;
+  touch_preference?: string;
+  balance_preference?: string;
+  shape_preference?: string;
+  weight_preference?: string;
 }
 
 // Tipos para autenticación y autorización

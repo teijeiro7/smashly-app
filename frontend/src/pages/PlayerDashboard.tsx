@@ -353,10 +353,68 @@ const RacketImageSmall = styled.img`
   object-fit: contain;
 `;
 
-const RacketMetaLine = styled.p`
-  margin: 0;
-  color: #64748b;
-  font-size: 0.875rem;
+
+const ScoreRow = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin: 0.15rem 0;
+`;
+
+const ScoreLabel = styled.span`
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+`;
+
+const ScoreBarTrack = styled.div`
+  flex: 1;
+  height: 6px;
+  background: #e2e8f0;
+  border-radius: 99px;
+  overflow: hidden;
+`;
+
+const ScoreBarFill = styled.div<{ $pct: number }>`
+  height: 100%;
+  width: ${p => p.$pct}%;
+  background: linear-gradient(90deg, #16a34a, #4ade80);
+  border-radius: 99px;
+  transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+`;
+
+const ScoreValue = styled.span`
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #15803d;
+  min-width: 2.8rem;
+  text-align: right;
+`;
+
+const PriceTag = styled.div`
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  margin-top: 0.25rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #15803d;
+`;
+
+const NoPriceTag = styled.div`
+  display: inline-flex;
+  align-items: center;
+  margin-top: 0.25rem;
+  padding: 0.2rem 0.55rem;
+  background: #f3f4f6;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 0.72rem;
+  color: #6b7280;
+  font-weight: 500;
 `;
 
 const RecommendedRacketBody = styled.div`
@@ -704,8 +762,17 @@ export const PlayerDashboard: React.FC = () => {
                   <RecommendedRacketBody>
                     <div>
                       <RacketName>{formatRecommendationModelName(racket.name, racket.brand)}</RacketName>
-                      <RacketMetaLine>Puntuación: {racket.match_score}</RacketMetaLine>
-                      {racket.price ? <RacketMetaLine>Precio aprox.: {racket.price}€</RacketMetaLine> : null}
+                      <ScoreRow>
+                        <ScoreLabel>Match</ScoreLabel>
+                        <ScoreBarTrack>
+                          <ScoreBarFill $pct={racket.match_score} />
+                        </ScoreBarTrack>
+                        <ScoreValue>{(racket.match_score / 10).toFixed(1)}/10</ScoreValue>
+                      </ScoreRow>
+                      {racket.price
+                        ? <PriceTag>€{racket.price.toFixed(2)}</PriceTag>
+                        : <NoPriceTag>Solo para recomendación</NoPriceTag>
+                      }
                     </div>
                     <RacketReason>{racket.reason}</RacketReason>
                   </RecommendedRacketBody>

@@ -351,6 +351,14 @@ export const EditProfileModal: React.FC<EditProfileModalProps> = ({
     birthdate: "",
     game_level: "",
     limitations: "",
+    gender: "",
+    physical_condition: "",
+    position: "",
+    frequency: "",
+    touch_preference: "",
+    balance_preference: "",
+    shape_preference: "",
+    weight_preference: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
@@ -370,6 +378,14 @@ export const EditProfileModal: React.FC<EditProfileModalProps> = ({
         birthdate: userProfile.birthdate || "",
         game_level: userProfile.game_level || "",
         limitations: userProfile.limitations?.[0] || "", // Tomar el primer elemento del array
+        gender: userProfile.gender || "",
+        physical_condition: userProfile.physical_condition || "",
+        position: userProfile.position || "",
+        frequency: userProfile.frequency || "",
+        touch_preference: userProfile.touch_preference || "",
+        balance_preference: userProfile.balance_preference || "",
+        shape_preference: userProfile.shape_preference || "",
+        weight_preference: userProfile.weight_preference || "",
       });
       setAvatarPreview(userProfile.avatar_url || null);
       setAvatarFile(null);
@@ -480,6 +496,14 @@ export const EditProfileModal: React.FC<EditProfileModalProps> = ({
         full_name: formData.full_name.trim() || undefined,
         current_racket: formData.current_racket || undefined,
         game_level: formData.game_level || undefined,
+        gender: formData.gender || undefined,
+        physical_condition: formData.physical_condition || undefined,
+        position: formData.position || undefined,
+        frequency: formData.frequency || undefined,
+        touch_preference: formData.touch_preference || undefined,
+        balance_preference: formData.balance_preference || undefined,
+        shape_preference: formData.shape_preference || undefined,
+        weight_preference: formData.weight_preference || undefined,
       };
 
       // Incluir avatar_url si cambió
@@ -741,6 +765,150 @@ export const EditProfileModal: React.FC<EditProfileModalProps> = ({
                     adecuadas
                   </HelperText>
                 </FormGroup>
+              </FormSection>
+
+              <FormSection>
+                <SectionTitle>
+                  🎾 Preferencias de juego
+                </SectionTitle>
+
+                <InputGroup>
+                  <FormGroup>
+                    <Label htmlFor="gender">Género</Label>
+                    <Select
+                      id="gender"
+                      name="gender"
+                      value={formData.gender}
+                      onChange={handleChange}
+                      disabled={isSubmitting}
+                    >
+                      <option value="">Selecciona género</option>
+                      <option value="masculino">Masculino</option>
+                      <option value="femenino">Femenino</option>
+                    </Select>
+                  </FormGroup>
+
+                  <FormGroup>
+                    <Label htmlFor="physical_condition">Condición física</Label>
+                    <Select
+                      id="physical_condition"
+                      name="physical_condition"
+                      value={formData.physical_condition}
+                      onChange={handleChange}
+                      disabled={isSubmitting}
+                    >
+                      <option value="">Selecciona condición</option>
+                      <option value="asiduo">Asiduo al deporte</option>
+                      <option value="ocasional">Ocasional</option>
+                    </Select>
+                  </FormGroup>
+                </InputGroup>
+
+                <InputGroup>
+                  <FormGroup>
+                    <Label htmlFor="position">Posición en pista</Label>
+                    <Select
+                      id="position"
+                      name="position"
+                      value={formData.position}
+                      onChange={handleChange}
+                      disabled={isSubmitting}
+                    >
+                      <option value="">Selecciona posición</option>
+                      <option value="reves">Revés</option>
+                      <option value="drive">Drive</option>
+                      <option value="ambos">Indiferente</option>
+                    </Select>
+                  </FormGroup>
+
+                  <FormGroup>
+                    <Label htmlFor="frequency">Frecuencia de juego</Label>
+                    <Select
+                      id="frequency"
+                      name="frequency"
+                      value={formData.frequency}
+                      onChange={handleChange}
+                      disabled={isSubmitting}
+                    >
+                      <option value="">Selecciona frecuencia</option>
+                      <option value="1">1 vez/semana o menos</option>
+                      <option value="2-3">2-3 veces/semana</option>
+                      <option value="4+">4+ veces/semana</option>
+                    </Select>
+                  </FormGroup>
+                </InputGroup>
+
+                <InputGroup>
+                  <FormGroup>
+                    <Label htmlFor="touch_preference">Tacto de pala</Label>
+                    <Select
+                      id="touch_preference"
+                      name="touch_preference"
+                      value={formData.touch_preference}
+                      onChange={handleChange}
+                      disabled={isSubmitting}
+                    >
+                      <option value="">Selecciona tacto</option>
+                      <option value="duro">Duro</option>
+                      <option value="medio">Medio</option>
+                      <option value="blando">Blando</option>
+                    </Select>
+                  </FormGroup>
+
+                  <FormGroup>
+                    <Label htmlFor="weight_preference">Peso de pala</Label>
+                    <Select
+                      id="weight_preference"
+                      name="weight_preference"
+                      value={formData.weight_preference}
+                      onChange={handleChange}
+                      disabled={isSubmitting}
+                    >
+                      <option value="">No sé</option>
+                      <option value="ligera">Ligera (&lt;360g)</option>
+                      <option value="media">Media (360-375g)</option>
+                      <option value="pesada">Pesada (&gt;375g)</option>
+                    </Select>
+                  </FormGroup>
+                </InputGroup>
+
+                <InputGroup>
+                  <FormGroup>
+                    <Label htmlFor="balance_preference">Balance de pala</Label>
+                    <Select
+                      id="balance_preference"
+                      name="balance_preference"
+                      value={formData.balance_preference}
+                      onChange={handleChange}
+                      disabled={isSubmitting}
+                    >
+                      <option value="">No sé</option>
+                      <option value="bajo">Bajo (Manejable)</option>
+                      <option value="medio">Medio (Equilibrado)</option>
+                      <option value="alto">Alto (Potencia)</option>
+                    </Select>
+                  </FormGroup>
+
+                  <FormGroup>
+                    <Label htmlFor="shape_preference">Forma de pala</Label>
+                    <Select
+                      id="shape_preference"
+                      name="shape_preference"
+                      value={formData.shape_preference}
+                      onChange={handleChange}
+                      disabled={isSubmitting}
+                    >
+                      <option value="">No sé</option>
+                      <option value="redonda">Redonda</option>
+                      <option value="lagrima">Lágrima</option>
+                      <option value="diamante">Diamante</option>
+                    </Select>
+                  </FormGroup>
+                </InputGroup>
+
+                <HelperText>
+                  Estas preferencias se usarán para pre-rellenar los formularios de recomendación
+                </HelperText>
               </FormSection>
 
               <ButtonGroup>

@@ -12,7 +12,41 @@ import {
   AdvancedFormData,
   RecommendationResult as ResultType,
 } from '../types/recommendation';
+import { UserProfile } from '../services/userProfileService';
 import { sileo } from 'sileo';
+
+const normalizeLevel = (gameLevel?: string): string => {
+  const value = (gameLevel || '').toLowerCase();
+  if (value.includes('princip')) return 'principiante';
+  if (value.includes('avanz')) return 'avanzado';
+  if (value.includes('profes')) return 'profesional';
+  if (value.includes('inter')) return 'intermedio';
+  return value || '';
+};
+
+const buildInitialData = (user: UserProfile | null): Partial<BasicFormData & AdvancedFormData> => {
+  if (!user) return {};
+  const injuries = (() => {
+    const text = user.limitations?.join(' ').toLowerCase() || '';
+    if (text.includes('codo')) return 'codo';
+    if (text.includes('hombro')) return 'hombro';
+    if (text.includes('muñeca') || text.includes('muneca')) return 'muneca';
+    return 'no';
+  })();
+  return {
+    level: user.game_level ? normalizeLevel(user.game_level) : '',
+    current_racket: user.current_racket || '',
+    injuries,
+    gender: user.gender as any,
+    physical_condition: user.physical_condition as any,
+    position: user.position || '',
+    frequency: user.frequency || '',
+    touch_preference: user.touch_preference as any,
+    balance_preference: user.balance_preference || '',
+    shape_preference: user.shape_preference || '',
+    weight_preference: user.weight_preference || '',
+  };
+};
 
 const PageContainer = styled.div`
   min-height: 100vh;
@@ -386,9 +420,9 @@ export const BestRacketPage: React.FC = () => {
           </ModeSelector>
 
           {formType === 'basic' ? (
-            <WizardForm mode="basic" onSubmit={(data) => handleBasicSubmit(data as BasicFormData)} isLoading={false} />
+            <WizardForm mode="basic" onSubmit={(data) => handleBasicSubmit(data as BasicFormData)} isLoading={false} initialData={buildInitialData(user)} />
           ) : (
-            <WizardForm mode="advanced" onSubmit={(data) => handleAdvancedSubmit(data as AdvancedFormData)} isLoading={false} />
+            <WizardForm mode="advanced" onSubmit={(data) => handleAdvancedSubmit(data as AdvancedFormData)} isLoading={false} initialData={buildInitialData(user)} />
           )}
         </>
       )}

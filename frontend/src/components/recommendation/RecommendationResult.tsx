@@ -160,6 +160,20 @@ const RacketPrice = styled.div`
   margin-top: 0.5rem;
 `;
 
+const NoPriceBadge = styled.div`
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  margin-top: 0.5rem;
+  padding: 0.25rem 0.6rem;
+  background: #f3f4f6;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  color: #6b7280;
+  font-weight: 500;
+`;
+
 const MatchScore = styled.div`
   background: #15803d;
   color: white;
@@ -400,7 +414,10 @@ export const RecommendationResult: React.FC<Props> = ({
               <RacketHeaderInfo>
                 {racket.brand && <RacketBrand>{racket.brand}</RacketBrand>}
                 <RacketName>{racket.name}</RacketName>
-                {racket.price && <RacketPrice>€{racket.price.toFixed(2)}</RacketPrice>}
+                {racket.price
+                  ? <RacketPrice>€{racket.price.toFixed(2)}</RacketPrice>
+                  : <NoPriceBadge>Solo para recomendación</NoPriceBadge>
+                }
               </RacketHeaderInfo>
               <MatchScore>{racket.match_score}% Match</MatchScore>
             </RacketHeader>

@@ -19,7 +19,8 @@ const userProfileSchema = Joi.object({
   birthdate: Joi.string().isoDate().optional(),
   game_level: Joi.string()
     .optional()
-    .valid('Principiante', 'Intermedio', 'Avanzado', 'Profesional'),
+    .valid('Principiante', 'Intermedio', 'Avanzado', 'Profesional',
+           'principiante', 'intermedio', 'avanzado', 'profesional'),
   limitations: Joi.array().items(Joi.string()).optional(),
 });
 
@@ -40,8 +41,17 @@ const updateProfileSchema = Joi.object({
   birthdate: Joi.string().isoDate().optional(),
   game_level: Joi.string()
     .optional()
-    .valid('Principiante', 'Intermedio', 'Avanzado', 'Profesional'),
+    .valid('Principiante', 'Intermedio', 'Avanzado', 'Profesional',
+           'principiante', 'intermedio', 'avanzado', 'profesional'),
   limitations: Joi.array().items(Joi.string()).optional(),
+  gender: Joi.string().valid('masculino', 'femenino').optional().allow('', null),
+  physical_condition: Joi.string().valid('asiduo', 'ocasional').optional().allow('', null),
+  position: Joi.string().valid('reves', 'drive', 'ambos').optional().allow('', null),
+  frequency: Joi.string().valid('1', '2-3', '4+').optional().allow('', null),
+  touch_preference: Joi.string().valid('duro', 'medio', 'blando').optional().allow('', null),
+  balance_preference: Joi.string().valid('bajo', 'medio', 'alto', 'no_se').optional().allow('', null),
+  shape_preference: Joi.string().valid('redonda', 'lagrima', 'diamante', 'no_se').optional().allow('', null),
+  weight_preference: Joi.string().valid('ligera', 'media', 'pesada', 'no_se').optional().allow('', null),
 });
 
 /**

@@ -41,6 +41,7 @@ export interface AdvancedFormData extends BasicFormData {
   current_racket_likes: string;
   current_racket_dislikes: string;
   objectives: string[];
+  only_in_stock?: boolean;
 
   // New strategic field (Ponderación de Características)
   // Array ordenado de 1 (más importante) a 5 (menos importante)

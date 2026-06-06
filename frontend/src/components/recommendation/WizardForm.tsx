@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiChevronRight, FiChevronLeft } from 'react-icons/fi';
@@ -251,6 +251,7 @@ interface WizardFormProps {
   mode: 'basic' | 'advanced';
   onSubmit: (data: BasicFormData | AdvancedFormData) => void;
   isLoading?: boolean;
+  initialData?: Partial<BasicFormData & AdvancedFormData>;
 }
 
 type Question = {
@@ -547,7 +548,7 @@ const ADVANCED_QUESTIONS: Question[] = [
   },
 ];
 
-export const WizardForm: React.FC<WizardFormProps> = ({ mode, onSubmit, isLoading }) => {
+export const WizardForm: React.FC<WizardFormProps> = ({ mode, onSubmit, isLoading, initialData }) => {
   const questions = mode === 'basic' ? BASIC_QUESTIONS : ADVANCED_QUESTIONS;
   const [currentIndex, setCurrentIndex] = useState(0);
 
@@ -562,6 +563,7 @@ export const WizardForm: React.FC<WizardFormProps> = ({ mode, onSubmit, isLoadin
         gender: undefined,
         physical_condition: undefined,
         touch_preference: undefined,
+        ...initialData,
       } as BasicFormData;
     }
     return {
@@ -584,10 +586,17 @@ export const WizardForm: React.FC<WizardFormProps> = ({ mode, onSubmit, isLoadin
       gender: undefined,
       physical_condition: undefined,
       touch_preference: undefined,
+      ...initialData,
     } as AdvancedFormData;
   };
 
   const [formData, setFormData] = useState<BasicFormData | AdvancedFormData>(getInitialData());
+
+  useEffect(() => {
+    setFormData(getInitialData());
+    setCurrentIndex(0);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialData]);
 
   const currentQuestion = questions[currentIndex];
   const isFirstQuestion = currentIndex === 0;

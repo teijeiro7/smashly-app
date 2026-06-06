@@ -42,7 +42,13 @@ export class RacketFilterService {
 
     // ===== PHASE 2: PERFORMANCE FILTERS =====
 
-    // 1. Filter by budget
+    // 1. Filter by stock (only rackets with a known price)
+    if ('only_in_stock' in profile && (profile as AdvancedFormData).only_in_stock) {
+      filtered = filtered.filter((r: any) => !!r.precio_actual);
+      logger.info(`📦 After in-stock filter: ${filtered.length} rackets`);
+    }
+
+    // 2. Filter by budget
     filtered = this.filterByBudget(filtered, profile.budget);
     logger.info(`💰 After budget filter: ${filtered.length} rackets`);
 
