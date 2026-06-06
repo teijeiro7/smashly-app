@@ -3,6 +3,8 @@ import { OAuth2Client } from 'google-auth-library';
 import { supabase, getSupabaseAdmin } from '../config/supabase';
 import logger from '../config/logger';
 import { ApiResponse } from '../types/common';
+import jwt from 'jsonwebtoken';
+import { config } from '../config';
 
 function getErrorMessage(error: unknown): string {
   if (error instanceof Error) {
@@ -74,6 +76,47 @@ export class GoogleAuthController {
     return email.split('@')[0];
   }
 
+  private static createManualSession(userId: string, email: string): any {
+    const jwtSecret = config.jwtSecret || process.env.JWT_SECRET;
+    
+    if (!jwtSecret) {
+      logger.error('[GoogleAuth] No JWT_SECRET configured');
+      return null;
+    }
+
+    const now = Math.floor(Date.now() / 1000);
+    const expiresIn = 60 * 60; // 1 hour
+
+    const payload = {
+      iss: 'supabase',
+      sub: userId,
+      email: email,
+      role: 'authenticated',
+      aal: 'aal1',
+      iat: now,
+      exp: now + expiresIn,
+      type: 'access',
+    };
+
+    const accessToken = jwt.sign(payload, jwtSecret);
+    const refreshToken = jwt.sign(
+      { sub: userId, iat: now, exp: now + 30 * 24 * 60 * 60 },
+      jwtSecret
+    );
+
+    return {
+      access_token: accessToken,
+      refresh_token: refreshToken,
+      expires_at: now + expiresIn,
+      expires_in: expiresIn,
+      token_type: 'bearer',
+      user: {
+        id: userId,
+        email: email,
+      },
+    };
+  }
+
   static async handleGoogleAuth(req: Request, res: Response): Promise<void> {
     try {
       logger.info('[GoogleAuth] Received request');
@@ -133,6 +176,11 @@ export class GoogleAuthController {
           if (!error && data.user) {
             userId = data.user.id;
             session = data.session;
+            // If signInWithIdToken succeeded but no session, create JWT manually
+            if (!session) {
+              logger.info('[GoogleAuth] signInWithIdToken succeeded but no session, creating JWT manually...');
+              session = GoogleAuthController.createManualSession(userId, googleUser.email);
+            }
           }
         } catch (e) {
           logger.info('signInWithIdToken failed, falling back to manual flow:', e);
@@ -182,19 +230,9 @@ export class GoogleAuthController {
           logger.info('Created new user:', userId);
         }
 
-        // Generate session directly via admin createSession (simpler and more reliable)
-        logger.info('[GoogleAuth] Creating session via admin createSession...');
-        const { data: sessionData, error: sessionError } = 
-          await admin.auth.admin.createSession(userId);
-
-        if (sessionError) {
-          logger.error('[GoogleAuth] createSession failed:', sessionError);
-        } else if (sessionData?.session) {
-          session = sessionData.session;
-          logger.info('[GoogleAuth] Session created via createSession');
-        } else {
-          logger.warn('[GoogleAuth] No session returned from createSession');
-        }
+        // Create session manually using JWT
+        logger.info('[GoogleAuth] Creating session manually via JWT...');
+        session = GoogleAuthController.createManualSession(userId, googleUser.email);
       }
 
       // Check if user already has a profile (determine if new user)
