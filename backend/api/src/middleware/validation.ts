@@ -74,7 +74,6 @@ const registerSchema = Joi.object({
     .pattern(/^[a-zA-Z0-9_]+$/)
     .required(),
   full_name: Joi.string().optional().allow(''),
-  role: Joi.string().valid('player', 'store_owner').required(),
   metadata: Joi.object().optional(),
 });
 
