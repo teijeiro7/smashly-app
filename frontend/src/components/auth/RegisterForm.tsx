@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
+import { useForm, useStore } from '@tanstack/react-form';
 import { sileo } from 'sileo';
 import {
-  FiEye,
-  FiEyeOff,
   FiFileText,
   FiGlobe,
   FiLock,
@@ -21,20 +20,17 @@ import OnboardingPromptModal from '../features/OnboardingPromptModal';
 import StoreRequestModal from '../features/StoreRequestModal';
 import {
   Form,
-  FormGroup,
-  Label,
-  InputWrapper,
-  IconWrapper,
-  Input,
-  PasswordToggle,
-  ErrorText,
   SubmitButton,
   Divider,
   SocialButtons,
   SocialButton,
 } from './AuthStyles';
+import { emailValidator, requiredStringValidator, passwordChecklist } from '../../schemas/auth';
+import TextField from '../form/TextField';
+import CheckboxField from '../form/CheckboxField';
 
-// Local styles for Register specific components
+// ─── Local styled components ─────────────────────────────────────────────────
+
 const RegistrationTypeSelector = styled.div`
   display: flex;
   gap: 1rem;
@@ -102,168 +98,77 @@ const TermsLink = styled(Link)`
   }
 `;
 
+// ─── Types ───────────────────────────────────────────────────────────────────
+
 type RegistrationType = 'player' | 'store';
-
-interface FormData {
-  registrationType: RegistrationType;
-  fullName: string;
-  nickname: string;
-  email: string;
-  password: string;
-  confirmPassword: string;
-  acceptedTerms: boolean;
-  // Store-specific fields
-  storeName?: string;
-  legalName?: string;
-  cifNif?: string;
-  contactEmail?: string;
-  phoneNumber?: string;
-  websiteUrl?: string;
-  logoUrl?: string;
-  shortDescription?: string;
-  location?: string;
-}
-
-interface FormErrors {
-  fullName?: string;
-  nickname?: string;
-  email?: string;
-  password?: string;
-  confirmPassword?: string;
-  acceptedTerms?: string;
-  storeName?: string;
-  legalName?: string;
-  cifNif?: string;
-  contactEmail?: string;
-  phoneNumber?: string;
-  websiteUrl?: string;
-  logoUrl?: string;
-  shortDescription?: string;
-  location?: string;
-}
 
 interface RegisterFormProps {
   onSuccess?: () => void;
   onLoginClick?: () => void;
 }
 
+// ─── Component ───────────────────────────────────────────────────────────────
+
 const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess, onLoginClick }) => {
   const navigate = useNavigate();
   const searchParams = useSearch({ strict: false }) as Record<string, string>;
   const { signUp, signInWithGoogle } = useAuth();
-  const [loading, setLoading] = useState(false);
-  const [googleLoading, setGoogleLoading] = useState(false);
+
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [showStoreModal, setShowStoreModal] = useState(false);
   const [showOnboardingModal, setShowOnboardingModal] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
 
   const redirectTo = searchParams['redirect'] || '/';
-  const [formData, setFormData] = useState<FormData>({
-    registrationType: 'player',
-    fullName: '',
-    nickname: '',
-    email: '',
-    password: '',
-    confirmPassword: '',
-    acceptedTerms: false,
-    storeName: '',
-    legalName: '',
-    cifNif: '',
-    contactEmail: '',
-    phoneNumber: '',
-    websiteUrl: '',
-    logoUrl: '',
-    shortDescription: '',
-    location: '',
-  });
-  const [errors, setErrors] = useState<FormErrors>({});
 
-  const validatePassword = (password: string) => {
-    return {
-      length: password.length >= 8,
-      uppercase: /[A-Z]/.test(password),
-      lowercase: /[a-z]/.test(password),
-      number: /\d/.test(password),
-      special: /[!@#$%^&*(),.?":{}|<>]/.test(password),
-    };
-  };
-
-  const passwordRequirements = validatePassword(formData.password);
-  const isPasswordValid = Object.values(passwordRequirements).every(Boolean);
-
-  const validateForm = (): boolean => {
-    const newErrors: FormErrors = {};
-
-    // Common fields
-    if (!formData.fullName.trim()) newErrors.fullName = 'Required';
-    if (!formData.nickname.trim()) newErrors.nickname = 'Required';
-
-    if (!formData.email.trim()) newErrors.email = 'Required';
-    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) newErrors.email = 'Invalid email';
-
-    if (!formData.password) newErrors.password = 'Required';
-    else if (!isPasswordValid) newErrors.password = 'Password does not meet requirements';
-
-    if (formData.password !== formData.confirmPassword)
-      newErrors.confirmPassword = 'Passwords do not match';
-
-    // Terms and conditions - REQUIRED
-    if (!formData.acceptedTerms)
-      newErrors.acceptedTerms = 'You must accept the terms and conditions to continue';
-
-    // Store specific
-    if (formData.registrationType === 'store') {
-      if (!formData.storeName?.trim()) newErrors.storeName = 'Required';
-      if (!formData.legalName?.trim()) newErrors.legalName = 'Required';
-      if (!formData.cifNif?.trim()) newErrors.cifNif = 'Required';
-      if (!formData.contactEmail?.trim()) newErrors.contactEmail = 'Required';
-      if (!formData.phoneNumber?.trim()) newErrors.phoneNumber = 'Required';
-      if (!formData.location?.trim()) newErrors.location = 'Required';
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-    if (errors[name as keyof FormErrors]) setErrors(prev => ({ ...prev, [name]: undefined }));
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!validateForm()) return;
-    setLoading(true);
-
-    try {
+  const form = useForm({
+    defaultValues: {
+      registrationType: 'player' as RegistrationType,
+      fullName: '',
+      nickname: '',
+      email: '',
+      password: '',
+      confirmPassword: '',
+      acceptedTerms: false,
+      // Store-specific
+      storeName: '',
+      legalName: '',
+      cifNif: '',
+      contactEmail: '',
+      phoneNumber: '',
+      websiteUrl: '',
+      logoUrl: '',
+      shortDescription: '',
+      location: '',
+    },
+    onSubmit: async ({ value }) => {
       const { error, token } = await signUp(
-        formData.email.trim(),
-        formData.password,
-        formData.nickname.trim(),
-        formData.fullName.trim() || undefined,
-        formData.registrationType === 'store' ? 'store_owner' : 'player'
+        value.email.trim(),
+        value.password,
+        value.nickname.trim(),
+        value.fullName.trim() || undefined,
+        value.registrationType === 'store' ? 'store_owner' : 'player'
       );
 
       if (error) {
-        sileo.error({ title: 'Error', description: error || 'Error creating account' });
+        sileo.error({ title: 'Error', description: error || 'Error al crear la cuenta' });
         return;
       }
 
-      if (formData.registrationType === 'store') {
+      if (value.registrationType === 'store') {
         try {
           await storeService.createStoreRequest(
             {
-              store_name: formData.storeName!,
-              legal_name: formData.legalName!,
-              cif_nif: formData.cifNif!,
-              contact_email: formData.contactEmail!,
-              phone_number: formData.phoneNumber!,
-              website_url: formData.websiteUrl,
-              logo_url: formData.logoUrl,
-              short_description: formData.shortDescription,
-              location: formData.location!,
+              store_name: value.storeName!,
+              legal_name: value.legalName!,
+              cif_nif: value.cifNif!,
+              contact_email: value.contactEmail!,
+              phone_number: value.phoneNumber!,
+              website_url: value.websiteUrl || undefined,
+              logo_url: value.logoUrl || undefined,
+              short_description: value.shortDescription || undefined,
+              location: value.location!,
             },
             token!
           );
@@ -271,7 +176,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess, onLoginClick }) 
         } catch (storeError: any) {
           sileo.error({
             title: 'Error',
-            description: `Account created but store registration failed: ${storeError.message}`,
+            description: `Cuenta creada pero el registro de tienda falló: ${storeError.message}`,
           });
           setTimeout(() => {
             if (onSuccess) onSuccess();
@@ -281,16 +186,20 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess, onLoginClick }) 
       } else {
         sileo.success({
           title: 'Éxito',
-          description: 'Account created successfully! Check your email.',
+          description: '¡Cuenta creada! Revisa tu correo.',
         });
         setShowOnboardingModal(true);
       }
-    } catch (error) {
-      sileo.error({ title: 'Error', description: 'Unexpected error. Please try again.' });
-    } finally {
-      setLoading(false);
-    }
-  };
+    },
+  });
+
+  // Reactive form state
+  const isSubmitting = useStore(form.store, s => s.isSubmitting);
+  const registrationType = useStore(form.store, s => s.values.registrationType);
+  const passwordValue = useStore(form.store, s => s.values.password);
+
+  const pwdChecklist = passwordChecklist(passwordValue);
+  const isPasswordValid = Object.values(pwdChecklist).every(Boolean);
 
   const handleModalClose = () => {
     setShowStoreModal(false);
@@ -305,9 +214,8 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess, onLoginClick }) 
       if (error) {
         sileo.error({ title: 'Error', description: error });
       }
-      // On success: browser redirects to Google → onAuthStateChange handles post-login
-    } catch (error: any) {
-      sileo.error({ title: 'Error', description: error?.message || 'Error inesperado con Google' });
+    } catch (err: any) {
+      sileo.error({ title: 'Error', description: err?.message || 'Error inesperado con Google' });
     } finally {
       setGoogleLoading(false);
     }
@@ -323,283 +231,347 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess, onLoginClick }) 
     <>
       <OnboardingPromptModal isOpen={showOnboardingModal} onClose={handleOnboardingClose} />
 
-      <Form onSubmit={handleSubmit}>
+      <Form
+        onSubmit={e => {
+          e.preventDefault();
+          e.stopPropagation();
+          void form.handleSubmit();
+        }}
+      >
+        {/* Registration type selector */}
         <RegistrationTypeSelector>
           <TypeCard
             type='button'
-            $isSelected={formData.registrationType === 'player'}
-            onClick={() => setFormData(p => ({ ...p, registrationType: 'player' }))}
+            $isSelected={registrationType === 'player'}
+            onClick={() => form.setFieldValue('registrationType', 'player')}
           >
             <TypeIcon>👤</TypeIcon>
             <TypeTitle>Jugador</TypeTitle>
           </TypeCard>
           <TypeCard
             type='button'
-            $isSelected={formData.registrationType === 'store'}
-            onClick={() => setFormData(p => ({ ...p, registrationType: 'store' }))}
+            $isSelected={registrationType === 'store'}
+            onClick={() => form.setFieldValue('registrationType', 'store')}
           >
             <TypeIcon>🏪</TypeIcon>
             <TypeTitle>Tienda</TypeTitle>
           </TypeCard>
         </RegistrationTypeSelector>
 
-        {/* Common Fields */}
-        <FormGroup>
-          <Label htmlFor='fullName'>Nombre Completo</Label>
-          <InputWrapper>
-            <IconWrapper>
-              <FiUser />
-            </IconWrapper>
-            <Input
+        {/* Common fields */}
+        <form.Field name='fullName' validators={{ onSubmit: requiredStringValidator }}>
+          {field => (
+            <TextField
+              label='Nombre Completo'
               id='fullName'
               name='fullName'
               type='text'
               placeholder='Tu nombre'
-              value={formData.fullName}
-              onChange={handleInputChange}
-              $hasError={!!errors.fullName}
+              value={field.state.value}
+              onChange={field.handleChange}
+              errors={field.state.meta.errors}
+              icon={<FiUser />}
             />
-          </InputWrapper>
-          {errors.fullName && <ErrorText>{errors.fullName}</ErrorText>}
-        </FormGroup>
+          )}
+        </form.Field>
 
-        <FormGroup>
-          <Label htmlFor='nickname'>Apodo</Label>
-          <InputWrapper>
-            <IconWrapper>
-              <FiUser />
-            </IconWrapper>
-            <Input
+        <form.Field name='nickname' validators={{ onSubmit: requiredStringValidator }}>
+          {field => (
+            <TextField
+              label='Apodo'
               id='nickname'
               name='nickname'
               type='text'
               placeholder='Tu apodo'
-              value={formData.nickname}
-              onChange={handleInputChange}
-              $hasError={!!errors.nickname}
+              value={field.state.value}
+              onChange={field.handleChange}
+              errors={field.state.meta.errors}
+              icon={<FiUser />}
             />
-          </InputWrapper>
-          {errors.nickname && <ErrorText>{errors.nickname}</ErrorText>}
-        </FormGroup>
+          )}
+        </form.Field>
 
-        <FormGroup>
-          <Label htmlFor='email'>Correo Electrónico</Label>
-          <InputWrapper>
-            <IconWrapper>
-              <FiMail />
-            </IconWrapper>
-            <Input
+        <form.Field name='email' validators={{ onSubmit: emailValidator }}>
+          {field => (
+            <TextField
+              label='Correo Electrónico'
               id='email'
               name='email'
               type='email'
               placeholder='tu@email.com'
-              value={formData.email}
-              onChange={handleInputChange}
-              $hasError={!!errors.email}
+              value={field.state.value}
+              onChange={field.handleChange}
+              errors={field.state.meta.errors}
+              icon={<FiMail />}
+              autoComplete='email'
             />
-          </InputWrapper>
-          {errors.email && <ErrorText>{errors.email}</ErrorText>}
-        </FormGroup>
+          )}
+        </form.Field>
 
-        <FormGroup>
-          <Label htmlFor='password'>Contraseña</Label>
-          <InputWrapper>
-            <IconWrapper>
-              <FiLock />
-            </IconWrapper>
-            <Input
+        <form.Field
+          name='password'
+          validators={{
+            onSubmit: ({ value }) => {
+              if (!value) return 'Requerido';
+              const checks = passwordChecklist(value);
+              if (!checks.length) return 'Al menos 8 caracteres';
+              if (!checks.uppercase) return 'Necesita una letra mayúscula';
+              if (!checks.lowercase) return 'Necesita una letra minúscula';
+              if (!checks.number) return 'Necesita un número';
+              if (!checks.special) return 'Necesita un carácter especial';
+              return undefined;
+            },
+          }}
+        >
+          {field => (
+            <TextField
+              label='Contraseña'
               id='password'
               name='password'
-              type={showPassword ? 'text' : 'password'}
-              placeholder='Contraseña'
-              value={formData.password}
-              onChange={handleInputChange}
-              $hasError={!!errors.password}
+              value={field.state.value}
+              onChange={field.handleChange}
+              errors={field.state.meta.errors}
+              icon={<FiLock />}
+              showPasswordToggle
+              showPassword={showPassword}
+              onTogglePassword={() => setShowPassword(p => !p)}
+              autoComplete='new-password'
             />
-            <PasswordToggle type='button' onClick={() => setShowPassword(!showPassword)}>
-              {showPassword ? <FiEyeOff /> : <FiEye />}
-            </PasswordToggle>
-          </InputWrapper>
-          {errors.password && <ErrorText>{errors.password}</ErrorText>}
-        </FormGroup>
+          )}
+        </form.Field>
 
-        <FormGroup>
-          <Label htmlFor='confirmPassword'>Confirmar Contraseña</Label>
-          <InputWrapper>
-            <IconWrapper>
-              <FiLock />
-            </IconWrapper>
-            <Input
-              id='confirmPassword'
-              name='confirmPassword'
-              type={showConfirmPassword ? 'text' : 'password'}
-              placeholder='Repetir contraseña'
-              value={formData.confirmPassword}
-              onChange={handleInputChange}
-              $hasError={!!errors.confirmPassword}
-            />
-            <PasswordToggle
-              type='button'
-              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-            >
-              {showConfirmPassword ? <FiEyeOff /> : <FiEye />}
-            </PasswordToggle>
-          </InputWrapper>
-          {errors.confirmPassword && <ErrorText>{errors.confirmPassword}</ErrorText>}
-        </FormGroup>
-
-        {/* Password Requirements visualization */}
-        {formData.password && !isPasswordValid && (
+        {/* Live password requirements indicator */}
+        {passwordValue && !isPasswordValid && (
           <PasswordRequirements>
             <RequirementsList>
-              <RequirementItem $met={passwordRequirements.length}>
-                Al menos 8 caracteres
-              </RequirementItem>
-              <RequirementItem $met={passwordRequirements.uppercase}>
-                Una letra mayúscula
-              </RequirementItem>
-              <RequirementItem $met={passwordRequirements.lowercase}>
-                Una letra minúscula
-              </RequirementItem>
-              <RequirementItem $met={passwordRequirements.number}>Un número</RequirementItem>
-              <RequirementItem $met={passwordRequirements.special}>
-                Un carácter especial
-              </RequirementItem>
+              <RequirementItem $met={pwdChecklist.length}>Al menos 8 caracteres</RequirementItem>
+              <RequirementItem $met={pwdChecklist.uppercase}>Una letra mayúscula</RequirementItem>
+              <RequirementItem $met={pwdChecklist.lowercase}>Una letra minúscula</RequirementItem>
+              <RequirementItem $met={pwdChecklist.number}>Un número</RequirementItem>
+              <RequirementItem $met={pwdChecklist.special}>Un carácter especial</RequirementItem>
             </RequirementsList>
           </PasswordRequirements>
         )}
 
-        {/* Store Specific Fields */}
-        {formData.registrationType === 'store' && (
+        <form.Field
+          name='confirmPassword'
+          validators={{
+            onSubmit: ({ value, fieldApi }) => {
+              if (!value) return 'Requerido';
+              const pwd = fieldApi.form.getFieldValue('password');
+              if (value !== pwd) return 'Las contraseñas no coinciden';
+              return undefined;
+            },
+          }}
+        >
+          {field => (
+            <TextField
+              label='Confirmar Contraseña'
+              id='confirmPassword'
+              name='confirmPassword'
+              value={field.state.value}
+              onChange={field.handleChange}
+              errors={field.state.meta.errors}
+              icon={<FiLock />}
+              showPasswordToggle
+              showPassword={showConfirmPassword}
+              onTogglePassword={() => setShowConfirmPassword(p => !p)}
+              autoComplete='new-password'
+            />
+          )}
+        </form.Field>
+
+        {/* Store-specific fields */}
+        {registrationType === 'store' && (
           <>
-            <FormGroup>
-              <Label>Nombre Tienda</Label>
-              <InputWrapper>
-                <IconWrapper>
-                  <FiShoppingBag />
-                </IconWrapper>
-                <Input
+            <form.Field
+              name='storeName'
+              validators={{
+                onSubmit: ({ value, fieldApi }) => {
+                  const regType = fieldApi.form.getFieldValue('registrationType');
+                  if (regType === 'store' && !value?.trim()) return 'Requerido';
+                  return undefined;
+                },
+              }}
+            >
+              {field => (
+                <TextField
+                  label='Nombre Tienda'
+                  id='storeName'
                   name='storeName'
-                  value={formData.storeName}
-                  onChange={handleInputChange}
-                  $hasError={!!errors.storeName}
+                  value={field.state.value ?? ''}
+                  onChange={field.handleChange}
+                  errors={field.state.meta.errors}
+                  icon={<FiShoppingBag />}
                 />
-              </InputWrapper>
-              {errors.storeName && <ErrorText>{errors.storeName}</ErrorText>}
-            </FormGroup>
-            <FormGroup>
-              <Label>CIF/NIF</Label>
-              <InputWrapper>
-                <IconWrapper>
-                  <FiFileText />
-                </IconWrapper>
-                <Input
+              )}
+            </form.Field>
+
+            <form.Field
+              name='cifNif'
+              validators={{
+                onSubmit: ({ value, fieldApi }) => {
+                  const regType = fieldApi.form.getFieldValue('registrationType');
+                  if (regType === 'store' && !value?.trim()) return 'Requerido';
+                  return undefined;
+                },
+              }}
+            >
+              {field => (
+                <TextField
+                  label='CIF/NIF'
+                  id='cifNif'
                   name='cifNif'
-                  value={formData.cifNif}
-                  onChange={handleInputChange}
-                  $hasError={!!errors.cifNif}
+                  value={field.state.value ?? ''}
+                  onChange={field.handleChange}
+                  errors={field.state.meta.errors}
+                  icon={<FiFileText />}
                 />
-              </InputWrapper>
-              {errors.cifNif && <ErrorText>{errors.cifNif}</ErrorText>}
-            </FormGroup>
-            <FormGroup>
-              <Label>Razón Social</Label>
-              <InputWrapper>
-                <IconWrapper>
-                  <FiFileText />
-                </IconWrapper>
-                <Input
+              )}
+            </form.Field>
+
+            <form.Field
+              name='legalName'
+              validators={{
+                onSubmit: ({ value, fieldApi }) => {
+                  const regType = fieldApi.form.getFieldValue('registrationType');
+                  if (regType === 'store' && !value?.trim()) return 'Requerido';
+                  return undefined;
+                },
+              }}
+            >
+              {field => (
+                <TextField
+                  label='Razón Social'
+                  id='legalName'
                   name='legalName'
-                  value={formData.legalName}
-                  onChange={handleInputChange}
-                  $hasError={!!errors.legalName}
+                  value={field.state.value ?? ''}
+                  onChange={field.handleChange}
+                  errors={field.state.meta.errors}
+                  icon={<FiFileText />}
                 />
-              </InputWrapper>
-              {errors.legalName && <ErrorText>{errors.legalName}</ErrorText>}
-            </FormGroup>
-            <FormGroup>
-              <Label>Email Contacto</Label>
-              <InputWrapper>
-                <IconWrapper>
-                  <FiMail />
-                </IconWrapper>
-                <Input
+              )}
+            </form.Field>
+
+            <form.Field
+              name='contactEmail'
+              validators={{
+                onSubmit: ({ value, fieldApi }) => {
+                  const regType = fieldApi.form.getFieldValue('registrationType');
+                  if (regType !== 'store') return undefined;
+                  if (!value?.trim()) return 'Requerido';
+                  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) return 'Email inválido';
+                  return undefined;
+                },
+              }}
+            >
+              {field => (
+                <TextField
+                  label='Email Contacto'
+                  id='contactEmail'
                   name='contactEmail'
-                  value={formData.contactEmail}
-                  onChange={handleInputChange}
-                  $hasError={!!errors.contactEmail}
+                  type='email'
+                  value={field.state.value ?? ''}
+                  onChange={field.handleChange}
+                  errors={field.state.meta.errors}
+                  icon={<FiMail />}
                 />
-              </InputWrapper>
-              {errors.contactEmail && <ErrorText>{errors.contactEmail}</ErrorText>}
-            </FormGroup>
-            <FormGroup>
-              <Label>Teléfono</Label>
-              <InputWrapper>
-                <IconWrapper>
-                  <FiPhone />
-                </IconWrapper>
-                <Input
+              )}
+            </form.Field>
+
+            <form.Field
+              name='phoneNumber'
+              validators={{
+                onSubmit: ({ value, fieldApi }) => {
+                  const regType = fieldApi.form.getFieldValue('registrationType');
+                  if (regType === 'store' && !value?.trim()) return 'Requerido';
+                  return undefined;
+                },
+              }}
+            >
+              {field => (
+                <TextField
+                  label='Teléfono'
+                  id='phoneNumber'
                   name='phoneNumber'
-                  value={formData.phoneNumber}
-                  onChange={handleInputChange}
-                  $hasError={!!errors.phoneNumber}
+                  value={field.state.value ?? ''}
+                  onChange={field.handleChange}
+                  errors={field.state.meta.errors}
+                  icon={<FiPhone />}
                 />
-              </InputWrapper>
-              {errors.phoneNumber && <ErrorText>{errors.phoneNumber}</ErrorText>}
-            </FormGroup>
-            <FormGroup>
-              <Label>Ubicación</Label>
-              <InputWrapper>
-                <IconWrapper>
-                  <FiMapPin />
-                </IconWrapper>
-                <Input
+              )}
+            </form.Field>
+
+            <form.Field
+              name='location'
+              validators={{
+                onSubmit: ({ value, fieldApi }) => {
+                  const regType = fieldApi.form.getFieldValue('registrationType');
+                  if (regType === 'store' && !value?.trim()) return 'Requerido';
+                  return undefined;
+                },
+              }}
+            >
+              {field => (
+                <TextField
+                  label='Ubicación'
+                  id='location'
                   name='location'
-                  value={formData.location}
-                  onChange={handleInputChange}
-                  $hasError={!!errors.location}
+                  value={field.state.value ?? ''}
+                  onChange={field.handleChange}
+                  errors={field.state.meta.errors}
+                  icon={<FiMapPin />}
                 />
-              </InputWrapper>
-              {errors.location && <ErrorText>{errors.location}</ErrorText>}
-            </FormGroup>
-            <FormGroup>
-              <Label>Sitio Web</Label>
-              <InputWrapper>
-                <IconWrapper>
-                  <FiGlobe />
-                </IconWrapper>
-                <Input
+              )}
+            </form.Field>
+
+            <form.Field name='websiteUrl'>
+              {field => (
+                <TextField
+                  label='Sitio Web'
+                  id='websiteUrl'
                   name='websiteUrl'
-                  value={formData.websiteUrl}
-                  onChange={handleInputChange}
-                  $hasError={!!errors.websiteUrl}
+                  value={field.state.value ?? ''}
+                  onChange={field.handleChange}
+                  errors={field.state.meta.errors}
+                  icon={<FiGlobe />}
                 />
-              </InputWrapper>
-              {errors.websiteUrl && <ErrorText>{errors.websiteUrl}</ErrorText>}
-            </FormGroup>
+              )}
+            </form.Field>
           </>
         )}
 
-        <FormGroup>
-          <label style={{ display: 'flex', alignItems: 'flex-start', gap: '0.625rem', cursor: 'pointer', fontSize: '0.875rem', color: '#374151' }}>
-            <input
-              type='checkbox'
-              checked={formData.acceptedTerms}
-              onChange={e => setFormData(p => ({ ...p, acceptedTerms: e.target.checked }))}
-              style={{ marginTop: '0.125rem', accentColor: '#16a34a', width: '1rem', height: '1rem', flexShrink: 0 }}
+        {/* Terms & conditions */}
+        <form.Field
+          name='acceptedTerms'
+          validators={{
+            onSubmit: ({ value }) =>
+              !value ? 'Debes aceptar los términos y condiciones para continuar' : undefined,
+          }}
+        >
+          {field => (
+            <CheckboxField
+              label={
+                <span>
+                  Acepto los{' '}
+                  <TermsLink to='/terms-and-conditions' target='_blank'>
+                    Términos de Servicio
+                  </TermsLink>{' '}
+                  y la{' '}
+                  <TermsLink to='/privacy-policy' target='_blank'>
+                    Política de Privacidad
+                  </TermsLink>
+                </span>
+              }
+              checked={field.state.value}
+              onChange={field.handleChange}
+              errors={field.state.meta.errors}
             />
-            <span>
-              Acepto los{' '}
-              <TermsLink to='/terms-and-conditions' target='_blank'>Términos de Servicio</TermsLink>
-              {' '}y la{' '}
-              <TermsLink to='/privacy-policy' target='_blank'>Política de Privacidad</TermsLink>
-            </span>
-          </label>
-          {errors.acceptedTerms && <ErrorText>{errors.acceptedTerms}</ErrorText>}
-        </FormGroup>
+          )}
+        </form.Field>
 
-        <SubmitButton type='submit' disabled={loading}>
-          {loading ? 'Creando cuenta...' : 'Crear Cuenta'}
+        <SubmitButton type='submit' disabled={isSubmitting}>
+          {isSubmitting ? 'Creando cuenta...' : 'Crear Cuenta'}
         </SubmitButton>
 
         <div
@@ -631,7 +603,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess, onLoginClick }) 
         </SocialButton>
       </SocialButtons>
 
-      {formData.registrationType === 'store' && (
+      {registrationType === 'store' && (
         <p
           style={{
             fontSize: '0.8rem',
@@ -648,7 +620,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess, onLoginClick }) 
         isOpen={showStoreModal}
         onClose={handleModalClose}
         onContinue={handleModalClose}
-        storeName={formData.storeName || 'tu tienda'}
+        storeName={form.getFieldValue('storeName') || 'tu tienda'}
       />
     </>
   );

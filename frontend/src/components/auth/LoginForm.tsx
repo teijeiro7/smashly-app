@@ -1,26 +1,23 @@
 import React, { useState } from 'react';
+import { useForm, useStore } from '@tanstack/react-form';
+import { z } from 'zod';
 import { sileo } from 'sileo';
-import { FiEye, FiEyeOff, FiLock, FiMail } from 'react-icons/fi';
+import { FiLock, FiMail } from 'react-icons/fi';
 import { FcGoogle } from 'react-icons/fc';
 import { useAuth } from '../../contexts/AuthContext.tsx';
 import styled from 'styled-components';
 import { Link, useNavigate, useSearch } from '@tanstack/react-router';
 import {
   Form,
-  FormGroup,
-  Label,
-  InputWrapper,
-  IconWrapper,
-  Input,
-  PasswordToggle,
-  ErrorText,
-  ForgotPasswordLink,
-  SubmitButton,
   Divider,
   SocialButtons,
   SocialButton,
   FooterText,
+  SubmitButton,
+  ForgotPasswordLink,
 } from './AuthStyles';
+import { emailValidator } from '../../schemas/auth';
+import TextField from '../form/TextField';
 
 const TermsLink = styled(Link)`
   color: #ccff00;
@@ -43,57 +40,18 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, onRegisterClick }) => 
   const { signIn, signInWithGoogle } = useAuth();
   const navigate = useNavigate();
   const searchParams = useSearch({ strict: false }) as Record<string, string>;
-
-  const [formData, setFormData] = useState({
-    email: '',
-    password: '',
-  });
-  const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
   const [showPassword, setShowPassword] = useState(false);
-  const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
 
-  // Get redirect path from URL params or default to home
   const redirectTo = searchParams['redirect'] || '/';
 
-  const validateForm = (): boolean => {
-    const newErrors: { email?: string; password?: string } = {};
-
-    if (!formData.email) {
-      newErrors.email = 'Requerido';
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = 'Email inválido';
-    }
-
-    if (!formData.password) {
-      newErrors.password = 'Requerido';
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-    if (errors[name as keyof typeof errors]) {
-      setErrors(prev => ({ ...prev, [name]: undefined }));
-    }
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!validateForm()) return;
-    setLoading(true);
-
-    try {
-      const { error, errorCode } = await signIn(formData.email, formData.password);
+  const form = useForm({
+    defaultValues: { email: '', password: '' },
+    onSubmit: async ({ value }) => {
+      const { error, errorCode } = await signIn(value.email, value.password);
       if (error) {
         if (errorCode === 'USER_NOT_FOUND') {
-          sileo.warning({
-            title: 'Cuenta no encontrada',
-            description: error,
-          });
+          sileo.warning({ title: 'Cuenta no encontrada', description: error });
         } else if (errorCode === 'INVALID_PASSWORD') {
           sileo.error({ title: 'Error', description: error });
         } else {
@@ -102,19 +60,12 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, onRegisterClick }) => 
         return;
       }
       sileo.success({ title: 'Éxito', description: '¡Bienvenido de nuevo!' });
+      if (onSuccess) onSuccess();
+      else navigate({ to: redirectTo as any });
+    },
+  });
 
-      if (onSuccess) {
-        onSuccess();
-      } else {
-        navigate({ to: redirectTo as any });
-      }
-    } catch (error: any) {
-      console.error('Error durante el inicio de sesión:', error);
-      sileo.error({ title: 'Error', description: error?.message || 'Error inesperado' });
-    } finally {
-      setLoading(false);
-    }
-  };
+  const isSubmitting = useStore(form.store, s => s.isSubmitting);
 
   const handleGoogleSignIn = async () => {
     setGoogleLoading(true);
@@ -123,9 +74,8 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, onRegisterClick }) => 
       if (error) {
         sileo.error({ title: 'Error', description: error });
       }
-      // On success: browser redirects to Google → onAuthStateChange handles post-login
-    } catch (error: any) {
-      sileo.error({ title: 'Error', description: error?.message || 'Error inesperado con Google' });
+    } catch (err: any) {
+      sileo.error({ title: 'Error', description: err?.message || 'Error inesperado con Google' });
     } finally {
       setGoogleLoading(false);
     }
@@ -133,64 +83,57 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, onRegisterClick }) => 
 
   return (
     <>
-      <Form onSubmit={handleSubmit}>
-        <FormGroup>
-          <Label htmlFor='email'>Correo Electrónico</Label>
-          <InputWrapper>
-            <IconWrapper>
-              <FiMail />
-            </IconWrapper>
-            <Input
+      <Form
+        onSubmit={e => {
+          e.preventDefault();
+          e.stopPropagation();
+          void form.handleSubmit();
+        }}
+      >
+        <form.Field name='email' validators={{ onSubmit: emailValidator }}>
+          {field => (
+            <TextField
+              label='Correo Electrónico'
               id='email'
               name='email'
               type='email'
               placeholder='padel@ejemplo.com'
-              value={formData.email}
-              onChange={handleChange}
-              $hasError={!!errors.email}
+              value={field.state.value}
+              onChange={field.handleChange}
+              errors={field.state.meta.errors}
+              icon={<FiMail />}
               autoComplete='email'
             />
-          </InputWrapper>
-          {errors.email && <ErrorText>{errors.email}</ErrorText>}
-        </FormGroup>
+          )}
+        </form.Field>
 
-        <FormGroup>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <Label htmlFor='password'>Contraseña</Label>
-            <ForgotPasswordLink to='/forgot-password' onClick={onSuccess}>
-              ¿Has olvidado tu contraseña?
-            </ForgotPasswordLink>
-          </div>
-          <InputWrapper>
-            <IconWrapper>
-              <FiLock />
-            </IconWrapper>
-            <Input
+        <form.Field name='password' validators={{ onSubmit: z.string().min(1, 'Requerido') }}>
+          {field => (
+            <TextField
+              label='Contraseña'
               id='password'
               name='password'
-              type={showPassword ? 'text' : 'password'}
-              placeholder='Introduce tu contraseña'
-              value={formData.password}
-              onChange={handleChange}
-              $hasError={!!errors.password}
+              value={field.state.value}
+              onChange={field.handleChange}
+              errors={field.state.meta.errors}
+              icon={<FiLock />}
+              showPasswordToggle
+              showPassword={showPassword}
+              onTogglePassword={() => setShowPassword(p => !p)}
               autoComplete='current-password'
+              labelSuffix={
+                <ForgotPasswordLink to='/forgot-password' onClick={onSuccess}>
+                  ¿Has olvidado tu contraseña?
+                </ForgotPasswordLink>
+              }
             />
-            <PasswordToggle type='button' onClick={() => setShowPassword(!showPassword)}>
-              {showPassword ? <FiEyeOff /> : <FiEye />}
-            </PasswordToggle>
-          </InputWrapper>
-          {errors.password && <ErrorText>{errors.password}</ErrorText>}
-        </FormGroup>
+          )}
+        </form.Field>
 
-        <SubmitButton type='submit' disabled={loading}>
-          {loading ? 'Iniciando Sesión...' : 'Iniciar Sesión'}
+        <SubmitButton type='submit' disabled={isSubmitting}>
+          {isSubmitting ? 'Iniciando Sesión...' : 'Iniciar Sesión'}
         </SubmitButton>
 
-        {/* Hidden registration link for accessibility/completeness if not using tabs? 
-            Actually, the design has tabs outside. 
-            If inside modal, we might want a "No account? Register" link at bottom?
-            The current design has tabs.
-        */}
         <div
           style={{ marginTop: '1rem', textAlign: 'center', fontSize: '0.9rem', color: '#6b7280' }}
         >
@@ -223,7 +166,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, onRegisterClick }) => 
       <FooterText>
         Al continuar, aceptas nuestros{' '}
         <TermsLink to='/terms-and-conditions'>Términos de Servicio</TermsLink> y{' '}
-        <TermsLink to='/privacy-policy'>Política de Privacidad</TermsLink>. .
+        <TermsLink to='/privacy-policy'>Política de Privacidad</TermsLink>.
       </FooterText>
     </>
   );
