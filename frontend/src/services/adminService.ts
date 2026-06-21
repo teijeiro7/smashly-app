@@ -1,4 +1,12 @@
 import { API_ENDPOINTS, buildApiUrl, getCommonHeaders, ApiResponse } from '../config/api';
+import { supabase } from '../lib/supabase';
+
+async function getAuthHeaders(): Promise<HeadersInit> {
+  const { data: { session } } = await supabase.auth.getSession();
+  const headers: HeadersInit = { 'Content-Type': 'application/json' };
+  if (session?.access_token) headers['Authorization'] = `Bearer ${session.access_token}`;
+  return headers;
+}
 
 /**
  * Helper para manejar respuestas de la API
@@ -86,10 +94,10 @@ export class AdminService {
    * Obtiene las métricas del dashboard de admin
    */
   static async getDashboardMetrics(): Promise<AdminMetrics> {
-    const response = await fetch(buildApiUrl(API_ENDPOINTS.ADMIN.METRICS), {
+    const headers = await getAuthHeaders();
+    const response = await fetch(API_ENDPOINTS.ADMIN.METRICS, {
       method: 'GET',
-      credentials: 'include',
-      headers: getCommonHeaders(),
+      headers,
     });
 
     return handleApiResponse<AdminMetrics>(response);
@@ -99,10 +107,10 @@ export class AdminService {
    * Obtiene todos los usuarios
    */
   static async getAllUsers(): Promise<AdminUser[]> {
-    const response = await fetch(buildApiUrl(API_ENDPOINTS.ADMIN.USERS), {
+    const headers = await getAuthHeaders();
+    const response = await fetch(API_ENDPOINTS.ADMIN.USERS, {
       method: 'GET',
-      credentials: 'include',
-      headers: getCommonHeaders(),
+      headers,
     });
 
     return handleApiResponse<AdminUser[]>(response);
@@ -112,10 +120,10 @@ export class AdminService {
    * Actualiza el rol de un usuario
    */
   static async updateUserRole(userId: string, role: 'admin' | 'player'): Promise<AdminUser> {
-    const response = await fetch(buildApiUrl(`${API_ENDPOINTS.ADMIN.USERS}/${userId}/role`), {
+    const headers = await getAuthHeaders();
+    const response = await fetch(`${API_ENDPOINTS.ADMIN.USERS}/${userId}`, {
       method: 'PATCH',
-      credentials: 'include',
-      headers: getCommonHeaders(),
+      headers,
       body: JSON.stringify({ role }),
     });
 
@@ -126,10 +134,10 @@ export class AdminService {
    * Elimina un usuario
    */
   static async deleteUser(userId: string): Promise<void> {
-    const response = await fetch(buildApiUrl(`${API_ENDPOINTS.ADMIN.USERS}/${userId}`), {
+    const headers = await getAuthHeaders();
+    const response = await fetch(`${API_ENDPOINTS.ADMIN.USERS}/${userId}`, {
       method: 'DELETE',
-      credentials: 'include',
-      headers: getCommonHeaders(),
+      headers,
     });
 
     await handleApiResponse<void>(response);
@@ -270,10 +278,11 @@ export class AdminService {
    * Verifica/aprueba una tienda
    */
   static async verifyStore(storeId: string): Promise<any> {
-    const response = await fetch(buildApiUrl(API_ENDPOINTS.ADMIN.VERIFY_STORE(storeId)), {
-      method: 'POST',
-      credentials: 'include',
-      headers: getCommonHeaders(),
+    const headers = await getAuthHeaders();
+    const response = await fetch(API_ENDPOINTS.ADMIN.VERIFY_STORE(storeId), {
+      method: 'PATCH',
+      headers,
+      body: JSON.stringify({ verified: true }),
     });
 
     return handleApiResponse<any>(response);
@@ -283,10 +292,11 @@ export class AdminService {
    * Rechaza una solicitud de tienda
    */
   static async rejectStore(storeId: string): Promise<void> {
-    const response = await fetch(buildApiUrl(API_ENDPOINTS.ADMIN.REJECT_STORE(storeId)), {
-      method: 'DELETE',
-      credentials: 'include',
-      headers: getCommonHeaders(),
+    const headers = await getAuthHeaders();
+    const response = await fetch(API_ENDPOINTS.ADMIN.REJECT_STORE(storeId), {
+      method: 'PATCH',
+      headers,
+      body: JSON.stringify({ verified: false }),
     });
 
     await handleApiResponse<void>(response);

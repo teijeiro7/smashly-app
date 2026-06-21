@@ -1,4 +1,4 @@
-import { API_URL, getCommonHeaders } from '../config/api';
+import { supabase } from '../lib/supabase';
 import { ComparisonResult, RacketComparisonData } from '../types/racket';
 
 export interface ComparisonResponse {
@@ -9,7 +9,7 @@ export interface SavedComparison {
   id: string;
   user_id: string;
   racket_ids: number[];
-  comparison_text: string; // Legacy format (markdown string) or JSON string of ComparisonResult
+  comparison_text: string;
   metrics?: RacketComparisonData[];
   share_token?: string;
   is_public?: boolean;
@@ -17,38 +17,23 @@ export interface SavedComparison {
   updated_at: string;
 }
 
-export interface SaveComparisonResponse {
-  success: boolean;
-  data: SavedComparison;
-  message: string;
-}
-
-export interface GetComparisonsResponse {
-  success: boolean;
-  data: SavedComparison[];
-}
-
-export interface ComparisonCountResponse {
-  success: boolean;
-  data: {
-    count: number;
-  };
+async function getAuthHeader(): Promise<HeadersInit> {
+  const { data: { session } } = await supabase.auth.getSession();
+  const headers: HeadersInit = { 'Content-Type': 'application/json' };
+  if (session?.access_token) {
+    headers['Authorization'] = `Bearer ${session.access_token}`;
+  }
+  return headers;
 }
 
 export const ComparisonService = {
+  /** AI comparison via Vercel serverless function */
   compareRackets: async (racketIds: number[], userProfile?: any): Promise<ComparisonResponse> => {
-    // Construct URL: API_URL (base) + /api/v1/comparison
-    // API_URL is usually http://localhost:3000 or similar
-    const baseUrl = API_URL.endsWith('/') ? API_URL.slice(0, -1) : API_URL;
-    const url = `${baseUrl}/api/v1/comparison`;
-
-    const response = await fetch(url, {
+    const headers = await getAuthHeader();
+    const response = await fetch('/api/comparison', {
       method: 'POST',
-      headers: getCommonHeaders(),
-      body: JSON.stringify({
-        racketIds,
-        userProfile,
-      }),
+      headers,
+      body: JSON.stringify({ racketIds, userProfile }),
     });
 
     if (!response.ok) {
@@ -63,153 +48,99 @@ export const ComparisonService = {
     racketIds: number[],
     comparison: ComparisonResult
   ): Promise<SavedComparison> => {
-    const baseUrl = API_URL.endsWith('/') ? API_URL.slice(0, -1) : API_URL;
-    const url = `${baseUrl}/api/v1/comparison/save`;
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) throw new Error('No autenticado');
 
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: getCommonHeaders(),
-      body: JSON.stringify({
-        racketIds,
-        comparisonText: JSON.stringify(comparison),
+    const { data, error } = await supabase
+      .from('comparisons')
+      .insert({
+        user_id: session.user.id,
+        racket_ids: racketIds,
+        comparison_text: JSON.stringify(comparison),
         metrics: comparison.metrics,
-      }),
-    });
+      })
+      .select()
+      .single();
 
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      throw new Error(errorData.error || errorData.message || 'Error al guardar la comparación');
-    }
-
-    const result = await response.json();
-    return result.data;
+    if (error) throw new Error(error.message);
+    return data as SavedComparison;
   },
 
   getUserComparisons: async (): Promise<SavedComparison[]> => {
-    const baseUrl = API_URL.endsWith('/') ? API_URL.slice(0, -1) : API_URL;
-    const url = `${baseUrl}/api/v1/comparison/user`;
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) return [];
 
-    const response = await fetch(url, {
-      method: 'GET',
-      headers: getCommonHeaders(),
-    });
+    const { data, error } = await supabase
+      .from('comparisons')
+      .select('*')
+      .eq('user_id', session.user.id)
+      .order('created_at', { ascending: false });
 
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      throw new Error(errorData.error || errorData.message || 'Error al obtener las comparaciones');
-    }
-
-    const result = await response.json();
-    return result.data;
+    if (error) throw new Error(error.message);
+    return (data || []) as SavedComparison[];
   },
 
   getComparisonById: async (id: string): Promise<SavedComparison> => {
-    const baseUrl = API_URL.endsWith('/') ? API_URL.slice(0, -1) : API_URL;
-    const url = `${baseUrl}/api/v1/comparison/${id}`;
+    const { data, error } = await supabase
+      .from('comparisons')
+      .select('*')
+      .eq('id', id)
+      .single();
 
-    const response = await fetch(url, {
-      method: 'GET',
-      headers: getCommonHeaders(),
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      throw new Error(errorData.error || errorData.message || 'Error al obtener la comparación');
-    }
-
-    const result = await response.json();
-    return result.data;
+    if (error) throw new Error(error.message);
+    return data as SavedComparison;
   },
 
   deleteComparison: async (id: string): Promise<void> => {
-    const baseUrl = API_URL.endsWith('/') ? API_URL.slice(0, -1) : API_URL;
-    const url = `${baseUrl}/api/v1/comparison/${id}`;
-
-    const response = await fetch(url, {
-      method: 'DELETE',
-      headers: getCommonHeaders(),
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      throw new Error(errorData.error || errorData.message || 'Error al eliminar la comparación');
-    }
+    const { error } = await supabase.from('comparisons').delete().eq('id', id);
+    if (error) throw new Error(error.message);
   },
 
   getComparisonCount: async (): Promise<number> => {
-    const baseUrl = API_URL.endsWith('/') ? API_URL.slice(0, -1) : API_URL;
-    const url = `${baseUrl}/api/v1/comparison/user/count`;
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) return 0;
 
-    const response = await fetch(url, {
-      method: 'GET',
-      headers: getCommonHeaders(),
-    });
+    const { count, error } = await supabase
+      .from('comparisons')
+      .select('*', { count: 'exact', head: true })
+      .eq('user_id', session.user.id);
 
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      throw new Error(
-        errorData.error || errorData.message || 'Error al obtener el contador de comparaciones'
-      );
-    }
-
-    const result: ComparisonCountResponse = await response.json();
-    return result.data.count;
+    if (error) return 0;
+    return count || 0;
   },
 
   shareComparison: async (id: string): Promise<string> => {
-    const baseUrl = API_URL.endsWith('/') ? API_URL.slice(0, -1) : API_URL;
-    const url = `${baseUrl}/api/v1/comparison/${id}/share`;
+    const shareToken = crypto.randomUUID();
 
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: getCommonHeaders(),
-    });
+    const { data, error } = await supabase
+      .from('comparisons')
+      .update({ share_token: shareToken, is_public: true })
+      .eq('id', id)
+      .select('share_token')
+      .single();
 
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      throw new Error(errorData.error || errorData.message || 'Error al compartir la comparación');
-    }
-
-    const result = await response.json();
-    return result.data.shareToken;
+    if (error) throw new Error(error.message);
+    return data.share_token;
   },
 
   unshareComparison: async (id: string): Promise<void> => {
-    const baseUrl = API_URL.endsWith('/') ? API_URL.slice(0, -1) : API_URL;
-    const url = `${baseUrl}/api/v1/comparison/${id}/unshare`;
+    const { error } = await supabase
+      .from('comparisons')
+      .update({ is_public: false })
+      .eq('id', id);
 
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: getCommonHeaders(),
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      throw new Error(
-        errorData.error || errorData.message || 'Error al dejar de compartir la comparación'
-      );
-    }
+    if (error) throw new Error(error.message);
   },
 
   getSharedComparison: async (token: string): Promise<SavedComparison> => {
-    const baseUrl = API_URL.endsWith('/') ? API_URL.slice(0, -1) : API_URL;
-    const url = `${baseUrl}/api/v1/comparison/shared/${token}`;
+    const { data, error } = await supabase
+      .from('comparisons')
+      .select('*')
+      .eq('share_token', token)
+      .eq('is_public', true)
+      .single();
 
-    const response = await fetch(url, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      throw new Error(
-        errorData.error || errorData.message || 'Error al obtener la comparación compartida'
-      );
-    }
-
-    const result = await response.json();
-    return result.data;
+    if (error) throw new Error('Comparación compartida no encontrada');
+    return data as SavedComparison;
   },
 };

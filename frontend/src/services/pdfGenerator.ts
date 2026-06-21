@@ -20,7 +20,7 @@ const THEME = {
 interface PdfOptions {
   rackets: Racket[];
   comparison: ComparisonResult;
-  proxyUrlBase: string;
+  proxyUrlBase?: string;
 }
 
 export class RacketPdfGenerator {
@@ -46,7 +46,7 @@ export class RacketPdfGenerator {
     const { rackets, comparison } = options;
 
     // 1. Cargar imágenes
-    const images = await this.loadImages(rackets, options.proxyUrlBase);
+    const images = await this.loadImages(rackets);
 
     // 2. Portada (Cover Page)
     this.renderCoverPage(rackets, images);
@@ -464,15 +464,14 @@ export class RacketPdfGenerator {
   }
 
   private async loadImages(
-    rackets: Racket[],
-    proxyUrlBase: string
+    rackets: Racket[]
   ): Promise<Record<number, string>> {
     const loaded: Record<number, string> = {};
     const promises = rackets.map(async r => {
       if (!r.imagenes?.[0]) return;
       try {
         const url = r.imagenes[0].startsWith('http')
-          ? `${proxyUrlBase}/api/v1/proxy/image?url=${encodeURIComponent(r.imagenes[0])}`
+          ? `/api/proxy/image?url=${encodeURIComponent(r.imagenes[0])}`
           : r.imagenes[0];
 
         const response = await fetch(url);

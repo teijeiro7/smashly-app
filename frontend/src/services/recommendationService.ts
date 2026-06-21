@@ -1,18 +1,24 @@
-import { buildApiUrl } from '../config/api';
+import { supabase } from '../lib/supabase';
 import { BasicFormData, AdvancedFormData, RecommendationResult, Recommendation } from '../types/recommendation';
+
+async function getAuthHeader(): Promise<HeadersInit> {
+  const { data: { session } } = await supabase.auth.getSession();
+  const headers: HeadersInit = { 'Content-Type': 'application/json' };
+  if (session?.access_token) {
+    headers['Authorization'] = `Bearer ${session.access_token}`;
+  }
+  return headers;
+}
 
 export class RecommendationService {
   static async generate(
     type: 'basic' | 'advanced',
     data: BasicFormData | AdvancedFormData
   ): Promise<RecommendationResult> {
-    const url = buildApiUrl('/api/v1/recommendations/generate');
-    const response = await fetch(url, {
+    const headers = await getAuthHeader();
+    const response = await fetch('/api/recommendations/generate', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      credentials: 'include',
+      headers,
       body: JSON.stringify({ type, data }),
     });
 
@@ -24,47 +30,61 @@ export class RecommendationService {
     return response.json();
   }
 
-  static async save(
+  static async generateWithRAG(
     type: 'basic' | 'advanced',
-    formData: BasicFormData | AdvancedFormData,
-    result: RecommendationResult
-  ): Promise<Recommendation> {
-    const url = buildApiUrl('/api/v1/recommendations/save');
-
-    const response = await fetch(url, {
+    data: BasicFormData | AdvancedFormData
+  ): Promise<RecommendationResult> {
+    const headers = await getAuthHeader();
+    const response = await fetch('/api/recommendations/generate-rag', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      credentials: 'include',
-      body: JSON.stringify({ type, formData, result }),
+      headers,
+      body: JSON.stringify({ type, data }),
     });
 
     if (!response.ok) {
-      throw new Error('Error saving recommendation');
+      const body = await response.json().catch(() => ({}));
+      throw new Error(body.error || body.message || `Error ${response.status} generating RAG recommendation`);
     }
 
     return response.json();
   }
 
+  static async save(
+    type: 'basic' | 'advanced',
+    formData: BasicFormData | AdvancedFormData,
+    result: RecommendationResult
+  ): Promise<Recommendation> {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) throw new Error('No autenticado');
+
+    const { data, error } = await supabase
+      .from('recommendations')
+      .insert({
+        user_id: session.user.id,
+        form_type: type,
+        form_data: formData,
+        recommendation_result: result,
+      })
+      .select()
+      .single();
+
+    if (error) throw new Error(error.message);
+    return data as Recommendation;
+  }
+
   static async getLast(): Promise<Recommendation | null> {
-    const url = buildApiUrl('/api/v1/recommendations/last');
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) return null;
 
-    const response = await fetch(url, {
-      method: 'GET',
-      credentials: 'include',
-    });
+    const { data, error } = await supabase
+      .from('recommendations')
+      .select('*')
+      .eq('user_id', session.user.id)
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle();
 
-    if (!response.ok) {
-      if (response.status === 404) return null;
-      // If it returns a message object instead of null for 404/empty, handle it in component
-      // But based on controller, it returns { message: ... } or object. 
-      // Let's assume 200 OK with message if not found or object.
-    }
-    
-    const data = await response.json();
-    if (data.message) return null;
-    
-    return data;
+    if (error) return null;
+    return (data as Recommendation) || null;
   }
 }

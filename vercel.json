@@ -1,0 +1,57 @@
+{
+  "buildCommand": "cd frontend && npm run build",
+  "outputDirectory": "frontend/dist",
+  "installCommand": "cd api && npm install && cd ../frontend && npm install",
+  "framework": null,
+  "functions": {
+    "api/**/*.ts": {
+      "runtime": "nodejs22.x"
+    }
+  },
+  "rewrites": [
+    {
+      "source": "/api/proxy/image",
+      "destination": "/api/proxy/image"
+    },
+    {
+      "source": "/api/recommendations/generate-rag",
+      "destination": "/api/recommendations/generate-rag"
+    },
+    {
+      "source": "/api/recommendations/generate",
+      "destination": "/api/recommendations/generate"
+    },
+    {
+      "source": "/api/comparison",
+      "destination": "/api/comparison"
+    },
+    {
+      "source": "/api/admin/metrics",
+      "destination": "/api/admin/metrics"
+    },
+    {
+      "source": "/api/admin/users",
+      "destination": "/api/admin/users/index"
+    },
+    {
+      "source": "/api/admin/users/:id",
+      "destination": "/api/admin/users/[id]"
+    },
+    {
+      "source": "/api/admin/stores/:id",
+      "destination": "/api/admin/stores/[id]"
+    },
+    {
+      "source": "/((?!api/).*)",
+      "destination": "/index.html"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/api/(.*)",
+      "headers": [
+        { "key": "Access-Control-Allow-Credentials", "value": "true" }
+      ]
+    }
+  ]
+}
