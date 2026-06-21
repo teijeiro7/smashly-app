@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { Link } from '@tanstack/react-router';
 import { FiArrowLeft, FiEdit2, FiTrash2, FiSearch, FiPackage, FiTag, FiX } from 'react-icons/fi';
 import { Racket } from '@/types/racket';
+import { racketImageUrl } from '../utils/imageUrl';
 import { RacketService } from '@/services/racketService';
 import { EditRacketModal } from '@/components/admin/EditRacketModal';
 import { sileo } from 'sileo';
@@ -683,7 +684,7 @@ const AdminRacketsPage: React.FC = () => {
                     <Td>
                       <RacketInfo>
                         {racket.imagenes && racket.imagenes.length > 0 && racket.imagenes[0] ? (
-                          <RacketImage src={racket.imagenes[0]} alt={racket.modelo || 'Pala'} />
+                          <RacketImage src={racketImageUrl(racket.imagenes[0])} alt={racket.modelo || 'Pala'} />
                         ) : (
                           <RacketImage
                             src='/placeholder-racket.svg'

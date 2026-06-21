@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { useAuth } from '../contexts/AuthContext';
+import { racketImageUrl } from '../utils/imageUrl';
 import { Link, useRouterState, useNavigate } from '@tanstack/react-router';
 import { QuickActionCard } from '../components/dashboard/QuickActionCard';
 import { FaLightbulb, FaBalanceScale, FaChartBar, FaUser, FaBullseye, FaHeart, FaFire, FaStar } from 'react-icons/fa';
@@ -649,7 +650,7 @@ export const PlayerDashboard: React.FC = () => {
                   onClick={() => navigate({ to: '/racket-detail', search: { id: racket.id } })}
                 >
                   {racket.imagenes?.[0] && (
-                    <RacketImage src={racket.imagenes[0]} alt={racket.nombre} />
+                    <RacketImage src={racketImageUrl(racket.imagenes[0])} alt={racket.nombre} />
                   )}
                   <RacketName>{racket.nombre}</RacketName>
                   <RacketBrand>{racket.marca}</RacketBrand>
@@ -672,7 +673,7 @@ export const PlayerDashboard: React.FC = () => {
                   onClick={() => navigate({ to: '/racket-detail', search: { id: racket.id } })}
                 >
                   {racket.imagenes?.[0] && (
-                    <RacketImage src={racket.imagenes[0]} alt={racket.nombre} />
+                    <RacketImage src={racketImageUrl(racket.imagenes[0])} alt={racket.nombre} />
                   )}
                   <RacketName>{racket.nombre}</RacketName>
                   <RacketBrand>{racket.marca}</RacketBrand>
@@ -694,7 +695,7 @@ export const PlayerDashboard: React.FC = () => {
                   onClick={() => navigate({ to: '/racket-detail', search: { id: racket.id } })}
                 >
                   {racket.imagenes?.[0] && (
-                    <RacketImage src={racket.imagenes[0]} alt={racket.nombre} />
+                    <RacketImage src={racketImageUrl(racket.imagenes[0])} alt={racket.nombre} />
                   )}
                   <RacketName>{racket.nombre}</RacketName>
                   <RacketBrand>{racket.marca}</RacketBrand>

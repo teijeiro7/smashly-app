@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiSearch, FiX } from 'react-icons/fi';
 import { useRackets } from '../../contexts/RacketsContext';
+import { racketImageUrl } from '../../utils/imageUrl';
 
 const SearchContainer = styled.div`
   position: relative;
@@ -255,7 +256,7 @@ export const RacketSearchInput: React.FC<RacketSearchInputProps> = ({
             {results.map(racket => (
               <ResultItem key={racket.id} onClick={() => handleSelect(racket)}>
                 {racket.imagenes?.[0] ? (
-                  <ResultImage src={racket.imagenes[0]} alt={racket.name} />
+                  <ResultImage src={racketImageUrl(racket.imagenes[0])} alt={racket.name} />
                 ) : (
                   <ResultPlaceholder>🎾</ResultPlaceholder>
                 )}

@@ -50,6 +50,7 @@ import {
   breadcrumbSchema,
 } from '../utils/seoSchemas';
 import { buildUrl } from '../config/seo';
+import { racketImageUrl } from '../utils/imageUrl';
 
 // --- Styled Components ---
 
@@ -1511,7 +1512,7 @@ const RacketDetailPage: React.FC = () => {
           <MainImage
             key={selectedImageIndex}
             $entering={slideDirectionRef.current}
-            src={racket.imagenes?.[selectedImageIndex] || racket.imagenes?.[0] || '/placeholder-racket.svg'}
+            src={racketImageUrl(racket.imagenes?.[selectedImageIndex] || racket.imagenes?.[0])}
             alt={racket.modelo}
             onError={handleImageError}
             onClick={() => setShowLightbox(true)}
@@ -1539,7 +1540,7 @@ const RacketDetailPage: React.FC = () => {
                     {racket.imagenes.map((img, index) => (
                       <Thumbnail
                         key={index}
-                        src={img}
+                        src={racketImageUrl(img)}
                         alt={`${racket.modelo} - imagen ${index + 1}`}
                         $isActive={index === selectedImageIndex}
                         onClick={() => setSelectedImageIndex(index)}
