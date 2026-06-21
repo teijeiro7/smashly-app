@@ -1,15 +1,13 @@
 import React, { createContext, ReactNode, useCallback, useContext, useEffect, useMemo, useState } from 'react';
-import { UserProfile, UserProfileService } from '../services/userProfileService';
-import { forceCleanAuthStorage, setAuthToken, removeAuthToken } from '../utils/authUtils';
-import { API_ENDPOINTS, buildApiUrl } from '../config/api';
-import { GoogleAuthService } from '../services/googleAuthService';
+import { supabase } from '../lib/supabase';
+import { UserProfile } from '../services/userProfileService';
 import { logger } from '../utils/logger';
 
-// Interfaces para TypeScript
 interface AuthContextType {
   user: UserProfile | null;
   userProfile: UserProfile | null;
   loading: boolean;
+  pendingGoogleOnboarding: { suggestedNickname: string } | null;
   signUp: (
     email: string,
     password: string,
@@ -21,14 +19,10 @@ interface AuthContextType {
     email: string,
     password: string
   ) => Promise<{ data: UserProfile | null; error: string | null; errorCode?: string }>;
-  signInWithGoogle: () => Promise<{
-    data: UserProfile | null;
-    error: string | null;
-    isNewUser?: boolean;
-    suggestedNickname?: string;
-  }>;
+  signInWithGoogle: () => Promise<{ data: UserProfile | null; error: string | null }>;
   signOut: () => Promise<{ error: string | null }>;
   refreshUserProfile: () => Promise<void>;
+  clearGoogleOnboarding: () => void;
   isAuthenticated: boolean;
 }
 
@@ -36,13 +30,9 @@ interface AuthProviderProps {
   children: ReactNode;
 }
 
-// Crear el contexto con valor por defecto
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
-
-// Exportar el contexto para testing
 export { AuthContext };
 
-// Hook personalizado para usar el contexto
 export const useAuth = (): AuthContextType => {
   const context = useContext(AuthContext);
   if (!context) {
@@ -51,67 +41,134 @@ export const useAuth = (): AuthContextType => {
   return context;
 };
 
-// Proveedor del contexto
+async function fetchProfile(userId: string): Promise<UserProfile | null> {
+  const { data, error } = await supabase
+    .from('user_profiles')
+    .select('*')
+    .eq('id', userId)
+    .single();
+
+  if (error) {
+    logger.warn('Could not fetch user profile:', error.message);
+    return null;
+  }
+  return data as UserProfile;
+}
+
+function deriveSuggestedNickname(session: any): string {
+  const meta = session?.user?.user_metadata ?? {};
+  const name: string = meta.full_name ?? meta.name ?? meta.email ?? session?.user?.email ?? '';
+  return name.split('@')[0].replace(/\s+/g, '_').toLowerCase().slice(0, 20);
+}
+
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<UserProfile | null>(null);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
+  const [pendingGoogleOnboarding, setPendingGoogleOnboarding] = useState<{
+    suggestedNickname: string;
+  } | null>(null);
 
-  // Función utilitaria para limpiar completamente el almacenamiento de auth
-  const clearAuthStorage = useCallback(() => {
-    forceCleanAuthStorage();
-    removeAuthToken();
+  const loadAndSetProfile = useCallback(async (userId: string): Promise<UserProfile | null> => {
+    const profile = await fetchProfile(userId);
+    setUser(profile);
+    setUserProfile(profile);
+    return profile;
   }, []);
 
-  // Función para cargar el perfil del usuario desde la API
-  const loadUserProfile = useCallback(async () => {
-    try {
-      const profile = await UserProfileService.getUserProfile();
+  const clearAuth = useCallback(() => {
+    setUser(null);
+    setUserProfile(null);
+  }, []);
 
-      if (!profile) {
-        logger.warn('No profile found for authenticated user. User needs to complete profile setup.');
-        setUser(null);
-        setUserProfile(null);
-        return profile;
-      }
-
-      setUser(profile);
-      setUserProfile(profile);
-      return profile;
-    } catch (error) {
-      if (
-        error instanceof Error &&
-        (error.message.includes('401') ||
-          error.message.toLowerCase().includes('token') ||
-          error.message.toLowerCase().includes('expired'))
-      ) {
-        setUser(null);
-        setUserProfile(null);
-        clearAuthStorage();
-      } else {
-        logger.error('Error loading user profile:', error);
-        setUser(null);
-        setUserProfile(null);
-      }
-      return null;
-    }
-  }, [clearAuthStorage]);
+  const clearGoogleOnboarding = useCallback(() => {
+    setPendingGoogleOnboarding(null);
+  }, []);
 
   useEffect(() => {
-    const initializeAuth = async () => {
-      try {
-        await loadUserProfile();
-      } catch (error) {
-        logger.error('Error during auth initialization:', error);
-        setUser(null);
-        setUserProfile(null);
-      } finally {
+    let mounted = true;
+
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (!mounted) return;
+      if (session?.user) {
+        loadAndSetProfile(session.user.id).finally(() => {
+          if (mounted) setLoading(false);
+        });
+      } else {
         setLoading(false);
       }
-    };
+    });
 
-    initializeAuth();
-  }, [loadUserProfile]);
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (!mounted) return;
+
+      if (event === 'SIGNED_OUT' || !session) {
+        clearAuth();
+        setLoading(false);
+        return;
+      }
+
+      if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'USER_UPDATED') {
+        const profile = await loadAndSetProfile(session.user.id);
+        setLoading(false);
+
+        // Detect new Google user who needs to set a nickname
+        const provider = session.user.app_metadata?.provider;
+        if (event === 'SIGNED_IN' && provider === 'google' && profile && !profile.nickname) {
+          setPendingGoogleOnboarding({
+            suggestedNickname: deriveSuggestedNickname(session),
+          });
+        }
+      }
+    });
+
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
+  }, [loadAndSetProfile, clearAuth]);
+
+  const signIn = useCallback(async (
+    email: string,
+    password: string
+  ): Promise<{ data: UserProfile | null; error: string | null; errorCode?: string }> => {
+    if (!email || !password) {
+      return { data: null, error: 'Email y contraseña son requeridos', errorCode: 'MISSING_CREDENTIALS' };
+    }
+
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: email.trim().toLowerCase(),
+      password,
+    });
+
+    if (error) {
+      let friendly = error.message;
+      let errorCode = error.code ?? 'AUTH_ERROR';
+
+      if (error.message.includes('Invalid login credentials')) {
+        friendly = 'Credenciales inválidas. Verifica tu email y contraseña.';
+        errorCode = 'INVALID_PASSWORD';
+      } else if (error.message.includes('Email not confirmed')) {
+        friendly = 'Por favor confirma tu email antes de iniciar sesión.';
+        errorCode = 'EMAIL_NOT_CONFIRMED';
+      } else if (error.message.includes('too many')) {
+        friendly = 'Demasiados intentos. Espera un momento antes de intentar de nuevo.';
+        errorCode = 'TOO_MANY_REQUESTS';
+      } else if (error.message.includes('User not found')) {
+        friendly = 'No tienes una cuenta con este email. ¿Quieres registrarte?';
+        errorCode = 'USER_NOT_FOUND';
+      }
+
+      return { data: null, error: friendly, errorCode };
+    }
+
+    if (!data.session) {
+      return { data: null, error: 'No se recibió sesión', errorCode: 'NO_SESSION' };
+    }
+
+    const profile = await loadAndSetProfile(data.session.user.id);
+    return { data: profile, error: null };
+  }, [loadAndSetProfile]);
 
   const signUp = useCallback(async (
     email: string,
@@ -120,175 +177,100 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     fullName?: string,
     _role?: 'player' | 'store_owner'
   ): Promise<{ data: UserProfile | null; error: string | null; token?: string }> => {
-    try {
-      const url = buildApiUrl(API_ENDPOINTS.AUTH_REGISTER);
-      const response = await fetch(url, {
-        method: 'POST',
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email: email.trim().toLowerCase(),
-          password,
-          nickname,
-          full_name: fullName,
-        }),
-      });
+    const { data, error } = await supabase.auth.signUp({
+      email: email.trim().toLowerCase(),
+      password,
+      options: {
+        data: { nickname, full_name: fullName },
+      },
+    });
 
-      const result = await response.json();
-
-      if (!response.ok || !result.success) {
-        const errorMessage = result.message || result.error || 'Error desconocido durante el registro';
-        return { data: null, error: errorMessage };
-      }
-
-      const access_token = result.data.session?.access_token;
-      const registeredUser = result.data.user;
-
-      if (access_token) {
-        setAuthToken(access_token);
-        await loadUserProfile();
-      }
-
-      return { data: registeredUser || userProfile, error: null, token: access_token };
-    } catch (error: any) {
-      return {
-        data: null,
-        error: error.message || 'Error inesperado durante el registro',
-      };
+    if (error) {
+      return { data: null, error: error.message };
     }
-  }, [loadUserProfile, userProfile]);
 
-  const signIn = useCallback(async (
-    email: string,
-    password: string
-  ): Promise<{ data: UserProfile | null; error: string | null; errorCode?: string }> => {
-    try {
-      if (!email || !password) {
-        return {
-          data: null,
-          error: 'Email y contraseña son requeridos',
-          errorCode: 'MISSING_CREDENTIALS',
-        };
-      }
-
-      const url = buildApiUrl(API_ENDPOINTS.AUTH_LOGIN);
-      const response = await fetch(url, {
-        method: 'POST',
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email: email.trim().toLowerCase(),
-          password,
-        }),
-      });
-
-      const result = await response.json();
-
-      if (!response.ok || !result.success) {
-        const errorCode = result.error;
-        const errorMessage = result.message || result.error || 'Error desconocido durante el inicio de sesión';
-
-        let friendlyErrorMessage = errorMessage;
-        if (errorCode === 'USER_NOT_FOUND') {
-          friendlyErrorMessage = 'No tienes una cuenta con este email. ¿Quieres registrarte?';
-        } else if (errorCode === 'INVALID_PASSWORD') {
-          friendlyErrorMessage = 'La contraseña es incorrecta. Inténtalo de nuevo.';
-        } else if (
-          errorMessage.toLowerCase().includes('invalid') ||
-          errorMessage.toLowerCase().includes('incorrect')
-        ) {
-          friendlyErrorMessage = 'Credenciales inválidas. Verifica tu email y contraseña.';
-        } else if (errorMessage.toLowerCase().includes('not found')) {
-          friendlyErrorMessage = 'No tienes una cuenta con este email. ¿Quieres registrarte?';
-        } else if (errorMessage.toLowerCase().includes('not confirmed')) {
-          friendlyErrorMessage = 'Por favor confirma tu email antes de iniciar sesión.';
-        } else if (errorMessage.toLowerCase().includes('too many')) {
-          friendlyErrorMessage = 'Demasiados intentos. Espera un momento antes de intentar de nuevo.';
-        }
-
-        return { data: null, error: friendlyErrorMessage, errorCode };
-      }
-
-      const { access_token } = result.data;
-
-      if (access_token) {
-        setAuthToken(access_token);
-        const loadedProfile = await loadUserProfile();
-        return { data: loadedProfile, error: null };
-      }
-
-      return { data: null, error: 'No se recibió token de autenticación', errorCode: 'NO_TOKEN' };
-    } catch (error: any) {
-      return {
-        data: null,
-        error: error.message || 'Error inesperado durante el inicio de sesión. Verifica tu conexión a internet.',
-        errorCode: error.code || 'UNKNOWN_ERROR',
-      };
+    if (!data.user) {
+      return { data: null, error: 'No se pudo crear el usuario' };
     }
-  }, [loadUserProfile]);
 
-  const refreshUserProfile = useCallback(async (): Promise<void> => {
-    await loadUserProfile();
-  }, [loadUserProfile]);
+    // Update profile with nickname/fullName (trigger creates the basic row)
+    await supabase.from('user_profiles').upsert({
+      id: data.user.id,
+      email: data.user.email,
+      nickname,
+      full_name: fullName ?? null,
+      role: 'player',
+    });
+
+    if (!data.session) {
+      // Email confirmation required — return without a loaded profile
+      return { data: null, error: null };
+    }
+
+    const profile = await loadAndSetProfile(data.user.id);
+    return {
+      data: profile,
+      error: null,
+      token: data.session.access_token,
+    };
+  }, [loadAndSetProfile]);
 
   const signInWithGoogle = useCallback(async (): Promise<{
     data: UserProfile | null;
     error: string | null;
-    isNewUser?: boolean;
-    suggestedNickname?: string;
   }> => {
-    try {
-      const result = await GoogleAuthService.signInWithGoogle();
-      const { user: googleUser, session, isNewUser, suggestedNickname } = result;
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: typeof window !== 'undefined' ? window.location.origin : undefined,
+      },
+    });
 
-      if (session?.access_token) {
-        setAuthToken(session.access_token);
-        const loadedProfile = await loadUserProfile();
-        return { data: loadedProfile, error: null, isNewUser, suggestedNickname };
-      }
-
-      return { data: googleUser || null, error: 'No se recibió token de autenticación', isNewUser, suggestedNickname };
-    } catch (error: any) {
-      return { data: null, error: error.message || 'Error al iniciar sesión con Google' };
+    if (error) {
+      return { data: null, error: error.message };
     }
-  }, [loadUserProfile]);
+
+    // Page redirects to Google — result arrives via onAuthStateChange after redirect back
+    return { data: null, error: null };
+  }, []);
 
   const signOut = useCallback(async (): Promise<{ error: string | null }> => {
-    try {
-      try {
-        const url = buildApiUrl(API_ENDPOINTS.AUTH_LOGOUT);
-        await fetch(url, {
-          method: 'POST',
-          credentials: 'include',
-          headers: { 'Content-Type': 'application/json' },
-        });
-      } catch (logoutError) {
-        logger.warn('Error calling logout endpoint:', logoutError);
-      }
+    const { error } = await supabase.auth.signOut();
+    clearAuth();
+    return { error: error?.message ?? null };
+  }, [clearAuth]);
 
-      setUser(null);
-      setUserProfile(null);
-      clearAuthStorage();
-      return { error: null };
-    } catch (error: any) {
-      setUser(null);
-      setUserProfile(null);
-      clearAuthStorage();
-      return { error: error.message || 'Error inesperado durante el cierre de sesión' };
+  const refreshUserProfile = useCallback(async (): Promise<void> => {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session?.user) {
+      await loadAndSetProfile(session.user.id);
     }
-  }, [clearAuthStorage]);
+  }, [loadAndSetProfile]);
 
   const value = useMemo<AuthContextType>(() => ({
     user,
     userProfile,
+    loading,
+    pendingGoogleOnboarding,
     signUp,
     signIn,
     signInWithGoogle,
     signOut,
     refreshUserProfile,
-    loading,
+    clearGoogleOnboarding,
     isAuthenticated: !!user,
-  }), [user, userProfile, signUp, signIn, signInWithGoogle, signOut, refreshUserProfile, loading]);
+  }), [
+    user,
+    userProfile,
+    loading,
+    pendingGoogleOnboarding,
+    signUp,
+    signIn,
+    signInWithGoogle,
+    signOut,
+    refreshUserProfile,
+    clearGoogleOnboarding,
+  ]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };

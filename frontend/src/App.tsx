@@ -11,10 +11,12 @@ import { BackgroundTasksProvider } from './contexts/BackgroundTasksContext';
 import ErrorBoundary from './components/ErrorBoundary';
 import ProtectedRoute from './components/ProtectedRoute';
 import { FloatingCompareButton } from './components/common/FloatingCompareButton';
-import { AuthProvider } from './contexts/AuthContext';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { AuthModalProvider, useAuthModal } from './contexts/AuthModalContext';
 import { NotificationProvider } from './contexts/NotificationContext';
 import AuthModal from './components/auth/AuthModal';
+import NicknamePromptModal from './components/auth/NicknamePromptModal';
+import { supabase } from './lib/supabase';
 import { RouteLoadingFallback, CatalogSkeleton } from './components/common/LoadingFallbacks';
 import { PWAInstallPrompt } from './components/pwa/PWAInstallPrompt';
 import { BackgroundTaskPopup } from './components/common/BackgroundTaskPopup';
@@ -114,6 +116,29 @@ const LazyRoute: React.FC<{ children: React.ReactNode; fallback?: React.ReactNod
   </LazyChunkErrorBoundary>
 );
 
+const GoogleOnboardingHandler: React.FC = () => {
+  const { pendingGoogleOnboarding, clearGoogleOnboarding, refreshUserProfile } = useAuth();
+
+  const handleNicknameConfirm = async (nickname: string) => {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) return;
+    await supabase.from('user_profiles').upsert({ id: session.user.id, nickname });
+    await refreshUserProfile();
+    clearGoogleOnboarding();
+  };
+
+  if (!pendingGoogleOnboarding) return null;
+
+  return (
+    <NicknamePromptModal
+      isOpen
+      suggestedNickname={pendingGoogleOnboarding.suggestedNickname}
+      onConfirm={handleNicknameConfirm}
+      onClose={clearGoogleOnboarding}
+    />
+  );
+};
+
 const LoginRedirect: React.FC = () => {
   const { openLogin } = useAuthModal();
   React.useEffect(() => { openLogin(); }, [openLogin]);
@@ -139,6 +164,7 @@ export default function App() {
                     <AuthModalProvider>
                       <ScrollToTop />
                       <AuthModal />
+                      <GoogleOnboardingHandler />
                       <PWAInstallPrompt />
                       <Layout>
                         <FloatingCompareButton />

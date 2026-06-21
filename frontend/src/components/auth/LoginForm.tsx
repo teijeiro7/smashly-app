@@ -3,8 +3,6 @@ import { sileo } from 'sileo';
 import { FiEye, FiEyeOff, FiLock, FiMail } from 'react-icons/fi';
 import { FcGoogle } from 'react-icons/fc';
 import { useAuth } from '../../contexts/AuthContext.tsx';
-import NicknamePromptModal from './NicknamePromptModal.tsx';
-import { UserProfileService } from '../../services/userProfileService.ts';
 import styled from 'styled-components';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import {
@@ -54,10 +52,6 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, onRegisterClick }) => 
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
-
-  // Nickname modal state
-  const [showNicknameModal, setShowNicknameModal] = useState(false);
-  const [suggestedNickname, setSuggestedNickname] = useState('');
 
   // Get redirect path from URL params or default to home
   const redirectTo = searchParams.get('redirect') || '/';
@@ -125,49 +119,15 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, onRegisterClick }) => 
   const handleGoogleSignIn = async () => {
     setGoogleLoading(true);
     try {
-      const { error, isNewUser, suggestedNickname: nickname } = await signInWithGoogle();
-
+      const { error } = await signInWithGoogle();
       if (error) {
         sileo.error({ title: 'Error', description: error });
-        return;
       }
-
-      // If it's a new user, show nickname prompt
-      if (isNewUser && nickname) {
-        setSuggestedNickname(nickname);
-        setShowNicknameModal(true);
-      } else {
-        // Existing user, proceed normally
-        sileo.success({ title: 'Éxito', description: '¡Bienvenido de nuevo!' });
-        if (onSuccess) {
-          onSuccess();
-        } else {
-          navigate(redirectTo);
-        }
-      }
+      // On success: browser redirects to Google → onAuthStateChange handles post-login
     } catch (error: any) {
-      console.error('Error during Google sign-in:', error);
       sileo.error({ title: 'Error', description: error?.message || 'Error inesperado con Google' });
     } finally {
       setGoogleLoading(false);
-    }
-  };
-
-  const handleNicknameConfirm = async (nickname: string) => {
-    try {
-      // Update the user's nickname
-      await UserProfileService.updateUserProfile({ nickname });
-
-      sileo.success({ title: 'Éxito', description: '¡Bienvenido a Smashlyapp!' });
-      setShowNicknameModal(false);
-
-      if (onSuccess) {
-        onSuccess();
-      } else {
-        navigate(redirectTo);
-      }
-    } catch (error: any) {
-      throw new Error(error.message || 'Error al actualizar el nickname');
     }
   };
 
@@ -259,13 +219,6 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, onRegisterClick }) => 
           {googleLoading ? 'Conectando...' : 'Google'}
         </SocialButton>
       </SocialButtons>
-
-      <NicknamePromptModal
-        isOpen={showNicknameModal}
-        suggestedNickname={suggestedNickname}
-        onConfirm={handleNicknameConfirm}
-        onClose={() => setShowNicknameModal(false)}
-      />
 
       <FooterText>
         Al continuar, aceptas nuestros{' '}

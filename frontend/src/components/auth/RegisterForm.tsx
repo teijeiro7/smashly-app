@@ -17,10 +17,8 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import styled from 'styled-components';
 import { useAuth } from '../../contexts/AuthContext.tsx';
 import storeService from '../../services/storeService';
-import { UserProfileService } from '../../services/userProfileService.ts';
 import OnboardingPromptModal from '../features/OnboardingPromptModal';
 import StoreRequestModal from '../features/StoreRequestModal';
-import NicknamePromptModal from './NicknamePromptModal.tsx';
 import {
   Form,
   FormGroup,
@@ -159,10 +157,6 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess, onLoginClick }) 
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [showStoreModal, setShowStoreModal] = useState(false);
   const [showOnboardingModal, setShowOnboardingModal] = useState(false);
-
-  // Nickname modal state for Google OAuth
-  const [showNicknameModal, setShowNicknameModal] = useState(false);
-  const [suggestedNickname, setSuggestedNickname] = useState('');
 
   const redirectTo = searchParams.get('redirect') || '/';
   const [formData, setFormData] = useState<FormData>({
@@ -307,44 +301,15 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess, onLoginClick }) 
   const handleGoogleSignIn = async () => {
     setGoogleLoading(true);
     try {
-      const { error, isNewUser, suggestedNickname: nickname } = await signInWithGoogle();
-
+      const { error } = await signInWithGoogle();
       if (error) {
         sileo.error({ title: 'Error', description: error });
-        return;
       }
-
-      // If it's a new user, show nickname prompt
-      if (isNewUser && nickname) {
-        setSuggestedNickname(nickname);
-        setShowNicknameModal(true);
-      } else {
-        // Existing user, proceed normally
-        sileo.success({ title: 'Éxito', description: '¡Bienvenido de nuevo!' });
-        if (onSuccess) {
-          onSuccess();
-        } else {
-          navigate(redirectTo);
-        }
-      }
+      // On success: browser redirects to Google → onAuthStateChange handles post-login
     } catch (error: any) {
-      console.error('Error during Google sign-in:', error);
       sileo.error({ title: 'Error', description: error?.message || 'Error inesperado con Google' });
     } finally {
       setGoogleLoading(false);
-    }
-  };
-
-  const handleNicknameConfirm = async (nickname: string) => {
-    try {
-      // Update the user's nickname
-      await UserProfileService.updateUserProfile({ nickname });
-
-      sileo.success({ title: 'Éxito', description: '¡Bienvenido a Smashlyapp!' });
-      setShowNicknameModal(false);
-      setShowOnboardingModal(true); // Show onboarding for new users
-    } catch (error: any) {
-      throw new Error(error.message || 'Error al actualizar el nickname');
     }
   };
 
@@ -678,14 +643,6 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess, onLoginClick }) 
           Al registrarte con Google serás registrado como Jugador
         </p>
       )}
-
-      <NicknamePromptModal
-        isOpen={showNicknameModal}
-        suggestedNickname={suggestedNickname}
-        onConfirm={handleNicknameConfirm}
-        onClose={() => setShowNicknameModal(false)}
-      />
-
 
       <StoreRequestModal
         isOpen={showStoreModal}
