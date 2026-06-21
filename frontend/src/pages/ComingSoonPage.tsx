@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import React from "react";
 import { FiClock, FiHome } from "react-icons/fi";
-import { Link } from "react-router-dom";
+import { Link } from '@tanstack/react-router';
 import styled from "styled-components";
 
 const Container = styled.div`

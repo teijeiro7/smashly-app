@@ -1,5 +1,5 @@
 import React from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearch } from '@tanstack/react-router';
 import styled from 'styled-components';
 
 const ErrorContainer = styled.div`
@@ -112,23 +112,23 @@ const errorTypes: Record<string, ErrorInfo> = {
 
 const ErrorPage: React.FC = () => {
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
+  const search = useSearch({ strict: false }) as { type?: string; message?: string };
 
-  const errorType = searchParams.get('type') || 'default';
-  const customMessage = searchParams.get('message');
+  const errorType = search.type || 'default';
+  const customMessage = search.message;
 
   const error = errorTypes[errorType] || errorTypes['default'];
 
   const handleGoHome = () => {
-    navigate('/');
+    navigate({ to: '/' });
   };
 
   const handleGoBack = () => {
-    navigate(-1);
+    window.history.back();
   };
 
   const handleLogin = () => {
-    navigate('/login');
+    navigate({ to: '/' });
   };
 
   return (

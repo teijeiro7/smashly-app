@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef, useCallback, useMemo } from 'react';
 import { FiGrid, FiList, FiSearch, FiX, FiChevronDown, FiFilter, FiTag } from 'react-icons/fi';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearch } from '@tanstack/react-router';
 import styled from 'styled-components';
 import { useComparison } from '../contexts/ComparisonContext';
 import { useRackets } from '../contexts/RacketsContext';
@@ -503,7 +503,7 @@ const ClearFiltersIconButton = styled(FilterButton)`
 // Component
 const CatalogPage: React.FC = () => {
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
+  const searchParams = useSearch({ strict: false }) as Record<string, string>;
   const { rackets, loading } = useRackets();
   const { count } = useComparison();
   const { isAuthenticated } = useAuth();
@@ -541,18 +541,18 @@ const CatalogPage: React.FC = () => {
 
   // Initialize state from URL params
   useEffect(() => {
-    const queryParam = searchParams.get('search') || '';
-    const brandParam = searchParams.get('brand') || 'Todas';
-    const shapeParam = searchParams.get('shape') || 'Todas';
-    const balanceParam = searchParams.get('balance') || 'Todos';
-    const coreParam = searchParams.get('core') || 'Todos';
-    const faceParam = searchParams.get('face') || 'Todas';
-    const levelParam = searchParams.get('level') || 'Todos';
-    const gameTypeParam = searchParams.get('gameType') || 'Todos';
-    const hardnessParam = searchParams.get('hardness') || 'Todas';
-    const offersParam = searchParams.get('offers');
-    const mostViewedParam = searchParams.get('mostViewed');
-    const sortParam = searchParams.get('sort') || 'name';
+    const queryParam = searchParams['search'] || '';
+    const brandParam = searchParams['brand'] || 'Todas';
+    const shapeParam = searchParams['shape'] || 'Todas';
+    const balanceParam = searchParams['balance'] || 'Todos';
+    const coreParam = searchParams['core'] || 'Todos';
+    const faceParam = searchParams['face'] || 'Todas';
+    const levelParam = searchParams['level'] || 'Todos';
+    const gameTypeParam = searchParams['gameType'] || 'Todos';
+    const hardnessParam = searchParams['hardness'] || 'Todas';
+    const offersParam = searchParams['offers'];
+    const mostViewedParam = searchParams['mostViewed'];
+    const sortParam = searchParams['sort'] || 'name';
 
     setSearchQuery(queryParam);
     setSelectedBrand(brandParam);
@@ -565,7 +565,7 @@ const CatalogPage: React.FC = () => {
     setSelectedHardness(hardnessParam);
     setShowOffers(offersParam === 'true');
     setShowMostViewed(mostViewedParam === 'true');
-    setShowAvailableOnly(searchParams.get('availableOnly') === 'true');
+    setShowAvailableOnly(searchParams['availableOnly'] === 'true');
     setSortBy(sortParam);
   }, [searchParams]);
 
@@ -587,8 +587,8 @@ const CatalogPage: React.FC = () => {
     if (showAvailableOnly) params.set('availableOnly', 'true');
     if (sortBy !== 'name') params.set('sort', sortBy);
 
-    const newUrl = params.toString() ? `?${params.toString()}` : window.location.pathname;
-    navigate(newUrl, { replace: true });
+    const searchObj = Object.fromEntries(params.entries());
+    navigate({ to: '/catalog', search: searchObj, replace: true });
   }, [
     searchQuery,
     selectedBrand,
@@ -929,7 +929,7 @@ rackets,
 
   // Handlers
   const handleRacketClick = (racket: Racket) => {
-    navigate(`/racket-detail?id=${racket.id}`);
+    navigate({ to: '/racket-detail', search: { id: racket.id } });
   };
 
   const handleLoadMore = useCallback(() => {
@@ -985,7 +985,7 @@ rackets,
   };
 
   const goToComparison = () => {
-    navigate('/compare-rackets');
+    navigate({ to: '/compare-rackets' });
   };
 
   if (loading) {

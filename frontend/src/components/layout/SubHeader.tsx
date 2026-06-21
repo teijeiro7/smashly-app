@@ -1,6 +1,6 @@
 import React from 'react';
 import { FiBook, FiCompass, FiHome, FiLayers } from 'react-icons/fi';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useRouterState } from '@tanstack/react-router';
 import styled from 'styled-components';
 import { useAuth } from '../../contexts/AuthContext';
 
@@ -92,7 +92,7 @@ const NavText = styled.span`
 `;
 
 const SubHeader: React.FC = () => {
-  const location = useLocation();
+  const { location } = useRouterState();
   const { user, isAuthenticated } = useAuth();
 
   const isActive = (path: string) => location.pathname === path;

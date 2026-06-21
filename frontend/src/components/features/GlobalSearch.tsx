@@ -1,7 +1,7 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import React, { useEffect, useRef, useState, useMemo, useDeferredValue } from 'react';
 import { FiX, FiTag, FiGrid, FiBox } from 'react-icons/fi';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from '@tanstack/react-router';
 import styled from 'styled-components';
 import { useRackets } from '../../contexts/RacketsContext';
 import { RacketService } from '../../services/racketService';
@@ -509,7 +509,7 @@ export const GlobalSearch: React.FC<GlobalSearchProps> = ({
     } else {
       toggleSearch();
     }
-    navigate(`/racket-detail?id=${racket.id}`);
+    navigate({ to: '/racket-detail', search: { id: racket.id } });
   };
 
   const handleBrandSelect = (brand: string) => {
@@ -520,7 +520,7 @@ export const GlobalSearch: React.FC<GlobalSearchProps> = ({
     } else {
       toggleSearch();
     }
-    navigate(`/catalog?brand=${encodeURIComponent(brand)}`);
+    navigate({ to: '/catalog', search: { brand: encodeURIComponent(brand) } });
   };
 
   const handleCategorySelect = (shape: string) => {
@@ -531,7 +531,7 @@ export const GlobalSearch: React.FC<GlobalSearchProps> = ({
     } else {
       toggleSearch();
     }
-    navigate(`/catalog?shape=${encodeURIComponent(shape)}`);
+    navigate({ to: '/catalog', search: { shape: encodeURIComponent(shape) } });
   };
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -554,7 +554,7 @@ export const GlobalSearch: React.FC<GlobalSearchProps> = ({
       } else {
         toggleSearch();
       }
-      navigate(`/catalog?search=${encodeURIComponent(searchQuery.trim())}`);
+      navigate({ to: '/catalog', search: { search: encodeURIComponent(searchQuery.trim()) } });
       setSearchQuery('');
       setSearchResults([]);
     }
@@ -572,7 +572,7 @@ export const GlobalSearch: React.FC<GlobalSearchProps> = ({
     } else {
       toggleSearch();
     }
-    navigate(`/catalog?search=${encodeURIComponent(searchQuery.trim())}`);
+    navigate({ to: '/catalog', search: { search: encodeURIComponent(searchQuery.trim()) } });
     setSearchQuery('');
     setSearchResults([]);
   };

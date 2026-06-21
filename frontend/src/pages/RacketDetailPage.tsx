@@ -18,7 +18,7 @@ import {
   FiCheck,
 } from 'react-icons/fi';
 
-import { Link, useSearchParams } from 'react-router-dom';
+import { Link, useSearch } from '@tanstack/react-router';
 import styled from 'styled-components';
 import { AddToListModal } from '../components/features/AddToListModal';
 import { ProductReviews } from '../components/features/ProductReviews';
@@ -1196,7 +1196,7 @@ const RacketDetailSeo: React.FC<RacketDetailSeoProps> = ({
 };
 
 const RacketDetailPage: React.FC = () => {
-  const [searchParams] = useSearchParams();
+  const searchParams = useSearch({ strict: false }) as Record<string, string>;
   const { rackets, loading: catalogLoading } = useRackets();
   const { isAuthenticated } = useAuth();
   const { addRacket, isRacketInComparison } = useComparison();
@@ -1213,7 +1213,7 @@ const RacketDetailPage: React.FC = () => {
   const carouselRef = useRef<HTMLDivElement>(null);
   const touchStartX = useRef<number | null>(null);
   const slideDirectionRef = useRef<'left' | 'right'>('left');
-  const racketId = searchParams.get('id');
+  const racketId = searchParams['id'];
 
   const handleImageError = (e: React.SyntheticEvent<HTMLImageElement>) => {
     const target = e.target as HTMLImageElement;

@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
 import { FiStar, FiList, FiGitBranch, FiClock } from 'react-icons/fi';
-import { Link } from 'react-router-dom';
+import { Link } from '@tanstack/react-router';
 
 const Container = styled.div`
   display: flex;

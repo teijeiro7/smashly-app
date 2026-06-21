@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { API_URL } from '../config/api';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate } from '@tanstack/react-router';
 import { FiArrowLeft, FiShare2, FiLock, FiGlobe, FiDownload, FiCalendar } from 'react-icons/fi';
 import { ComparisonService, SavedComparison } from '../services/comparisonService';
 import { RacketService } from '../services/racketService';
@@ -275,7 +275,7 @@ const formatDate = (dateString: string): string => {
 };
 
 const SavedComparisonPage: React.FC = () => {
-  const { id } = useParams<{ id: string }>();
+  const { id } = useParams({ strict: false }) as { id?: string };
   const navigate = useNavigate();
 
   const [comparison, setComparison] = useState<SavedComparison | null>(null);
@@ -370,9 +370,9 @@ const SavedComparisonPage: React.FC = () => {
 
   const handleBack = () => {
     if (window.history.length > 1) {
-      navigate(-1);
+      window.history.back();
     } else {
-      navigate('/profile?tab=activity');
+      navigate({ to: '/profile', search: { tab: 'activity' } });
     }
   };
 

@@ -13,7 +13,7 @@ import {
   FiCopy,
   FiCheck,
 } from 'react-icons/fi';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from '@tanstack/react-router';
 import { ComparisonService, SavedComparison } from '../services/comparisonService';
 import { RacketService } from '../services/racketService';
 import { Racket } from '../types/racket';
@@ -510,7 +510,7 @@ const MyComparisonsPage: React.FC = () => {
 
   useEffect(() => {
     if (!isAuthenticated) {
-      navigate('/login');
+      navigate({ to: '/login' });
       return;
     }
 

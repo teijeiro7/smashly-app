@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useParams, Link, useNavigate } from '@tanstack/react-router';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
 import { FiArrowLeft, FiList, FiLock, FiGlobe, FiLoader } from 'react-icons/fi';
@@ -104,7 +104,7 @@ const Spin = styled(motion.div)`
 `;
 
 const ListPage: React.FC = () => {
-  const { id } = useParams<{ id: string }>();
+  const { id } = useParams({ strict: false }) as { id?: string };
   const navigate = useNavigate();
   const [list, setList] = useState<ListWithRackets | null>(null);
   const [loading, setLoading] = useState(true);
@@ -212,7 +212,7 @@ const ListPage: React.FC = () => {
                 racket={racket} 
                 view="grid"
                 index={index}
-                onClick={() => navigate(`/racket-detail?id=${racket.id}`)}
+                onClick={() => navigate({ to: '/racket-detail', search: { id: racket.id } })}
               />
             ))}
           </RacketsGrid>

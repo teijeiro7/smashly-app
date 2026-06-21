@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from '@tanstack/react-router';
 
 const Container = styled.div`
   background: white;
@@ -123,7 +123,7 @@ export const ProfileCompletionBar: React.FC<ProfileCompletionBarProps> = ({
             ))}
           </Suggestions>
           
-          <CompleteButton onClick={() => navigate('/profile')}>
+          <CompleteButton onClick={() => navigate({ to: '/profile' })}>
             Completar perfil
           </CompleteButton>
         </>

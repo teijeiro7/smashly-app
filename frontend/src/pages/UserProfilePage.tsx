@@ -14,7 +14,7 @@ import {
   FiCalendar,
 } from 'react-icons/fi';
 import { GiTennisRacket } from 'react-icons/gi';
-import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { Link, useNavigate, useSearch } from '@tanstack/react-router';
 import { useAuth } from '../contexts/AuthContext';
 import { UserProfileService } from '../services/userProfileService';
 import { UploadService } from '../services/uploadService';
@@ -422,7 +422,7 @@ interface UserProfileFormData {
 const UserProfilePage: React.FC = () => {
   const { user, userProfile, refreshUserProfile, loading } = useAuth();
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
+  const searchParams = useSearch({ strict: false }) as Record<string, string>;
   const [activeTab, setActiveTab] = useState<TabType>('profile');
   const [saving, setSaving] = useState(false);
   const [activityData, setActivityData] = useState<any>(null);
@@ -446,7 +446,7 @@ const UserProfilePage: React.FC = () => {
   });
 
   useEffect(() => {
-    const tab = searchParams.get('tab');
+    const tab = searchParams['tab'];
     if (tab && ['profile', 'activity', 'collections', 'account'].includes(tab)) {
       setActiveTab(tab as TabType);
     }
@@ -479,7 +479,7 @@ const UserProfilePage: React.FC = () => {
     if (loading) return;
 
     if (!user) {
-      navigate('/login');
+      navigate({ to: '/login' });
     }
   }, [user, navigate, loading]);
 

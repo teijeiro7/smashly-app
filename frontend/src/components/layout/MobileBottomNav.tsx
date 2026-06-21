@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { FiCompass, FiHelpCircle, FiHome, FiLayers, FiUser, FiX, FiLogIn } from 'react-icons/fi';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, useRouterState, useNavigate } from '@tanstack/react-router';
 import styled from 'styled-components';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../../contexts/AuthContext';
@@ -185,7 +185,7 @@ const CloseButton = styled.button`
 `;
 
 const MobileBottomNav: React.FC = () => {
-  const location = useLocation();
+  const { location } = useRouterState();
   const navigate = useNavigate();
   const { user, isAuthenticated, userProfile } = useAuth();
   const { openLogin } = useAuthModal();
@@ -201,7 +201,7 @@ const MobileBottomNav: React.FC = () => {
     } else if (!hasCompleteProfile) {
       setShowPopup('onboarding');
     } else {
-      navigate('/profile');
+      navigate({ to: '/profile' });
     }
   };
 
@@ -216,7 +216,7 @@ const MobileBottomNav: React.FC = () => {
 
   const handleGoToOnboarding = () => {
     setShowPopup(null);
-    navigate('/onboarding');
+    navigate({ to: '/onboarding' as any });
   };
 
   const items = [

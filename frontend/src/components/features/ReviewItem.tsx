@@ -5,7 +5,8 @@
 
 import { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
-import { Link, useLocation } from 'react-router-dom';
+import { Link } from '@tanstack/react-router';
+import { useRouterState } from '@tanstack/react-router';
 import { reviewService } from '../../services/reviewService';
 import type { ReviewComment, ReviewWithDetails } from '../../types/review';
 import { useAuth } from '../../contexts/AuthContext';
@@ -26,7 +27,7 @@ export const ReviewItem: React.FC<ReviewItemProps> = ({
   showProductInfo = true,
 }) => {
   const { user } = useAuth();
-  const location = useLocation();
+  const { location } = useRouterState();
   const containerRef = useRef<HTMLDivElement>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [likes, setLikes] = useState(review.likes_count);
@@ -45,7 +46,7 @@ export const ReviewItem: React.FC<ReviewItemProps> = ({
 
   // Efecto para scroll automático desde notificaciones
   useEffect(() => {
-    const searchParams = new URLSearchParams(location.search);
+    const searchParams = new URLSearchParams(location.searchStr);
     const targetReviewId = searchParams.get('reviewId');
 
     if (targetReviewId === review.id && containerRef.current) {
@@ -55,7 +56,7 @@ export const ReviewItem: React.FC<ReviewItemProps> = ({
         handleShowComments();
       }
     }
-  }, [location.search, review.id]);
+  }, [location.searchStr, review.id]);
 
   const handleShowComments = async () => {
     if (showComments) {

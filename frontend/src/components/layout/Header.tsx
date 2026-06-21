@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { FiMenu, FiSearch, FiX, FiUser, FiLogOut, FiHome, FiGrid, FiBarChart2, FiHelpCircle, FiLogIn, FiUserPlus } from 'react-icons/fi';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, useRouterState, useNavigate } from '@tanstack/react-router';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
 import { useAuth } from '../../contexts/AuthContext';
@@ -544,7 +544,7 @@ const Header: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
-  const location = useLocation();
+  const { location } = useRouterState();
   const { userProfile, signOut } = useAuth();
   const { openLogin, openRegister } = useAuthModal();
   const navigate = useNavigate();
@@ -613,7 +613,7 @@ const Header: React.FC = () => {
               <UserDropdown $isOpen={isUserMenuOpen}>
                 <DropdownItem
                   onClick={() => {
-                    navigate('/profile');
+                    navigate({ to: '/profile' });
                     setIsUserMenuOpen(false);
                   }}
                 >
@@ -625,7 +625,7 @@ const Header: React.FC = () => {
                   onClick={async () => {
                     await signOut();
                     setIsUserMenuOpen(false);
-                    navigate('/');
+                    navigate({ to: '/' });
                   }}
                 >
                   <FiLogOut />
@@ -726,7 +726,7 @@ const Header: React.FC = () => {
                     onClick={async () => {
                       await signOut();
                       closeAllMenus();
-                      navigate('/');
+                      navigate({ to: '/' });
                     }}
                     style={{ cursor: 'pointer', marginTop: '0.5rem', width: '100%' }}
                   >

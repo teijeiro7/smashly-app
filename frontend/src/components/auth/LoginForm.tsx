@@ -4,7 +4,7 @@ import { FiEye, FiEyeOff, FiLock, FiMail } from 'react-icons/fi';
 import { FcGoogle } from 'react-icons/fc';
 import { useAuth } from '../../contexts/AuthContext.tsx';
 import styled from 'styled-components';
-import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { Link, useNavigate, useSearch } from '@tanstack/react-router';
 import {
   Form,
   FormGroup,
@@ -42,7 +42,7 @@ interface LoginFormProps {
 const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, onRegisterClick }) => {
   const { signIn, signInWithGoogle } = useAuth();
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
+  const searchParams = useSearch({ strict: false }) as Record<string, string>;
 
   const [formData, setFormData] = useState({
     email: '',
@@ -54,7 +54,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, onRegisterClick }) => 
   const [googleLoading, setGoogleLoading] = useState(false);
 
   // Get redirect path from URL params or default to home
-  const redirectTo = searchParams.get('redirect') || '/';
+  const redirectTo = searchParams['redirect'] || '/';
 
   const validateForm = (): boolean => {
     const newErrors: { email?: string; password?: string } = {};
@@ -106,7 +106,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, onRegisterClick }) => 
       if (onSuccess) {
         onSuccess();
       } else {
-        navigate(redirectTo);
+        navigate({ to: redirectTo as any });
       }
     } catch (error: any) {
       console.error('Error durante el inicio de sesión:', error);

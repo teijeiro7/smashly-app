@@ -11,7 +11,7 @@ import {
   FiX,
   FiCheck,
 } from 'react-icons/fi';
-import { Link } from 'react-router-dom';
+import { Link } from '@tanstack/react-router';
 import { sileo } from 'sileo';
 import { ListService } from '../../services/listService';
 import { ComparisonService, SavedComparison } from '../../services/comparisonService';

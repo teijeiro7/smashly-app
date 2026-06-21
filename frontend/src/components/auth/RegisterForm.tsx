@@ -13,7 +13,7 @@ import {
   FiUser,
 } from 'react-icons/fi';
 import { FcGoogle } from 'react-icons/fc';
-import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { Link, useNavigate, useSearch } from '@tanstack/react-router';
 import styled from 'styled-components';
 import { useAuth } from '../../contexts/AuthContext.tsx';
 import storeService from '../../services/storeService';
@@ -149,7 +149,7 @@ interface RegisterFormProps {
 
 const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess, onLoginClick }) => {
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
+  const searchParams = useSearch({ strict: false }) as Record<string, string>;
   const { signUp, signInWithGoogle } = useAuth();
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
@@ -158,7 +158,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess, onLoginClick }) 
   const [showStoreModal, setShowStoreModal] = useState(false);
   const [showOnboardingModal, setShowOnboardingModal] = useState(false);
 
-  const redirectTo = searchParams.get('redirect') || '/';
+  const redirectTo = searchParams['redirect'] || '/';
   const [formData, setFormData] = useState<FormData>({
     registrationType: 'player',
     fullName: '',
@@ -275,7 +275,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess, onLoginClick }) 
           });
           setTimeout(() => {
             if (onSuccess) onSuccess();
-            else navigate('/login');
+            else navigate({ to: '/login' });
           }, 3000);
         }
       } else {
@@ -295,7 +295,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess, onLoginClick }) 
   const handleModalClose = () => {
     setShowStoreModal(false);
     if (onSuccess) onSuccess();
-    else navigate(redirectTo);
+    else navigate({ to: redirectTo as any });
   };
 
   const handleGoogleSignIn = async () => {
@@ -316,7 +316,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess, onLoginClick }) 
   const handleOnboardingClose = () => {
     setShowOnboardingModal(false);
     if (onSuccess) onSuccess();
-    else navigate('/');
+    else navigate({ to: '/' });
   };
 
   return (

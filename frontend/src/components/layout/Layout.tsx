@@ -1,5 +1,5 @@
 import React from 'react';
-import { useLocation } from 'react-router-dom';
+import { useRouterState } from '@tanstack/react-router';
 import styled from 'styled-components';
 import Footer from './Footer';
 import Header from './Header';
@@ -30,7 +30,7 @@ const Main = styled.main`
 `;
 
 const Layout: React.FC<LayoutProps> = ({ children }) => {
-  const location = useLocation();
+  const { location } = useRouterState();
   const isAuthPage = ['/login', '/register'].includes(location.pathname);
 
   return (

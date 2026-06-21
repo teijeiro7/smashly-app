@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { FiClock, FiLayers, FiAlertCircle } from 'react-icons/fi';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link } from '@tanstack/react-router';
 import { ComparisonService, SavedComparison } from '../services/comparisonService';
 import { RacketService } from '../services/racketService';
 import { Racket } from '../types/racket';
@@ -282,7 +282,7 @@ const BackButton = styled(Link)`
 `;
 
 const SharedComparisonPage: React.FC = () => {
-  const { token } = useParams<{ token: string }>();
+  const { token } = useParams({ strict: false }) as { token?: string };
   const [comparison, setComparison] = useState<SavedComparison | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);

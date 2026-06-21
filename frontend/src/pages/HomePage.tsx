@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { FiArrowRight, FiCheck, FiSearch, FiTarget, FiZap } from 'react-icons/fi';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from '@tanstack/react-router';
 import styled, { keyframes } from 'styled-components';
 import RotatingPhrases from '../components/features/RotatingPhrases';
 import { useAuth } from '../contexts/AuthContext';
@@ -658,10 +658,10 @@ const HomePage: React.FC = () => {
       });
       if (role === 'player') {
         console.log('↪️ Redirecting player to dashboard');
-        navigate('/dashboard', { replace: true });
+        navigate({ to: '/dashboard', replace: true });
       } else if (role === 'admin') {
         console.log('↪️ Redirecting admin to /admin');
-        navigate('/admin', { replace: true });
+        navigate({ to: '/admin', replace: true });
       }
     }
   }, [isAuthenticated, user, navigate]);

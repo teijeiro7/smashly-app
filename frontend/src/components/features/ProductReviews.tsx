@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import { Link } from 'react-router-dom';
+import { Link } from '@tanstack/react-router';
 import { reviewService } from '../../services/reviewService';
 import type { ReviewsResponse } from '../../types/review';
 import { ReviewItem } from './ReviewItem';

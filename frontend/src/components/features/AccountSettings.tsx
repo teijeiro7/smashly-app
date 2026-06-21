@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from '@tanstack/react-router';
 import {
   FiMail,
   FiCalendar,
@@ -156,7 +156,7 @@ const AccountSettings: React.FC<AccountSettingsProps> = ({ user }) => {
     setIsLoggingOut(true);
     try {
       await signOut();
-      navigate('/');
+      navigate({ to: '/' });
     } catch (error) {
       sileo.error({ title: 'Error', description: 'Error al cerrar sesión' });
     } finally {

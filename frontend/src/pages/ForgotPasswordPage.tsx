@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiMail, FiArrowLeft, FiCheckCircle, FiAlertCircle, FiLoader } from 'react-icons/fi';
-import { Link } from 'react-router-dom';
+import { Link } from '@tanstack/react-router';
 import { sileo } from 'sileo';
 import { buildApiUrl, API_ENDPOINTS } from '../config/api';
 

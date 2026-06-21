@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { AdminService } from '../services/adminService';
 import { FiAlertTriangle, FiCheck, FiX, FiLayers, FiArrowLeft } from 'react-icons/fi';
-import { Link } from 'react-router-dom';
+import { Link } from '@tanstack/react-router';
 import { sileo } from 'sileo';
 
 const PageContainer = styled.div`

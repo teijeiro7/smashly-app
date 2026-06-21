@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiX, FiMinimize2, FiCpu, FiCheckCircle, FiAlertCircle } from 'react-icons/fi';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useRouterState } from '@tanstack/react-router';
 import {
   useBackgroundTasks,
   TaskType,
@@ -354,7 +354,7 @@ const getTaskSubtitle = (task: BackgroundTask): string => {
 export const BackgroundTaskPopup: React.FC = () => {
   const { tasks, dismissTask } = useBackgroundTasks();
   const navigate = useNavigate();
-  const location = useLocation();
+  const { location } = useRouterState();
   const [minimized, setMinimized] = useState(true);
   const [showPopup, setShowPopup] = useState(false);
 
@@ -396,9 +396,9 @@ export const BackgroundTaskPopup: React.FC = () => {
     if (minimized) {
       // Si está minimizado, solo navegar a la página correspondiente
       if (visibleTask.type === 'comparison') {
-        navigate('/compare-rackets');
+        navigate({ to: '/compare-rackets' });
       } else if (visibleTask.type === 'recommendation') {
-        navigate('/best-racket');
+        navigate({ to: '/best-racket' });
       }
       // Cerrar el popup después de navegar (dar tiempo para que se cargue la página)
       setTimeout(() => {

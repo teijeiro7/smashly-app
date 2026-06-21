@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useRouterState } from '@tanstack/react-router';
 import {
   FiHome,
   FiPackage,
@@ -201,7 +201,7 @@ const navItems = [
 ];
 
 const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
-  const location = useLocation();
+  const { location } = useRouterState();
   const [mobileOpen, setMobileOpen] = useState(false);
 
   const handleNavClick = () => {

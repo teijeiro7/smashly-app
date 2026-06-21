@@ -1,7 +1,7 @@
 import React from "react";
 import styled from "styled-components";
 import { useAuth } from "../contexts/AuthContext";
-import { Navigate } from "react-router-dom";
+import { Navigate } from '@tanstack/react-router';
 import AdminLayout from "../components/features/AdminLayout";
 import StoreRequestsManager from "../components/features/StoreRequestsManager";
 

@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import React from "react";
 import { FiTarget, FiTrendingUp, FiZap, FiChevronRight } from "react-icons/fi";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from '@tanstack/react-router';
 import styled from "styled-components";
 
 const BannerContainer = styled(motion.div)`
@@ -198,7 +198,7 @@ const AiBanner: React.FC = () => {
         <CTASection>
           <CTAButton
             variant="primary"
-            onClick={() => navigate("/best-racket")}
+            onClick={() => navigate({ to: '/best-racket' })}
           >
             <FiZap />
             Encontrar Mi Pala Ideal
@@ -206,7 +206,7 @@ const AiBanner: React.FC = () => {
           </CTAButton>
           <CTAButton
             variant="secondary"
-            onClick={() => navigate("/compare-rackets")}
+            onClick={() => navigate({ to: '/compare-rackets' })}
           >
             <FiTrendingUp />
             Comparar Palas

@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { FiBell, FiTrendingDown, FiCheckCircle, FiStar, FiAlertCircle, FiUserPlus, FiShoppingBag, FiX, FiCheck } from 'react-icons/fi';
 import { useNotifications } from '../../contexts/NotificationContext';
 import { Notification, NotificationType } from '../../types/notification';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from '@tanstack/react-router';
 
 const DropdownContainer = styled.div`
   position: absolute;
@@ -308,7 +308,7 @@ export const NotificationDropdown: React.FC<NotificationDropdownProps> = ({ onCl
     }
     
     const link = getNotificationLink(notification);
-    navigate(link);
+    navigate({ to: link as any });
     onClose();
   };
 

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from '@tanstack/react-router';
 import styled from 'styled-components';
 import {
   FiEdit2,
@@ -289,7 +289,7 @@ const UserPage: React.FC = () => {
                 <FiAlertCircle />
               </EmptyStateIcon>
               <EmptyStateText>No se encontró el perfil de usuario</EmptyStateText>
-              <EditButton onClick={() => navigate('/login')}>Iniciar sesión</EditButton>
+              <EditButton onClick={() => navigate({ to: '/login' })}>Iniciar sesión</EditButton>
             </EmptyState>
           </DetailsSection>
         </ContentWrapper>

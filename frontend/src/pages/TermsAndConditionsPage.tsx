@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import { Link as RouterLink } from 'react-router-dom';
+import { Link as RouterLink } from '@tanstack/react-router';
 import { FiArrowLeft } from 'react-icons/fi';
 import SEO from '../components/seo/SEO';
 import { organizationSchema, webPageSchema } from '../utils/seoSchemas';

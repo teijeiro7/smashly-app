@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
 import { FiLock, FiEye, FiEyeOff, FiAlertCircle, FiLoader, FiShield } from 'react-icons/fi';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useRouterState } from '@tanstack/react-router';
 import { sileo } from 'sileo';
 import { buildApiUrl, API_ENDPOINTS } from '../config/api';
 
@@ -189,7 +189,7 @@ const PasswordStrength = styled.div<{ $strength: number }>`
 
 const UpdatePasswordPage: React.FC = () => {
   const navigate = useNavigate();
-  const location = useLocation();
+  const { location } = useRouterState();
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -268,7 +268,7 @@ const UpdatePasswordPage: React.FC = () => {
       });
 
       // Redirigir al inicio (el modal de login se puede abrir allí)
-      navigate('/');
+      navigate({ to: '/' });
     } catch (err: any) {
       setError(err.message);
       sileo.error({

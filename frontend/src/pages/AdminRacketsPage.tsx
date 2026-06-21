@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import styled from 'styled-components';
-import { Link } from 'react-router-dom';
+import { Link } from '@tanstack/react-router';
 import { FiArrowLeft, FiEdit2, FiTrash2, FiSearch, FiPackage, FiTag, FiX } from 'react-icons/fi';
 import { Racket } from '@/types/racket';
 import { RacketService } from '@/services/racketService';

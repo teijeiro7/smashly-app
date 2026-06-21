@@ -3,7 +3,7 @@ import styled from "styled-components";
 import { FiX, FiTrash2, FiExternalLink } from "react-icons/fi";
 import { motion, AnimatePresence } from "framer-motion";
 import { ListWithRackets } from "../../types/list";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from '@tanstack/react-router';
 
 interface ViewListModalProps {
   isOpen: boolean;
@@ -259,7 +259,7 @@ export const ViewListModal: React.FC<ViewListModalProps> = ({
   };
 
   const handleViewRacket = (racketId: number) => {
-    navigate(`/racket-detail?id=${racketId}`);
+    navigate({ to: '/racket-detail', search: { id: racketId } });
     onClose();
   };
 

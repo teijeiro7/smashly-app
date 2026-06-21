@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { useComparison } from '../../contexts/ComparisonContext';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useRouterState } from '@tanstack/react-router';
 import { FaBalanceScale } from 'react-icons/fa';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -62,14 +62,14 @@ const Badge = styled(motion.div)`
 `;
 
 export const FloatingCompareButton: React.FC = () => {
-  const { count, rackets } = useComparison();
+  const { count } = useComparison();
   const navigate = useNavigate();
-  const { pathname } = useLocation();
+  const { location } = useRouterState();
 
-  if (count === 0 || pathname === '/catalog') return null;
+  if (count === 0 || location.pathname === '/catalog') return null;
 
   const handleClick = () => {
-    navigate('/compare-rackets', { state: { rackets } });
+    navigate({ to: '/compare-rackets' });
   };
 
   return (

@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
 import { FiCpu, FiLayers, FiArrowRight, FiBookmark } from 'react-icons/fi';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from '@tanstack/react-router';
 import { useAuth } from '../contexts/AuthContext';
 import SEO from '../components/seo/SEO';
 import {
@@ -270,7 +270,7 @@ const ComparePage: React.FC = () => {
         </Subtitle>
         {isAuthenticated && (
           <HeaderActions>
-            <SecondaryButton onClick={() => navigate('/comparisons')}>
+            <SecondaryButton onClick={() => navigate({ to: '/comparisons' })}>
               <FiBookmark />
               Mis Comparaciones Guardadas
             </SecondaryButton>
@@ -280,7 +280,7 @@ const ComparePage: React.FC = () => {
 
       <MainContent>
         <Card
-          onClick={() => navigate('/best-racket')}
+          onClick={() => navigate({ to: '/best-racket' })}
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
         >
@@ -298,7 +298,7 @@ const ComparePage: React.FC = () => {
         </Card>
 
         <Card
-          onClick={() => navigate('/compare-rackets')} // Assuming this route exists or will be created, or maybe this page IS the compare page but leads to a specific tool?
+          onClick={() => navigate({ to: '/compare-rackets' })} // Assuming this route exists or will be created, or maybe this page IS the compare page but leads to a specific tool?
           // Wait, the user said "No hagas la seccion de palas mas vendidas, solo la de mejor pala para ti y la de compara palas".
           // If I am IN the compare page, maybe these should open modals or navigate to specific tools?
           // For now I'll assume they navigate to specific routes or sections.

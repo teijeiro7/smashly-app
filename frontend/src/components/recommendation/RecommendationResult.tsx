@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { RecommendationResult as ResultType } from '../../types/recommendation';
-import { Link } from 'react-router-dom';
+import { Link } from '@tanstack/react-router';
 
 const ResultContainer = styled.div`
   max-width: 1200px;

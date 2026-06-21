@@ -14,7 +14,7 @@ import {
   FiSettings,
 } from 'react-icons/fi';
 import { sileo } from 'sileo';
-import { Link } from 'react-router-dom';
+import { Link } from '@tanstack/react-router';
 import { AdminService, AdminMetrics, Activity } from '../../services/adminService';
 
 const DashboardContainer = styled.div`
@@ -471,7 +471,7 @@ const AdminDashboard: React.FC = () => {
           <CardHeader>
             <CardTitle>Actividad Reciente</CardTitle>
             <Link
-              to="/admin/activity"
+              to={"/admin/activity" as any}
               style={{
                 fontSize: '0.875rem',
                 color: '#16a34a',

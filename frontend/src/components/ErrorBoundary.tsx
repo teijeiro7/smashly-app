@@ -1,5 +1,4 @@
-import React, { Component, ErrorInfo, ReactNode } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Component, ErrorInfo, ReactNode } from 'react';
 import { logger } from '../utils/logger';
 
 interface Props {
@@ -12,10 +11,8 @@ interface State {
   error?: Error;
 }
 
-class ErrorBoundaryClass extends Component<Props & { navigate: (to: string) => void }, State> {
-  public state: State = {
-    hasError: false,
-  };
+class ErrorBoundary extends Component<Props, State> {
+  public state: State = { hasError: false };
 
   public static getDerivedStateFromError(error: Error): State {
     return { hasError: true, error };
@@ -26,10 +23,9 @@ class ErrorBoundaryClass extends Component<Props & { navigate: (to: string) => v
   }
 
   private handleGoToError = () => {
-    this.props.navigate(
-      `/error?type=500&message=${ 
-        encodeURIComponent(this.state.error?.message || 'Error desconocido')}`
-    );
+    window.location.href = `/error?type=500&message=${encodeURIComponent(
+      this.state.error?.message || 'Error desconocido'
+    )}`;
   };
 
   private handleRetry = () => {
@@ -65,44 +61,16 @@ class ErrorBoundaryClass extends Component<Props & { navigate: (to: string) => v
               boxShadow: '0 10px 40px rgba(22, 163, 74, 0.12)',
             }}
           >
-            <h1
-              style={{
-                fontSize: '3rem',
-                margin: '0',
-                color: '#dc2626',
-                fontWeight: '700',
-              }}
-            >
+            <h1 style={{ fontSize: '3rem', margin: '0', color: '#dc2626', fontWeight: '700' }}>
               ¡Ups!
             </h1>
-            <h2
-              style={{
-                fontSize: '1.5rem',
-                margin: '1rem 0',
-                color: '#1f2937',
-              }}
-            >
+            <h2 style={{ fontSize: '1.5rem', margin: '1rem 0', color: '#1f2937' }}>
               Algo salió mal
             </h2>
-            <p
-              style={{
-                fontSize: '1rem',
-                color: '#6b7280',
-                margin: '1.5rem 0',
-                lineHeight: '1.6',
-              }}
-            >
-              Ha ocurrido un error inesperado. Puedes intentar recargar la página o volver al
-              inicio.
+            <p style={{ fontSize: '1rem', color: '#6b7280', margin: '1.5rem 0', lineHeight: '1.6' }}>
+              Ha ocurrido un error inesperado. Puedes intentar recargar la página o volver al inicio.
             </p>
-            <div
-              style={{
-                display: 'flex',
-                gap: '1rem',
-                justifyContent: 'center',
-                marginTop: '2rem',
-              }}
-            >
+            <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', marginTop: '2rem' }}>
               <button
                 onClick={this.handleRetry}
                 style={{
@@ -144,15 +112,5 @@ class ErrorBoundaryClass extends Component<Props & { navigate: (to: string) => v
     return this.props.children;
   }
 }
-
-// Wrapper component to use hooks with class component
-const ErrorBoundary: React.FC<Props> = ({ children, fallback }) => {
-  const navigate = useNavigate();
-  return (
-    <ErrorBoundaryClass navigate={navigate} fallback={fallback}>
-      {children}
-    </ErrorBoundaryClass>
-  );
-};
 
 export default ErrorBoundary;

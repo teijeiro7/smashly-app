@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { useAuth } from '../contexts/AuthContext';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, useRouterState, useNavigate } from '@tanstack/react-router';
 import { QuickActionCard } from '../components/dashboard/QuickActionCard';
 import { FaLightbulb, FaBalanceScale, FaChartBar, FaUser, FaBullseye, FaHeart, FaFire, FaStar } from 'react-icons/fa';
 import { RacketService } from '../services/racketService';
@@ -497,7 +497,7 @@ const formatRecommendationModelName = (name?: string | null, brand?: string | nu
 export const PlayerDashboard: React.FC = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const location = useLocation();
+  const { location } = useRouterState();
   const [favorites, setFavorites] = useState<Racket[]>([]);
   const [favoritesCount, setFavoritesCount] = useState<number>(0);
   const [offers, setOffers] = useState<Racket[]>([]);
@@ -587,25 +587,25 @@ export const PlayerDashboard: React.FC = () => {
       icon: FaLightbulb,
       title: 'Mejor pala para ti',
       description: 'Encuentra tu pala ideal con IA',
-      onClick: () => navigate('/best-racket'),
+      onClick: () => navigate({ to: '/best-racket' }),
     },
     {
       icon: FaBalanceScale,
       title: 'Comparar palas',
       description: 'Compara hasta 3 palas',
-      onClick: () => navigate('/compare-rackets'),
+      onClick: () => navigate({ to: '/compare-rackets' }),
     },
     {
       icon: FaChartBar,
       title: 'Mis comparaciones',
       description: 'Historial de comparaciones',
-      onClick: () => navigate('/comparisons'),
+      onClick: () => navigate({ to: '/comparisons' }),
     },
     {
       icon: FaUser,
       title: 'Mi Cuenta',
       description: 'Ver y editar perfil',
-      onClick: () => navigate('/profile'),
+      onClick: () => navigate({ to: '/profile' }),
     },
   ];
 
@@ -646,7 +646,7 @@ export const PlayerDashboard: React.FC = () => {
               {favorites.map(racket => (
                 <RacketCard
                   key={racket.id}
-                  onClick={() => navigate(`/racket-detail?id=${racket.id}`)}
+                  onClick={() => navigate({ to: '/racket-detail', search: { id: racket.id } })}
                 >
                   {racket.imagenes?.[0] && (
                     <RacketImage src={racket.imagenes[0]} alt={racket.nombre} />
@@ -657,7 +657,7 @@ export const PlayerDashboard: React.FC = () => {
                 </RacketCard>
               ))}
             </RacketsGrid>
-            <ViewAllButton onClick={() => navigate('/favorites')}>Ver todas →</ViewAllButton>
+            <ViewAllButton onClick={() => navigate({ to: '/favorites' as any })}>Ver todas →</ViewAllButton>
           </Section>
         )}
 
@@ -669,7 +669,7 @@ export const PlayerDashboard: React.FC = () => {
               {recentlyViewed.slice(0, 4).map(racket => (
                 <RacketCard
                   key={racket.id}
-                  onClick={() => navigate(`/racket-detail?id=${racket.id}`)}
+                  onClick={() => navigate({ to: '/racket-detail', search: { id: racket.id } })}
                 >
                   {racket.imagenes?.[0] && (
                     <RacketImage src={racket.imagenes[0]} alt={racket.nombre} />
@@ -691,7 +691,7 @@ export const PlayerDashboard: React.FC = () => {
               {offers.map(racket => (
                 <RacketCard
                   key={racket.id}
-                  onClick={() => navigate(`/racket-detail?id=${racket.id}`)}
+                  onClick={() => navigate({ to: '/racket-detail', search: { id: racket.id } })}
                 >
                   {racket.imagenes?.[0] && (
                     <RacketImage src={racket.imagenes[0]} alt={racket.nombre} />
