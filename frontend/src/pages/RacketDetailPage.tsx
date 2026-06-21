@@ -1,7 +1,6 @@
 import { useRackets } from '@/contexts/RacketsContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { Racket } from '@/types/racket';
-import { API_URL } from '@/config/api';
 
 import React, { useEffect, useState, useRef, useCallback } from 'react';
 import {
@@ -1512,12 +1511,7 @@ const RacketDetailPage: React.FC = () => {
           <MainImage
             key={selectedImageIndex}
             $entering={slideDirectionRef.current}
-            src={
-              ((racket.imagenes?.[selectedImageIndex] || racket.imagenes?.[0])?.startsWith('http')
-                ? `${API_URL}/api/v1/proxy/image?url=${encodeURIComponent(racket.imagenes?.[selectedImageIndex] || racket.imagenes?.[0])}`
-                : racket.imagenes?.[selectedImageIndex] || racket.imagenes?.[0]) ||
-              '/placeholder-racket.svg'
-            }
+            src={racket.imagenes?.[selectedImageIndex] || racket.imagenes?.[0] || '/placeholder-racket.svg'}
             alt={racket.modelo}
             onError={handleImageError}
             onClick={() => setShowLightbox(true)}
@@ -1545,11 +1539,7 @@ const RacketDetailPage: React.FC = () => {
                     {racket.imagenes.map((img, index) => (
                       <Thumbnail
                         key={index}
-                        src={
-                          img.startsWith('http')
-                            ? `${API_URL}/api/v1/proxy/image?url=${encodeURIComponent(img)}`
-                            : img
-                        }
+                        src={img}
                         alt={`${racket.modelo} - imagen ${index + 1}`}
                         $isActive={index === selectedImageIndex}
                         onClick={() => setSelectedImageIndex(index)}

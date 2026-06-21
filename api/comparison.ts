@@ -1,5 +1,5 @@
 import type { IncomingMessage, ServerResponse } from 'http';
-import { generateContent } from './_lib/openrouter';
+import { generateContent } from './_lib/ai';
 import { getRacketsByIds } from './_lib/racket-service';
 
 function getDbRadarValues(racket: any): null | Record<string, number> {

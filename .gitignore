@@ -378,3 +378,4 @@ AGENTS.md
 opencode.json
 docs/TFG_Cristian_Teijeiro
 .codegraph
+.env*.local

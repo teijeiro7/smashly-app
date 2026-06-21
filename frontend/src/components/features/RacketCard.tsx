@@ -3,7 +3,6 @@ import { FiEye, FiTag, FiHeart } from 'react-icons/fi';
 import styled from 'styled-components';
 import { Racket } from '../../types/racket';
 import { getLowestPrice } from '../../utils/priceUtils';
-import { API_URL } from '../../config/api';
 
 // Styled Components
 const RacketCardContainer = styled.li<{ $view: 'grid' | 'list'; $index: number }>`
@@ -283,9 +282,7 @@ const RacketCardComponent: React.FC<RacketCardProps> = memo(
             src={(() => {
               const imageUrl = racket.imagenes?.[currentImageIndex] || racket.imagenes?.[0];
               if (!imageUrl) return '/placeholder-racket.svg';
-              return imageUrl.startsWith('http')
-                ? `${API_URL}/api/v1/proxy/image?url=${encodeURIComponent(imageUrl)}`
-                : imageUrl;
+              return imageUrl;
             })()}
             alt={racket.modelo}
             onError={handleImageError}

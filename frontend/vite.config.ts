@@ -115,12 +115,8 @@ export default defineConfig(({ mode }) => ({
   server: {
     port: 5173,
     host: true,
-    proxy: {
-      '/api': {
-        target: 'http://localhost:3000',
-        changeOrigin: true,
-      },
-    },
+    // In production: /api/* handled by Vercel serverless functions
+    // For local dev with Vercel functions: run `vercel dev` instead of `vite`
     watch: {
       ignored: [
         '**/node_modules/**',

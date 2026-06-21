@@ -1,5 +1,5 @@
 import type { IncomingMessage, ServerResponse } from 'http';
-import { generateContent, embed } from '../_lib/openrouter';
+import { generateContent, embed } from '../_lib/ai';
 import { getAllRackets } from '../_lib/racket-service';
 import { filterRackets } from '../_lib/racket-filter';
 import { getTesteaMetrics } from '../_lib/testea-metrics';
