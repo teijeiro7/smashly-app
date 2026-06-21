@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { Navigate } from 'react-router-dom';
+import { Navigate } from '@tanstack/react-router';
 import { useAuth } from '../contexts/AuthContext';
 import { useAuthModal } from '../contexts/AuthModalContext';
 import LoadingSpinner from './common/LoadingSpinner';
