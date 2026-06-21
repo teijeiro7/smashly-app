@@ -1,9 +1,4 @@
-import {
-  API_ENDPOINTS,
-  buildApiUrl,
-  getCommonHeaders,
-  ApiResponse,
-} from "../config/api";
+import { supabase } from '../lib/supabase';
 
 export interface RecentlyViewedRacket {
   id: number;
@@ -14,86 +9,56 @@ export interface RecentlyViewedRacket {
   viewed_at: string;
 }
 
-/**
- * Helper para manejar respuestas de la API
- */
-async function handleApiResponse<T>(response: Response): Promise<T> {
-  if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}));
-    throw new Error(
-      errorData.message || `Error: ${response.status} ${response.statusText}`
-    );
-  }
-
-  const data: ApiResponse<T> = await response.json();
-
-  if (!data.success) {
-    throw new Error(data.message || data.error || "Error desconocido");
-  }
-
-  return data.data as T;
-}
-
 export class RacketViewService {
-  /**
-   * Registra que el usuario ha visto una pala
-   */
   static async recordView(racketId: number): Promise<void> {
-    const response = await fetch(
-      buildApiUrl(API_ENDPOINTS.RACKET_VIEWS.RECORD_VIEW(racketId)),
-      {
-        method: "POST",
-        headers: getCommonHeaders(),
-      }
-    );
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) return;
 
-    await handleApiResponse<void>(response);
+    const { error } = await supabase
+      .from('racket_views')
+      .upsert(
+        { user_id: session.user.id, racket_id: racketId, viewed_at: new Date().toISOString() },
+        { onConflict: 'user_id,racket_id' }
+      );
+
+    if (error) throw new Error(error.message);
   }
 
-  /**
-   * Obtiene las palas vistas recientemente por el usuario
-   */
-  static async getRecentlyViewed(
-    limit: number = 10
-  ): Promise<RecentlyViewedRacket[]> {
-    const response = await fetch(
-      buildApiUrl(API_ENDPOINTS.RACKET_VIEWS.RECENTLY_VIEWED, { limit }),
-      {
-        method: "GET",
-        headers: getCommonHeaders(),
-      }
-    );
+  static async getRecentlyViewed(limit: number = 10): Promise<RecentlyViewedRacket[]> {
+    const { data, error } = await supabase
+      .from('racket_views')
+      .select('viewed_at, racket:rackets(id, nombre, marca, imagenes, precio_actual)')
+      .order('viewed_at', { ascending: false })
+      .limit(limit);
 
-    return handleApiResponse<RecentlyViewedRacket[]>(response);
+    if (error) throw new Error(error.message);
+
+    return (data ?? [])
+      .map((row: any) => ({
+        ...row.racket,
+        viewed_at: row.viewed_at,
+      }))
+      .filter((r: any) => r.id) as RecentlyViewedRacket[];
   }
 
-  /**
-   * Elimina una visualización del historial
-   */
   static async removeView(racketId: number): Promise<void> {
-    const response = await fetch(
-      buildApiUrl(API_ENDPOINTS.RACKET_VIEWS.REMOVE_VIEW(racketId)),
-      {
-        method: "DELETE",
-        headers: getCommonHeaders(),
-      }
-    );
+    const { error } = await supabase
+      .from('racket_views')
+      .delete()
+      .eq('racket_id', racketId);
 
-    await handleApiResponse<void>(response);
+    if (error) throw new Error(error.message);
   }
 
-  /**
-   * Limpia todo el historial de visualizaciones
-   */
   static async clearHistory(): Promise<void> {
-    const response = await fetch(
-      buildApiUrl(API_ENDPOINTS.RACKET_VIEWS.CLEAR_HISTORY),
-      {
-        method: "DELETE",
-        headers: getCommonHeaders(),
-      }
-    );
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) return;
 
-    await handleApiResponse<void>(response);
+    const { error } = await supabase
+      .from('racket_views')
+      .delete()
+      .eq('user_id', session.user.id);
+
+    if (error) throw new Error(error.message);
   }
 }

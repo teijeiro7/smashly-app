@@ -1,8 +1,8 @@
+import { supabase } from '../lib/supabase';
 import { Racket } from '../types/racket';
 import { API_ENDPOINTS, buildApiUrl, getCommonHeaders, ApiResponse } from '../config/api';
-import { logger } from '../utils/logger';
 
-// ── Tipos para historial de precios ────────────────────────────────────────────
+// ── Price history types (aggregated on backend, keep on Express for now) ──────
 export interface PricePoint {
   date: string;
   price: number;
@@ -24,401 +24,208 @@ export interface PriceHistoryResult {
   combined: PricePoint[];
 }
 
-/**
- * Helper para manejar respuestas de la API
- */
 async function handleApiResponse<T>(response: Response): Promise<T> {
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
     throw new Error(errorData.message || `Error: ${response.status} ${response.statusText}`);
   }
-
   const data: ApiResponse<T> = await response.json();
-
-  if (!data.success) {
-    throw new Error(data.message || data.error || 'Error desconocido');
-  }
-
+  if (!data.success) throw new Error(data.message || data.error || 'Error desconocido');
   return data.data as T;
 }
 
 export class RacketService {
-  /**
-   * Obtiene todas las palas desde la API REST
-   */
   static async getAllRackets(): Promise<Racket[]> {
-    try {
-      const url = buildApiUrl(API_ENDPOINTS.RACKETS);
-      const response = await fetch(url, {
-        method: 'GET',
-        headers: getCommonHeaders(),
-      });
+    const { data, error } = await supabase
+      .from('rackets')
+      .select('*')
+      .order('es_bestseller', { ascending: false })
+      .order('nombre');
 
-      return await handleApiResponse<Racket[]>(response);
-    } catch (error: any) {
-      logger.error('Error fetching rackets from API:', error);
-      throw error;
-    }
+    if (error) throw new Error(error.message);
+    return (data ?? []) as Racket[];
   }
 
-  /**
-   * Obtiene palas con paginación desde la API REST
-   */
-  static async getRacketsWithPagination(page: number = 0, limit: number = 50): Promise<Racket[]> {
-    try {
-      const url = buildApiUrl(API_ENDPOINTS.RACKETS, {
-        page,
-        limit,
-        paginated: 'true',
-      });
-      const response = await fetch(url, {
-        method: 'GET',
-        headers: getCommonHeaders(),
-      });
-
-      const data = await handleApiResponse<any>(response);
-      return data.items || data;
-    } catch (error: any) {
-      logger.error('Error fetching rackets with pagination:', error);
-      throw error;
-    }
+  // Alias used by RacketsContext — TanStack Query caches this, ETag no longer needed
+  static async getAllRacketsCached(): Promise<Racket[]> {
+    return RacketService.getAllRackets();
   }
 
-  /**
-   * Obtiene una pala por su ID desde la API REST
-   */
+  static async getRacketsWithPagination(page = 0, limit = 50): Promise<Racket[]> {
+    const from = page * limit;
+    const { data, error } = await supabase
+      .from('rackets')
+      .select('*')
+      .order('nombre')
+      .range(from, from + limit - 1);
+
+    if (error) throw new Error(error.message);
+    return (data ?? []) as Racket[];
+  }
+
   static async getRacketById(id: number): Promise<Racket | null> {
-    try {
-      const url = buildApiUrl(API_ENDPOINTS.RACKETS_BY_ID(id));
-      const response = await fetch(url, {
-        method: 'GET',
-        headers: getCommonHeaders(),
-      });
+    const { data, error } = await supabase
+      .from('rackets')
+      .select('*')
+      .eq('id', id)
+      .maybeSingle();
 
-      if (response.status === 404) {
-        return null;
-      }
-
-      return await handleApiResponse<Racket>(response);
-    } catch (error: any) {
-      logger.error('Error fetching racket by ID:', error);
-      if (error.message?.includes('404')) {
-        return null;
-      }
-      throw error;
-    }
+    if (error) throw new Error(error.message);
+    return data as Racket | null;
   }
 
-  /**
-   * Obtiene una pala por su nombre (exact match, case-insensitive)
-   */
   static async getRacketByName(nombre: string): Promise<Racket | null> {
-    try {
-      const url = buildApiUrl(API_ENDPOINTS.RACKETS_BY_NAME(nombre));
-      const response = await fetch(url, {
-        method: 'GET',
-        headers: getCommonHeaders(),
-      });
+    const { data, error } = await supabase
+      .from('rackets')
+      .select('*')
+      .ilike('nombre', nombre)
+      .maybeSingle();
 
-      if (response.status === 404) {
-        return null;
-      }
-
-      return await handleApiResponse<Racket>(response);
-    } catch (error: any) {
-      logger.error('Error fetching racket by name:', error);
-      return null;
-    }
+    if (error) throw new Error(error.message);
+    return data as Racket | null;
   }
 
-  /**
-   * Busca palas por texto desde la API REST con filtros opcionales
-   */
   static async searchRackets(
     query: string,
     filters?: Record<string, string>,
     pagination?: { page?: number; limit?: number }
   ): Promise<{ data: Racket[]; pagination?: any }> {
-    try {
-      const params: Record<string, string> = { q: query };
-      
-      if (filters) {
-        Object.entries(filters).forEach(([key, value]) => {
-          if (value) params[key] = value;
-        });
-      }
+    const page = pagination?.page ?? 0;
+    const limit = pagination?.limit ?? 50;
+    const from = page * limit;
 
-      if (pagination) {
-        if (pagination.page !== undefined) params.page = String(pagination.page);
-        if (pagination.limit !== undefined) params.limit = String(pagination.limit);
-      }
+    let q = supabase.from('rackets').select('*', { count: 'exact' });
 
-      const url = buildApiUrl(API_ENDPOINTS.RACKETS_SEARCH, params);
-      const response = await fetch(url, {
-        method: 'GET',
-        headers: getCommonHeaders(),
-      });
-
-      return await handleApiResponse<any>(response);
-    } catch (error: any) {
-      logger.error('Error searching rackets:', error);
-      throw error;
+    if (query) {
+      q = q.or(`nombre.ilike.%${query}%,marca.ilike.%${query}%,modelo.ilike.%${query}%`);
     }
+
+    if (filters) {
+      const filterMap: Record<string, string> = {
+        brand: 'marca',
+        forma: 'caracteristicas_forma',
+        balance: 'caracteristicas_balance',
+        nivel: 'caracteristicas_nivel_de_juego',
+      };
+      for (const [key, value] of Object.entries(filters)) {
+        if (!value) continue;
+        const col = filterMap[key] ?? key;
+        q = q.eq(col, value);
+      }
+    }
+
+    const { data, count, error } = await q
+      .order('es_bestseller', { ascending: false })
+      .order('nombre')
+      .range(from, from + limit - 1);
+
+    if (error) throw new Error(error.message);
+
+    return {
+      data: (data ?? []) as Racket[],
+      pagination: { page, limit, total: count ?? 0, totalPages: Math.ceil((count ?? 0) / limit) },
+    };
   }
 
-  /**
-   * Obtiene palas por marca desde la API REST
-   */
   static async getRacketsByBrand(marca: string): Promise<Racket[]> {
-    try {
-      const url = buildApiUrl(API_ENDPOINTS.RACKETS_BY_BRAND(marca));
-      const response = await fetch(url, {
-        method: 'GET',
-        headers: getCommonHeaders(),
-      });
+    const { data, error } = await supabase
+      .from('rackets')
+      .select('*')
+      .eq('marca', marca)
+      .order('nombre');
 
-      return await handleApiResponse<Racket[]>(response);
-    } catch (error: any) {
-      logger.error('Error fetching rackets by brand:', error);
-      throw error;
-    }
+    if (error) throw new Error(error.message);
+    return (data ?? []) as Racket[];
   }
 
-  /**
-   * Obtiene palas bestseller desde la API REST
-   */
   static async getBestsellerRackets(): Promise<Racket[]> {
-    try {
-      const url = buildApiUrl(API_ENDPOINTS.RACKETS_BESTSELLERS);
-      const response = await fetch(url, {
-        method: 'GET',
-        headers: getCommonHeaders(),
-      });
+    const { data, error } = await supabase
+      .from('rackets')
+      .select('*')
+      .eq('es_bestseller', true)
+      .order('nombre');
 
-      return await handleApiResponse<Racket[]>(response);
-    } catch (error: any) {
-      logger.error('Error fetching bestseller rackets:', error);
-      throw error;
-    }
+    if (error) throw new Error(error.message);
+    return (data ?? []) as Racket[];
   }
 
-  /**
-   * Obtiene palas en oferta desde la API REST
-   */
   static async getRacketsOnSale(): Promise<Racket[]> {
-    try {
-      const url = buildApiUrl(API_ENDPOINTS.RACKETS_OFFERS);
-      const response = await fetch(url, {
-        method: 'GET',
-        headers: getCommonHeaders(),
-      });
+    const { data, error } = await supabase
+      .from('rackets')
+      .select('*')
+      .eq('en_oferta', true)
+      .order('nombre');
 
-      return await handleApiResponse<Racket[]>(response);
-    } catch (error: any) {
-      logger.error('Error fetching rackets on sale:', error);
-      throw error;
-    }
+    if (error) throw new Error(error.message);
+    return (data ?? []) as Racket[];
   }
 
-  /**
-   * Obtiene todas las marcas únicas desde la API REST
-   */
   static async getUniqueBrands(): Promise<string[]> {
-    try {
-      const url = buildApiUrl(API_ENDPOINTS.RACKETS_BRANDS);
-      const response = await fetch(url, {
-        method: 'GET',
-        headers: getCommonHeaders(),
-      });
+    const { data, error } = await supabase
+      .from('rackets')
+      .select('marca')
+      .order('marca');
 
-      return await handleApiResponse<string[]>(response);
-    } catch (error: any) {
-      logger.error('Error fetching brands:', error);
-      throw error;
-    }
+    if (error) throw new Error(error.message);
+    const brands = [...new Set((data ?? []).map((r: any) => r.marca).filter(Boolean))];
+    return brands as string[];
   }
 
-  /**
-   * Obtiene todas las palas con caché ETag + expiración semanal (domingos):
-   * - Si localStorage tiene datos válidos (no expirados) → envía If-None-Match
-   * - 304 → devuelve localStorage directamente (sin descargar el catálogo)
-   * - 200 → guarda nuevo ETag + catálogo + expiración en localStorage
-   * - Cache-Control max-age del servidor cubre la mayoría de visitas recurrentes sin red
-   */
-  static async getAllRacketsCached(): Promise<Racket[]> {
-    const CACHE_KEY = 'smashly_catalog';
-    const ETAG_KEY = 'smashly_catalog_etag';
-    const EXPIRY_KEY = 'smashly_catalog_expiry';
+  static async getStats(): Promise<{ total: number; bestsellers: number; onSale: number; brands: number }> {
+    const [totalRes, bestsellersRes, onSaleRes, brandsRes] = await Promise.all([
+      supabase.from('rackets').select('*', { count: 'exact', head: true }),
+      supabase.from('rackets').select('*', { count: 'exact', head: true }).eq('es_bestseller', true),
+      supabase.from('rackets').select('*', { count: 'exact', head: true }).eq('en_oferta', true),
+      supabase.from('rackets').select('marca'),
+    ]);
 
-    const storedExpiry = localStorage.getItem(EXPIRY_KEY);
-    const cacheExpired = storedExpiry ? Date.now() > parseInt(storedExpiry, 10) : true;
+    const uniqueBrands = new Set((brandsRes.data ?? []).map((r: any) => r.marca).filter(Boolean));
 
-    // Clear stale cache on Sunday expiry so next fetch gets fresh data
-    if (cacheExpired) {
-      localStorage.removeItem(CACHE_KEY);
-      localStorage.removeItem(ETAG_KEY);
-      localStorage.removeItem(EXPIRY_KEY);
-    }
-
-    const storedETag = localStorage.getItem(ETAG_KEY);
-    const storedData = localStorage.getItem(CACHE_KEY);
-
-    const headers: HeadersInit = { ...getCommonHeaders() };
-    if (storedETag && storedData) {
-      (headers as Record<string, string>)['If-None-Match'] = storedETag;
-    }
-
-    try {
-      const url = buildApiUrl(API_ENDPOINTS.RACKETS);
-      const response = await fetch(url, { headers });
-
-      if (response.status === 304 && storedData) {
-        const parsed = JSON.parse(storedData) as Racket[];
-        logger.log(`⚡ Catálogo desde localStorage (${parsed.length} palas, ETag hit)`);
-        return parsed;
-      }
-
-      const data = await handleApiResponse<Racket[]>(response);
-      const newETag = response.headers.get('ETag') || '';
-
-      // Expiry = next Sunday 00:00:00
-      const now = new Date();
-      const daysUntilSunday = now.getDay() === 0 ? 7 : 7 - now.getDay();
-      const nextSunday = new Date(now);
-      nextSunday.setDate(now.getDate() + daysUntilSunday);
-      nextSunday.setHours(0, 0, 0, 0);
-
-      try {
-        localStorage.setItem(CACHE_KEY, JSON.stringify(data));
-        if (newETag) localStorage.setItem(ETAG_KEY, newETag);
-        localStorage.setItem(EXPIRY_KEY, String(nextSunday.getTime()));
-      } catch (e) {
-        logger.warn('localStorage quota exceeded:', e);
-      }
-
-      logger.log(`💾 Catálogo actualizado (${data.length} palas, expira ${nextSunday.toISOString()})`);
-      return data;
-    } catch (error: any) {
-      // Fallback to stale localStorage data rather than failing completely
-      if (storedData) {
-        try {
-          return JSON.parse(storedData) as Racket[];
-        } catch {}
-      }
-      logger.error('Error fetching catalog:', error);
-      throw error;
-    }
+    return {
+      total: totalRes.count ?? 0,
+      bestsellers: bestsellersRes.count ?? 0,
+      onSale: onSaleRes.count ?? 0,
+      brands: uniqueBrands.size,
+    };
   }
 
-  /**
-   * Obtiene estadísticas básicas desde la API REST
-   */
-  static async getStats(): Promise<{
-    total: number;
-    bestsellers: number;
-    onSale: number;
-    brands: number;
-  }> {
-    try {
-      const url = buildApiUrl(API_ENDPOINTS.RACKETS_STATS);
-      const response = await fetch(url, {
-        method: 'GET',
-        headers: getCommonHeaders(),
-      });
-
-      return await handleApiResponse<{
-        total: number;
-        bestsellers: number;
-        onSale: number;
-        brands: number;
-      }>(response);
-    } catch (error: any) {
-      logger.error('Error fetching stats:', error);
-      throw error;
-    }
-  }
-
-  /**
-   * Actualiza una pala existente
-   */
+  // ── Admin mutations — service-role bypass handled in Vercel functions (Phase 4) ──
   static async updateRacket(id: number, updates: Partial<Racket>): Promise<Racket> {
-    try {
-      const url = buildApiUrl(API_ENDPOINTS.RACKETS_BY_ID(id));
-      const response = await fetch(url, {
-        method: 'PUT',
-        credentials: 'include',
-        headers: getCommonHeaders(),
-        body: JSON.stringify(updates),
-      });
+    const { data, error } = await supabase
+      .from('rackets')
+      .update(updates)
+      .eq('id', id)
+      .select()
+      .single();
 
-      return await handleApiResponse<Racket>(response);
-    } catch (error: any) {
-      logger.error('Error updating racket:', error);
-      throw error;
-    }
+    if (error) throw new Error(error.message);
+    return data as Racket;
   }
 
-  /**
-   * Elimina una pala por su ID
-   */
   static async deleteRacket(id: number): Promise<void> {
-    try {
-      const url = buildApiUrl(API_ENDPOINTS.RACKETS_BY_ID(id));
-      const response = await fetch(url, {
-        method: 'DELETE',
-        credentials: 'include',
-        headers: getCommonHeaders(),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || `Error: ${response.status}`);
-      }
-    } catch (error: any) {
-      logger.error('Error deleting racket:', error);
-      throw error;
-    }
+    const { error } = await supabase.from('rackets').delete().eq('id', id);
+    if (error) throw new Error(error.message);
   }
 
-  /**
-   * Actualiza masivamente un campo para todas las palas que coincidan con un valor antiguo
-   */
   static async bulkUpdateRackets(
     field: string,
     oldValue: any,
     newValue: any
   ): Promise<{ updatedCount: number }> {
-    try {
-      const url = buildApiUrl(API_ENDPOINTS.RACKETS_BULK_UPDATE);
-      const response = await fetch(url, {
-        method: 'POST',
-        credentials: 'include',
-        headers: getCommonHeaders(),
-        body: JSON.stringify({ field, oldValue, newValue }),
-      });
+    const { data, error } = await supabase
+      .from('rackets')
+      .update({ [field]: newValue })
+      .eq(field, oldValue)
+      .select('id');
 
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || 'Error al realizar la actualización masiva');
-      }
-
-      const result = await response.json();
-      return result.data;
-    } catch (error: any) {
-      logger.error('Error in bulkUpdateRackets:', error);
-      throw error;
-    }
+    if (error) throw new Error(error.message);
+    return { updatedCount: data?.length ?? 0 };
   }
 
-  /**
-   * Obtiene el historial de precios de una pala.
-   * @param racketId  ID numérico de la pala
-   * @param days      Ventana temporal en días (default: 90)
-   * @param store     Filtrar por tienda (opcional)
-   */
+  // ── Price history: aggregation kept on Express until Phase 4 Vercel function ──
   static async getPriceHistory(
     racketId: number,
-    days: number = 90,
+    days = 90,
     store?: string
   ): Promise<PriceHistoryResult | null> {
     try {
@@ -426,14 +233,9 @@ export class RacketService {
       if (store) params.store = store;
 
       const url = buildApiUrl(API_ENDPOINTS.RACKETS_PRICE_HISTORY(racketId), params);
-      const response = await fetch(url, {
-        method: 'GET',
-        headers: getCommonHeaders(),
-      });
-
+      const response = await fetch(url, { method: 'GET', headers: getCommonHeaders() });
       return await handleApiResponse<PriceHistoryResult>(response);
-    } catch (error: any) {
-      logger.error('Error fetching price history:', error);
+    } catch {
       return null;
     }
   }

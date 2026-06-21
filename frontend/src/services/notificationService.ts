@@ -1,184 +1,59 @@
-import { API_URL } from "../config/api";
-import { getAuthToken } from "../utils/authUtils";
-import { Notification, NotificationFilters } from "../types/notification";
-import { logger } from "../utils/logger";
-
-const NOTIFICATIONS_STORAGE_KEY = "smashly_notifications_cache";
-const NOTIFICATIONS_UNREAD_KEY = "smashly_notifications_unread";
+import { supabase } from '../lib/supabase';
+import { Notification, NotificationFilters } from '../types/notification';
 
 export class NotificationService {
-  private static saveToLocalStorage(notifications: Notification[]): void {
-    try {
-      localStorage.setItem(NOTIFICATIONS_STORAGE_KEY, JSON.stringify(notifications));
-    } catch (error) {
-      logger.error("Error saving notifications to localStorage:", error);
-    }
-  }
-
-  private static getFromLocalStorage(): Notification[] {
-    try {
-      const data = localStorage.getItem(NOTIFICATIONS_STORAGE_KEY);
-      return data ? JSON.parse(data) : [];
-    } catch (error) {
-      logger.error("Error reading notifications from localStorage:", error);
-      return [];
-    }
-  }
-
-  private static saveUnreadCount(count: number): void {
-    try {
-      localStorage.setItem(NOTIFICATIONS_UNREAD_KEY, String(count));
-    } catch (error) {
-      logger.error("Error saving unread count to localStorage:", error);
-    }
-  }
-
-  private static getUnreadCountFromStorage(): number {
-    try {
-      const count = localStorage.getItem(NOTIFICATIONS_UNREAD_KEY);
-      return count ? parseInt(count, 10) : 0;
-    } catch (error) {
-      logger.error("Error reading unread count from localStorage:", error);
-      return 0;
-    }
-  }
-
   static async fetchNotifications(filters?: NotificationFilters): Promise<Notification[]> {
-    const token = getAuthToken();
-    if (!token) {
-      return this.getFromLocalStorage();
+    let query = supabase
+      .from('notifications')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (filters?.unreadOnly) {
+      query = query.eq('is_read', false);
     }
 
-    try {
-      const params = new URLSearchParams();
-      if (filters?.limit) params.append("limit", String(filters.limit));
-      if (filters?.offset) params.append("offset", String(filters.offset));
-      if (filters?.unreadOnly) params.append("unreadOnly", "true");
-
-      const queryString = params.toString();
-      const url = `${API_URL}/api/v1/notifications${queryString ? `?${queryString}` : ""}`;
-
-      const response = await fetch(url, {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-      });
-
-      if (!response.ok) {
-        throw new Error("Error al obtener las notificaciones");
-      }
-
-      const notifications = await response.json();
-      this.saveToLocalStorage(notifications);
-      return notifications;
-    } catch (error) {
-      logger.error("Error fetching notifications:", error);
-      return this.getFromLocalStorage();
+    if (filters?.limit) {
+      query = query.limit(filters.limit);
     }
+
+    if (filters?.offset) {
+      query = query.range(filters.offset, (filters.offset + (filters.limit ?? 50)) - 1);
+    }
+
+    const { data, error } = await query;
+    if (error) throw new Error(error.message);
+    return (data ?? []) as Notification[];
   }
 
   static async getUnreadCount(): Promise<number> {
-    const token = getAuthToken();
-    if (!token) {
-      return this.getUnreadCountFromStorage();
-    }
+    const { count, error } = await supabase
+      .from('notifications')
+      .select('*', { count: 'exact', head: true })
+      .eq('is_read', false);
 
-    try {
-      const response = await fetch(`${API_URL}/api/v1/notifications/unread-count`, {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-      });
-
-      if (!response.ok) {
-        throw new Error("Error al obtener el contador de notificaciones");
-      }
-
-      const data = await response.json();
-      this.saveUnreadCount(data.count);
-      return data.count;
-    } catch (error) {
-      logger.error("Error fetching unread count:", error);
-      return this.getUnreadCountFromStorage();
-    }
+    if (error) throw new Error(error.message);
+    return count ?? 0;
   }
 
   static async markAsRead(notificationId: string): Promise<boolean> {
-    const token = getAuthToken();
-    if (!token) {
-      return false;
-    }
+    const { error } = await supabase
+      .from('notifications')
+      .update({ is_read: true })
+      .eq('id', notificationId);
 
-    try {
-      const response = await fetch(`${API_URL}/api/v1/notifications/${notificationId}/read`, {
-        method: "PATCH",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-      });
-
-      if (!response.ok) {
-        throw new Error("Error al marcar la notificación como leída");
-      }
-
-      const localNotifications = this.getFromLocalStorage();
-      const updatedNotifications = localNotifications.map((n) =>
-        n.id === notificationId ? { ...n, is_read: true } : n
-      );
-      this.saveToLocalStorage(updatedNotifications);
-
-      const currentUnread = this.getUnreadCountFromStorage();
-      if (currentUnread > 0) {
-        this.saveUnreadCount(currentUnread - 1);
-      }
-
-      return true;
-    } catch (error) {
-      logger.error("Error marking notification as read:", error);
-      return false;
-    }
+    if (error) throw new Error(error.message);
+    return true;
   }
 
   static async markAllAsRead(): Promise<number> {
-    const token = getAuthToken();
-    if (!token) {
-      return 0;
-    }
+    const { data, error } = await supabase
+      .from('notifications')
+      .update({ is_read: true })
+      .eq('is_read', false)
+      .select('id');
 
-    try {
-      const response = await fetch(`${API_URL}/api/v1/notifications/read-all`, {
-        method: "PATCH",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-      });
-
-      if (!response.ok) {
-        throw new Error("Error al marcar todas las notificaciones como leídas");
-      }
-
-      const data = await response.json();
-
-      const localNotifications = this.getFromLocalStorage();
-      const updatedNotifications = localNotifications.map((n) => ({ ...n, is_read: true }));
-      this.saveToLocalStorage(updatedNotifications);
-      this.saveUnreadCount(0);
-
-      return data.markedCount || 0;
-    } catch (error) {
-      logger.error("Error marking all notifications as read:", error);
-      return 0;
-    }
+    if (error) throw new Error(error.message);
+    return data?.length ?? 0;
   }
 
   static async createNotification(
@@ -187,92 +62,36 @@ export class NotificationService {
     message: string,
     data?: Record<string, unknown>
   ): Promise<Notification | null> {
-    const token = getAuthToken();
-    if (!token) {
-      return null;
-    }
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) return null;
 
-    try {
-      const response = await fetch(`${API_URL}/api/v1/notifications`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify({ type, title, message, data }),
-      });
+    const { data: notification, error } = await supabase
+      .from('notifications')
+      .insert({
+        user_id: session.user.id,
+        type,
+        title,
+        message,
+        data: data ?? {},
+        is_read: false,
+      })
+      .select()
+      .single();
 
-      logger.log('Notification response status:', response.status);
-      
-      if (!response.ok) {
-        const errorData = await response.json();
-        logger.error('Error creating notification:', errorData);
-        throw new Error("Error al crear la notificación");
-      }
-
-      const notification = await response.json();
-      logger.log('Notification created:', notification);
-      
-      const localNotifications = this.getFromLocalStorage();
-      const updatedNotifications = [notification, ...localNotifications];
-      this.saveToLocalStorage(updatedNotifications);
-      
-      const currentUnread = this.getUnreadCountFromStorage();
-      this.saveUnreadCount(currentUnread + 1);
-
-      return notification;
-    } catch (error) {
-      logger.error("Error creating notification:", error);
-      return null;
-    }
+    if (error) throw new Error(error.message);
+    return notification as Notification;
   }
 
   static async deleteNotification(notificationId: string): Promise<boolean> {
-    const token = getAuthToken();
-    if (!token) {
-      return false;
-    }
+    const { error } = await supabase
+      .from('notifications')
+      .delete()
+      .eq('id', notificationId);
 
-    try {
-      const response = await fetch(`${API_URL}/api/v1/notifications/${notificationId}`, {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-      });
-
-      if (!response.ok) {
-        throw new Error("Error al eliminar la notificación");
-      }
-
-      const localNotifications = this.getFromLocalStorage();
-      const notificationToDelete = localNotifications.find((n) => n.id === notificationId);
-      const updatedNotifications = localNotifications.filter((n) => n.id !== notificationId);
-      this.saveToLocalStorage(updatedNotifications);
-
-      if (notificationToDelete && !notificationToDelete.is_read) {
-        const currentUnread = this.getUnreadCountFromStorage();
-        if (currentUnread > 0) {
-          this.saveUnreadCount(currentUnread - 1);
-        }
-      }
-
-      return true;
-    } catch (error) {
-      logger.error("Error deleting notification:", error);
-      return false;
-    }
+    if (error) throw new Error(error.message);
+    return true;
   }
 
-  static clearLocalStorage(): void {
-    try {
-      localStorage.removeItem(NOTIFICATIONS_STORAGE_KEY);
-      localStorage.removeItem(NOTIFICATIONS_UNREAD_KEY);
-    } catch (error) {
-      logger.error("Error clearing notification localStorage:", error);
-    }
-  }
+  // No-op: kept for backward compat (localStorage cache removed)
+  static clearLocalStorage(): void {}
 }

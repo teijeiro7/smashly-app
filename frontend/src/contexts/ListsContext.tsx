@@ -1,7 +1,9 @@
-import React, { createContext, ReactNode, useContext, useState, useCallback, useMemo } from 'react';
+import React, { createContext, ReactNode, useContext, useCallback, useMemo } from 'react';
 import { sileo } from 'sileo';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { List, ListWithRackets, CreateListRequest } from '../types/list';
 import { ListService } from '../services/listService';
+import { useAuth } from './AuthContext';
 
 interface ListsContextType {
   lists: List[];
@@ -15,154 +17,120 @@ interface ListsContextType {
   removeRacketFromList: (listId: string, racketId: number) => Promise<void>;
 }
 
-interface ListsProviderProps {
-  children: ReactNode;
-}
-
 const ListsContext = createContext<ListsContextType | undefined>(undefined);
 
 export const useList = (): ListsContextType => {
   const context = useContext(ListsContext);
-  if (!context) {
-    throw new Error('useList debe usarse dentro de ListsProvider');
-  }
+  if (!context) throw new Error('useList debe usarse dentro de ListsProvider');
   return context;
 };
 
+interface ListsProviderProps { children: ReactNode }
+
 export const ListsProvider: React.FC<ListsProviderProps> = ({ children }) => {
-  const [lists, setLists] = useState<List[]>([]);
-  const [loading, setLoading] = useState(false);
+  const { isAuthenticated } = useAuth();
+  const queryClient = useQueryClient();
 
-  /**
-   * Obtiene todas las listas del usuario
-   */
-  const fetchLists = useCallback(async () => {
-    try {
-      setLoading(true);
-      const userLists = await ListService.getUserLists();
-      setLists(userLists);
-    } catch (error: any) {
-      console.error('Error fetching lists:', error);
-      sileo.error({ title: 'Error', description: error.message || 'Error al cargar las listas' });
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const { data: lists = [], isLoading, refetch } = useQuery({
+    queryKey: ['lists'],
+    queryFn: () => ListService.getUserLists(),
+    enabled: isAuthenticated,
+    staleTime: 1000 * 60 * 5,
+  });
 
-  /**
-   * Crea una nueva lista
-   */
+  const fetchLists = useCallback(async () => { await refetch(); }, [refetch]);
+
+  const createMutation = useMutation({
+    mutationFn: (data: CreateListRequest) => ListService.createList(data),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['lists'] }),
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: ({ id, name, description }: { id: string; name: string; description?: string }) =>
+      ListService.updateList(id, { name, description }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['lists'] }),
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: (listId: string) => ListService.deleteList(listId),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['lists'] }),
+  });
+
+  const addRacketMutation = useMutation({
+    mutationFn: ({ listId, racketId }: { listId: string; racketId: number }) =>
+      ListService.addRacketToList(listId, racketId),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['lists'] }),
+  });
+
+  const removeRacketMutation = useMutation({
+    mutationFn: ({ listId, racketId }: { listId: string; racketId: number }) =>
+      ListService.removeRacketFromList(listId, racketId),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['lists'] }),
+  });
+
   const createList = useCallback(async (data: CreateListRequest): Promise<List | null> => {
     try {
-      const newList = await ListService.createList(data);
-      setLists(prev => [newList, ...prev]);
+      const list = await createMutation.mutateAsync(data);
       sileo.success({ title: 'Éxito', description: 'Lista creada exitosamente' });
-      return newList;
+      return list;
     } catch (error: any) {
-      console.error('Error creating list:', error);
       sileo.error({ title: 'Error', description: error.message || 'Error al crear la lista' });
       return null;
     }
-  }, []);
+  }, [createMutation]);
 
-  /**
-   * Actualiza una lista
-   */
   const updateList = useCallback(async (listId: string, name: string, description?: string) => {
     try {
-      const updated = await ListService.updateList(listId, {
-        name,
-        description,
-      });
-      setLists(prev => prev.map(list => (list.id === listId ? updated : list)));
+      await updateMutation.mutateAsync({ id: listId, name, description });
       sileo.success({ title: 'Éxito', description: 'Lista actualizada exitosamente' });
     } catch (error: any) {
-      console.error('Error updating list:', error);
       sileo.error({ title: 'Error', description: error.message || 'Error al actualizar la lista' });
       throw error;
     }
-  }, []);
+  }, [updateMutation]);
 
-  /**
-   * Elimina una lista
-   */
   const deleteList = useCallback(async (listId: string) => {
     try {
-      await ListService.deleteList(listId);
-      setLists(prev => prev.filter(list => list.id !== listId));
+      await deleteMutation.mutateAsync(listId);
       sileo.success({ title: 'Éxito', description: 'Lista eliminada exitosamente' });
     } catch (error: any) {
-      console.error('Error deleting list:', error);
       sileo.error({ title: 'Error', description: error.message || 'Error al eliminar la lista' });
       throw error;
     }
-  }, []);
+  }, [deleteMutation]);
 
-  /**
-   * Obtiene una lista con sus palas
-   */
   const getListById = useCallback(async (listId: string): Promise<ListWithRackets | null> => {
     try {
       return await ListService.getListById(listId);
     } catch (error: any) {
-      console.error('Error getting list:', error);
       sileo.error({ title: 'Error', description: error.message || 'Error al obtener la lista' });
       return null;
     }
   }, []);
 
-  /**
-   * Añade una pala a una lista
-   */
   const addRacketToList = useCallback(async (listId: string, racketId: number) => {
     try {
-      await ListService.addRacketToList(listId, racketId);
-      setLists(prev =>
-        prev.map(list =>
-          list.id === listId ? { ...list, racket_count: (list.racket_count || 0) + 1 } : list
-        )
-      );
+      await addRacketMutation.mutateAsync({ listId, racketId });
       sileo.success({ title: 'Éxito', description: 'Pala añadida a la lista' });
     } catch (error: any) {
-      console.error('Error adding racket to list:', error);
-      sileo.error({
-        title: 'Error',
-        description: error.message || 'Error al añadir pala a la lista',
-      });
+      sileo.error({ title: 'Error', description: error.message || 'Error al añadir pala a la lista' });
       throw error;
     }
-  }, []);
+  }, [addRacketMutation]);
 
-  /**
-   * Elimina una pala de una lista
-   */
   const removeRacketFromList = useCallback(async (listId: string, racketId: number) => {
     try {
-      await ListService.removeRacketFromList(listId, racketId);
-      setLists(prev =>
-        prev.map(list =>
-          list.id === listId
-            ? {
-                ...list,
-                racket_count: Math.max(0, (list.racket_count || 0) - 1),
-              }
-            : list
-        )
-      );
+      await removeRacketMutation.mutateAsync({ listId, racketId });
       sileo.success({ title: 'Éxito', description: 'Pala eliminada de la lista' });
     } catch (error: any) {
-      console.error('Error removing racket from list:', error);
-      sileo.error({
-        title: 'Error',
-        description: error.message || 'Error al eliminar pala de la lista',
-      });
+      sileo.error({ title: 'Error', description: error.message || 'Error al eliminar pala de la lista' });
       throw error;
     }
-  }, []);
+  }, [removeRacketMutation]);
 
   const value = useMemo<ListsContextType>(() => ({
     lists,
-    loading,
+    loading: isLoading,
     fetchLists,
     createList,
     updateList,
@@ -170,7 +138,7 @@ export const ListsProvider: React.FC<ListsProviderProps> = ({ children }) => {
     getListById,
     addRacketToList,
     removeRacketFromList,
-  }), [lists, loading, fetchLists, createList, updateList, deleteList, getListById, addRacketToList, removeRacketFromList]);
+  }), [lists, isLoading, fetchLists, createList, updateList, deleteList, getListById, addRacketToList, removeRacketFromList]);
 
   return <ListsContext.Provider value={value}>{children}</ListsContext.Provider>;
 };

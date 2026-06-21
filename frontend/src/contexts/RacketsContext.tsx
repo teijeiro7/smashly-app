@@ -1,17 +1,8 @@
-import React, {
-  createContext,
-  ReactNode,
-  useContext,
-  useEffect,
-  useState,
-  useCallback,
-  useMemo,
-} from "react";
-import { RacketService } from "../services/racketService";
-import { Racket } from "../types/racket";
-import { logger } from "../utils/logger";
+import React, { createContext, ReactNode, useContext, useCallback, useMemo } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { RacketService } from '../services/racketService';
+import { Racket } from '../types/racket';
 
-// Interfaz para el contexto
 interface RacketsContextType {
   rackets: Racket[];
   loading: boolean;
@@ -23,7 +14,6 @@ interface RacketsContextType {
   refreshRackets: () => Promise<void>;
 }
 
-// Interfaz para las props del provider
 interface RacketsProviderProps {
   children: ReactNode;
 }
@@ -32,83 +22,57 @@ const RacketsContext = createContext<RacketsContextType | null>(null);
 
 export const useRackets = (): RacketsContextType => {
   const context = useContext(RacketsContext);
-  if (!context) {
-    throw new Error("useRackets debe usarse dentro de RacketsProvider");
-  }
+  if (!context) throw new Error('useRackets debe usarse dentro de RacketsProvider');
   return context;
 };
 
-export const RacketsProvider: React.FC<RacketsProviderProps> = ({
-  children,
-}) => {
-  const [rackets, setRackets] = useState<Racket[]>(() => {
-    try {
-      const cached = localStorage.getItem('smashly_catalog');
-      return cached ? JSON.parse(cached) : [];
-    } catch { return []; }
+export const RacketsProvider: React.FC<RacketsProviderProps> = ({ children }) => {
+  const queryClient = useQueryClient();
+
+  const { data: rackets = [], isLoading, error, refetch } = useQuery({
+    queryKey: ['rackets', 'all'],
+    queryFn: () => RacketService.getAllRackets(),
+    staleTime: 1000 * 60 * 30, // 30 min — replaces ETag/localStorage weekly expiry
+    gcTime: 1000 * 60 * 60,    // 1 hour in cache
   });
-  const [loading, setLoading] = useState<boolean>(() => !localStorage.getItem('smashly_catalog'));
-  const [error, setError] = useState<string | null>(null);
 
-  const fetchRackets = useCallback(async (): Promise<void> => {
-    try {
-      setError(null);
+  const fetchRackets = useCallback(async () => {
+    await refetch();
+  }, [refetch]);
 
-      // Usar carga cacheada: checkea versión, carga de localStorage si coincide, API si cambió
-      const data = await RacketService.getAllRacketsCached();
-      setRackets(data);
-      logger.log(`Loaded ${data.length} rackets (cached: ${!!localStorage.getItem('smashly_catalog_version')})`);
-    } catch (error: any) {
-      setError(error.message || "Error al cargar las palas");
-      logger.error("Error fetching rackets:", error);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  const refreshRackets = useCallback(async (): Promise<void> => {
-    localStorage.removeItem('smashly_catalog');
-    localStorage.removeItem('smashly_catalog_etag');
-    localStorage.removeItem('smashly_catalog_expiry');
-    await fetchRackets();
-  }, [fetchRackets]);
+  const refreshRackets = useCallback(async () => {
+    queryClient.invalidateQueries({ queryKey: ['rackets', 'all'] });
+    await refetch();
+  }, [queryClient, refetch]);
 
   const getRacketById = useCallback((id: string | number): Racket | undefined => {
-    const numericId = typeof id === "string" ? parseInt(id) : id;
-    return rackets.find((racket) => racket.id === numericId);
+    const numericId = typeof id === 'string' ? parseInt(id) : id;
+    return rackets.find(r => r.id === numericId);
   }, [rackets]);
 
   const getRacketsByCategory = useCallback((category: string): Racket[] => {
-    return rackets.filter((racket) => racket.marca === category);
+    return rackets.filter(r => r.marca === category);
   }, [rackets]);
 
   const searchRackets = useCallback((query: string): Racket[] => {
-    const lowerQuery = query.toLowerCase();
-    return rackets.filter(
-      (racket) =>
-        (racket.nombre || '').toLowerCase().includes(lowerQuery) ||
-        (racket.marca || '').toLowerCase().includes(lowerQuery) ||
-        (racket.modelo || '').toLowerCase().includes(lowerQuery)
+    const q = query.toLowerCase();
+    return rackets.filter(r =>
+      (r.nombre || '').toLowerCase().includes(q) ||
+      (r.marca || '').toLowerCase().includes(q) ||
+      (r.modelo || '').toLowerCase().includes(q)
     );
   }, [rackets]);
 
-  useEffect(() => {
-    // Single ETag-aware request: 304 if unchanged (uses localStorage), 200 if changed
-    fetchRackets();
-  }, []);
-
   const value = useMemo<RacketsContextType>(() => ({
     rackets,
-    loading,
-    error,
+    loading: isLoading,
+    error: error ? String(error) : null,
     fetchRackets,
     getRacketById,
     getRacketsByCategory,
     searchRackets,
     refreshRackets,
-  }), [rackets, loading, error, fetchRackets, getRacketById, getRacketsByCategory, searchRackets, refreshRackets]);
+  }), [rackets, isLoading, error, fetchRackets, getRacketById, getRacketsByCategory, searchRackets, refreshRackets]);
 
-  return (
-    <RacketsContext.Provider value={value}>{children}</RacketsContext.Provider>
-  );
+  return <RacketsContext.Provider value={value}>{children}</RacketsContext.Provider>;
 };
