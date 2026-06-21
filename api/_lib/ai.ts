@@ -1,5 +1,5 @@
 // AI utilities for Vercel functions
-// Text generation: custom Cloudflare Worker (no API key)
+// Text generation: custom Cloudflare Worker (no API key, streams text/event-stream)
 // Embeddings: OpenRouter text-embedding-3-small (requires OPENROUTER_API_KEY)
 
 const FREE_AI_BASE = process.env.FREE_AI_API_URL || 'https://free-ai-api.teijeiroparga2004.workers.dev';
@@ -25,14 +25,77 @@ export async function generateContent(prompt: string): Promise<string> {
       throw new Error(`Free AI API error ${res.status}: ${text}`);
     }
 
-    const data = await res.json() as any;
-    return (
-      data?.choices?.[0]?.message?.content ||
-      data?.response ||
-      data?.content ||
-      data?.text ||
-      ''
-    );
+    if (!res.body) {
+      throw new Error('Response body is null');
+    }
+
+    const contentType = res.headers.get('content-type') || '';
+    const isSSE = contentType.includes('event-stream');
+
+    const reader = res.body.getReader();
+    const decoder = new TextDecoder();
+    let fullText = '';
+    let buffer = '';
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+
+      buffer += decoder.decode(value, { stream: true });
+      const lines = buffer.split('\n');
+      buffer = lines.pop() || '';
+
+      for (const line of lines) {
+        const trimmed = line.trim();
+        if (!trimmed) continue;
+
+        const isDataPrefix = trimmed.startsWith('data: ');
+        const isDone = isDataPrefix ? trimmed.slice(6).trim() === '[DONE]' : trimmed === '[DONE]';
+        const isEmptyData = isDataPrefix ? !trimmed.slice(6).trim() : !trimmed;
+
+        if (isDone || isEmptyData) continue;
+
+        if (isSSE && isDataPrefix) {
+          try {
+            const parsed = JSON.parse(trimmed.slice(6));
+            fullText += parsed.choices?.[0]?.delta?.content || '';
+          } catch {
+            fullText += trimmed;
+          }
+        } else {
+          fullText += trimmed;
+        }
+      }
+    }
+
+    // Flush trailing buffer
+    if (buffer.trim()) {
+      const trimmedBuffer = buffer.trim();
+      const isDataPrefix = trimmedBuffer.startsWith('data: ');
+      const isDone = isDataPrefix
+        ? trimmedBuffer.slice(6).trim() === '[DONE]'
+        : trimmedBuffer === '[DONE]';
+      const isEmptyData = isDataPrefix ? !trimmedBuffer.slice(6).trim() : !trimmedBuffer;
+
+      if (!isDone && !isEmptyData) {
+        if (isSSE && isDataPrefix) {
+          try {
+            const parsed = JSON.parse(trimmedBuffer.slice(6));
+            fullText += parsed.choices?.[0]?.delta?.content || '';
+          } catch {
+            fullText += trimmedBuffer;
+          }
+        } else {
+          fullText += trimmedBuffer;
+        }
+      }
+    }
+
+    if (!fullText) {
+      throw new Error('Free AI API returned empty response');
+    }
+
+    return fullText;
   } finally {
     clearTimeout(timeout);
   }
