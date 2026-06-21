@@ -152,7 +152,7 @@ export default defineConfig(({ mode }) => ({
     rollupOptions: {
       output: {
         manualChunks: {
-          'vendor-react': ['react', 'react-dom', 'react-router-dom', 'react-is'],
+          'vendor-react': ['react', 'react-dom', 'react-is', '@tanstack/react-router'],
           'vendor-motion': ['framer-motion'],
           'vendor-styled': ['styled-components'],
           'vendor-charts': ['recharts'],
@@ -169,7 +169,7 @@ export default defineConfig(({ mode }) => ({
     include: [
       'react',
       'react-dom',
-      'react-router-dom',
+      '@tanstack/react-router',
       '@tanstack/react-query',
     ],
     // Exclude heavy libs from optimization to load on demand
