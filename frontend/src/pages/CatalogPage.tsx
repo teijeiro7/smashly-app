@@ -29,10 +29,10 @@ const Container = styled.div`
 `;
 
 const Header = styled.div`
-  background: white;
+  background: var(--surface);
   border-bottom: 1px solid var(--border);
   padding: clamp(1.5rem, 4vw, 2.5rem) 0;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 1px 3px var(--shadow-color);
 `;
 
 const HeaderContent = styled.div`
@@ -100,11 +100,11 @@ const MainContent = styled.div`
 `;
 
 const FiltersSection = styled.div`
-  background: white;
+  background: var(--surface);
   border-radius: 12px;
   padding: clamp(1rem, 2vw, 1.5rem);
   margin-bottom: 1.5rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 1px 3px var(--shadow-color), 0 1px 2px var(--shadow-color);
   border: 1px solid var(--border);
 `;
 
@@ -156,7 +156,7 @@ const FilterButton = styled.button<{ $active?: boolean }>`
   padding: 0.5rem 1rem;
   border: 1.5px solid ${props => (props.$active ? 'var(--primary-hover)' : 'var(--border)')};
   border-radius: 8px;
-  background: ${props => (props.$active ? 'var(--primary-subtle)' : 'white')};
+  background: ${props => (props.$active ? 'var(--primary-subtle)' : 'var(--surface)')};
   color: ${props => (props.$active ? 'var(--primary-hover)' : 'var(--text-muted)')};
   font-size: 0.875rem;
   font-weight: 500;
@@ -180,7 +180,7 @@ const FilterSelect = styled.select`
   padding: 0.5rem 2.5rem 0.5rem 1rem;
   border: 1.5px solid var(--border);
   border-radius: 8px;
-  background: white;
+  background: var(--surface);
   color: var(--text-muted);
   font-size: 0.875rem;
   font-weight: 500;
@@ -222,7 +222,7 @@ const AdvancedFiltersToggle = styled.button<{ $active: boolean }>`
   width: 100%;
   border: 1.5px dashed ${props => (props.$active ? 'var(--primary-hover)' : 'var(--border)')};
   border-radius: 8px;
-  background: ${props => (props.$active ? 'var(--primary-subtle)' : 'white')};
+  background: ${props => (props.$active ? 'var(--primary-subtle)' : 'var(--surface)')};
   color: ${props => (props.$active ? 'var(--primary-hover)' : 'var(--text-muted)')};
   font-size: 0.875rem;
   font-weight: 600;
@@ -325,7 +325,7 @@ const ViewToggle = styled.div`
   border: 1px solid var(--border);
   border-radius: 8px;
   padding: 0.125rem;
-  background: white;
+  background: var(--surface);
   min-height: 46px;
   align-items: center;
   flex-shrink: 0;
@@ -356,7 +356,7 @@ const SortSelect = styled.select`
   padding: 0.5rem 1rem;
   border: 1px solid var(--border);
   border-radius: 8px;
-  background: white;
+  background: var(--surface);
   color: var(--text-muted);
   font-size: 0.875rem;
   cursor: pointer;
@@ -389,9 +389,9 @@ const RacketsGrid = styled.ul<{ $view: 'grid' | 'list' }>`
 const EmptyState = styled.div`
   text-align: center;
   padding: 4rem 2rem;
-  background: white;
+  background: var(--surface);
   border-radius: 12px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 1px 3px var(--shadow-color);
   border: 1px solid var(--border);
 `;
 
@@ -425,7 +425,7 @@ const ClearFiltersButton = styled.button`
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 1px 3px var(--shadow-color);
 
   &:hover {
     background: var(--primary-hover);
@@ -443,10 +443,10 @@ const FloatingPanel = styled.div<{ $visible: boolean }>`
   position: fixed;
   bottom: 2rem;
   right: 2rem;
-  background: white;
+  background: var(--surface);
   border-radius: 12px;
   padding: 1rem 1.5rem;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 10px 30px var(--shadow-color);
   border: 1.5px solid var(--primary-hover);
   z-index: 50;
   transform: translateY(${props => (props.$visible ? '0' : '120px')});

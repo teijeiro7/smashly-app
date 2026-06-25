@@ -99,7 +99,7 @@ const ActionButton = styled(motion.button)<{ $danger?: boolean }>`
 
   &:hover {
     background: ${props => props.$danger ? 'var(--danger)' : 'var(--border)'};
-    color: ${props => props.$danger ? 'var(--text-inverse)' : 'var(--primary)'};
+    color: ${props => props.$danger ? 'var(--brand-on-surface)' : 'var(--primary)'};
   }
 `;
 

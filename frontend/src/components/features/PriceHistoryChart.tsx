@@ -19,7 +19,7 @@ const ChartContainer = styled.div`
   background: var(--surface);
   border-radius: 16px;
   padding: 1.5rem;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 20px var(--shadow-color);
   display: flex;
   flex-direction: column;
 `;

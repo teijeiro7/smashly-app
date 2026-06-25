@@ -82,7 +82,7 @@ const SearchInput = styled.input<{ $isInHeader?: boolean; $isMobileContext?: boo
   font-size: 14px;
   color: ${props => {
     if (props.$isMobileContext) return 'var(--text)';
-    if (props.$isInHeader) return 'var(--text-inverse)';
+    if (props.$isInHeader) return 'var(--brand-on-surface)';
     return 'var(--text)';
   }};
   background: transparent;
@@ -130,7 +130,7 @@ const ClearButton = styled.button<{ $isInHeader?: boolean; $isMobileContext?: bo
     }};
     color: ${props => {
       if (props.$isMobileContext) return 'var(--text-muted)';
-      if (props.$isInHeader) return 'var(--text-inverse)';
+      if (props.$isInHeader) return 'var(--brand-on-surface)';
       return 'var(--text-muted)';
     }};
   }

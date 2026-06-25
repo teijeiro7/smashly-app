@@ -190,7 +190,7 @@ const Container = styled.div`
   padding: 2rem;
   background: var(--surface);
   border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 8px var(--shadow-color);
 `;
 
 const Header = styled.div`
@@ -234,11 +234,11 @@ const ReviewCard = styled.div`
   overflow: hidden;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 2px 4px var(--shadow-color);
 
   &:hover {
     transform: translateY(-4px);
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 8px 16px var(--shadow-color);
     border-color: #667eea;
   }
 `;
@@ -334,7 +334,7 @@ const ModalContent = styled.div`
   overflow-y: auto;
   position: relative;
   margin: auto;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 20px 60px var(--shadow-color);
 `;
 
 const CloseButton = styled.button`

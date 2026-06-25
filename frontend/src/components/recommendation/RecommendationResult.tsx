@@ -39,7 +39,7 @@ const AnalysisCard = styled.div`
   border-radius: 16px;
   padding: 0;
   margin-bottom: 3rem;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 4px 6px -1px var(--shadow-color), 0 2px 4px -1px var(--shadow-color);
   border: 1px solid rgba(0, 0, 0, 0.06);
   overflow: hidden;
 `;
@@ -66,7 +66,7 @@ const IconWrapper = styled.div`
   svg {
     width: 22px;
     height: 22px;
-    color: var(--text-inverse);
+    color: var(--brand-on-surface);
   }
 `;
 
@@ -116,7 +116,7 @@ const RacketCard = styled.div`
   transition: all 0.3s ease;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 6px var(--shadow-color);
 
   &:hover {
     transform: translateY(-5px);
@@ -176,7 +176,7 @@ const NoPriceBadge = styled.div`
 
 const MatchScore = styled.div`
   background: var(--primary-hover);
-  color: var(--text-inverse);
+  color: var(--brand-on-surface);
   padding: 0.4rem 0.9rem;
   border-radius: 20px;
   font-weight: bold;
@@ -298,7 +298,7 @@ const ViewButton = styled(Link)`
   display: block;
   text-align: center;
   background: var(--brand-surface-hover);
-  color: var(--text-inverse);
+  color: var(--brand-on-surface);
   padding: 0.75rem;
   border-radius: 12px;
   text-decoration: none;
@@ -309,7 +309,7 @@ const ViewButton = styled(Link)`
 
   &:hover {
     background: var(--brand-surface-hover);
-    color: var(--text-inverse);
+    color: var(--brand-on-surface);
     transform: translateY(-2px);
     box-shadow: 0 6px 12px rgba(var(--primary-rgb-dark), 0.3);
     text-decoration: none;
@@ -329,11 +329,11 @@ const Button = styled.button<{ $primary?: boolean }>`
   font-weight: 600;
   cursor: pointer;
   background: ${props => (props.$primary ? 'var(--primary-hover)' : 'var(--surface)')};
-  color: ${props => (props.$primary ? 'var(--text-inverse)' : 'var(--text)')};
+  color: ${props => (props.$primary ? 'var(--brand-on-surface)' : 'var(--text)')};
   border: ${props => (props.$primary ? 'none' : '1px solid var(--border)')};
   transition: all 0.2s;
   font-size: 1rem;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 2px 5px var(--shadow-color);
 
   &:hover {
     background: ${props => (props.$primary ? 'var(--primary-hover)' : 'var(--surface-2)')};

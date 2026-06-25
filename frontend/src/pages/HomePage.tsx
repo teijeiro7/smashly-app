@@ -92,7 +92,7 @@ const Badge = styled.div`
   letter-spacing: 0.02em;
   will-change: transform, opacity;
   animation: ${heroFadeIn} 0.6s ease forwards;
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 24px var(--shadow-color);
 
   @media (prefers-reduced-motion: reduce) {
     animation: none;
@@ -218,7 +218,7 @@ const PrimaryButton = styled(Link)`
   align-items: center;
   justify-content: center;
   gap: 10px;
-  background: white;
+  background: var(--surface);
   color: var(--primary-hover);
   min-height: 56px;
   padding: clamp(14px, 3vw, 18px) clamp(28px, 5vw, 40px);
@@ -227,7 +227,7 @@ const PrimaryButton = styled(Link)`
   font-weight: 700;
   font-size: clamp(0.95rem, 2vw, 1.125rem);
   transition: transform 0.2s ease, box-shadow 0.2s ease, color 0.2s ease;
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 24px var(--shadow-color);
   white-space: nowrap;
   letter-spacing: -0.01em;
 
@@ -246,7 +246,7 @@ const PrimaryButton = styled(Link)`
 
   &:hover {
     transform: translateY(-3px);
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
+    box-shadow: 0 12px 40px var(--shadow-color);
     text-decoration: none;
     color: var(--primary-hover);
   }
@@ -487,7 +487,7 @@ const StepDescription = styled.p`
 
 const FeaturesSection = styled.section`
   padding: clamp(64px, 10vw, 96px) 20px;
-  background: white;
+  background: var(--surface);
 `;
 
 const FeaturesContent = styled.div`
@@ -583,7 +583,7 @@ const FeatureVisual = styled.div`
   align-items: center;
   justify-content: center;
   min-height: 280px;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 4px 6px -1px var(--shadow-color), 0 2px 4px -1px var(--shadow-color);
 `;
 
 const FeatureVisualIcon = styled.div`

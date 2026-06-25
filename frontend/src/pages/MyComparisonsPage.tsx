@@ -36,7 +36,7 @@ const Container = styled.div`
 `;
 
 const Header = styled.div`
-  background: rgba(255, 255, 255, 0.92);
+  background: var(--surface-overlay);
   border-bottom: 1px solid var(--border);
   padding: 1.5rem 0;
   margin-bottom: 2rem;
@@ -46,7 +46,7 @@ const Header = styled.div`
   @media (hover: none) and (pointer: coarse) {
     backdrop-filter: none;
     -webkit-backdrop-filter: none;
-    background: rgba(255, 255, 255, 0.98);
+    background: var(--surface-overlay);
   }
 
   @media (max-width: 768px) {
@@ -121,9 +121,9 @@ const Content = styled.div`
 const EmptyState = styled.div`
   text-align: center;
   padding: 4rem 2rem;
-  background: white;
+  background: var(--surface);
   border-radius: 16px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 20px var(--shadow-color);
 `;
 
 const EmptyIcon = styled.div`
@@ -177,10 +177,10 @@ const ComparisonsList = styled.div`
 `;
 
 const ComparisonCard = styled(motion.div)`
-  background: white;
+  background: var(--surface);
   border-radius: 16px;
   padding: clamp(1rem, 2vw, 1.5rem);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 20px var(--shadow-color);
   border: 1px solid rgba(var(--primary-rgb), 0.1);
   transition: all 0.3s ease;
 
@@ -372,19 +372,19 @@ const Modal = styled(motion.div)`
 `;
 
 const ModalContent = styled(motion.div)`
-  background: white;
+  background: var(--surface);
   border-radius: 16px;
   max-width: 900px;
   width: 100%;
   max-height: 90vh;
   overflow: auto;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 20px 50px var(--shadow-color);
 `;
 
 const ModalHeader = styled.div`
   position: sticky;
   top: 0;
-  background: white;
+  background: var(--surface);
   border-bottom: 1px solid var(--border);
   padding: 1.5rem;
   display: flex;

@@ -37,7 +37,7 @@ const HeroSection = styled.div`
   border-radius: 24px;
   padding: clamp(1.25rem, 3vw, 3rem);
   margin-bottom: 2rem;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 20px var(--shadow-color);
   border: 1px solid rgba(22, 163, 74, 0.15);
   position: relative;
   overflow: hidden;
@@ -162,10 +162,10 @@ const RacketsGrid = styled.div`
 `;
 
 const RacketCard = styled.div`
-  background: white;
+  background: var(--surface);
   border-radius: 16px;
   padding: 1rem;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 2px 10px var(--shadow-color);
   border: 1px solid rgba(22, 163, 74, 0.1);
   transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
   cursor: pointer;
@@ -294,7 +294,7 @@ const RecommendationActionButton = styled.button`
   border-radius: 14px;
   min-height: 48px;
   padding: 0.9rem 1rem;
-  background: white;
+  background: var(--surface);
   color: var(--brand-surface-strong);
   font-weight: 700;
   cursor: pointer;
@@ -339,7 +339,7 @@ const RacketPosition = styled.span`
 const RacketImageWrap = styled.div`
   border-radius: 16px;
   overflow: hidden;
-  background: white;
+  background: var(--surface);
   border: 1px solid rgba(22, 163, 74, 0.08);
   min-height: 180px;
   padding: 0.75rem;

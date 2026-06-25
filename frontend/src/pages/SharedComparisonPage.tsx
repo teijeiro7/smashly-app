@@ -27,7 +27,7 @@ const ContentWrapper = styled.div`
 `;
 
 const Card = styled.div`
-  background: white;
+  background: var(--surface);
   border-radius: 16px;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
   overflow: hidden;

@@ -79,10 +79,10 @@ const Subtitle = styled.p`
 const SelectionSection = styled.div`
   max-width: 1000px;
   margin: 0 auto 3rem;
-  background: white;
+  background: var(--surface);
   border-radius: 20px;
   padding: 2rem;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 4px 6px -1px var(--shadow-color), 0 2px 4px -1px var(--shadow-color);
 
   @media (max-width: 768px) {
     margin-bottom: 1.25rem;
@@ -129,9 +129,9 @@ const SearchResults = styled.ul`
   top: 100%;
   left: 0;
   right: 0;
-  background: white;
+  background: var(--surface);
   border-radius: 12px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 10px 25px var(--shadow-color);
   max-height: 300px;
   overflow-y: auto;
   z-index: 50;
@@ -169,7 +169,7 @@ const SelectedRacketsContainer = styled.div`
 `;
 
 const SelectedRacketCard = styled(motion.div)`
-  background: white;
+  background: var(--surface);
   border: 1px solid rgba(0, 0, 0, 0.06);
   border-radius: 16px;
   padding: 1rem;
@@ -178,14 +178,14 @@ const SelectedRacketCard = styled(motion.div)`
   flex-direction: column;
   align-items: center;
   text-align: center;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 4px 6px -1px var(--shadow-color), 0 2px 4px -1px var(--shadow-color);
 `;
 
 const RemoveButton = styled.button`
   position: absolute;
   top: 0.5rem;
   right: 0.5rem;
-  background: white;
+  background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 50%;
   width: 30px;
@@ -274,10 +274,10 @@ const CompareButton = styled.button`
 const ResultSection = styled(motion.div)`
   max-width: 1000px;
   margin: 0 auto;
-  background: white;
+  background: var(--surface);
   border-radius: 20px;
   padding: 3rem;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 20px 25px -5px var(--shadow-color), 0 10px 10px -5px var(--shadow-color);
   position: relative;
   overflow-x: hidden;
 
@@ -364,7 +364,7 @@ const ActionButton = styled.button<{ variant?: 'secondary' }>`
   ${props =>
     props.variant === 'secondary'
       ? `
-    background: white;
+    background: var(--surface);
     border: 1px solid var(--border);
     color: var(--text);
     &:hover { background: var(--surface-2); border-color: var(--border-strong); }
@@ -462,13 +462,13 @@ const ModalOverlay = styled(motion.div)`
 `;
 
 const ModalContent = styled(motion.div)`
-  background: white;
+  background: var(--surface);
   border-radius: 24px;
   width: 100%;
   max-width: 900px;
   max-height: 85vh;
   overflow-y: auto;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 20px 50px var(--shadow-color);
   position: relative;
   display: flex;
   flex-direction: column;
@@ -547,7 +547,7 @@ const FavoritesGrid = styled.div`
 `;
 
 const FavoriteRacketCard = styled(motion.div)<{ $isSelected?: boolean }>`
-  background: ${props => (props.$isSelected ? 'var(--surface-3)' : 'white')};
+  background: ${props => (props.$isSelected ? 'var(--surface-3)' : 'var(--surface)')};
   border: 1.5px solid ${props => (props.$isSelected ? 'var(--border-strong)' : 'var(--border)')};
   border-radius: 6px;
   padding: 0.375rem 0.5rem;

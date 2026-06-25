@@ -51,11 +51,11 @@ const SkeletonGrid = styled.div`
 `;
 
 const SkeletonGallery = styled.div`
-  background: white;
+  background: var(--surface);
   border-radius: 24px;
   padding: 2rem;
   min-height: 600px;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 6px -1px var(--shadow-color);
   display: flex;
   flex-direction: column;
   gap: 2rem;
@@ -102,11 +102,11 @@ const SkeletonRating = styled(SkeletonBase)`
 `;
 
 const SkeletonPriceCard = styled.div`
-  background: white;
+  background: var(--surface);
   border-radius: 20px;
   padding: 1.5rem;
   border: 1px solid var(--color-gray-200);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+  box-shadow: 0 4px 20px var(--shadow-color);
   display: flex;
   flex-direction: column;
   gap: 1rem;
@@ -141,7 +141,7 @@ const SkeletonSpecsGrid = styled.div`
 `;
 
 const SkeletonSpecCard = styled.div`
-  background: white;
+  background: var(--surface);
   padding: 1rem;
   border-radius: 12px;
   border: 1px solid var(--color-gray-100);

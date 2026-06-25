@@ -13,7 +13,7 @@ const NavShell = styled.nav`
   bottom: 0;
   z-index: 380;
   display: none;
-  background: rgba(255, 255, 255, 0.95);
+  background: var(--surface-overlay);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   border-top: 1px solid var(--primary-faint);

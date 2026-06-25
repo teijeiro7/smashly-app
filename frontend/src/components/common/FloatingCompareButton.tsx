@@ -52,7 +52,7 @@ const Badge = styled(motion.div)`
   height: 24px;
   border-radius: 50%;
   background: var(--danger);
-  color: var(--text-inverse);
+  color: var(--brand-on-surface);
   font-size: 0.75rem;
   font-weight: 700;
   display: flex;

@@ -10,7 +10,7 @@ const Section = styled.div`
   background: var(--surface);
   border-radius: 20px;
   padding: 2rem;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 2px 10px var(--shadow-color);
   margin-bottom: 2rem;
 `;
 
@@ -35,7 +35,7 @@ const SectionTitle = styled.h2`
 
 const CreateButton = styled.button`
   background: linear-gradient(135deg, var(--brand-surface) 0%, var(--brand-surface-hover) 100%);
-  color: var(--text-inverse);
+  color: var(--brand-on-surface);
   border: none;
   padding: 0.75rem 1.5rem;
   border-radius: 12px;
@@ -93,7 +93,7 @@ const ListIcon = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--text-inverse);
+  color: var(--brand-on-surface);
   font-size: 1.5rem;
 `;
 

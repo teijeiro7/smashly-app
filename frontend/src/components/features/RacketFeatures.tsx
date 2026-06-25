@@ -88,7 +88,7 @@ const FeatureIcon = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--text-inverse);
+  color: var(--brand-on-surface);
   font-size: 1.25rem;
   box-shadow: 0 4px 12px rgba(var(--primary-rgb), 0.3);
 `;
@@ -162,7 +162,7 @@ const TechnologyIcon = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--text-inverse);
+  color: var(--brand-on-surface);
   font-size: 0.75rem;
   flex-shrink: 0;
 `;

@@ -97,13 +97,13 @@ const ModeButton = styled.button<{ $active: boolean }>`
   padding: 0.75rem 1.5rem;
   border-radius: 9999px;
   border: 1.5px solid ${props => (props.$active ? 'var(--primary-hover)' : 'var(--border)')};
-  background: ${props => (props.$active ? 'var(--primary-hover)' : 'white')};
+  background: ${props => (props.$active ? 'var(--primary-hover)' : 'var(--surface)')};
   color: ${props => (props.$active ? 'white' : 'var(--text-muted)')};
   cursor: pointer;
   transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
   font-weight: 600;
   font-size: 0.9375rem;
-  box-shadow: ${props => props.$active ? '0 4px 6px -1px rgba(var(--primary-rgb-dark), 0.25), 0 2px 4px -1px rgba(var(--primary-rgb-dark), 0.15)' : '0 1px 2px 0 rgba(0, 0, 0, 0.05)'};
+  box-shadow: ${props => props.$active ? '0 4px 6px -1px rgba(var(--primary-rgb-dark), 0.25), 0 2px 4px -1px rgba(var(--primary-rgb-dark), 0.15)' : '0 1px 2px 0 var(--shadow-color)'};
 
   &:hover {
     border-color: var(--primary-hover);

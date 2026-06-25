@@ -80,7 +80,7 @@ const MinimizedContent = styled.div<{ $status: string }>`
         ? 'linear-gradient(135deg, var(--danger) 0%, var(--danger) 100%)'
         : 'var(--surface-3)'};
   border-radius: 50%;
-  color: ${props => (props.$status === 'running' ? 'var(--text-muted)' : 'var(--text-inverse)')};
+  color: ${props => (props.$status === 'running' ? 'var(--text-muted)' : 'var(--brand-on-surface)')};
   position: relative;
   z-index: 1;
   border: ${props => (props.$status === 'running' ? '3px solid var(--primary)' : 'none')};
@@ -113,7 +113,7 @@ const CompletionBadge = styled(motion.div)`
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--text-inverse);
+  color: var(--brand-on-surface);
   font-size: 14px;
   box-shadow: 0 2px 8px rgba(var(--primary-rgb), 0.4);
   border: 2px solid var(--surface);
@@ -124,7 +124,7 @@ const CompletionTooltip = styled(motion.div)`
   bottom: 90px;
   right: 0;
   background: linear-gradient(135deg, var(--brand-surface) 0%, var(--brand-surface-hover) 100%);
-  color: var(--text-inverse);
+  color: var(--brand-on-surface);
   padding: 12px 16px;
   border-radius: 12px;
   font-size: 0.875rem;
@@ -157,7 +157,7 @@ const Header = styled.div<{ $minimized: boolean; $status: string }>`
       : props.$status === 'error'
         ? 'linear-gradient(135deg, var(--danger) 0%, var(--danger) 100%)'
         : 'linear-gradient(135deg, var(--info) 0%, var(--info) 100%)'};
-  color: var(--text-inverse);
+  color: var(--brand-on-surface);
 `;
 
 const HeaderLeft = styled.div`
@@ -195,7 +195,7 @@ const HeaderActions = styled.div`
 const IconButton = styled.button`
   background: rgba(255, 255, 255, 0.2);
   border: none;
-  color: var(--text-inverse);
+  color: var(--brand-on-surface);
   padding: 8px;
   border-radius: 8px;
   cursor: pointer;
@@ -260,7 +260,7 @@ const ViewResultButton = styled.button`
   width: 100%;
   padding: 12px;
   background: linear-gradient(135deg, var(--brand-surface) 0%, var(--brand-surface-hover) 100%);
-  color: var(--text-inverse);
+  color: var(--brand-on-surface);
   border: none;
   border-radius: 10px;
   font-size: 1rem;

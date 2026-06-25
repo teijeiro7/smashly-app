@@ -99,7 +99,7 @@ const FilterButtons = styled.div`
 const FilterButton = styled.button<{ active: boolean }>`
   padding: 0.5rem 1rem;
   background: ${(props) => (props.active ? "var(--primary)" : "var(--surface)")};
-  color: ${(props) => (props.active ? "var(--text-inverse)" : "var(--text-muted)")};
+  color: ${(props) => (props.active ? "var(--brand-on-surface)" : "var(--text-muted)")};
   border: 1px solid ${(props) => (props.active ? "var(--primary)" : "var(--border)")};
   border-radius: 6px;
   font-size: 0.875rem;

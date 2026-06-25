@@ -51,7 +51,7 @@ const Subtitle = styled.p`
 const TabsContainer = styled.div`
   display: flex;
   gap: 0.375rem;
-  background: white;
+  background: var(--surface);
   padding: 0.375rem;
   border-radius: 12px;
   border: 1px solid var(--border);
@@ -91,7 +91,7 @@ const MainContent = styled.div`
 `;
 
 const ContentCard = styled.div`
-  background: white;
+  background: var(--surface);
   border-radius: 16px;
   border: 1px solid var(--border);
   overflow: hidden;
@@ -146,8 +146,8 @@ const AddButton = styled(motion.button)`
   align-items: center;
   gap: 0.375rem;
   padding: 0.5rem 1rem;
-  background: var(--text);
-  color: white;
+  background: var(--brand-surface);
+  color: var(--brand-on-surface);
   border: none;
   border-radius: 8px;
   font-size: 0.8125rem;
@@ -155,7 +155,7 @@ const AddButton = styled(motion.button)`
   cursor: pointer;
 
   &:hover {
-    background: var(--text);
+    background: var(--brand-surface-hover);
   }
 
   svg {
@@ -184,7 +184,7 @@ const ListItem = styled(motion.div)`
   transition: background-color 0.2s ease, border-color 0.2s ease;
 
   &:hover {
-    background: white;
+    background: var(--surface);
     border-color: var(--border);
   }
 `;
@@ -283,7 +283,7 @@ const FormInput = styled.input`
   border-radius: 8px;
   font-size: 0.875rem;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
-  background: white;
+  background: var(--surface);
 
   &:focus {
     outline: none;
@@ -317,12 +317,12 @@ const Button = styled(motion.button)<{ $variant?: 'primary' | 'secondary' }>`
   ${props =>
     props.$variant === 'primary'
       ? `
-    background: var(--text);
-    color: white;
-    &:hover { background: var(--text); }
+    background: var(--brand-surface-hover);
+    color: var(--brand-on-surface);
+    &:hover { background: var(--brand-surface); }
   `
       : `
-    background: white;
+    background: var(--surface);
     color: var(--text-muted);
     border: 1px solid var(--border);
     &:hover { background: var(--surface-2); color: var(--text); }
@@ -398,7 +398,7 @@ const SettingsInput = styled.input`
   border-radius: 8px;
   font-size: 0.875rem;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
-  background: white;
+  background: var(--surface);
 
   &:focus {
     outline: none;
@@ -412,8 +412,8 @@ const SaveButton = styled(motion.button)`
   align-items: center;
   gap: 0.5rem;
   padding: 0.75rem 1.5rem;
-  background: var(--text);
-  color: white;
+  background: var(--brand-surface);
+  color: var(--brand-on-surface);
   border: none;
   border-radius: 10px;
   font-size: 0.9375rem;
@@ -422,7 +422,7 @@ const SaveButton = styled(motion.button)`
   margin-top: 1.5rem;
 
   &:hover {
-    background: var(--text);
+    background: var(--brand-surface-hover);
   }
 `;
 

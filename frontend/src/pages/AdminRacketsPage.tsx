@@ -38,9 +38,9 @@ const BackButton = styled(Link)`
   text-decoration: none;
   font-weight: 500;
   padding: 0.5rem 1rem;
-  background: white;
+  background: var(--surface);
   border-radius: 8px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 1px 3px var(--shadow-color);
   transition: all 0.2s;
 
   &:hover {
@@ -59,10 +59,10 @@ const SearchContainer = styled.div`
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  background: white;
+  background: var(--surface);
   padding: 0.5rem 1rem;
   border-radius: 8px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 1px 3px var(--shadow-color);
   flex: 1;
   max-width: 400px;
 `;
@@ -93,9 +93,9 @@ const FiltersContainer = styled.div`
   flex-wrap: wrap;
   align-items: flex-end;
   padding: 1rem;
-  background: white;
+  background: var(--surface);
   border-radius: 8px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 1px 3px var(--shadow-color);
 `;
 
 const FilterGroup = styled.div`
@@ -118,7 +118,7 @@ const FilterSelect = styled.select`
   border-radius: 6px;
   font-size: 0.875rem;
   color: var(--text);
-  background: white;
+  background: var(--surface);
   min-width: 140px;
   cursor: pointer;
 
@@ -188,9 +188,9 @@ const Content = styled.div`
 `;
 
 const TableContainer = styled.div`
-  background: white;
+  background: var(--surface);
   border-radius: 12px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 6px var(--shadow-color);
   overflow: hidden;
   border: 1px solid var(--border);
 `;
@@ -339,9 +339,9 @@ const StatsBar = styled.div`
   gap: 2rem;
   margin-bottom: 1rem;
   padding: 1rem;
-  background: white;
+  background: var(--surface);
   border-radius: 8px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 1px 3px var(--shadow-color);
 `;
 
 const Stat = styled.div`

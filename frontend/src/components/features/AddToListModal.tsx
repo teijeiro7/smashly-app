@@ -113,7 +113,7 @@ const CreateNewButton = styled.button`
   width: 100%;
   padding: 1rem;
   background: linear-gradient(135deg, var(--brand-surface) 0%, var(--brand-surface-hover) 100%);
-  color: var(--text-inverse);
+  color: var(--brand-on-surface);
   border: none;
   border-radius: 12px;
   font-weight: 600;
@@ -166,7 +166,7 @@ const ListIcon = styled.div<{ isAdded?: boolean }>`
   width: 40px;
   height: 40px;
   background: ${(props) => (props.isAdded ? "var(--primary)" : "var(--surface-3)")};
-  color: ${(props) => (props.isAdded ? "var(--text-inverse)" : "var(--text-muted)")};
+  color: ${(props) => (props.isAdded ? "var(--brand-on-surface)" : "var(--text-muted)")};
   border-radius: 10px;
   display: flex;
   align-items: center;

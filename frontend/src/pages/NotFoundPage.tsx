@@ -16,7 +16,7 @@ const Container = styled.div`
 `;
 
 const Card = styled.div`
-  background: white;
+  background: var(--surface);
   border-radius: 24px;
   padding: clamp(2rem, 5vw, 3rem);
   max-width: 480px;
@@ -77,7 +77,7 @@ const SecondaryBtn = styled(Link)`
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  background: white;
+  background: var(--surface);
   color: var(--text);
   padding: 0.75rem 1.5rem;
   border-radius: 10px;

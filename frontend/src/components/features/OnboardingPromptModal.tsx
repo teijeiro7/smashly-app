@@ -90,7 +90,7 @@ const ButtonGroup = styled.div`
 
 const PrimaryButton = styled.button`
   background: linear-gradient(135deg, var(--brand-surface) 0%, var(--brand-surface-hover) 100%);
-  color: var(--text-inverse);
+  color: var(--brand-on-surface);
   border: none;
   padding: 0.875rem;
   border-radius: 12px;

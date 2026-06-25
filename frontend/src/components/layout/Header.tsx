@@ -12,7 +12,7 @@ import ThemeToggle from '../common/ThemeToggle';
 const HeaderContainer = styled.header`
   background: var(--brand-surface);
   padding: 0;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 1px 3px var(--shadow-color), 0 1px 2px var(--shadow-color);
   position: sticky;
   top: 0;
   z-index: 350;
@@ -22,7 +22,7 @@ const HeaderContainer = styled.header`
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 
   @media (max-width: 768px) {
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 2px 8px var(--shadow-color);
   }
 `;
 
@@ -103,7 +103,7 @@ const MobileElements = styled.div`
 const MobileSearchButton = styled.button`
   background: none;
   border: none;
-  color: var(--text-inverse);
+  color: var(--brand-on-surface);
   font-size: 1.25rem;
   cursor: pointer;
   min-width: 40px;
@@ -140,7 +140,7 @@ const MobileMenuDropdown = styled(motion.div)<{ $isOpen: boolean }>`
   right: 0;
   background: var(--surface);
   border-radius: 0 0 20px 20px;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 20px 40px var(--shadow-color);
   z-index: 100;
   overflow: hidden;
   max-height: min(85dvh, 720px);
@@ -189,7 +189,7 @@ const MobileNavTitle = styled.h4`
 `;
 
 const NavLink = styled(Link)<{ $isActive: boolean; $isMobile?: boolean }>`
-  color: ${props => (props.$isMobile ? 'var(--text)' : 'var(--text-inverse)')};
+  color: ${props => (props.$isMobile ? 'var(--text)' : 'var(--brand-on-surface)')};
   text-decoration: none;
   font-weight: 500;
   padding: ${props => (props.$isMobile ? '12px 16px' : '8px 16px')};
@@ -220,7 +220,7 @@ const NavLink = styled(Link)<{ $isActive: boolean; $isMobile?: boolean }>`
 
   &:hover {
     background: ${props => (props.$isMobile ? 'var(--surface-2)' : 'rgba(255, 255, 255, 0.08)')};
-    color: ${props => (props.$isMobile ? 'var(--primary-hover)' : 'var(--text-inverse)')};
+    color: ${props => (props.$isMobile ? 'var(--primary-hover)' : 'var(--brand-on-surface)')};
     text-decoration: none;
     transform: ${props => (props.$isMobile ? 'translateX(3px)' : 'none')};
     
@@ -238,7 +238,7 @@ const MobileMenuButton = styled.button`
   display: none;
   background: none;
   border: none;
-  color: var(--text-inverse);
+  color: var(--brand-on-surface);
   font-size: 1.25rem;
   cursor: pointer;
   min-width: 40px;
@@ -307,14 +307,14 @@ const AuthButton = styled.button<{
       return props.$variant === 'primary'
         ? `
         background: var(--primary-hover);
-        color: var(--text-inverse);
+        color: var(--brand-on-surface);
         box-shadow: 0 2px 8px rgba(var(--primary-rgb-dark), 0.2);
         
         &:hover {
           background: var(--primary-hover);
           transform: translateY(-1px);
           box-shadow: 0 4px 12px rgba(var(--primary-rgb-dark), 0.25);
-          color: var(--text-inverse);
+          color: var(--brand-on-surface);
         }
       `
         : `
@@ -333,17 +333,17 @@ const AuthButton = styled.button<{
         ? `
         background: var(--surface);
         color: var(--primary-hover);
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 1px 3px var(--shadow-color);
         
         &:hover {
           background: var(--primary-subtle);
           transform: translateY(-1px);
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+          box-shadow: 0 4px 12px var(--shadow-color);
         }
       `
         : `
         background: transparent;
-        color: var(--text-inverse);
+        color: var(--brand-on-surface);
         border: 1.5px solid rgba(255, 255, 255, 0.25);
         
         &:hover {
@@ -376,13 +376,13 @@ const LogoutButton = styled.button<{
   cursor: pointer;
   border: none;
   background: transparent;
-  color: var(--text-inverse);
+  color: var(--brand-on-surface);
   font-size: 0.875rem;
   font-family: inherit;
 
   &:hover {
     background: rgba(255, 255, 255, 0.08);
-    color: var(--text-inverse);
+    color: var(--brand-on-surface);
     text-decoration: none;
   }
 
@@ -431,7 +431,7 @@ const AvatarButton = styled.button`
   &:hover {
     transform: scale(1.05);
     border-color: rgba(255, 255, 255, 0.6);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 2px 8px var(--shadow-color);
   }
 
   &:active {
@@ -456,7 +456,7 @@ const UserDropdown = styled.div<{ $isOpen: boolean }>`
   right: 0;
   background: var(--surface);
   border-radius: 12px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 10px 40px var(--shadow-color);
   min-width: 200px;
   opacity: ${props => (props.$isOpen ? '1' : '0')};
   visibility: ${props => (props.$isOpen ? 'visible' : 'hidden')};

@@ -9,7 +9,7 @@ const FormContainer = styled.div`
   padding: 2rem;
   background: var(--surface);
   border-radius: 24px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 10px 30px var(--shadow-color);
   border: 1px solid rgba(var(--primary-rgb-dark), 0.1);
 `;
 
@@ -126,7 +126,7 @@ const Button = styled.button<{ $primary?: boolean }>`
   font-weight: 600;
   cursor: pointer;
   background: ${props => (props.$primary ? 'var(--primary-hover)' : 'var(--surface-3)')};
-  color: ${props => (props.$primary ? 'var(--text-inverse)' : 'var(--text)')};
+  color: ${props => (props.$primary ? 'var(--brand-on-surface)' : 'var(--text)')};
   transition: all 0.2s;
   font-size: 1rem;
 

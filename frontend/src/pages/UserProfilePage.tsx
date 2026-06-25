@@ -123,7 +123,7 @@ const MainContent = styled.div`
 const NavigationTabs = styled.div`
   display: flex;
   gap: 0.25rem;
-  background: white;
+  background: var(--surface);
   padding: 0.5rem;
   border-radius: 16px;
   border: 1px solid var(--border);
@@ -160,7 +160,7 @@ const NavTab = styled.button<{ $active: boolean }>`
 `;
 
 const ContentCard = styled.div`
-  background: white;
+  background: var(--surface);
   border-radius: 20px;
   border: 1px solid var(--border);
   overflow: hidden;
@@ -223,7 +223,7 @@ const FormInput = styled.input`
   border-radius: 10px;
   font-size: 0.9375rem;
   transition: all 0.2s ease;
-  background: white;
+  background: var(--surface);
 
   &:focus {
     outline: none;
@@ -247,7 +247,7 @@ const FormSelect = styled.select`
   border-radius: 10px;
   font-size: 0.9375rem;
   transition: all 0.2s ease;
-  background: white;
+  background: var(--surface);
   cursor: pointer;
 
   &:focus {
@@ -268,7 +268,7 @@ const FormTextarea = styled.textarea`
   border-radius: 10px;
   font-size: 0.9375rem;
   transition: all 0.2s ease;
-  background: white;
+  background: var(--surface);
   resize: vertical;
   min-height: 100px;
 

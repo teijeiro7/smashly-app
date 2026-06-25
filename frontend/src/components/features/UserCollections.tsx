@@ -45,11 +45,11 @@ const Tab = styled.button<{ $active: boolean }>`
   cursor: pointer;
   transition: all 0.2s ease;
   background: ${props => (props.$active ? 'var(--primary)' : 'transparent')};
-  color: ${props => (props.$active ? 'var(--text-inverse)' : 'var(--text-muted)')};
+  color: ${props => (props.$active ? 'var(--brand-on-surface)' : 'var(--text-muted)')};
 
   &:hover {
     background: ${props => (props.$active ? 'var(--primary)' : 'var(--surface-3)')};
-    color: ${props => (props.$active ? 'var(--text-inverse)' : 'var(--primary)')};
+    color: ${props => (props.$active ? 'var(--brand-on-surface)' : 'var(--primary)')};
   }
 `;
 
@@ -91,7 +91,7 @@ const AddButton = styled(motion.button)`
   cursor: pointer;
 
   &:hover {
-    background: var(--text);
+    background: var(--brand-surface-hover);
   }
 `;
 
@@ -164,7 +164,7 @@ const ActionButton = styled(motion.button)<{ $danger?: boolean }>`
 
   &:hover {
     background: ${props => props.$danger ? 'var(--danger)' : 'var(--surface-3)'};
-    color: ${props => props.$danger ? 'var(--text-inverse)' : 'var(--primary)'};
+    color: ${props => props.$danger ? 'var(--brand-on-surface)' : 'var(--primary)'};
   }
 `;
 
@@ -246,7 +246,7 @@ const Button = styled.button<{ $primary?: boolean }>`
   cursor: pointer;
   border: none;
   background: ${props => props.$primary ? 'var(--primary)' : 'var(--surface-3)'};
-  color: ${props => props.$primary ? 'var(--text-inverse)' : 'var(--text-muted)'};
+  color: ${props => props.$primary ? 'var(--brand-on-surface)' : 'var(--text-muted)'};
 `;
 
 const UserCollections: React.FC = () => {

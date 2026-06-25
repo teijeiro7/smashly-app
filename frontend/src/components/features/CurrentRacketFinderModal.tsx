@@ -239,8 +239,8 @@ const PrimaryButton = styled.button`
   min-height: 48px;
   padding: 0.85rem 1.5rem;
   cursor: pointer;
-  background: var(--text);
-  color: var(--text-inverse);
+  background: var(--brand-surface);
+  color: var(--brand-on-surface);
   font-weight: 700;
   font-size: 0.95rem;
   display: inline-flex;
@@ -252,7 +252,7 @@ const PrimaryButton = styled.button`
   letter-spacing: -0.01em;
 
   &:hover {
-    background: var(--text-muted);
+    background: var(--brand-surface-hover);
   }
 
   &:active {

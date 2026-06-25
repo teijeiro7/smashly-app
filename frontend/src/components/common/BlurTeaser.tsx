@@ -51,7 +51,7 @@ const Overlay = styled.div`
   @media (hover: none) and (pointer: coarse) {
     backdrop-filter: none;
     -webkit-backdrop-filter: none;
-    background: rgba(255, 255, 255, 0.4);
+    background: var(--surface-overlay);
   }
   padding: 2rem;
   text-align: center;
@@ -66,7 +66,7 @@ const LockIcon = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--text-inverse);
+  color: var(--brand-on-surface);
   box-shadow: 0 8px 24px rgba(var(--primary-rgb), 0.3);
   animation: float 3s ease-in-out infinite;
 
@@ -120,7 +120,7 @@ const CTAButtons = styled.div`
 const CTAButton = styled(Link)`
   padding: 0.875rem 2rem;
   background: var(--color-primary);
-  color: var(--text-inverse);
+  color: var(--brand-on-surface);
   border-radius: 12px;
   font-weight: 700;
   font-size: 1rem;
@@ -132,7 +132,7 @@ const CTAButton = styled(Link)`
     background: var(--color-primary-dark);
     transform: translateY(-2px);
     box-shadow: 0 6px 16px rgba(var(--primary-rgb), 0.4);
-    color: var(--text-inverse);
+    color: var(--brand-on-surface);
     text-decoration: none;
   }
 `;

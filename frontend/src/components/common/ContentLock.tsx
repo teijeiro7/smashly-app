@@ -91,7 +91,7 @@ const LockOverlay = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(255, 255, 255, 0.75);
+  background: var(--surface-overlay);
   backdrop-filter: blur(4px);
   -webkit-backdrop-filter: blur(4px);
   z-index: 10;
@@ -100,7 +100,7 @@ const LockOverlay = styled.div`
   @media (hover: none) and (pointer: coarse) {
     backdrop-filter: none;
     -webkit-backdrop-filter: none;
-    background: rgba(255, 255, 255, 0.9);
+    background: var(--surface-overlay);
   }
 `;
 
@@ -110,7 +110,7 @@ const LockCard = styled.div`
   padding: 3rem 2.5rem;
   max-width: 500px;
   width: 100%;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 20px 40px var(--shadow-color), 0 0 0 1px var(--shadow-color);
   text-align: center;
   animation: slideUp 0.3s ease-out;
 
@@ -139,7 +139,7 @@ const IconWrapper = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--text-inverse);
+  color: var(--brand-on-surface);
   box-shadow: 0 8px 20px rgba(var(--primary-rgb), 0.3);
 `;
 
@@ -192,7 +192,7 @@ const LoginButton = styled(Link)`
     background: var(--primary-hover);
     transform: translateY(-2px);
     box-shadow: 0 6px 16px rgba(var(--primary-rgb), 0.35);
-    color: var(--text-inverse);
+    color: var(--brand-on-surface);
   }
 
   &:active {

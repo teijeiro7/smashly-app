@@ -32,7 +32,7 @@ const StatCard = styled(motion.div)<{ $color: string }>`
   &:hover {
     border-color: ${props => props.$color};
     transform: translateY(-2px);
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 8px 30px var(--shadow-color);
   }
 `;
 

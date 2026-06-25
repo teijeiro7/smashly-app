@@ -8,7 +8,7 @@ const CharacteristicsContainer = styled(motion.div)`
   background: var(--surface);
   border-radius: 16px;
   padding: 1.5rem;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 4px 6px -1px var(--shadow-color), 0 2px 4px -1px var(--shadow-color);
   margin-bottom: 1.5rem;
 `;
 
@@ -36,7 +36,7 @@ const CharacteristicItem = styled.div`
   background: var(--surface-2);
   border-radius: 8px;
   border: 1px solid rgba(var(--primary-rgb), 0.15);
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  box-shadow: 0 1px 2px 0 var(--shadow-color);
 `;
 
 const CharacteristicLabel = styled.span`
@@ -56,7 +56,7 @@ const DescriptionContainer = styled.div`
   padding: 1.25rem;
   margin-top: 1rem;
   border: 1px solid rgba(var(--primary-rgb), 0.2);
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  box-shadow: 0 1px 2px 0 var(--shadow-color);
 `;
 
 const DescriptionTitle = styled.h4`

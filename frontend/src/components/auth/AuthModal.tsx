@@ -42,7 +42,7 @@ const ModalContainer = styled(motion.div)`
   overflow: hidden;
   display: flex;
   position: relative;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 25px 50px -12px var(--shadow-color);
   will-change: transform, opacity;
 
   @media (max-width: 768px) {
@@ -62,7 +62,7 @@ const LeftPanel = styled.div<{ $bgImage: string }>`
   flex-direction: column;
   justify-content: space-between;
   padding: 40px;
-  color: var(--text-inverse);
+  color: var(--brand-on-surface);
   transition: background-image 0.3s ease-in-out; // Smooth transition between images
   will-change: background-image;
 

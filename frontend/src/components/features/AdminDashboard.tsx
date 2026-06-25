@@ -85,7 +85,7 @@ const StatCard = styled.div<{ $accent?: string }>`
   &:hover {
     border-color: ${props => props.$accent || 'var(--primary)'}40;
     transform: translateY(-2px);
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 8px 30px var(--shadow-color);
   }
 `;
 
@@ -301,7 +301,7 @@ const QuickActionDesc = styled.div`
 
 const AlertBadge = styled.div<{ count: number }>`
   background: var(--error);
-  color: var(--text-inverse);
+  color: var(--brand-on-surface);
   font-size: 0.75rem;
   font-weight: 600;
   padding: 0.125rem 0.5rem;

@@ -93,7 +93,7 @@ const UserEmail = styled.p`
 `;
 
 const EditButton = styled.button`
-  background: white;
+  background: var(--surface);
   color: var(--primary);
   border: none;
   padding: 0.75rem 1.5rem;
@@ -126,7 +126,7 @@ const EditButton = styled.button`
 `;
 
 const DetailsSection = styled.div`
-  background: white;
+  background: var(--surface);
   border-radius: 20px;
   padding: 2rem;
   box-shadow: 0 4px 20px rgba(22, 163, 74, 0.1);

@@ -25,12 +25,12 @@ const Container = styled.div`
 `;
 
 const Header = styled.div`
-  background: white;
+  background: var(--surface);
   border-radius: 24px;
   max-width: 1200px;
   margin: 0 auto;
   padding: 2.5rem 1.5rem;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 4px 6px -1px var(--shadow-color), 0 2px 4px -1px var(--shadow-color);
   text-align: center;
 
   @media (max-width: 768px) {
@@ -115,10 +115,10 @@ const MainContent = styled.div`
 `;
 
 const Card = styled(motion.div)`
-  background: white;
+  background: var(--surface);
   border-radius: 20px;
   padding: 3rem 2rem;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 4px 6px -1px var(--shadow-color), 0 2px 4px -1px var(--shadow-color);
   border: 1px solid rgba(0, 0, 0, 0.06);
   display: flex;
   flex-direction: column;
@@ -132,7 +132,7 @@ const Card = styled(motion.div)`
 
   &:hover {
     transform: translateY(-4px);
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    box-shadow: 0 20px 25px -5px var(--shadow-color), 0 10px 10px -5px var(--shadow-color);
     border-color: rgba(var(--primary-rgb-dark), 0.3);
 
     .icon-container {

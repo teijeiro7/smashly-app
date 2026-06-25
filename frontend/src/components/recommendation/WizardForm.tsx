@@ -125,7 +125,7 @@ const Input = styled.input`
   &:focus {
     outline: none;
     border-color: var(--text);
-    box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.06);
+    box-shadow: 0 0 0 3px var(--shadow-color);
   }
 `;
 
@@ -147,7 +147,7 @@ const TextArea = styled.textarea`
   &:focus {
     outline: none;
     border-color: var(--text);
-    box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.06);
+    box-shadow: 0 0 0 3px var(--shadow-color);
   }
 `;
 
@@ -173,7 +173,7 @@ const NavButton = styled.button<{ $primary?: boolean }>`
   font-weight: 600;
   cursor: pointer;
   background: ${props => (props.$primary ? 'var(--primary-hover)' : 'var(--surface-3)')};
-  color: ${props => (props.$primary ? 'var(--text-inverse)' : 'var(--text)')};
+  color: ${props => (props.$primary ? 'var(--brand-on-surface)' : 'var(--text)')};
   transition: background-color 0.15s ease, transform 0.15s ease, color 0.15s ease;
   font-size: 0.95rem;
   flex: 1;

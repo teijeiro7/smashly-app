@@ -23,7 +23,7 @@ const ChartContainer = styled.div`
   background: var(--surface);
   border-radius: 16px;
   padding: 2rem;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4px 20px var(--shadow-color);
   margin: 2rem 0;
   will-change: contents;
   transform: translateZ(0);
@@ -63,7 +63,7 @@ const CustomTooltip = memo(({ active, payload, metrics }: any) => {
   return (
     <div
       style={{
-        background: 'white',
+        background: 'var(--surface)',
         padding: '12px',
         borderRadius: '8px',
         boxShadow: '0 4px 12px rgba(0,0,0,0.15)',

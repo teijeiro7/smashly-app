@@ -7,7 +7,7 @@ const Card = styled(motion.div)`
   background: var(--surface);
   border-radius: 20px;
   padding: 2rem;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 20px var(--shadow-color);
   border: 1px solid rgba(var(--primary-rgb), 0.1);
   cursor: pointer;
   transition: all 0.3s ease;

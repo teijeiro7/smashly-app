@@ -389,7 +389,7 @@ const FormContainer = styled.div`
   padding: 1.5rem;
   border-radius: 16px;
   border: 1px solid var(--border);
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 6px -1px var(--shadow-color);
 `;
 
 const EmptyStateBanner = styled.div`

@@ -82,11 +82,11 @@ const RequestCard = styled.div`
   background: var(--surface);
   border-radius: 12px;
   padding: 1.5rem;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 2px 10px var(--shadow-color);
   transition: all 0.3s ease;
 
   &:hover {
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 20px var(--shadow-color);
     transform: translateY(-2px);
   }
 `;
@@ -191,7 +191,7 @@ const ActionButton = styled.button<{ variant: 'approve' | 'reject' }>`
 
     &:hover {
       background: var(--danger);
-      color: var(--text-inverse);
+      color: var(--brand-on-surface);
     }
   `}
 

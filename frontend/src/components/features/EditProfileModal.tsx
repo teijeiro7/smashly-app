@@ -224,7 +224,7 @@ const Button = styled.button<{ variant?: "primary" | "secondary" }>`
     props.variant === "primary"
       ? `
     background: linear-gradient(135deg, var(--brand-surface) 0%, var(--brand-surface-hover) 100%);
-    color: var(--text-inverse);
+    color: var(--brand-on-surface);
     &:hover {
       transform: translateY(-2px);
       box-shadow: 0 4px 12px rgba(var(--primary-rgb), 0.3);

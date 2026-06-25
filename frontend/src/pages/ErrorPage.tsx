@@ -14,7 +14,7 @@ const ErrorContainer = styled.div`
 `;
 
 const ErrorCard = styled.div`
-  background: white;
+  background: var(--surface);
   border-radius: 12px;
   padding: 3rem 2rem;
   max-width: 500px;

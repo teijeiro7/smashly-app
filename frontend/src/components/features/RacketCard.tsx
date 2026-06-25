@@ -10,7 +10,7 @@ const RacketCardContainer = styled.li<{ $view: 'grid' | 'list'; $index: number }
   background: var(--surface);
   border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 1px 3px var(--shadow-color), 0 1px 2px var(--shadow-color);
   cursor: pointer;
   transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   border: 1px solid var(--border);
@@ -36,7 +36,7 @@ const RacketCardContainer = styled.li<{ $view: 'grid' | 'list'; $index: number }
 
   &:hover {
     transform: translateY(-4px);
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 10px 25px var(--shadow-color);
     border-color: var(--primary-hover);
   }
 `;
@@ -79,7 +79,7 @@ const RacketBadge = styled.div<{ $variant: 'bestseller' | 'offer' | 'comparison'
     if (props.$variant === 'comparison') return 'var(--text-muted)'; // Gray-Slate for comparison
     return 'var(--error)'; // Offer
   }};
-  color: var(--text-inverse);
+  color: var(--brand-on-surface);
   padding: 0.375rem 0.75rem;
   border-radius: 6px;
   font-size: 0.75rem;
@@ -142,7 +142,7 @@ const OriginalPrice = styled.div`
 
 const DiscountBadge = styled.div`
   background: var(--error);
-  color: var(--text-inverse);
+  color: var(--brand-on-surface);
   padding: 0.25rem 0.5rem;
   border-radius: 4px;
   font-size: 0.75rem;
@@ -162,7 +162,7 @@ const ActionButtons = styled.div<{ $view: 'grid' | 'list' }>`
 const ViewDetailsButton = styled.button`
   flex: 1;
   background: var(--primary-hover);
-  color: var(--text-inverse);
+  color: var(--brand-on-surface);
   border: none;
   padding: 0.75rem 1rem;
   border-radius: 8px;

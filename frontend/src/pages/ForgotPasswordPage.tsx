@@ -16,10 +16,10 @@ const PageContainer = styled.div`
 `;
 
 const Card = styled(motion.div)`
-  background: white;
+  background: var(--surface);
   padding: 2.5rem;
   border-radius: 24px;
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 10px 25px -5px var(--shadow-color), 0 8px 10px -6px var(--shadow-color);
   width: 100%;
   max-width: 450px;
   border: 1px solid var(--border);
@@ -91,7 +91,7 @@ const Input = styled.input<{ $hasError?: boolean }>`
   padding: 0.75rem 1rem 0.75rem 2.75rem;
   border-radius: 12px;
   border: 1.5px solid ${props => props.$hasError ? '#fca5a5' : 'var(--border)'};
-  background: ${props => props.$hasError ? 'var(--danger-subtle)' : 'white'};
+  background: ${props => props.$hasError ? 'var(--danger-subtle)' : 'var(--surface)'};
   font-size: 1rem;
   transition: all 0.2s ease;
   color: var(--text);

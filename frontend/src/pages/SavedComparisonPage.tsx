@@ -44,7 +44,7 @@ const BackButton = styled.button`
   align-items: center;
   gap: 0.5rem;
   padding: 0.5rem 1rem;
-  background: white;
+  background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 8px;
   color: var(--text);
@@ -96,7 +96,7 @@ const ActionButton = styled.button<{ variant?: 'primary' }>`
     &:hover { background: var(--brand-surface-hover); }
   `
       : `
-    background: white;
+    background: var(--surface);
     border: 1px solid var(--border);
     color: var(--text);
     &:hover { background: var(--surface-2); border-color: var(--border-strong); }
@@ -111,7 +111,7 @@ const ActionButton = styled.button<{ variant?: 'primary' }>`
 const ResultSection = styled(motion.div)`
   max-width: 1000px;
   margin: 0 auto;
-  background: white;
+  background: var(--surface);
   border-radius: 24px;
   padding: 3rem;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);

@@ -101,7 +101,7 @@ const Tab = styled.button<{ active: boolean }>`
 const Table = styled.div`
   background: var(--surface);
   border-radius: 12px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 2px 10px var(--shadow-color);
   overflow: hidden;
 `;
 
@@ -194,7 +194,7 @@ const ActionsCell = styled(Cell)`
 const IconButton = styled.button<{ color?: string }>`
   padding: 0.5rem;
   background: ${props => props.color || 'var(--surface-3)'};
-  color: ${props => (props.color ? 'var(--text-inverse)' : 'var(--text-muted)')};
+  color: ${props => (props.color ? 'var(--brand-on-surface)' : 'var(--text-muted)')};
   border: none;
   border-radius: 8px;
   cursor: pointer;

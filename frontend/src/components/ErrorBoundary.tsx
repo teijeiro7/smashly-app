@@ -82,7 +82,7 @@ class ErrorBoundary extends Component<Props, State> {
                   transition: 'all 0.2s ease',
                   border: 'none',
                   background: 'var(--primary)',
-                  color: 'var(--text-inverse)',
+                  color: 'var(--brand-on-surface)',
                 }}
               >
                 Reintentar

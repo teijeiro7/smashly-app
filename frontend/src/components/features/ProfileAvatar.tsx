@@ -34,7 +34,7 @@ const AvatarFallback = styled.div<{ $size?: number }>`
   justify-content: center;
   font-size: ${props => (props.$size || 120) / 2.5}px;
   font-weight: 700;
-  color: var(--text-inverse);
+  color: var(--brand-on-surface);
   background: linear-gradient(135deg, rgba(var(--primary-rgb), 0.20), rgba(var(--primary-rgb), 0.08));
 `;
 
@@ -55,7 +55,7 @@ const UploadButton = styled(motion.button)`
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 
   &:hover {
-    background: var(--text);
+    background: var(--brand-surface-hover);
   }
 `;
 

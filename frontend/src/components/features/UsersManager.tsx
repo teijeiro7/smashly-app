@@ -56,7 +56,7 @@ const FilterButtons = styled.div`
 const FilterButton = styled.button<{ active: boolean }>`
   padding: 0.75rem 1.25rem;
   background: ${props => (props.active ? 'var(--primary)' : 'var(--surface)')};
-  color: ${props => (props.active ? 'var(--text-inverse)' : 'var(--text-muted)')};
+  color: ${props => (props.active ? 'var(--brand-on-surface)' : 'var(--text-muted)')};
   border: 1px solid ${props => (props.active ? 'var(--primary)' : 'var(--border)')};
   border-radius: 8px;
   font-size: 0.875rem;
@@ -72,7 +72,7 @@ const FilterButton = styled.button<{ active: boolean }>`
 const Table = styled.div`
   background: var(--surface);
   border-radius: 12px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 2px 10px var(--shadow-color);
   overflow: hidden;
 `;
 
@@ -135,7 +135,7 @@ const Avatar = styled.div`
   height: 40px;
   border-radius: 50%;
   background: linear-gradient(135deg, var(--brand-surface) 0%, var(--brand-surface-hover) 100%);
-  color: var(--text-inverse);
+  color: var(--brand-on-surface);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -184,7 +184,7 @@ const ActionsCell = styled(Cell)`
 const IconButton = styled.button<{ color?: string }>`
   padding: 0.5rem;
   background: ${props => props.color || 'var(--surface-3)'};
-  color: ${props => (props.color ? 'var(--text-inverse)' : 'var(--text-muted)')};
+  color: ${props => (props.color ? 'var(--brand-on-surface)' : 'var(--text-muted)')};
   border: none;
   border-radius: 8px;
   cursor: pointer;
@@ -228,7 +228,7 @@ const StatCard = styled.div`
   background: var(--surface);
   padding: 1.5rem;
   border-radius: 12px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 2px 10px var(--shadow-color);
 `;
 
 const StatValue = styled.div`

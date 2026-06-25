@@ -312,10 +312,12 @@ export const GlobalStyles = createGlobalStyle`
     --radius-2xl: 1.5rem;
 
     /* Shadows */
-    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    --shadow-color: rgba(0, 0, 0, 0.10);
+    --surface-overlay: rgba(255, 255, 255, 0.85);
+    --shadow-sm: 0 1px 2px 0 var(--shadow-color);
+    --shadow-md: 0 4px 6px -1px var(--shadow-color), 0 2px 4px -1px var(--shadow-color);
+    --shadow-lg: 0 10px 15px -3px var(--shadow-color), 0 4px 6px -2px var(--shadow-color);
+    --shadow-xl: 0 20px 25px -5px var(--shadow-color), 0 10px 10px -5px var(--shadow-color);
   }
 
   /* Dark mode — selectors use BOTH attribute and class for maximum
@@ -384,10 +386,12 @@ export const GlobalStyles = createGlobalStyle`
     --brand-on-surface: #ffffff;
     --surface-inverse: #0f172a;
 
-    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.40);
-    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.50), 0 2px 4px -1px rgba(0, 0, 0, 0.40);
-    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.55), 0 4px 6px -2px rgba(0, 0, 0, 0.40);
-    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.60), 0 10px 10px -5px rgba(0, 0, 0, 0.45);
+    --shadow-color: rgba(0, 0, 0, 0.50);
+    --surface-overlay: rgba(18, 26, 22, 0.85);
+    --shadow-sm: 0 1px 2px 0 var(--shadow-color);
+    --shadow-md: 0 4px 6px -1px var(--shadow-color), 0 2px 4px -1px var(--shadow-color);
+    --shadow-lg: 0 10px 15px -3px var(--shadow-color), 0 4px 6px -2px var(--shadow-color);
+    --shadow-xl: 0 20px 25px -5px var(--shadow-color), 0 10px 10px -5px var(--shadow-color);
 
     color-scheme: dark;
   }
@@ -458,10 +462,12 @@ export const GlobalStyles = createGlobalStyle`
       --brand-on-surface: #ffffff;
       --surface-inverse: #0f172a;
 
-      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.40);
-      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.50), 0 2px 4px -1px rgba(0, 0, 0, 0.40);
-      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.55), 0 4px 6px -2px rgba(0, 0, 0, 0.40);
-      --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.60), 0 10px 10px -5px rgba(0, 0, 0, 0.45);
+      --shadow-color: rgba(0, 0, 0, 0.50);
+      --surface-overlay: rgba(18, 26, 22, 0.85);
+      --shadow-sm: 0 1px 2px 0 var(--shadow-color);
+      --shadow-md: 0 4px 6px -1px var(--shadow-color), 0 2px 4px -1px var(--shadow-color);
+      --shadow-lg: 0 10px 15px -3px var(--shadow-color), 0 4px 6px -2px var(--shadow-color);
+      --shadow-xl: 0 20px 25px -5px var(--shadow-color), 0 10px 10px -5px var(--shadow-color);
 
       color-scheme: dark;
     }

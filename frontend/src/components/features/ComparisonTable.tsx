@@ -21,7 +21,7 @@ const TableContainer = styled.div`
   overflow-x: auto;
   margin-bottom: 3rem;
   border-radius: 16px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 20px var(--shadow-color);
   background: var(--surface);
   -webkit-overflow-scrolling: touch;
 

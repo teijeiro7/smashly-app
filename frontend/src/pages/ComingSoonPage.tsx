@@ -14,7 +14,7 @@ const Container = styled.div`
 `;
 
 const ContentCard = styled(motion.div)`
-  background: white;
+  background: var(--surface);
   border-radius: 24px;
   box-shadow: 0 20px 60px rgba(var(--primary-rgb), 0.1);
   padding: 3rem;
@@ -119,7 +119,7 @@ const Button = styled(Link)<{ variant?: "primary" | "secondary" }>`
     }
   `
       : `
-    background: white;
+    background: var(--surface);
     color: var(--primary);
     border: 2px solid var(--primary);
     

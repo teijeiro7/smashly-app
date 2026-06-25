@@ -79,7 +79,7 @@ const SuccessIcon = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--text-inverse);
+  color: var(--brand-on-surface);
   animation: scaleIn 0.4s ease;
 
   @keyframes scaleIn {
@@ -156,7 +156,7 @@ const Button = styled.button<{ variant?: "primary" | "secondary" }>`
   `
       : `
     background: linear-gradient(135deg, var(--brand-surface) 0%, var(--success) 100%);
-    color: var(--text-inverse);
+    color: var(--brand-on-surface);
     &:hover {
       transform: translateY(-2px);
       box-shadow: 0 8px 24px rgba(var(--primary-rgb), 0.3);

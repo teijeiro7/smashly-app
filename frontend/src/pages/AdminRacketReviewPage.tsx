@@ -27,9 +27,9 @@ const BackButton = styled(Link)`
   text-decoration: none;
   font-weight: 500;
   padding: 0.5rem 1rem;
-  background: white;
+  background: var(--surface);
   border-radius: 8px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 1px 3px var(--shadow-color);
   transition: all 0.2s;
 
   &:hover {
@@ -52,9 +52,9 @@ const Content = styled.div`
 `;
 
 const ConflictCard = styled.div`
-  background: white;
+  background: var(--surface);
   border-radius: 12px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 6px var(--shadow-color);
   padding: 1.5rem;
   border: 1px solid var(--border);
 `;

@@ -7,7 +7,7 @@ import { useAuth } from '../../contexts/AuthContext';
 const SubHeaderContainer = styled.div`
   background: var(--surface);
   border-bottom: 1px solid var(--border);
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 1px 2px var(--shadow-color);
   position: sticky;
   top: calc(64px + env(safe-area-inset-top, 0));
   z-index: 320;

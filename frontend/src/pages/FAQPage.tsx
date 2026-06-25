@@ -59,10 +59,10 @@ const Subtitle = styled.p`
 
 const CategorySection = styled.div`
   padding: 1.5rem 0;
-  background: white;
+  background: var(--surface);
   border-top: 1px solid var(--border);
   border-bottom: 1px solid var(--border);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+  box-shadow: 0 2px 4px var(--shadow-color);
 `;
 
 const CategoryContainer = styled.div`
@@ -195,10 +195,10 @@ const FAQSection = styled.div`
 `;
 
 const FAQItem = styled.div`
-  background: white;
+  background: var(--surface);
   border-radius: 0.75rem;
   overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 2px 8px var(--shadow-color);
 `;
 
 const QuestionHeader = styled.button`
@@ -207,7 +207,7 @@ const QuestionHeader = styled.button`
   align-items: center;
   justify-content: space-between;
   padding: 1rem;
-  background: white;
+  background: var(--surface);
   border: none;
   cursor: pointer;
   text-align: left;
@@ -281,11 +281,11 @@ const ContactSection = styled.div`
 `;
 
 const ContactCard = styled.div`
-  background: white;
+  background: var(--surface);
   border-radius: 1rem;
   padding: clamp(1.5rem, 4vw, 2rem);
   text-align: center;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 12px var(--shadow-color);
 `;
 
 const ContactIconContainer = styled.div`
@@ -349,7 +349,7 @@ const CategorySelect = styled.select`
   padding: 0.875rem 1rem;
   border-radius: 12px;
   border: 2px solid var(--border);
-  background: white;
+  background: var(--surface);
   font-size: 0.9375rem;
   font-weight: 500;
   color: var(--text);

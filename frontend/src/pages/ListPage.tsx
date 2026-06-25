@@ -61,7 +61,7 @@ const Badge = styled.span`
   border-radius: 9999px;
   font-size: 0.75rem;
   font-weight: 600;
-  background: white;
+  background: var(--surface);
   color: var(--text-muted);
   border: 1px solid var(--border);
 `;
@@ -91,7 +91,7 @@ const LoadingState = styled.div`
 const EmptyState = styled.div`
   text-align: center;
   padding: 4rem 2rem;
-  background: white;
+  background: var(--surface);
   border-radius: 20px;
   border: 2px dashed var(--border);
   color: var(--text-muted);

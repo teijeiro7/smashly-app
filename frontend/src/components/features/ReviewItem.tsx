@@ -469,7 +469,7 @@ const Container = styled.div`
   transition: all 0.2s;
 
   &:hover {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+    box-shadow: 0 4px 12px var(--shadow-color);
     border-color: var(--border);
   }
 `;
