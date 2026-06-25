@@ -65,8 +65,8 @@ const Container = styled.div`
   flex-wrap: wrap;
   gap: 2rem;
   padding: 1.5rem;
-  background: white;
-  border: 1px solid #e0e0e0;
+  background: var(--surface);
+  border: 1px solid var(--border);
   border-radius: 8px;
   margin-bottom: 2rem;
 
@@ -87,7 +87,7 @@ const FilterGroup = styled.div`
 const Label = styled.div`
   font-size: 0.875rem;
   font-weight: 600;
-  color: #666;
+  color: var(--text-muted);
 `;
 
 const FilterButtons = styled.div`
@@ -98,9 +98,9 @@ const FilterButtons = styled.div`
 
 const FilterButton = styled.button<{ active: boolean }>`
   padding: 0.5rem 1rem;
-  background: ${(props) => (props.active ? "#4CAF50" : "white")};
-  color: ${(props) => (props.active ? "white" : "#666")};
-  border: 1px solid ${(props) => (props.active ? "#4CAF50" : "#ddd")};
+  background: ${(props) => (props.active ? "var(--primary)" : "var(--surface)")};
+  color: ${(props) => (props.active ? "var(--brand-on-surface)" : "var(--text-muted)")};
+  border: 1px solid ${(props) => (props.active ? "var(--primary)" : "var(--border)")};
   border-radius: 6px;
   font-size: 0.875rem;
   font-weight: ${(props) => (props.active ? "600" : "400")};
@@ -108,22 +108,22 @@ const FilterButton = styled.button<{ active: boolean }>`
   transition: all 0.2s;
 
   &:hover {
-    background: ${(props) => (props.active ? "#45a049" : "#f5f5f5")};
-    border-color: ${(props) => (props.active ? "#45a049" : "#bbb")};
+    background: ${(props) => (props.active ? "var(--primary-hover)" : "var(--surface-2)")};
+    border-color: ${(props) => (props.active ? "var(--primary-hover)" : "var(--border-strong)")};
   }
 `;
 
 const Select = styled.select`
   padding: 0.5rem 1rem;
-  border: 1px solid #ddd;
+  border: 1px solid var(--border);
   border-radius: 6px;
   font-size: 0.875rem;
-  background: white;
+  background: var(--surface);
   cursor: pointer;
   transition: border-color 0.2s;
 
   &:focus {
     outline: none;
-    border-color: #4caf50;
+    border-color: var(--primary);
   }
 `;

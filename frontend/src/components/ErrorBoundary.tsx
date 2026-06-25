@@ -48,26 +48,26 @@ class ErrorBoundary extends Component<Props, State> {
             minHeight: '100vh',
             padding: '2rem',
             textAlign: 'center',
-            background: 'linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%)',
+            background: 'linear-gradient(135deg, var(--primary-subtle) 0%, var(--primary-faint) 100%)',
           }}
         >
           <div
             style={{
-              background: 'white',
+              background: 'var(--surface)',
               borderRadius: '16px',
               padding: '3rem 2rem',
               maxWidth: '500px',
               width: '100%',
-              boxShadow: '0 10px 40px rgba(22, 163, 74, 0.12)',
+              boxShadow: '0 10px 40px rgba(var(--primary-rgb), 0.12)',
             }}
           >
-            <h1 style={{ fontSize: '3rem', margin: '0', color: '#dc2626', fontWeight: '700' }}>
+            <h1 style={{ fontSize: '3rem', margin: '0', color: 'var(--danger)', fontWeight: '700' }}>
               ¡Ups!
             </h1>
-            <h2 style={{ fontSize: '1.5rem', margin: '1rem 0', color: '#1f2937' }}>
+            <h2 style={{ fontSize: '1.5rem', margin: '1rem 0', color: 'var(--text)' }}>
               Algo salió mal
             </h2>
-            <p style={{ fontSize: '1rem', color: '#6b7280', margin: '1.5rem 0', lineHeight: '1.6' }}>
+            <p style={{ fontSize: '1rem', color: 'var(--text-muted)', margin: '1.5rem 0', lineHeight: '1.6' }}>
               Ha ocurrido un error inesperado. Puedes intentar recargar la página o volver al inicio.
             </p>
             <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', marginTop: '2rem' }}>
@@ -81,8 +81,8 @@ class ErrorBoundary extends Component<Props, State> {
                   cursor: 'pointer',
                   transition: 'all 0.2s ease',
                   border: 'none',
-                  background: '#16a34a',
-                  color: 'white',
+                  background: 'var(--primary)',
+                  color: 'var(--brand-on-surface)',
                 }}
               >
                 Reintentar
@@ -96,9 +96,9 @@ class ErrorBoundary extends Component<Props, State> {
                   fontWeight: '600',
                   cursor: 'pointer',
                   transition: 'all 0.2s ease',
-                  border: '1px solid #d1d5db',
-                  background: 'white',
-                  color: '#374151',
+                  border: '1px solid var(--border-strong)',
+                  background: 'var(--surface)',
+                  color: 'var(--text)',
                 }}
               >
                 Ver Detalles

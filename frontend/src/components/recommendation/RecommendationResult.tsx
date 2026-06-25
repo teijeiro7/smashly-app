@@ -22,12 +22,12 @@ const Header = styled.div`
   h2 {
     font-size: 2.5rem;
     margin-bottom: 1rem;
-    color: #1f2937;
+    color: var(--text);
     font-weight: 800;
   }
 
   p {
-    color: #6b7280;
+    color: var(--text-muted);
     font-size: 1.1rem;
     max-width: 600px;
     margin: 0 auto;
@@ -35,11 +35,11 @@ const Header = styled.div`
 `;
 
 const AnalysisCard = styled.div`
-  background: white;
+  background: var(--surface);
   border-radius: 16px;
   padding: 0;
   margin-bottom: 3rem;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 4px 6px -1px var(--shadow-color), 0 2px 4px -1px var(--shadow-color);
   border: 1px solid rgba(0, 0, 0, 0.06);
   overflow: hidden;
 `;
@@ -49,14 +49,14 @@ const AnalysisHeader = styled.div`
   align-items: center;
   gap: 0.75rem;
   padding: 1.5rem 2rem;
-  background: #f9fafb;
-  border-bottom: 1px solid #e5e7eb;
+  background: var(--surface-2);
+  border-bottom: 1px solid var(--border);
 `;
 
 const IconWrapper = styled.div`
   width: 40px;
   height: 40px;
-  background: linear-gradient(135deg, #15803d 0%, #15803d 100%);
+  background: var(--brand-surface-hover);
   border-radius: 10px;
   display: flex;
   align-items: center;
@@ -66,12 +66,12 @@ const IconWrapper = styled.div`
   svg {
     width: 22px;
     height: 22px;
-    color: white;
+    color: var(--brand-on-surface);
   }
 `;
 
 const AnalysisTitle = styled.h3`
-  color: #1f2937;
+  color: var(--text);
   margin: 0;
   font-size: 1.25rem;
   font-weight: 700;
@@ -83,7 +83,7 @@ const AnalysisContent = styled.div`
 
 const AnalysisParagraph = styled.p`
   line-height: 1.8;
-  color: #4b5563;
+  color: var(--text);
   margin-bottom: 1rem;
   font-size: 0.95rem;
 
@@ -92,7 +92,7 @@ const AnalysisParagraph = styled.p`
   }
 
   strong {
-    color: #1f2937;
+    color: var(--text);
     font-weight: 600;
   }
 `;
@@ -109,26 +109,26 @@ const RacketsGrid = styled.div`
 `;
 
 const RacketCard = styled.div`
-  background: white;
+  background: var(--surface);
   border-radius: 24px;
   overflow: hidden;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--border);
   transition: all 0.3s ease;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 6px var(--shadow-color);
 
   &:hover {
     transform: translateY(-5px);
-    border-color: #15803d;
-    box-shadow: 0 20px 40px rgba(21, 128, 61, 0.15);
+    border-color: var(--primary-hover);
+    box-shadow: 0 20px 40px rgba(var(--primary-rgb-dark), 0.15);
   }
 `;
 
 const RacketHeader = styled.div`
   padding: 1.5rem;
-  background: #f0fdf4;
-  border-bottom: 1px solid #e5e7eb;
+  background: var(--primary-subtle);
+  border-bottom: 1px solid var(--border);
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
@@ -142,21 +142,21 @@ const RacketHeaderInfo = styled.div`
 const RacketName = styled.h4`
   font-size: 1.1rem;
   margin: 0 0 0.25rem 0;
-  color: #1f2937;
+  color: var(--text);
   font-weight: 700;
   line-height: 1.3;
 `;
 
 const RacketBrand = styled.div`
   font-size: 0.85rem;
-  color: #6b7280;
+  color: var(--text-muted);
   margin-bottom: 0.5rem;
 `;
 
 const RacketPrice = styled.div`
   font-size: 1.3rem;
   font-weight: 700;
-  color: #15803d;
+  color: var(--primary-hover);
   margin-top: 0.5rem;
 `;
 
@@ -166,17 +166,17 @@ const NoPriceBadge = styled.div`
   gap: 0.3rem;
   margin-top: 0.5rem;
   padding: 0.25rem 0.6rem;
-  background: #f3f4f6;
-  border: 1px solid #d1d5db;
+  background: var(--surface-3);
+  border: 1px solid var(--border-strong);
   border-radius: 6px;
   font-size: 0.75rem;
-  color: #6b7280;
+  color: var(--text-muted);
   font-weight: 500;
 `;
 
 const MatchScore = styled.div`
-  background: #15803d;
-  color: white;
+  background: var(--primary-hover);
+  color: var(--brand-on-surface);
   padding: 0.4rem 0.9rem;
   border-radius: 20px;
   font-weight: bold;
@@ -198,7 +198,11 @@ const RacketImage = styled.img`
   height: auto;
   object-fit: contain;
   margin: 0 auto;
-  border-radius: 8px;
+  border-radius: var(--racket-image-radius-card);
+  background: var(--racket-image-bg);
+  border: var(--racket-image-border);
+  box-shadow: var(--racket-image-shadow);
+  padding: 0.5rem;
 `;
 
 const Section = styled.div`
@@ -212,7 +216,7 @@ const Section = styled.div`
 const SectionTitle = styled.h5`
   font-size: 0.85rem;
   font-weight: 700;
-  color: #15803d;
+  color: var(--primary-hover);
   text-transform: uppercase;
   letter-spacing: 0.5px;
   margin: 0 0 0.75rem 0;
@@ -222,7 +226,7 @@ const SectionTitle = styled.h5`
 `;
 
 const SectionContent = styled.div`
-  color: #4b5563;
+  color: var(--text);
   font-size: 0.9rem;
   line-height: 1.6;
 `;
@@ -238,15 +242,15 @@ const MetricBadge = styled.div<{ $certified?: boolean }>`
   flex-direction: column;
   align-items: center;
   padding: 0.5rem 0.75rem;
-  background: ${props => (props.$certified ? '#f0fdf4' : '#f9fafb')};
-  border: 1px solid ${props => (props.$certified ? '#15803d' : '#e5e7eb')};
+  background: ${props => (props.$certified ? 'var(--primary-subtle)' : 'var(--surface-2)')};
+  border: 1px solid ${props => (props.$certified ? 'var(--primary-hover)' : 'var(--border)')};
   border-radius: 8px;
   min-width: 70px;
 `;
 
 const MetricLabel = styled.div`
   font-size: 0.7rem;
-  color: #6b7280;
+  color: var(--text-muted);
   text-transform: uppercase;
   font-weight: 600;
   margin-bottom: 0.25rem;
@@ -255,7 +259,7 @@ const MetricLabel = styled.div`
 const MetricValue = styled.div<{ $certified?: boolean }>`
   font-size: 1.1rem;
   font-weight: 700;
-  color: ${props => (props.$certified ? '#15803d' : '#1f2937')};
+  color: ${props => (props.$certified ? 'var(--primary-hover)' : 'var(--text)')};
 `;
 
 const SafetyBadge = styled.div<{ $safe: boolean }>`
@@ -263,12 +267,12 @@ const SafetyBadge = styled.div<{ $safe: boolean }>`
   align-items: center;
   gap: 0.5rem;
   padding: 0.5rem 1rem;
-  background: ${props => (props.$safe ? '#f0fdf4' : '#fef2f2')};
-  border: 1px solid ${props => (props.$safe ? '#15803d' : '#ef4444')};
+  background: ${props => (props.$safe ? 'var(--primary-subtle)' : 'var(--surface-2)')};
+  border: 1px solid ${props => (props.$safe ? 'var(--primary-hover)' : 'var(--error)')};
   border-radius: 8px;
   font-size: 0.85rem;
   font-weight: 600;
-  color: ${props => (props.$safe ? '#15803d' : '#dc2626')};
+  color: ${props => (props.$safe ? 'var(--primary-hover)' : 'var(--danger)')};
 `;
 
 const CommunityRating = styled.div`
@@ -276,42 +280,42 @@ const CommunityRating = styled.div`
   align-items: center;
   gap: 0.5rem;
   font-size: 0.9rem;
-  color: #6b7280;
+  color: var(--text-muted);
 `;
 
 const Stars = styled.div`
-  color: #fbbf24;
+  color: var(--warning);
   font-size: 1rem;
 `;
 
 const CertificationNote = styled.div`
   font-size: 0.75rem;
-  color: #6b7280;
+  color: var(--text-muted);
   font-style: italic;
   margin-top: 0.5rem;
   padding: 0.5rem;
-  background: #f9fafb;
+  background: var(--surface-2);
   border-radius: 6px;
 `;
 
 const ViewButton = styled(Link)`
   display: block;
   text-align: center;
-  background: linear-gradient(135deg, #15803d 0%, #15803d 100%);
-  color: white;
+  background: var(--brand-surface-hover);
+  color: var(--brand-on-surface);
   padding: 0.75rem;
   border-radius: 12px;
   text-decoration: none;
   font-weight: 600;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 6px rgba(21, 128, 61, 0.2);
+  box-shadow: 0 4px 6px rgba(var(--primary-rgb-dark), 0.2);
   margin-top: auto;
 
   &:hover {
-    background: linear-gradient(135deg, #15803d 0%, #14532d 100%);
-    color: white;
+    background: var(--brand-surface-hover);
+    color: var(--brand-on-surface);
     transform: translateY(-2px);
-    box-shadow: 0 6px 12px rgba(21, 128, 61, 0.3);
+    box-shadow: 0 6px 12px rgba(var(--primary-rgb-dark), 0.3);
     text-decoration: none;
   }
 `;
@@ -328,15 +332,15 @@ const Button = styled.button<{ $primary?: boolean }>`
   border: none;
   font-weight: 600;
   cursor: pointer;
-  background: ${props => (props.$primary ? '#15803d' : 'white')};
-  color: ${props => (props.$primary ? 'white' : '#4b5563')};
-  border: ${props => (props.$primary ? 'none' : '1px solid #e5e7eb')};
+  background: ${props => (props.$primary ? 'var(--primary-hover)' : 'var(--surface)')};
+  color: ${props => (props.$primary ? 'var(--brand-on-surface)' : 'var(--text)')};
+  border: ${props => (props.$primary ? 'none' : '1px solid var(--border)')};
   transition: all 0.2s;
   font-size: 1rem;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 2px 5px var(--shadow-color);
 
   &:hover {
-    background: ${props => (props.$primary ? '#15803d' : '#f9fafb')};
+    background: ${props => (props.$primary ? 'var(--primary-hover)' : 'var(--surface-2)')};
     transform: translateY(-1px);
   }
 `;
@@ -503,7 +507,7 @@ export const RecommendationResult: React.FC<Props> = ({
               {racket.what_it_sacrifices && (
                 <Section>
                   <SectionTitle>⚖️ Qué cede frente a las otras opciones</SectionTitle>
-                  <SectionContent style={{ color: '#6b7280', fontStyle: 'italic' }}>
+                    <SectionContent style={{ color: 'var(--text-muted)', fontStyle: 'italic' }}>
                     {racket.what_it_sacrifices}
                   </SectionContent>
                 </Section>
@@ -545,9 +549,9 @@ export const RecommendationResult: React.FC<Props> = ({
 
       {/* Coaching tip (new) */}
       {result.coaching_tip && (
-        <AnalysisCard style={{ borderLeftColor: '#2563eb', marginBottom: '2rem' }}>
+        <AnalysisCard style={{ borderLeftColor: 'var(--color-secondary)', marginBottom: '2rem' }}>
           <AnalysisHeader>
-            <IconWrapper style={{ background: 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)' }}>
+            <IconWrapper style={{ background: 'linear-gradient(135deg, var(--color-secondary) 0%, var(--color-secondary) 100%)' }}>
               <svg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' strokeWidth={2} stroke='currentColor'>
                 <path strokeLinecap='round' strokeLinejoin='round' d='M4.26 10.147a60.436 60.436 0 00-.491 6.347A48.627 48.627 0 0112 20.904a48.627 48.627 0 018.232-4.41 60.46 60.46 0 00-.491-6.347m-15.482 0a50.57 50.57 0 00-2.658-.813A59.905 59.905 0 0112 3.493a59.902 59.902 0 0110.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.697 50.697 0 0112 13.489a50.702 50.702 0 017.74-3.342M6.75 15a.75.75 0 100-1.5.75.75 0 000 1.5zm0 0v-3.675A55.378 55.378 0 0112 8.443m-7.007 11.55A5.981 5.981 0 006.75 15.75v-1.5' />
               </svg>

@@ -12,7 +12,7 @@ interface ComparisonTableProps {
   rackets?: Racket[];
 }
 
-const RACKET_COLORS = ['#16a34a', '#3b82f6', '#f59e0b'];
+const RACKET_COLORS = ['var(--primary)', 'var(--info)', 'var(--accent)'];
 
 // ── Desktop table ─────────────────────────────────────────────
 
@@ -21,13 +21,13 @@ const TableContainer = styled.div`
   overflow-x: auto;
   margin-bottom: 3rem;
   border-radius: 16px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-  background: white;
+  box-shadow: 0 4px 20px var(--shadow-color);
+  background: var(--surface);
   -webkit-overflow-scrolling: touch;
 
   &::-webkit-scrollbar { height: 6px; }
-  &::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 3px; }
-  &::-webkit-scrollbar-thumb { background: #c1c1c1; border-radius: 3px; }
+  &::-webkit-scrollbar-track { background: var(--surface-3); border-radius: 3px; }
+  &::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 3px; }
 
   @media (max-width: 768px) {
     display: none;
@@ -43,11 +43,11 @@ const Table = styled.table`
 const Th = styled.th`
   text-align: left;
   padding: 1rem;
-  background: #f9fafb;
-  color: #374151;
+  background: var(--surface-2);
+  color: var(--text);
   font-weight: 600;
   font-size: 0.875rem;
-  border-bottom: 2px solid #e5e7eb;
+  border-bottom: 2px solid var(--border);
   white-space: nowrap;
 
   &:first-child { border-top-left-radius: 16px; width: 25%; min-width: 100px; }
@@ -56,29 +56,29 @@ const Th = styled.th`
 
 const Tr = styled.tr`
   &:last-child td { border-bottom: none; }
-  &:nth-child(even) { background: #f9fafb; }
+  &:nth-child(even) { background: var(--surface-2); }
   transition: background 0.2s;
-  &:hover { background: #f3f4f6; }
+  &:hover { background: var(--surface-3); }
 `;
 
 const Td = styled.td`
   padding: 0.875rem 1rem;
-  border-bottom: 1px solid #e5e7eb;
-  color: #4b5563;
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
   font-size: 0.875rem;
   line-height: 1.5;
   white-space: nowrap;
-  &:first-child { font-weight: 600; color: #1f2937; }
+  &:first-child { font-weight: 600; color: var(--text); }
 `;
 
 const CheckMark = styled(FiCheckCircle)`
-  color: #15803d;
+  color: var(--primary-hover);
   margin-left: 0.5rem;
   vertical-align: middle;
 `;
 
 const EmptyMark = styled(FiMinus)`
-  color: #d1d5db;
+  color: var(--border-strong);
 `;
 
 // ── Mobile cards ──────────────────────────────────────────────
@@ -95,21 +95,21 @@ const MobileCards = styled.div`
 `;
 
 const FeatureCard = styled.div`
-  background: white;
-  border: 1px solid #e5e7eb;
+  background: var(--surface);
+  border: 1px solid var(--border);
   border-radius: 12px;
   overflow: hidden;
 `;
 
 const FeatureHeader = styled.div`
-  background: #f9fafb;
+  background: var(--surface-2);
   padding: 0.5rem 0.875rem;
   font-size: 0.75rem;
   font-weight: 700;
-  color: #374151;
+  color: var(--text);
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid var(--border);
 `;
 
 const RacketRow = styled.div`
@@ -117,7 +117,7 @@ const RacketRow = styled.div`
   align-items: center;
   padding: 0.5rem 0.875rem;
   gap: 0.625rem;
-  border-bottom: 1px solid #f3f4f6;
+  border-bottom: 1px solid var(--surface-3);
 
   &:last-child { border-bottom: none; }
 `;
@@ -132,7 +132,7 @@ const RacketDot = styled.div<{ $color: string }>`
 
 const RacketNameMobile = styled.span`
   font-size: 0.8125rem;
-  color: #6b7280;
+  color: var(--text-muted);
   flex: 1;
   white-space: nowrap;
   overflow: hidden;
@@ -142,7 +142,7 @@ const RacketNameMobile = styled.span`
 const RacketValueMobile = styled.span`
   font-size: 0.8125rem;
   font-weight: 600;
-  color: #1f2937;
+  color: var(--text);
   text-align: right;
 `;
 
@@ -193,7 +193,7 @@ const ComparisonTable: React.FC<ComparisonTableProps> = ({ data, metrics, racket
 
   return (
     <div style={{ marginBottom: '2rem' }}>
-      <h3 style={{ color: '#15803d', marginBottom: '1.5rem', fontSize: '1.5rem', fontWeight: 700 }}>
+      <h3 style={{ color: 'var(--primary-hover)', marginBottom: '1.5rem', fontSize: '1.5rem', fontWeight: 700 }}>
         Comparativa Detallada
       </h3>
 
@@ -238,11 +238,11 @@ const ComparisonTable: React.FC<ComparisonTableProps> = ({ data, metrics, racket
                 : findMatchingValue(row, racket.racketName);
               return (
                 <RacketRow key={ci}>
-                  <RacketDot $color={RACKET_COLORS[ci] ?? '#6b7280'} />
+                  <RacketDot $color={RACKET_COLORS[ci] ?? 'var(--text-muted)'} />
                   <RacketNameMobile>
                     {toTitleCase(racket.racketName)}
                     {racket.isCertified && (
-                      <FiCheckCircle size={11} color='#15803d' style={{ marginLeft: 4, verticalAlign: 'middle' }} />
+                      <FiCheckCircle size={11} color='var(--primary-hover)' style={{ marginLeft: 4, verticalAlign: 'middle' }} />
                     )}
                   </RacketNameMobile>
                   <RacketValueMobile>{val ?? '—'}</RacketValueMobile>

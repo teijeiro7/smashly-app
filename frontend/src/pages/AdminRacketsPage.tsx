@@ -10,7 +10,7 @@ import { sileo } from 'sileo';
 
 const PageContainer = styled.div`
   min-height: 100vh;
-  background: #f9fafb;
+  background: var(--surface-2);
   padding: 2rem;
 `;
 
@@ -34,24 +34,24 @@ const BackButton = styled(Link)`
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  color: #4b5563;
+  color: var(--text);
   text-decoration: none;
   font-weight: 500;
   padding: 0.5rem 1rem;
-  background: white;
+  background: var(--surface);
   border-radius: 8px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 1px 3px var(--shadow-color);
   transition: all 0.2s;
 
   &:hover {
-    background: #f3f4f6;
+    background: var(--surface-3);
   }
 `;
 
 const Title = styled.h1`
   font-size: 1.5rem;
   font-weight: 700;
-  color: #111827;
+  color: var(--text);
   margin: 0;
 `;
 
@@ -59,10 +59,10 @@ const SearchContainer = styled.div`
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  background: white;
+  background: var(--surface);
   padding: 0.5rem 1rem;
   border-radius: 8px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 1px 3px var(--shadow-color);
   flex: 1;
   max-width: 400px;
 `;
@@ -72,15 +72,15 @@ const SearchInput = styled.input`
   outline: none;
   flex: 1;
   font-size: 0.875rem;
-  color: #374151;
+  color: var(--text);
 
   &::placeholder {
-    color: #9ca3af;
+    color: var(--text-subtle);
   }
 `;
 
 const SearchIcon = styled.div`
-  color: #9ca3af;
+  color: var(--text-subtle);
   display: flex;
   align-items: center;
 `;
@@ -93,9 +93,9 @@ const FiltersContainer = styled.div`
   flex-wrap: wrap;
   align-items: flex-end;
   padding: 1rem;
-  background: white;
+  background: var(--surface);
   border-radius: 8px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 1px 3px var(--shadow-color);
 `;
 
 const FilterGroup = styled.div`
@@ -107,25 +107,25 @@ const FilterGroup = styled.div`
 const FilterLabel = styled.label`
   font-size: 0.7rem;
   font-weight: 600;
-  color: #6b7280;
+  color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 0.05em;
 `;
 
 const FilterSelect = styled.select`
   padding: 0.5rem 0.75rem;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--border);
   border-radius: 6px;
   font-size: 0.875rem;
-  color: #374151;
-  background: white;
+  color: var(--text);
+  background: var(--surface);
   min-width: 140px;
   cursor: pointer;
 
   &:focus {
     outline: none;
-    border-color: #16a34a;
-    box-shadow: 0 0 0 2px rgba(22, 163, 74, 0.1);
+    border-color: var(--primary);
+    box-shadow: 0 0 0 2px rgba(var(--primary-rgb), 0.1);
   }
 `;
 
@@ -134,24 +134,24 @@ const ClearFiltersButton = styled.button`
   align-items: center;
   gap: 0.25rem;
   padding: 0.5rem 0.75rem;
-  background: #f3f4f6;
+  background: var(--surface-3);
   border: none;
   border-radius: 6px;
   font-size: 0.8rem;
-  color: #6b7280;
+  color: var(--text-muted);
   cursor: pointer;
   align-self: flex-end;
   transition: all 0.2s;
 
   &:hover {
-    background: #e5e7eb;
-    color: #374151;
+    background: var(--border);
+    color: var(--text);
   }
 `;
 
 const ResultsInfo = styled.span`
   font-size: 0.8rem;
-  color: #6b7280;
+  color: var(--text-muted);
   margin-left: auto;
   align-self: flex-end;
   white-space: nowrap;
@@ -162,7 +162,7 @@ const BulkReplaceButton = styled.button`
   align-items: center;
   gap: 0.25rem;
   padding: 0.5rem 0.75rem;
-  background: #16a34a;
+  background: var(--primary);
   border: none;
   border-radius: 6px;
   font-size: 0.8rem;
@@ -173,11 +173,11 @@ const BulkReplaceButton = styled.button`
   font-weight: 500;
 
   &:hover {
-    background: #15803d;
+    background: var(--primary-hover);
   }
 
   &:disabled {
-    background: #9ca3af;
+    background: var(--text-subtle);
     cursor: not-allowed;
   }
 `;
@@ -188,11 +188,11 @@ const Content = styled.div`
 `;
 
 const TableContainer = styled.div`
-  background: white;
+  background: var(--surface);
   border-radius: 12px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 6px var(--shadow-color);
   overflow: hidden;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--border);
 `;
 
 const Table = styled.table`
@@ -203,20 +203,20 @@ const Table = styled.table`
 const Th = styled.th`
   text-align: left;
   padding: 1rem;
-  background: #f9fafb;
+  background: var(--surface-2);
   font-weight: 600;
   font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: #6b7280;
-  border-bottom: 1px solid #e5e7eb;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border);
 `;
 
 const Td = styled.td`
   padding: 1rem;
-  border-bottom: 1px solid #f3f4f6;
+  border-bottom: 1px solid var(--border);
   font-size: 0.875rem;
-  color: #374151;
+  color: var(--text);
   vertical-align: middle;
 `;
 
@@ -229,19 +229,22 @@ const RacketInfo = styled.div`
 const RacketImage = styled.img`
   width: 48px;
   height: 48px;
-  object-fit: cover;
+  object-fit: contain;
   border-radius: 8px;
-  background: #f3f4f6;
+  background: var(--racket-image-bg);
+  border: var(--racket-image-border);
+  box-shadow: var(--racket-image-shadow);
+  padding: 0.125rem;
 `;
 
 const RacketName = styled.div`
   font-weight: 600;
-  color: #111827;
+  color: var(--text);
 `;
 
 const RacketDetails = styled.div`
   font-size: 0.75rem;
-  color: #6b7280;
+  color: var(--text-muted);
   margin-top: 0.25rem;
 `;
 
@@ -252,12 +255,12 @@ interface PriceProps {
 
 const Price = styled.span<PriceProps>`
   font-weight: ${props => (props.isBest ? '700' : '600')};
-  color: ${props => (props.isBest ? '#10b981' : props.sale ? '#ef4444' : '#374151')};
+  color: ${props => (props.isBest ? 'var(--success)' : props.sale ? 'var(--error)' : 'var(--text)')};
   font-size: ${props => (props.isBest ? '1rem' : '0.875rem')};
-  background: ${props => (props.isBest ? '#f0fdf4' : 'transparent')};
+  background: ${props => (props.isBest ? 'var(--primary-subtle)' : 'transparent')};
   padding: ${props => (props.isBest ? '2px 6px' : '0')};
   border-radius: ${props => (props.isBest ? '4px' : '0')};
-  border: ${props => (props.isBest ? '1px solid #bbf7d0' : 'none')};
+  border: ${props => (props.isBest ? '1px solid var(--primary-subtle)' : 'none')};
 `;
 
 const Badge = styled.span<{ variant: 'success' | 'warning' | 'default' }>`
@@ -273,8 +276,8 @@ const Badge = styled.span<{ variant: 'success' | 'warning' | 'default' }>`
     switch (props.variant) {
       case 'success':
         return `
-          background: #dcfce7;
-          color: #166534;
+          background: var(--primary-subtle);
+          color: var(--primary-hover);
         `;
       case 'warning':
         return `
@@ -283,8 +286,8 @@ const Badge = styled.span<{ variant: 'success' | 'warning' | 'default' }>`
         `;
       default:
         return `
-          background: #f3f4f6;
-          color: #4b5563;
+          background: var(--surface-3);
+          color: var(--text);
         `;
     }
   }}
@@ -310,13 +313,13 @@ const ActionButton = styled.button<{ variant?: 'edit' | 'delete' }>`
     props.variant === 'edit'
       ? `
         background: #eff6ff;
-        color: #3b82f6;
+        color: var(--info);
         &:hover { background: #dbeafe; }
       `
       : `
-        background: #fef2f2;
-        color: #ef4444;
-        &:hover { background: #fee2e2; }
+        background: var(--danger-subtle);
+        color: var(--error);
+        &:hover { background: var(--danger-subtle); }
       `}
 `;
 
@@ -325,13 +328,13 @@ const LoadingContainer = styled.div`
   justify-content: center;
   align-items: center;
   padding: 4rem;
-  color: #6b7280;
+  color: var(--text-muted);
 `;
 
 const EmptyState = styled.div`
   text-align: center;
   padding: 4rem;
-  color: #6b7280;
+  color: var(--text-muted);
 `;
 
 const StatsBar = styled.div`
@@ -339,9 +342,9 @@ const StatsBar = styled.div`
   gap: 2rem;
   margin-bottom: 1rem;
   padding: 1rem;
-  background: white;
+  background: var(--surface);
   border-radius: 8px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 1px 3px var(--shadow-color);
 `;
 
 const Stat = styled.div`
@@ -349,11 +352,11 @@ const Stat = styled.div`
   align-items: center;
   gap: 0.5rem;
   font-size: 0.875rem;
-  color: #6b7280;
+  color: var(--text-muted);
 
   span {
     font-weight: 600;
-    color: #111827;
+    color: var(--text);
   }
 `;
 

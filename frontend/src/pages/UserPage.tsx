@@ -19,7 +19,7 @@ import { sileo } from 'sileo';
 
 const PageContainer = styled.div`
   min-height: calc(100vh - 70px);
-  background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+  background: linear-gradient(135deg, var(--primary-faint) 0%, var(--primary-subtle) 100%);
   padding: 2rem 1rem;
 `;
 
@@ -29,7 +29,7 @@ const ContentWrapper = styled.div`
 `;
 
 const ProfileHeader = styled.div`
-  background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+  background: linear-gradient(135deg, var(--brand-surface) 0%, var(--brand-surface-hover) 100%);
   border-radius: 20px;
   padding: 2.5rem;
   box-shadow: 0 4px 20px rgba(22, 163, 74, 0.1);
@@ -93,8 +93,8 @@ const UserEmail = styled.p`
 `;
 
 const EditButton = styled.button`
-  background: white;
-  color: #16a34a;
+  background: var(--surface);
+  color: var(--primary);
   border: none;
   padding: 0.75rem 1.5rem;
   border-radius: 12px;
@@ -109,7 +109,7 @@ const EditButton = styled.button`
   align-self: flex-end;
 
   &:hover {
-    background: #f0f0f0;
+    background: var(--surface-3);
     transform: translateY(-2px);
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
   }
@@ -126,7 +126,7 @@ const EditButton = styled.button`
 `;
 
 const DetailsSection = styled.div`
-  background: white;
+  background: var(--surface);
   border-radius: 20px;
   padding: 2rem;
   box-shadow: 0 4px 20px rgba(22, 163, 74, 0.1);
@@ -136,7 +136,7 @@ const DetailsSection = styled.div`
 const SectionTitle = styled.h2`
   font-size: 1.5rem;
   font-weight: 700;
-  color: #15803d;
+  color: var(--primary-hover);
   margin: 0 0 1.5rem 0;
   display: flex;
   align-items: center;
@@ -150,14 +150,14 @@ const DetailGrid = styled.div`
 `;
 
 const DetailCard = styled.div`
-  background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+  background: linear-gradient(135deg, var(--primary-faint) 0%, var(--primary-subtle) 100%);
   padding: 1.5rem;
   border-radius: 16px;
-  border: 2px solid #e5e7eb;
+  border: 2px solid var(--border);
   transition: all 0.2s ease;
 
   &:hover {
-    border-color: #16a34a;
+    border-color: var(--primary);
     transform: translateY(-2px);
     box-shadow: 0 4px 15px rgba(22, 163, 74, 0.1);
   }
@@ -169,7 +169,7 @@ const DetailLabel = styled.div`
   gap: 0.5rem;
   font-size: 0.875rem;
   font-weight: 600;
-  color: #6b7280;
+  color: var(--text-muted);
   margin-bottom: 0.5rem;
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -178,18 +178,18 @@ const DetailLabel = styled.div`
 const DetailValue = styled.div`
   font-size: 1.125rem;
   font-weight: 600;
-  color: #15803d;
+  color: var(--primary-hover);
 `;
 
 const EmptyState = styled.div`
   text-align: center;
   padding: 3rem;
-  color: #6b7280;
+  color: var(--text-muted);
 `;
 
 const EmptyStateIcon = styled.div`
   font-size: 4rem;
-  color: #d1d5db;
+  color: var(--border-strong);
   margin-bottom: 1rem;
 `;
 
@@ -208,8 +208,8 @@ const LoadingContainer = styled.div`
 const Spinner = styled.div`
   width: 50px;
   height: 50px;
-  border: 4px solid #e5e7eb;
-  border-top: 4px solid #16a34a;
+  border: 4px solid var(--border);
+  border-top: 4px solid var(--primary);
   border-radius: 50%;
   animation: spin 1s linear infinite;
 
@@ -227,7 +227,7 @@ const Avatar = styled.div`
   width: 120px;
   height: 120px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+  background: linear-gradient(135deg, var(--brand-surface) 0%, var(--brand-surface-hover) 100%);
   display: flex;
   align-items: center;
   justify-content: center;

@@ -12,24 +12,24 @@ const PageContainer = styled.div`
   align-items: center;
   justify-content: center;
   padding: 2rem;
-  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  background: linear-gradient(135deg, var(--surface-2) 0%, var(--surface-3) 100%);
 `;
 
 const Card = styled(motion.div)`
-  background: white;
+  background: var(--surface);
   padding: 2.5rem;
   border-radius: 24px;
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 10px 25px -5px var(--shadow-color), 0 8px 10px -6px var(--shadow-color);
   width: 100%;
   max-width: 450px;
-  border: 1px solid #f1f5f9;
+  border: 1px solid var(--border);
 `;
 
 const BackLink = styled(Link)`
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  color: #64748b;
+  color: var(--text-muted);
   text-decoration: none;
   font-size: 0.875rem;
   font-weight: 500;
@@ -37,7 +37,7 @@ const BackLink = styled(Link)`
   transition: all 0.2s ease;
 
   &:hover {
-    color: #16a34a;
+    color: var(--primary);
     transform: translateX(-4px);
   }
 `;
@@ -45,12 +45,12 @@ const BackLink = styled(Link)`
 const Title = styled.h1`
   font-size: 1.875rem;
   font-weight: 800;
-  color: #1e293b;
+  color: var(--text);
   margin-bottom: 0.75rem;
 `;
 
 const Description = styled.p`
-  color: #64748b;
+  color: var(--text-muted);
   line-height: 1.6;
   margin-bottom: 2rem;
 `;
@@ -70,7 +70,7 @@ const FormGroup = styled.div`
 const Label = styled.label`
   font-size: 0.875rem;
   font-weight: 600;
-  color: #475569;
+  color: var(--text);
 `;
 
 const InputWrapper = styled.div<{ $hasError?: boolean }>`
@@ -81,7 +81,7 @@ const InputWrapper = styled.div<{ $hasError?: boolean }>`
   svg {
     position: absolute;
     left: 1rem;
-    color: ${props => props.$hasError ? '#ef4444' : '#94a3b8'};
+    color: ${props => props.$hasError ? 'var(--error)' : 'var(--text-subtle)'};
     transition: color 0.2s ease;
   }
 `;
@@ -90,26 +90,26 @@ const Input = styled.input<{ $hasError?: boolean }>`
   width: 100%;
   padding: 0.75rem 1rem 0.75rem 2.75rem;
   border-radius: 12px;
-  border: 1.5px solid ${props => props.$hasError ? '#fca5a5' : '#e2e8f0'};
-  background: ${props => props.$hasError ? '#fef2f2' : 'white'};
+  border: 1.5px solid ${props => props.$hasError ? '#fca5a5' : 'var(--border)'};
+  background: ${props => props.$hasError ? 'var(--danger-subtle)' : 'var(--surface)'};
   font-size: 1rem;
   transition: all 0.2s ease;
-  color: #1e293b;
+  color: var(--text);
 
   &:focus {
     outline: none;
-    border-color: ${props => props.$hasError ? '#ef4444' : '#16a34a'};
-    box-shadow: 0 0 0 4px ${props => props.$hasError ? 'rgba(239, 68, 68, 0.1)' : 'rgba(22, 163, 74, 0.1)'};
+    border-color: ${props => props.$hasError ? 'var(--error)' : 'var(--primary)'};
+    box-shadow: 0 0 0 4px ${props => props.$hasError ? 'rgba(239, 68, 68, 0.1)' : 'rgba(var(--primary-rgb), 0.1)'};
   }
 
   &::placeholder {
-    color: #94a3b8;
+    color: var(--text-subtle);
   }
 `;
 
 const SubmitButton = styled.button`
-  background: #16a34a;
-  color: white;
+  background: var(--brand-surface);
+  color: var(--brand-on-surface);
   padding: 0.875rem;
   border: none;
   border-radius: 12px;
@@ -124,9 +124,9 @@ const SubmitButton = styled.button`
   margin-top: 0.5rem;
 
   &:hover:not(:disabled) {
-    background: #15803d;
+    background: var(--primary-hover);
     transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(22, 163, 74, 0.2);
+    box-shadow: 0 4px 12px rgba(var(--primary-rgb), 0.2);
   }
 
   &:active:not(:disabled) {
@@ -148,8 +148,8 @@ const SuccessIcon = styled.div`
   width: 64px;
   height: 64px;
   border-radius: 50%;
-  background: #f0fdf4;
-  color: #16a34a;
+  background: var(--primary-subtle);
+  color: var(--primary);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -159,7 +159,7 @@ const SuccessIcon = styled.div`
 
 const ErrorText = styled.span`
   font-size: 0.75rem;
-  color: #ef4444;
+  color: var(--error);
   margin-top: 0.25rem;
   display: flex;
   align-items: center;
@@ -294,7 +294,7 @@ const ForgotPasswordPage: React.FC = () => {
               <SubmitButton 
                 as={Link} 
                 to="/" 
-                style={{ textDecoration: 'none', background: '#f1f5f9', color: '#475569' }}
+                style={{ textDecoration: 'none', background: 'var(--surface-3)', color: 'var(--text)' }}
               >
                 Volver a la página principal
               </SubmitButton>

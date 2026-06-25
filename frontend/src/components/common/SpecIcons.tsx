@@ -217,7 +217,7 @@ export const PadelProShopLogo: React.FC<IconProps> = ({ size = 24 }) => (
       fontFamily='Arial, sans-serif'
       fontSize='20'
       fontWeight='400'
-      fill='#FFFFFF'
+      fill='var(--surface)'
     >
       Padel
     </text>
@@ -227,9 +227,9 @@ export const PadelProShopLogo: React.FC<IconProps> = ({ size = 24 }) => (
       fontFamily='Arial, sans-serif'
       fontSize='24'
       fontWeight='700'
-      fill='#FFFFFF'
+      fill='var(--surface)'
     >
-      PRO<tspan fill='#FFFFFF'>Shop</tspan>
+      PRO<tspan fill='var(--surface)'>Shop</tspan>
     </text>
     <path
       d='M185 25 L195 35 L210 20'

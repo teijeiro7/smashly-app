@@ -12,25 +12,25 @@ const PageContainer = styled.div`
   align-items: center;
   justify-content: center;
   padding: 2rem;
-  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  background: linear-gradient(135deg, var(--surface-2) 0%, var(--surface-3) 100%);
 `;
 
 const Card = styled(motion.div)`
-  background: white;
+  background: var(--surface);
   padding: 2.5rem;
   border-radius: 24px;
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 10px 25px -5px var(--shadow-color), 0 8px 10px -6px var(--shadow-color);
   width: 100%;
   max-width: 450px;
-  border: 1px solid #f1f5f9;
+  border: 1px solid var(--surface-3);
 `;
 
 const HeaderIcon = styled.div`
   width: 56px;
   height: 56px;
   border-radius: 16px;
-  background: #f0fdf4;
-  color: #16a34a;
+  background: var(--primary-faint);
+  color: var(--primary);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -41,12 +41,12 @@ const HeaderIcon = styled.div`
 const Title = styled.h1`
   font-size: 1.875rem;
   font-weight: 800;
-  color: #1e293b;
+  color: var(--text);
   margin-bottom: 0.75rem;
 `;
 
 const Description = styled.p`
-  color: #64748b;
+  color: var(--text-muted);
   line-height: 1.6;
   margin-bottom: 2rem;
 `;
@@ -66,7 +66,7 @@ const FormGroup = styled.div`
 const Label = styled.label`
   font-size: 0.875rem;
   font-weight: 600;
-  color: #475569;
+  color: var(--text);
 `;
 
 const InputWrapper = styled.div<{ $hasError?: boolean }>`
@@ -77,7 +77,7 @@ const InputWrapper = styled.div<{ $hasError?: boolean }>`
   svg {
     position: absolute;
     left: 1rem;
-    color: ${props => props.$hasError ? '#ef4444' : '#94a3b8'};
+    color: ${props => props.$hasError ? 'var(--error)' : 'var(--text-subtle)'};
     transition: color 0.2s ease;
   }
 `;
@@ -86,20 +86,20 @@ const Input = styled.input<{ $hasError?: boolean }>`
   width: 100%;
   padding: 0.75rem 1rem 0.75rem 2.75rem;
   border-radius: 12px;
-  border: 1.5px solid ${props => props.$hasError ? '#fca5a5' : '#e2e8f0'};
-  background: ${props => props.$hasError ? '#fef2f2' : 'white'};
+  border: 1.5px solid ${props => props.$hasError ? '#fca5a5' : 'var(--border)'};
+  background: ${props => props.$hasError ? 'var(--danger-subtle)' : 'var(--surface)'};
   font-size: 1rem;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
-  color: #1e293b;
+  color: var(--text);
 
   &:focus {
     outline: none;
-    border-color: ${props => props.$hasError ? '#ef4444' : '#16a34a'};
+    border-color: ${props => props.$hasError ? 'var(--error)' : 'var(--primary)'};
     box-shadow: 0 0 0 4px ${props => props.$hasError ? 'rgba(239, 68, 68, 0.1)' : 'rgba(22, 163, 74, 0.1)'};
   }
 
   &::placeholder {
-    color: #94a3b8;
+    color: var(--text-subtle);
   }
 `;
 
@@ -108,7 +108,7 @@ const PasswordToggle = styled.button`
   right: 1rem;
   background: none;
   border: none;
-  color: #94a3b8;
+  color: var(--text-subtle);
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -116,13 +116,13 @@ const PasswordToggle = styled.button`
   padding: 0;
 
   &:hover {
-    color: #64748b;
+    color: var(--text-muted);
   }
 `;
 
 const SubmitButton = styled.button`
-  background: #16a34a;
-  color: white;
+  background: var(--brand-surface);
+  color: var(--brand-on-surface);
   padding: 0.875rem;
   border: none;
   border-radius: 12px;
@@ -137,7 +137,7 @@ const SubmitButton = styled.button`
   margin-top: 0.5rem;
 
   &:hover:not(:disabled) {
-    background: #15803d;
+    background: var(--primary-hover);
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(22, 163, 74, 0.2);
   }
@@ -154,7 +154,7 @@ const SubmitButton = styled.button`
 
 const ErrorText = styled.span`
   font-size: 0.75rem;
-  color: #ef4444;
+  color: var(--error);
   margin-top: 0.25rem;
   display: flex;
   align-items: center;
@@ -164,7 +164,7 @@ const ErrorText = styled.span`
 const PasswordStrength = styled.div<{ $strength: number }>`
   height: 4px;
   width: 100%;
-  background: #e2e8f0;
+  background: var(--border);
   border-radius: 2px;
   margin-top: 0.5rem;
   overflow: hidden;
@@ -178,10 +178,10 @@ const PasswordStrength = styled.div<{ $strength: number }>`
     height: 100%;
     width: ${props => (props.$strength / 4) * 100}%;
     background: ${props => {
-      if (props.$strength <= 1) return '#ef4444';
-      if (props.$strength <= 2) return '#f59e0b';
-      if (props.$strength <= 3) return '#3b82f6';
-      return '#16a34a';
+      if (props.$strength <= 1) return 'var(--error)';
+      if (props.$strength <= 2) return 'var(--accent)';
+      if (props.$strength <= 3) return 'var(--info)';
+      return 'var(--primary)';
     }};
     transition: all 0.3s ease;
   }

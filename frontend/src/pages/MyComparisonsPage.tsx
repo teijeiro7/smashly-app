@@ -26,8 +26,8 @@ import RacketRadarChart from '../components/features/RacketRadarChart';
 const Container = styled.div`
   min-height: 100dvh;
   background:
-    radial-gradient(circle at top right, rgba(22, 163, 74, 0.08), transparent 45%),
-    linear-gradient(135deg, #f8faf8 0%, #e8f5e8 100%);
+    radial-gradient(circle at top right, rgba(var(--primary-rgb), 0.08), transparent 45%),
+    linear-gradient(135deg, var(--surface-2) 0%, var(--primary-faint) 100%);
   padding-bottom: calc(6.5rem + env(safe-area-inset-bottom, 0));
 
   @media (min-width: 1025px) {
@@ -36,8 +36,8 @@ const Container = styled.div`
 `;
 
 const Header = styled.div`
-  background: rgba(255, 255, 255, 0.92);
-  border-bottom: 1px solid #e5e7eb;
+  background: var(--surface-overlay);
+  border-bottom: 1px solid var(--border);
   padding: 1.5rem 0;
   margin-bottom: 2rem;
   backdrop-filter: blur(10px);
@@ -46,7 +46,7 @@ const Header = styled.div`
   @media (hover: none) and (pointer: coarse) {
     backdrop-filter: none;
     -webkit-backdrop-filter: none;
-    background: rgba(255, 255, 255, 0.98);
+    background: var(--surface-overlay);
   }
 
   @media (max-width: 768px) {
@@ -77,7 +77,7 @@ const BackButton = styled(Link)`
   align-items: center;
   gap: 0.5rem;
   min-height: 44px;
-  color: #16a34a;
+  color: var(--primary);
   text-decoration: none;
   font-weight: 500;
   padding: 0.5rem 1rem;
@@ -85,15 +85,15 @@ const BackButton = styled(Link)`
   transition: all 0.2s ease;
 
   &:hover {
-    background: #f0fdf4;
-    color: #15803d;
+    background: var(--primary-subtle);
+    color: var(--primary-hover);
   }
 `;
 
 const Title = styled.h1`
   font-size: 1.75rem;
   font-weight: 700;
-  color: #1f2937;
+  color: var(--text);
   margin: 0;
 
   @media (max-width: 768px) {
@@ -106,9 +106,9 @@ const Stats = styled.div`
   align-items: center;
   gap: 0.5rem;
   font-size: 0.875rem;
-  color: #6b7280;
+  color: var(--text-muted);
   padding: 0.5rem 1rem;
-  background: #f9fafb;
+  background: var(--surface-2);
   border-radius: 8px;
 `;
 
@@ -121,27 +121,27 @@ const Content = styled.div`
 const EmptyState = styled.div`
   text-align: center;
   padding: 4rem 2rem;
-  background: white;
+  background: var(--surface);
   border-radius: 16px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 20px var(--shadow-color);
 `;
 
 const EmptyIcon = styled.div`
   font-size: 4rem;
-  color: #d1d5db;
+  color: var(--border-strong);
   margin-bottom: 1rem;
 `;
 
 const EmptyTitle = styled.h2`
   font-size: 1.5rem;
   font-weight: 700;
-  color: #1f2937;
+  color: var(--text);
   margin: 0 0 0.5rem;
 `;
 
 const EmptyText = styled.p`
   font-size: 1rem;
-  color: #6b7280;
+  color: var(--text-muted);
   margin: 0 0 2rem;
 `;
 
@@ -152,7 +152,7 @@ const CompareButton = styled(Link)`
   gap: 0.5rem;
   min-height: 48px;
   padding: 0.75rem 1.5rem;
-  background: linear-gradient(135deg, #16a34a 0%, #059669 100%);
+  background: linear-gradient(135deg, var(--primary) 0%, var(--success) 100%);
   color: white;
   text-decoration: none;
   border-radius: 8px;
@@ -163,7 +163,7 @@ const CompareButton = styled(Link)`
     color: white;
     text-decoration: none;
     transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(22, 163, 74, 0.4);
+    box-shadow: 0 8px 25px rgba(var(--primary-rgb), 0.4);
   }
 
   &:active {
@@ -177,16 +177,16 @@ const ComparisonsList = styled.div`
 `;
 
 const ComparisonCard = styled(motion.div)`
-  background: white;
+  background: var(--surface);
   border-radius: 16px;
   padding: clamp(1rem, 2vw, 1.5rem);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-  border: 1px solid rgba(22, 163, 74, 0.1);
+  box-shadow: 0 4px 20px var(--shadow-color);
+  border: 1px solid rgba(var(--primary-rgb), 0.1);
   transition: all 0.3s ease;
 
   &:hover {
-    box-shadow: 0 8px 30px rgba(22, 163, 74, 0.15);
-    border-color: #16a34a;
+    box-shadow: 0 8px 30px rgba(var(--primary-rgb), 0.15);
+    border-color: var(--primary);
   }
 
   @media (max-width: 768px) {
@@ -215,7 +215,7 @@ const ComparisonDate = styled.div`
   align-items: center;
   gap: 0.5rem;
   font-size: 0.875rem;
-  color: #6b7280;
+  color: var(--text-muted);
   margin-bottom: 0.5rem;
 `;
 
@@ -231,8 +231,8 @@ const RacketTag = styled.span`
   align-items: center;
   gap: 0.25rem;
   padding: 0.25rem 0.75rem;
-  background: #f0fdf4;
-  color: #16a34a;
+  background: var(--primary-subtle);
+  color: var(--primary);
   border-radius: 20px;
   font-size: 0.875rem;
   font-weight: 500;
@@ -264,12 +264,12 @@ const ActionButton = styled.button<{ variant?: 'primary' | 'danger' }>`
   transition: all 0.2s ease;
   background: ${props =>
     props.variant === 'danger'
-      ? '#fef2f2'
+      ? 'var(--danger-subtle)'
       : props.variant === 'primary'
-        ? 'linear-gradient(135deg, #16a34a 0%, #059669 100%)'
-        : '#f9fafb'};
+        ? 'linear-gradient(135deg, var(--primary) 0%, var(--success) 100%)'
+        : 'var(--surface-2)'};
   color: ${props =>
-    props.variant === 'danger' ? '#dc2626' : props.variant === 'primary' ? 'white' : '#374151'};
+    props.variant === 'danger' ? 'var(--danger)' : props.variant === 'primary' ? 'white' : 'var(--text)'};
 
   &:hover {
     transform: translateY(-2px);
@@ -278,7 +278,7 @@ const ActionButton = styled.button<{ variant?: 'primary' | 'danger' }>`
         props.variant === 'danger'
           ? 'rgba(220, 38, 38, 0.3)'
           : props.variant === 'primary'
-            ? 'rgba(22, 163, 74, 0.4)'
+            ? 'rgba(var(--primary-rgb), 0.4)'
             : 'rgba(0, 0, 0, 0.1)'};
   }
 
@@ -294,8 +294,8 @@ const ActionButton = styled.button<{ variant?: 'primary' | 'danger' }>`
 `;
 
 const ComparisonPreview = styled.div`
-  background: #f9fafb;
-  border: 1px solid #e5e7eb;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
   border-radius: 8px;
   padding: 1rem;
   max-height: 200px;
@@ -309,13 +309,13 @@ const ComparisonPreview = styled.div`
     left: 0;
     right: 0;
     height: 40px;
-    background: linear-gradient(to bottom, transparent, #f9fafb);
+    background: linear-gradient(to bottom, transparent, var(--surface-2));
   }
 `;
 
 const PreviewText = styled.div`
   font-size: 0.875rem;
-  color: #4b5563;
+  color: var(--text);
   line-height: 1.6;
 
   h1,
@@ -325,7 +325,7 @@ const PreviewText = styled.div`
     font-size: 1rem;
     font-weight: 600;
     margin: 0.5rem 0;
-    color: #1f2937;
+    color: var(--text);
   }
 
   p {
@@ -347,8 +347,8 @@ const LoadingState = styled.div`
 const Spinner = styled.div`
   width: 50px;
   height: 50px;
-  border: 4px solid #e5e7eb;
-  border-top-color: #16a34a;
+  border: 4px solid var(--border);
+  border-top-color: var(--primary);
   border-radius: 50%;
   animation: spin 1s linear infinite;
   margin: 0 auto 1rem;
@@ -372,20 +372,20 @@ const Modal = styled(motion.div)`
 `;
 
 const ModalContent = styled(motion.div)`
-  background: white;
+  background: var(--surface);
   border-radius: 16px;
   max-width: 900px;
   width: 100%;
   max-height: 90vh;
   overflow: auto;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 20px 50px var(--shadow-color);
 `;
 
 const ModalHeader = styled.div`
   position: sticky;
   top: 0;
-  background: white;
-  border-bottom: 1px solid #e5e7eb;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
   padding: 1.5rem;
   display: flex;
   justify-content: space-between;
@@ -396,7 +396,7 @@ const ModalHeader = styled.div`
 const ModalTitle = styled.h2`
   font-size: 1.5rem;
   font-weight: 700;
-  color: #1f2937;
+  color: var(--text);
   margin: 0;
 `;
 
@@ -407,13 +407,13 @@ const CloseButton = styled.button`
   width: 32px;
   height: 32px;
   border: none;
-  background: #f3f4f6;
+  background: var(--surface-3);
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.2s ease;
 
   &:hover {
-    background: #e5e7eb;
+    background: var(--border);
   }
 `;
 
@@ -423,7 +423,7 @@ const ModalBody = styled.div`
   h1,
   h2,
   h3 {
-    color: #1f2937;
+    color: var(--text);
     margin-top: 1.5rem;
     margin-bottom: 1rem;
   }
@@ -441,14 +441,14 @@ const ModalBody = styled.div`
   }
 
   p {
-    color: #4b5563;
+    color: var(--text);
     line-height: 1.7;
     margin: 1rem 0;
   }
 
   ul,
   ol {
-    color: #4b5563;
+    color: var(--text);
     line-height: 1.7;
     margin: 1rem 0;
     padding-left: 1.5rem;
@@ -462,30 +462,30 @@ const ModalBody = styled.div`
 
   th,
   td {
-    border: 1px solid #e5e7eb;
+    border: 1px solid var(--border);
     padding: 0.75rem;
     text-align: left;
   }
 
   th {
-    background: #f9fafb;
+    background: var(--surface-2);
     font-weight: 600;
-    color: #1f2937;
+    color: var(--text);
   }
 
   td {
-    color: #4b5563;
+    color: var(--text);
   }
 
   code {
-    background: #f3f4f6;
+    background: var(--surface-3);
     padding: 0.25rem 0.5rem;
     border-radius: 4px;
     font-size: 0.875em;
   }
 
   strong {
-    color: #16a34a;
+    color: var(--primary);
     font-weight: 600;
   }
 `;
@@ -793,7 +793,7 @@ const MyComparisonsPage: React.FC = () => {
                 style={{
                   textAlign: 'center',
                   padding: '2rem',
-                  color: '#6b7280',
+                  color: 'var(--text-muted)',
                   fontSize: '0.875rem',
                 }}
               >
@@ -807,7 +807,7 @@ const MyComparisonsPage: React.FC = () => {
                 style={{
                   textAlign: 'center',
                   padding: '2rem',
-                  color: '#9ca3af',
+                  color: 'var(--text-subtle)',
                   fontSize: '0.875rem',
                 }}
               >

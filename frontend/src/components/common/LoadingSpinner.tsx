@@ -25,8 +25,8 @@ const SpinnerContainer = styled.div<{
 `;
 
 const Spinner = styled.div<{ $size?: 'small' | 'medium' | 'large' }>`
-  border: 3px solid rgba(22, 163, 74, 0.1);
-  border-top: 3px solid #16a34a;
+  border: 3px solid rgba(var(--primary-rgb), 0.1);
+  border-top: 3px solid var(--primary);
   border-radius: 50%;
   width: ${props => {
     switch (props.$size) {
@@ -52,7 +52,7 @@ const Spinner = styled.div<{ $size?: 'small' | 'medium' | 'large' }>`
 `;
 
 const LoadingText = styled.p<{ $size?: 'small' | 'medium' | 'large' }>`
-  color: #6b7280;
+  color: var(--text-muted);
   font-size: ${props => {
     switch (props.$size) {
       case 'small':

@@ -114,11 +114,16 @@ const ImageContainer = styled.div`
   align-items: center;
   justify-content: center;
   position: relative;
+  background: var(--racket-image-bg);
+  border: var(--racket-image-border);
+  border-radius: var(--racket-image-radius-detail);
+  box-shadow: var(--racket-image-shadow);
+  padding: 2rem;
 `;
 
 const LightboxImage = styled.img`
   max-width: 100%;
-  max-height: 90vh;
+  max-height: 80vh;
   object-fit: contain;
   animation: zoomIn 0.3s ease;
   user-select: none;

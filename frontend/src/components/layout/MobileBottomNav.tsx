@@ -13,10 +13,10 @@ const NavShell = styled.nav`
   bottom: 0;
   z-index: 380;
   display: none;
-  background: rgba(255, 255, 255, 0.95);
+  background: var(--surface-overlay);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  border-top: 1px solid #d9e8dc;
+  border-top: 1px solid var(--primary-faint);
   box-shadow: 0 -12px 30px rgba(17, 24, 39, 0.08);
   will-change: transform;
   transform: translateZ(0);
@@ -24,7 +24,7 @@ const NavShell = styled.nav`
   @media (hover: none) and (pointer: coarse) {
     backdrop-filter: none;
     -webkit-backdrop-filter: none;
-    background: white;
+    background: var(--surface);
   }
   padding: 8px 10px calc(8px + env(safe-area-inset-bottom, 0));
 
@@ -75,14 +75,14 @@ const navItemStyles = `
 
 const NavItemLink = styled(Link)<{ $active: boolean }>`
   ${navItemStyles}
-  color: ${props => (props.$active ? '#0f6e38' : '#4b5563')};
-  background: ${props => (props.$active ? '#eaf8ee' : 'transparent')};
+  color: ${props => (props.$active ? 'var(--primary-hover)' : 'var(--text)')};
+  background: ${props => (props.$active ? 'var(--primary-subtle)' : 'transparent')};
 `;
 
 const NavItemButton = styled.button<{ $active: boolean }>`
   ${navItemStyles}
-  color: ${props => (props.$active ? '#0f6e38' : '#4b5563')};
-  background: ${props => (props.$active ? '#eaf8ee' : 'transparent')};
+  color: ${props => (props.$active ? 'var(--primary-hover)' : 'var(--text)')};
+  background: ${props => (props.$active ? 'var(--primary-subtle)' : 'transparent')};
 `;
 
 const PopupOverlay = styled(motion.div)`
@@ -101,7 +101,7 @@ const PopupOverlay = styled(motion.div)`
 `;
 
 const PopupCard = styled(motion.div)`
-  background: white;
+  background: var(--surface);
   border-radius: 20px;
   padding: 1.5rem;
   width: 100%;
@@ -112,7 +112,7 @@ const PopupCard = styled(motion.div)`
 const PopupTitle = styled.h3`
   font-size: 1.1rem;
   font-weight: 700;
-  color: #111827;
+  color: var(--text);
   margin-bottom: 0.5rem;
   display: flex;
   align-items: center;
@@ -121,7 +121,7 @@ const PopupTitle = styled.h3`
 
 const PopupText = styled.p`
   font-size: 0.9rem;
-  color: #6b7280;
+  color: var(--text-muted);
   line-height: 1.5;
   margin-bottom: 1.25rem;
 `;
@@ -133,8 +133,8 @@ const PopupButtons = styled.div`
 `;
 
 const PrimaryButton = styled.button`
-  background: #16a34a;
-  color: white;
+  background: var(--brand-surface);
+  color: var(--brand-on-surface);
   border: none;
   border-radius: 12px;
   padding: 0.875rem 1rem;
@@ -148,14 +148,14 @@ const PrimaryButton = styled.button`
   transition: background 0.2s;
 
   &:hover {
-    background: #15803d;
+    background: var(--brand-surface-hover);
   }
 `;
 
 const SecondaryButton = styled.button`
   background: transparent;
-  color: #6b7280;
-  border: 1px solid #e5e7eb;
+  color: var(--text-muted);
+  border: 1px solid var(--border);
   border-radius: 12px;
   padding: 0.875rem 1rem;
   font-size: 0.95rem;
@@ -164,7 +164,7 @@ const SecondaryButton = styled.button`
   transition: background 0.2s;
 
   &:hover {
-    background: #f9fafb;
+    background: var(--surface-2);
   }
 `;
 
@@ -174,13 +174,13 @@ const CloseButton = styled.button`
   right: 0.75rem;
   background: none;
   border: none;
-  color: #9ca3af;
+  color: var(--text-subtle);
   cursor: pointer;
   padding: 0.25rem;
   display: flex;
 
   &:hover {
-    color: #6b7280;
+    color: var(--text-muted);
   }
 `;
 

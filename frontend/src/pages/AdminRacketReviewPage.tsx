@@ -7,7 +7,7 @@ import { sileo } from 'sileo';
 
 const PageContainer = styled.div`
   min-height: 100vh;
-  background: #f9fafb;
+  background: var(--surface-2);
   padding: 2rem;
 `;
 
@@ -23,24 +23,24 @@ const BackButton = styled(Link)`
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  color: #4b5563;
+  color: var(--text);
   text-decoration: none;
   font-weight: 500;
   padding: 0.5rem 1rem;
-  background: white;
+  background: var(--surface);
   border-radius: 8px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 1px 3px var(--shadow-color);
   transition: all 0.2s;
 
   &:hover {
-    background: #f3f4f6;
+    background: var(--surface-3);
   }
 `;
 
 const Title = styled.h1`
   font-size: 1.5rem;
   font-weight: 700;
-  color: #111827;
+  color: var(--text);
   margin: 0;
 `;
 
@@ -52,11 +52,11 @@ const Content = styled.div`
 `;
 
 const ConflictCard = styled.div`
-  background: white;
+  background: var(--surface);
   border-radius: 12px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 6px var(--shadow-color);
   padding: 1.5rem;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--border);
 `;
 
 const ConflictHeader = styled.div`
@@ -65,13 +65,13 @@ const ConflictHeader = styled.div`
   align-items: center;
   margin-bottom: 1.5rem;
   padding-bottom: 1rem;
-  border-bottom: 1px solid #f3f4f6;
+  border-bottom: 1px solid var(--border);
 `;
 
 const ConflictTitle = styled.h3`
   font-size: 1.125rem;
   font-weight: 600;
-  color: #4b5563;
+  color: var(--text);
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -88,17 +88,17 @@ const ComparisonGrid = styled.div`
 `;
 
 const RacketColumn = styled.div<{ type: 'existing' | 'new' }>`
-  background: ${props => (props.type === 'existing' ? '#f0fdf4' : '#fff7ed')};
+  background: ${props => (props.type === 'existing' ? 'var(--primary-subtle)' : '#fff7ed')};
   padding: 1rem;
   border-radius: 8px;
-  border: 1px solid ${props => (props.type === 'existing' ? '#bbf7d0' : '#fed7aa')};
+  border: 1px solid ${props => (props.type === 'existing' ? 'var(--primary-subtle)' : '#fed7aa')};
 `;
 
 const ColumnTitle = styled.h4`
   font-size: 1rem;
   font-weight: 600;
   margin: 0 0 1rem 0;
-  color: #1f2937;
+  color: var(--text);
   display: flex;
   justify-content: space-between;
 `;
@@ -116,12 +116,12 @@ const DataRow = styled.div`
 `;
 
 const Label = styled.span`
-  color: #6b7280;
+  color: var(--text-muted);
   font-weight: 500;
 `;
 
 const Value = styled.span`
-  color: #111827;
+  color: var(--text);
 `;
 
 const Actions = styled.div`
@@ -130,7 +130,7 @@ const Actions = styled.div`
   gap: 1rem;
   margin-top: 1.5rem;
   padding-top: 1.5rem;
-  border-top: 1px solid #f3f4f6;
+  border-top: 1px solid var(--border);
 `;
 
 const ActionButton = styled.button<{ variant: 'success' | 'danger' | 'neutral' }>`
@@ -148,21 +148,21 @@ const ActionButton = styled.button<{ variant: 'success' | 'danger' | 'neutral' }
     switch (props.variant) {
       case 'success':
         return `
-          background: #16a34a;
+          background: var(--primary);
           color: white;
-          &:hover { background: #15803d; }
+          &:hover { background: var(--primary-hover); }
         `;
       case 'danger':
         return `
-          background: #ef4444;
+          background: var(--error);
           color: white;
-          &:hover { background: #dc2626; }
+          &:hover { background: var(--danger); }
         `;
       case 'neutral':
         return `
-          background: #f3f4f6;
-          color: #374151;
-          &:hover { background: #e5e7eb; }
+          background: var(--surface-3);
+          color: var(--text);
+          &:hover { background: var(--border); }
         `;
     }
   }}
@@ -216,7 +216,7 @@ const AdminRacketReviewPage: React.FC = () => {
 
       <Content>
         {conflicts.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: '3rem', color: '#6b7280' }}>
+          <div style={{ textAlign: 'center', padding: '3rem', color: 'var(--text-muted)' }}>
             <h3>🎉 No hay conflictos pendientes</h3>
             <p>Todas las palas están sincronizadas correctamente.</p>
           </div>
@@ -225,10 +225,10 @@ const AdminRacketReviewPage: React.FC = () => {
             <ConflictCard key={conflict.id}>
               <ConflictHeader>
                 <ConflictTitle>
-                  <FiAlertTriangle color='#f59e0b' />
+                  <FiAlertTriangle color='var(--accent)' />
                   Posible Duplicado Detectado
                 </ConflictTitle>
-                <div style={{ fontSize: '0.875rem', color: '#6b7280' }}>
+                <div style={{ fontSize: '0.875rem', color: 'var(--text-muted)' }}>
                   Detectado el: {new Date(conflict.created_at).toLocaleDateString()}
                 </div>
               </ConflictHeader>
@@ -238,7 +238,7 @@ const AdminRacketReviewPage: React.FC = () => {
                 <RacketColumn type='existing'>
                   <ColumnTitle>
                     Existente (ID: {conflict.related_racket?.id})
-                    <small style={{ fontWeight: 'normal', color: '#16a34a' }}>Activa</small>
+                    <small style={{ fontWeight: 'normal', color: 'var(--primary)' }}>Activa</small>
                   </ColumnTitle>
                   {conflict.related_racket && (
                     <DataList>
@@ -266,7 +266,7 @@ const AdminRacketReviewPage: React.FC = () => {
                 <RacketColumn type='new'>
                   <ColumnTitle>
                     Nueva / Entrante (ID: {conflict.id})
-                    <small style={{ fontWeight: 'normal', color: '#f59e0b' }}>Conflicto</small>
+                    <small style={{ fontWeight: 'normal', color: 'var(--accent)' }}>Conflicto</small>
                   </ColumnTitle>
                   <DataList>
                     <DataRow>

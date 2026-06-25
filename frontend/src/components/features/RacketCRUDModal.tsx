@@ -18,7 +18,7 @@ const Overlay = styled.div`
 `;
 
 const Modal = styled.div`
-  background: white;
+  background: var(--surface);
   border-radius: 16px;
   width: 100%;
   max-width: 600px;
@@ -29,7 +29,7 @@ const Modal = styled.div`
 
 const ModalHeader = styled.div`
   padding: 1.5rem;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid var(--border);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -38,14 +38,14 @@ const ModalHeader = styled.div`
 const ModalTitle = styled.h2`
   margin: 0;
   font-size: 1.5rem;
-  color: #16a34a;
+  color: var(--primary);
   font-weight: 700;
 `;
 
 const CloseButton = styled.button`
   background: none;
   border: none;
-  color: #666;
+  color: var(--text-muted);
   cursor: pointer;
   padding: 0.5rem;
   display: flex;
@@ -55,8 +55,8 @@ const CloseButton = styled.button`
   transition: all 0.3s ease;
 
   &:hover {
-    background: #f3f4f6;
-    color: #333;
+    background: var(--surface-3);
+    color: var(--text);
   }
 
   svg {
@@ -83,31 +83,31 @@ const FormGroup = styled.div`
 const Label = styled.label`
   font-size: 0.875rem;
   font-weight: 600;
-  color: #333;
+  color: var(--text);
 `;
 
 const Input = styled.input`
   padding: 0.75rem;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--border);
   border-radius: 8px;
   font-size: 1rem;
   transition: all 0.3s ease;
 
   &:focus {
     outline: none;
-    border-color: #16a34a;
-    box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.1);
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.1);
   }
 
   &:disabled {
-    background: #f9fafb;
+    background: var(--surface-2);
     cursor: not-allowed;
   }
 `;
 
 const Select = styled.select`
   padding: 0.75rem;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--border);
   border-radius: 8px;
   font-size: 1rem;
   transition: all 0.3s ease;
@@ -115,14 +115,14 @@ const Select = styled.select`
 
   &:focus {
     outline: none;
-    border-color: #16a34a;
-    box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.1);
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.1);
   }
 `;
 
 const TextArea = styled.textarea`
   padding: 0.75rem;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--border);
   border-radius: 8px;
   font-size: 1rem;
   font-family: inherit;
@@ -132,8 +132,8 @@ const TextArea = styled.textarea`
 
   &:focus {
     outline: none;
-    border-color: #16a34a;
-    box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.1);
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.1);
   }
 `;
 
@@ -149,7 +149,7 @@ const FormRow = styled.div`
 
 const ModalFooter = styled.div`
   padding: 1.5rem;
-  border-top: 1px solid #e5e7eb;
+  border-top: 1px solid var(--border);
   display: flex;
   gap: 1rem;
   justify-content: flex-end;
@@ -167,21 +167,21 @@ const Button = styled.button<{ variant?: 'primary' | 'secondary' }>`
   ${props =>
     props.variant === 'primary'
       ? `
-    background: #16a34a;
-    color: white;
+    background: var(--brand-surface);
+    color: var(--brand-on-surface);
 
     &:hover {
-      background: #15803d;
+      background: var(--primary-hover);
       transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(22, 163, 74, 0.3);
+      box-shadow: 0 4px 12px rgba(var(--primary-rgb), 0.3);
     }
   `
       : `
-    background: #f3f4f6;
-    color: #666;
+    background: var(--surface-3);
+    color: var(--text-muted);
 
     &:hover {
-      background: #e5e7eb;
+      background: var(--border);
     }
   `}
 
@@ -295,7 +295,7 @@ const RacketCRUDModal: React.FC<RacketCRUDModalProps> = ({ racket, onClose, onSa
           <Form onSubmit={handleSubmit}>
             <FormGroup>
               <Label>
-                Nombre <span style={{ color: '#dc2626' }}>*</span>
+                Nombre <span style={{ color: 'var(--danger)' }}>*</span>
               </Label>
               <Input
                 type='text'
@@ -310,7 +310,7 @@ const RacketCRUDModal: React.FC<RacketCRUDModalProps> = ({ racket, onClose, onSa
             <FormRow>
               <FormGroup>
                 <Label>
-                  Marca <span style={{ color: '#dc2626' }}>*</span>
+                  Marca <span style={{ color: 'var(--danger)' }}>*</span>
                 </Label>
                 <Input
                   type='text'
@@ -324,7 +324,7 @@ const RacketCRUDModal: React.FC<RacketCRUDModalProps> = ({ racket, onClose, onSa
 
               <FormGroup>
                 <Label>
-                  Precio (€) <span style={{ color: '#dc2626' }}>*</span>
+                  Precio (€) <span style={{ color: 'var(--danger)' }}>*</span>
                 </Label>
                 <Input
                   type='number'

@@ -37,7 +37,7 @@ const Modal = styled(motion.div)`
   max-height: min(92vh, 880px);
   overflow: auto;
   border-radius: 20px;
-  background: #ffffff;
+  background: var(--surface);
   border: 1px solid rgba(0, 0, 0, 0.06);
   box-shadow:
     0 1px 2px rgba(0, 0, 0, 0.02),
@@ -54,7 +54,7 @@ const Modal = styled(motion.div)`
     background: transparent;
   }
   &::-webkit-scrollbar-thumb {
-    background: #e2e8f0;
+    background: var(--border);
     border-radius: 3px;
   }
 `;
@@ -65,7 +65,7 @@ const Header = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  border-bottom: 1px solid #f1f5f9;
+  border-bottom: 1px solid var(--surface-3);
 `;
 
 const TitleWrap = styled.div`
@@ -78,13 +78,13 @@ const Eyebrow = styled.span`
   font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.12em;
-  color: #16a34a;
+  color: var(--primary);
   font-weight: 700;
 `;
 
 const Title = styled.h2`
   margin: 0;
-  color: #0f172a;
+  color: var(--text);
   font-size: 1.35rem;
   font-weight: 700;
   letter-spacing: -0.01em;
@@ -93,15 +93,15 @@ const Title = styled.h2`
 
 const Description = styled.p`
   margin: 0.25rem 0 0;
-  color: #64748b;
+  color: var(--text-muted);
   line-height: 1.5;
   font-size: 0.9rem;
 `;
 
 const CloseButton = styled.button`
   border: none;
-  background: #f8fafc;
-  color: #64748b;
+  background: var(--surface-2);
+  color: var(--text-muted);
   border-radius: 10px;
   width: 36px;
   height: 36px;
@@ -112,8 +112,8 @@ const CloseButton = styled.button`
   flex-shrink: 0;
 
   &:hover {
-    background: #f1f5f9;
-    color: #334155;
+    background: var(--surface-3);
+    color: var(--text);
   }
 `;
 
@@ -128,8 +128,8 @@ const Form = styled.form`
 const SummaryCard = styled.div`
   border-radius: 14px;
   padding: 1rem 1.25rem;
-  background: #f8fafc;
-  border: 1px solid #f1f5f9;
+  background: var(--surface-2);
+  border: 1px solid var(--surface-3);
   display: grid;
   gap: 0.3rem;
 `;
@@ -138,12 +138,12 @@ const SummaryLabel = styled.span`
   font-size: 0.7rem;
   text-transform: uppercase;
   letter-spacing: 0.1em;
-  color: #64748b;
+  color: var(--text-muted);
   font-weight: 700;
 `;
 
 const SummaryValue = styled.div`
-  color: #0f172a;
+  color: var(--text);
   font-size: 1rem;
   font-weight: 700;
 `;
@@ -157,7 +157,7 @@ const FormGroup = styled.div`
 const Label = styled.label`
   font-size: 0.85rem;
   font-weight: 700;
-  color: #1e293b;
+  color: var(--text);
   display: flex;
   align-items: center;
   gap: 0.4rem;
@@ -166,12 +166,12 @@ const Label = styled.label`
 
 const Select = styled.select`
   width: 100%;
-  border: 1.5px solid #e2e8f0;
+  border: 1.5px solid var(--border);
   border-radius: 12px;
   padding: 0.8rem 1rem;
   font-size: 0.95rem;
-  background: #ffffff;
-  color: #0f172a;
+  background: var(--surface);
+  color: var(--text);
   font-weight: 500;
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
   appearance: none;
@@ -182,28 +182,28 @@ const Select = styled.select`
   cursor: pointer;
 
   &:hover {
-    border-color: #cbd5e1;
+    border-color: var(--border-strong);
   }
 
   &:focus {
     outline: none;
-    border-color: #16a34a;
-    box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.08);
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.08);
   }
 `;
 
 // ── Budget Card ─────────────────────────────────────────────────────────────
 const BudgetCard = styled.div`
-  border: 1.5px solid #e2e8f0;
+  border: 1.5px solid var(--border);
   border-radius: 14px;
   padding: 1rem 1.25rem;
-  background: #ffffff;
+  background: var(--surface);
   display: grid;
   gap: 0.75rem;
   transition: border-color 0.15s ease;
 
   &:hover {
-    border-color: #cbd5e1;
+    border-color: var(--border-strong);
   }
 `;
 
@@ -215,7 +215,7 @@ const BudgetHeader = styled.div`
 `;
 
 const BudgetValue = styled.strong`
-  color: #14532d;
+  color: var(--primary-hover);
   font-size: 1rem;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
@@ -239,8 +239,8 @@ const PrimaryButton = styled.button`
   min-height: 48px;
   padding: 0.85rem 1.5rem;
   cursor: pointer;
-  background: #111111;
-  color: #ffffff;
+  background: var(--brand-surface);
+  color: var(--brand-on-surface);
   font-weight: 700;
   font-size: 0.95rem;
   display: inline-flex;
@@ -252,7 +252,7 @@ const PrimaryButton = styled.button`
   letter-spacing: -0.01em;
 
   &:hover {
-    background: #333333;
+    background: var(--brand-surface-hover);
   }
 
   &:active {
@@ -267,21 +267,21 @@ const PrimaryButton = styled.button`
 `;
 
 const SecondaryButton = styled.button`
-  border: 1.5px solid #e2e8f0;
+  border: 1.5px solid var(--border);
   border-radius: 12px;
   min-height: 48px;
   padding: 0.85rem 1.5rem;
   cursor: pointer;
-  background: #ffffff;
-  color: #475569;
+  background: var(--surface);
+  color: var(--text);
   font-weight: 600;
   font-size: 0.95rem;
   transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease, transform 0.15s ease;
 
   &:hover {
-    background: #f8fafc;
-    border-color: #cbd5e1;
-    color: #334155;
+    background: var(--surface-2);
+    border-color: var(--border-strong);
+    color: var(--text);
   }
 
   &:active {
@@ -292,7 +292,7 @@ const SecondaryButton = styled.button`
 // ── Helper Text ─────────────────────────────────────────────────────────────
 const HelperText = styled.p`
   margin: 0;
-  color: #64748b;
+  color: var(--text-muted);
   font-size: 0.82rem;
   line-height: 1.5;
 `;
@@ -303,9 +303,9 @@ const SectionDivider = styled.div`
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.1em;
-  color: #16a34a;
+  color: var(--primary);
   padding-bottom: 0.5rem;
-  border-bottom: 1px solid #f0fdf4;
+  border-bottom: 1px solid var(--primary-subtle);
   margin-top: 0.5rem;
 `;
 
@@ -325,15 +325,15 @@ const StockToggleRow = styled.label`
   align-items: center;
   gap: 0.75rem;
   padding: 0.875rem 1rem;
-  border: 1.5px solid #e2e8f0;
+  border: 1.5px solid var(--border);
   border-radius: 12px;
   cursor: pointer;
   font-size: 0.9rem;
   font-weight: 500;
-  color: #334155;
+  color: var(--text);
   transition: border-color 0.15s;
-  &:hover { border-color: #16a34a; }
-  input { accent-color: #16a34a; width: 18px; height: 18px; }
+  &:hover { border-color: var(--primary); }
+  input { accent-color: var(--primary); width: 18px; height: 18px; }
 `;
 
 // ── Objective Options ───────────────────────────────────────────────────────

@@ -15,8 +15,8 @@ import { buildUrl, allKeywords } from '../config/seo';
 const Container = styled.div`
   min-height: 100dvh;
   background:
-    radial-gradient(circle at top right, rgba(21, 128, 61, 0.08), transparent 42%),
-    linear-gradient(150deg, #f8faf8 0%, #edf7ef 45%, #e6f4e7 100%);
+    radial-gradient(circle at top right, rgba(var(--primary-rgb-dark), 0.08), transparent 42%),
+    linear-gradient(150deg, var(--surface-2) 0%, var(--primary-subtle) 45%, var(--primary-subtle) 100%);
   padding: 1rem 1rem calc(6.5rem + env(safe-area-inset-bottom));
 
   @media (min-width: 769px) {
@@ -25,12 +25,12 @@ const Container = styled.div`
 `;
 
 const Header = styled.div`
-  background: white;
+  background: var(--surface);
   border-radius: 24px;
   max-width: 1200px;
   margin: 0 auto;
   padding: 2.5rem 1.5rem;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 4px 6px -1px var(--shadow-color), 0 2px 4px -1px var(--shadow-color);
   text-align: center;
 
   @media (max-width: 768px) {
@@ -42,11 +42,11 @@ const Header = styled.div`
 const Title = styled.h1`
   font-size: 3rem;
   font-weight: 800;
-  color: #1f2937;
+  color: var(--text);
   margin-bottom: 1rem;
 
   .highlight {
-    color: #15803d;
+    color: var(--primary-hover);
   }
 
   @media (max-width: 768px) {
@@ -56,7 +56,7 @@ const Title = styled.h1`
 
 const Subtitle = styled.p`
   font-size: 1.25rem;
-  color: #6b7280;
+  color: var(--text-muted);
   max-width: 600px;
   margin: 0 auto;
   line-height: 1.6;
@@ -84,8 +84,8 @@ const SecondaryButton = styled.button`
   padding: 0.75rem 1.5rem;
   min-height: 44px;
   background: transparent;
-  color: #15803d;
-  border: 2px solid #16a34a;
+  color: var(--primary-hover);
+  border: 2px solid var(--primary);
   border-radius: 12px;
   font-weight: 600;
   font-size: 0.875rem;
@@ -93,9 +93,9 @@ const SecondaryButton = styled.button`
   transition: background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
 
   &:hover {
-    background: rgba(22, 163, 74, 0.05);
+    background: rgba(var(--primary-rgb), 0.05);
     transform: translateY(-1px);
-    box-shadow: 0 4px 6px -1px rgba(21, 128, 61, 0.15);
+    box-shadow: 0 4px 6px -1px rgba(var(--primary-rgb-dark), 0.15);
   }
 `;
 
@@ -115,10 +115,10 @@ const MainContent = styled.div`
 `;
 
 const Card = styled(motion.div)`
-  background: white;
+  background: var(--surface);
   border-radius: 20px;
   padding: 3rem 2rem;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 4px 6px -1px var(--shadow-color), 0 2px 4px -1px var(--shadow-color);
   border: 1px solid rgba(0, 0, 0, 0.06);
   display: flex;
   flex-direction: column;
@@ -132,11 +132,11 @@ const Card = styled(motion.div)`
 
   &:hover {
     transform: translateY(-4px);
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-    border-color: rgba(21, 128, 61, 0.3);
+    box-shadow: 0 20px 25px -5px var(--shadow-color), 0 10px 10px -5px var(--shadow-color);
+    border-color: rgba(var(--primary-rgb-dark), 0.3);
 
     .icon-container {
-      background: #15803d;
+      background: var(--primary-hover);
       color: white;
       transform: scale(1.08);
     }
@@ -164,8 +164,8 @@ const IconContainer = styled.div`
   width: 80px;
   height: 80px;
   border-radius: 20px;
-  background: #f0fdf4;
-  color: #15803d;
+  background: var(--primary-subtle);
+  color: var(--primary-hover);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -189,7 +189,7 @@ const IconContainer = styled.div`
 const CardTitle = styled.h2`
   font-size: 1.75rem;
   font-weight: 700;
-  color: #1f2937;
+  color: var(--text);
   margin-bottom: 1rem;
 
   @media (max-width: 768px) {
@@ -202,7 +202,7 @@ const CardTitle = styled.h2`
 
 const CardDescription = styled.p`
   font-size: 1rem;
-  color: #6b7280;
+  color: var(--text-muted);
   margin-bottom: 2rem;
   line-height: 1.6;
   flex-grow: 1;
@@ -220,7 +220,7 @@ const ActionButton = styled.div`
   align-items: center;
   gap: 0.5rem;
   font-weight: 600;
-  color: #15803d;
+  color: var(--primary-hover);
   font-size: 1.125rem;
 
   @media (max-width: 768px) {

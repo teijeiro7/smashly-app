@@ -21,15 +21,15 @@ const Container = styled.div`
 `;
 
 const Section = styled.div`
-  background: white;
+  background: var(--surface);
   border-radius: 16px;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--border);
   overflow: hidden;
 `;
 
 const SectionHeader = styled.div`
   padding: 1.25rem 1.5rem;
-  border-bottom: 1px solid #f1f5f9;
+  border-bottom: 1px solid var(--surface-3);
   display: flex;
   align-items: center;
   gap: 0.75rem;
@@ -49,7 +49,7 @@ const SectionIcon = styled.div<{ color: string }>`
 const SectionTitle = styled.h3`
   font-size: 1rem;
   font-weight: 600;
-  color: #16a34a;
+  color: var(--primary);
   margin: 0;
 `;
 
@@ -62,7 +62,7 @@ const InfoRow = styled.div`
   align-items: center;
   justify-content: space-between;
   padding: 1rem 0;
-  border-bottom: 1px solid #f1f5f9;
+  border-bottom: 1px solid var(--surface-3);
 
   &:last-child {
     border-bottom: none;
@@ -71,13 +71,13 @@ const InfoRow = styled.div`
 
 const InfoLabel = styled.div`
   font-size: 0.9375rem;
-  color: #64748b;
+  color: var(--text-muted);
 `;
 
 const InfoValue = styled.div`
   font-size: 0.9375rem;
   font-weight: 500;
-  color: #16a34a;
+  color: var(--primary);
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -94,18 +94,18 @@ const ActionButton = styled(motion.button)<{ $danger?: boolean }>`
   cursor: pointer;
   border: none;
   transition: all 0.2s ease;
-  background: ${props => props.$danger ? '#fef2f2' : '#f1f5f9'};
-  color: ${props => props.$danger ? '#dc2626' : '#64748b'};
+  background: ${props => props.$danger ? 'var(--danger-subtle)' : 'var(--surface-3)'};
+  color: ${props => props.$danger ? 'var(--danger)' : 'var(--text-muted)'};
 
   &:hover {
-    background: ${props => props.$danger ? '#dc2626' : '#e2e8f0'};
-    color: ${props => props.$danger ? 'white' : '#16a34a'};
+    background: ${props => props.$danger ? 'var(--danger)' : 'var(--border)'};
+    color: ${props => props.$danger ? 'var(--brand-on-surface)' : 'var(--primary)'};
   }
 `;
 
 const DangerZone = styled.div`
-  background: #fef2f2;
-  border: 1px solid #fecaca;
+  background: var(--danger-subtle);
+  border: 1px solid var(--danger-strong);
   border-radius: 12px;
   padding: 1.25rem;
   margin-top: 1rem;
@@ -114,7 +114,7 @@ const DangerZone = styled.div`
 const DangerTitle = styled.h4`
   font-size: 0.9375rem;
   font-weight: 600;
-  color: #dc2626;
+  color: var(--danger);
   margin: 0 0 0.5rem 0;
   display: flex;
   align-items: center;
@@ -123,7 +123,7 @@ const DangerTitle = styled.h4`
 
 const DangerText = styled.p`
   font-size: 0.8125rem;
-  color: #64748b;
+  color: var(--text-muted);
   margin: 0 0 1rem 0;
   line-height: 1.5;
 `;
@@ -175,7 +175,7 @@ const AccountSettings: React.FC<AccountSettingsProps> = ({ user }) => {
     <Container>
       <Section>
         <SectionHeader>
-          <SectionIcon color="#3b82f6">
+          <SectionIcon color="var(--info)">
             <FiMail size={20} />
           </SectionIcon>
           <SectionTitle>Datos de Cuenta</SectionTitle>
@@ -198,8 +198,8 @@ const AccountSettings: React.FC<AccountSettingsProps> = ({ user }) => {
           <InfoRow>
             <InfoLabel>Estado</InfoLabel>
             <InfoValue>
-              <FiShield size={14} style={{ color: '#16a34a' }} />
-              <span style={{ color: '#16a34a' }}>Cuenta verificada</span>
+              <FiShield size={14} style={{ color: 'var(--primary)' }} />
+              <span style={{ color: 'var(--primary)' }}>Cuenta verificada</span>
             </InfoValue>
           </InfoRow>
         </SectionContent>
@@ -207,7 +207,7 @@ const AccountSettings: React.FC<AccountSettingsProps> = ({ user }) => {
 
       <Section>
         <SectionHeader>
-          <SectionIcon color="#f59e0b">
+          <SectionIcon color="var(--accent)">
             <FiLock size={20} />
           </SectionIcon>
           <SectionTitle>Seguridad</SectionTitle>
@@ -269,7 +269,7 @@ const AccountSettings: React.FC<AccountSettingsProps> = ({ user }) => {
 
       <Section>
         <SectionHeader>
-          <SectionIcon color="#ef4444">
+          <SectionIcon color="var(--error)">
             <FiLogOut size={20} />
           </SectionIcon>
           <SectionTitle>Sesión</SectionTitle>

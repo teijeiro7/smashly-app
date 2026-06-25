@@ -34,7 +34,7 @@ interface RacketFeaturesProps {
 }
 
 const FeaturesContainer = styled(motion.div)`
-  background: white;
+  background: var(--surface);
   border-radius: 16px;
   padding: 2rem;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
@@ -43,7 +43,7 @@ const FeaturesContainer = styled(motion.div)`
 const SectionTitle = styled.h3`
   font-size: 1.5rem;
   font-weight: 700;
-  color: #1f2937;
+  color: var(--text);
   margin-bottom: 2rem;
   display: flex;
   align-items: center;
@@ -58,7 +58,7 @@ const FeaturesGrid = styled.div`
 `;
 
 const FeatureCard = styled(motion.div)`
-  background: linear-gradient(135deg, #f8fdf8 0%, #f0f9f0 100%);
+  background: linear-gradient(135deg, var(--primary-faint) 0%, var(--primary-subtle) 100%);
   border: 1px solid #d1fae5;
   border-radius: 12px;
   padding: 1.5rem;
@@ -69,8 +69,8 @@ const FeatureCard = styled(motion.div)`
 
   &:hover {
     transform: translateY(-4px);
-    box-shadow: 0 8px 20px rgba(22, 163, 74, 0.15);
-    border-color: #16a34a;
+    box-shadow: 0 8px 20px rgba(var(--primary-rgb), 0.15);
+    border-color: var(--primary);
   }
 `;
 
@@ -84,13 +84,13 @@ const FeatureIcon = styled.div`
   width: 48px;
   height: 48px;
   border-radius: 12px;
-  background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+  background: linear-gradient(135deg, var(--brand-surface) 0%, var(--brand-surface-hover) 100%);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: white;
+  color: var(--brand-on-surface);
   font-size: 1.25rem;
-  box-shadow: 0 4px 12px rgba(22, 163, 74, 0.3);
+  box-shadow: 0 4px 12px rgba(var(--primary-rgb), 0.3);
 `;
 
 const FeatureInfo = styled.div`
@@ -100,7 +100,7 @@ const FeatureInfo = styled.div`
 const FeatureLabel = styled.div`
   font-size: 0.875rem;
   font-weight: 500;
-  color: #6b7280;
+  color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 0.5px;
 `;
@@ -108,20 +108,20 @@ const FeatureLabel = styled.div`
 const FeatureValue = styled.div`
   font-size: 1.125rem;
   font-weight: 700;
-  color: #1f2937;
+  color: var(--text);
   margin-top: 0.25rem;
 `;
 
 const TechnologiesSection = styled.div`
   margin-top: 1rem;
   padding-top: 1.5rem;
-  border-top: 2px solid #e5e7eb;
+  border-top: 2px solid var(--border);
 `;
 
 const TechnologiesTitle = styled.h4`
   font-size: 1.125rem;
   font-weight: 600;
-  color: #1f2937;
+  color: var(--text);
   margin-bottom: 1rem;
   display: flex;
   align-items: center;
@@ -162,7 +162,7 @@ const TechnologyIcon = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  color: white;
+  color: var(--brand-on-surface);
   font-size: 0.75rem;
   flex-shrink: 0;
 `;

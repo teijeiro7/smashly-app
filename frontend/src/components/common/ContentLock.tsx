@@ -91,7 +91,7 @@ const LockOverlay = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(255, 255, 255, 0.75);
+  background: var(--surface-overlay);
   backdrop-filter: blur(4px);
   -webkit-backdrop-filter: blur(4px);
   z-index: 10;
@@ -100,17 +100,17 @@ const LockOverlay = styled.div`
   @media (hover: none) and (pointer: coarse) {
     backdrop-filter: none;
     -webkit-backdrop-filter: none;
-    background: rgba(255, 255, 255, 0.9);
+    background: var(--surface-overlay);
   }
 `;
 
 const LockCard = styled.div`
-  background: white;
+  background: var(--surface);
   border-radius: 24px;
   padding: 3rem 2.5rem;
   max-width: 500px;
   width: 100%;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 20px 40px var(--shadow-color), 0 0 0 1px var(--shadow-color);
   text-align: center;
   animation: slideUp 0.3s ease-out;
 
@@ -134,19 +134,19 @@ const IconWrapper = styled.div`
   width: 80px;
   height: 80px;
   margin: 0 auto 1.5rem;
-  background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+  background: linear-gradient(135deg, var(--brand-surface) 0%, var(--brand-surface-hover) 100%);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: white;
-  box-shadow: 0 8px 20px rgba(22, 163, 74, 0.3);
+  color: var(--brand-on-surface);
+  box-shadow: 0 8px 20px rgba(var(--primary-rgb), 0.3);
 `;
 
 const LockTitle = styled.h3`
   font-size: 1.75rem;
   font-weight: 800;
-  color: #111827;
+  color: var(--text);
   margin: 0 0 0.75rem 0;
   line-height: 1.2;
 
@@ -157,7 +157,7 @@ const LockTitle = styled.h3`
 
 const LockDescription = styled.p`
   font-size: 1.05rem;
-  color: #6b7280;
+  color: var(--text-muted);
   margin: 0 0 2rem 0;
   line-height: 1.5;
 `;
@@ -179,20 +179,20 @@ const LoginButton = styled(Link)`
   justify-content: center;
   gap: 0.5rem;
   padding: 1rem 1.5rem;
-  background: #16a34a;
-  color: white;
+  background: var(--brand-surface);
+  color: var(--brand-on-surface);
   border-radius: 12px;
   font-weight: 700;
   font-size: 1rem;
   text-decoration: none;
   transition: transform 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
-  box-shadow: 0 4px 12px rgba(22, 163, 74, 0.25);
+  box-shadow: 0 4px 12px rgba(var(--primary-rgb), 0.25);
 
   &:hover {
-    background: #15803d;
+    background: var(--primary-hover);
     transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(22, 163, 74, 0.35);
-    color: white;
+    box-shadow: 0 6px 16px rgba(var(--primary-rgb), 0.35);
+    color: var(--brand-on-surface);
   }
 
   &:active {
@@ -207,9 +207,9 @@ const SignUpButton = styled(Link)`
   justify-content: center;
   gap: 0.5rem;
   padding: 1rem 1.5rem;
-  background: white;
-  color: #16a34a;
-  border: 2px solid #16a34a;
+  background: var(--surface);
+  color: var(--primary);
+  border: 2px solid var(--primary);
   border-radius: 12px;
   font-weight: 700;
   font-size: 1rem;
@@ -217,9 +217,9 @@ const SignUpButton = styled(Link)`
   transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
 
   &:hover {
-    background: #f0fdf4;
-    color: #15803d;
-    border-color: #15803d;
+    background: var(--primary-subtle);
+    color: var(--primary-hover);
+    border-color: var(--primary-hover);
   }
 
   &:active {
@@ -229,7 +229,7 @@ const SignUpButton = styled(Link)`
 
 const SubText = styled.p`
   font-size: 0.875rem;
-  color: #9ca3af;
+  color: var(--text-subtle);
   margin: 0;
   font-weight: 500;
 `;

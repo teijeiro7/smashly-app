@@ -12,7 +12,7 @@ const PageHeader = styled.div`
 const PageTitle = styled.h1`
   font-size: 1.75rem;
   font-weight: 700;
-  color: #0f172a;
+  color: var(--text);
   margin-bottom: 0.5rem;
   letter-spacing: -0.025em;
 
@@ -22,7 +22,7 @@ const PageTitle = styled.h1`
 `;
 
 const PageSubtitle = styled.p`
-  color: #64748b;
+  color: var(--text-muted);
   font-size: 1rem;
 `;
 

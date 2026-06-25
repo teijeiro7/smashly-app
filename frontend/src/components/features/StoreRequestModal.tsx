@@ -26,7 +26,7 @@ const Overlay = styled.div`
 `;
 
 const ModalContainer = styled.div`
-  background: white;
+  background: var(--surface);
   border-radius: 16px;
   padding: 2rem;
   max-width: 500px;
@@ -53,15 +53,15 @@ const CloseButton = styled.button`
   right: 1rem;
   background: none;
   border: none;
-  color: #6b7280;
+  color: var(--text-muted);
   cursor: pointer;
   padding: 0.5rem;
   border-radius: 8px;
   transition: all 0.2s ease;
 
   &:hover {
-    background: #f3f4f6;
-    color: #1f2937;
+    background: var(--surface-3);
+    color: var(--text);
   }
 `;
 
@@ -75,11 +75,11 @@ const SuccessIcon = styled.div`
   width: 80px;
   height: 80px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #16a34a 0%, #059669 100%);
+  background: linear-gradient(135deg, var(--brand-surface) 0%, var(--success) 100%);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: white;
+  color: var(--brand-on-surface);
   animation: scaleIn 0.4s ease;
 
   @keyframes scaleIn {
@@ -93,7 +93,7 @@ const SuccessIcon = styled.div`
 `;
 
 const Title = styled.h2`
-  color: #1f2937;
+  color: var(--text);
   font-size: 1.75rem;
   margin: 0 0 1rem 0;
   text-align: center;
@@ -101,7 +101,7 @@ const Title = styled.h2`
 `;
 
 const Message = styled.p`
-  color: #6b7280;
+  color: var(--text-muted);
   font-size: 1rem;
   line-height: 1.6;
   margin: 0 0 1.5rem 0;
@@ -109,22 +109,22 @@ const Message = styled.p`
 `;
 
 const InfoBox = styled.div`
-  background: #f0fdf4;
-  border: 1px solid #bbf7d0;
+  background: var(--primary-subtle);
+  border: 1px solid var(--primary-subtle);
   border-radius: 12px;
   padding: 1rem;
   margin-bottom: 1.5rem;
 `;
 
 const InfoTitle = styled.h3`
-  color: #15803d;
+  color: var(--primary-hover);
   font-size: 0.95rem;
   font-weight: 600;
   margin: 0 0 0.5rem 0;
 `;
 
 const InfoText = styled.p`
-  color: #166534;
+  color: var(--primary-hover);
   font-size: 0.875rem;
   line-height: 1.5;
   margin: 0;
@@ -148,18 +148,18 @@ const Button = styled.button<{ variant?: "primary" | "secondary" }>`
   ${(props) =>
     props.variant === "secondary"
       ? `
-    background: #f3f4f6;
-    color: #1f2937;
+    background: var(--surface-3);
+    color: var(--text);
     &:hover {
-      background: #e5e7eb;
+      background: var(--border);
     }
   `
       : `
-    background: linear-gradient(135deg, #16a34a 0%, #059669 100%);
-    color: white;
+    background: linear-gradient(135deg, var(--brand-surface) 0%, var(--success) 100%);
+    color: var(--brand-on-surface);
     &:hover {
       transform: translateY(-2px);
-      box-shadow: 0 8px 24px rgba(22, 163, 74, 0.3);
+      box-shadow: 0 8px 24px rgba(var(--primary-rgb), 0.3);
     }
   `}
 

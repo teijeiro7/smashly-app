@@ -20,7 +20,7 @@ import { emailValidator } from '../../schemas/auth';
 import TextField from '../form/TextField';
 
 const TermsLink = styled(Link)`
-  color: #ccff00;
+  color: var(--accent);
   text-decoration: none;
   font-weight: 600;
   transition: opacity 0.2s;
@@ -135,14 +135,14 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, onRegisterClick }) => 
         </SubmitButton>
 
         <div
-          style={{ marginTop: '1rem', textAlign: 'center', fontSize: '0.9rem', color: '#6b7280' }}
+          style={{ marginTop: '1rem', textAlign: 'center', fontSize: '0.9rem', color: 'var(--text-muted)' }}
         >
           ¿No tienes cuenta?{' '}
           <button
             type='button'
             onClick={onRegisterClick}
             style={{
-              color: '#16a34a',
+              color: 'var(--primary)',
               fontWeight: 600,
               background: 'none',
               border: 'none',

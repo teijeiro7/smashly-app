@@ -38,23 +38,23 @@ const HeaderInfo = styled.div``;
 const Title = styled.h1`
   font-size: 1.75rem;
   font-weight: 700;
-  color: #0f172a;
+  color: var(--text);
   letter-spacing: -0.025em;
 `;
 
 const Subtitle = styled.p`
   font-size: 1rem;
-  color: #64748b;
+  color: var(--text-muted);
   margin-top: 0.375rem;
 `;
 
 const TabsContainer = styled.div`
   display: flex;
   gap: 0.375rem;
-  background: white;
+  background: var(--surface);
   padding: 0.375rem;
   border-radius: 12px;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--border);
   overflow-x: auto;
 `;
 
@@ -70,12 +70,12 @@ const Tab = styled.button<{ $active: boolean }>`
   cursor: pointer;
   transition: background-color 0.2s ease, color 0.2s ease;
   white-space: nowrap;
-  background: ${props => (props.$active ? '#0f172a' : 'transparent')};
-  color: ${props => (props.$active ? 'white' : '#64748b')};
+  background: ${props => (props.$active ? 'var(--text)' : 'transparent')};
+  color: ${props => (props.$active ? 'white' : 'var(--text-muted)')};
 
   &:hover {
-    background: ${props => (props.$active ? '#0f172a' : '#f1f5f9')};
-    color: ${props => (props.$active ? 'white' : '#0f172a')};
+    background: ${props => (props.$active ? 'var(--text)' : 'var(--surface-3)')};
+    color: ${props => (props.$active ? 'white' : 'var(--text)')};
   }
 
   svg {
@@ -91,15 +91,15 @@ const MainContent = styled.div`
 `;
 
 const ContentCard = styled.div`
-  background: white;
+  background: var(--surface);
   border-radius: 16px;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--border);
   overflow: hidden;
 `;
 
 const CardHeader = styled.div`
   padding: 1.25rem 1.5rem;
-  border-bottom: 1px solid #f1f5f9;
+  border-bottom: 1px solid var(--border);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -109,13 +109,13 @@ const CardHeader = styled.div`
 const CardTitle = styled.h3`
   font-size: 1.0625rem;
   font-weight: 600;
-  color: #0f172a;
+  color: var(--text);
   display: flex;
   align-items: center;
   gap: 0.625rem;
 
   svg {
-    color: #0f172a;
+    color: var(--text);
   }
 `;
 
@@ -133,12 +133,12 @@ const HeaderStat = styled.div`
 const HeaderStatValue = styled.span`
   font-size: 1.125rem;
   font-weight: 700;
-  color: #0f172a;
+  color: var(--text);
 `;
 
 const HeaderStatLabel = styled.span`
   font-size: 0.8125rem;
-  color: #64748b;
+  color: var(--text-muted);
 `;
 
 const AddButton = styled(motion.button)`
@@ -146,8 +146,8 @@ const AddButton = styled(motion.button)`
   align-items: center;
   gap: 0.375rem;
   padding: 0.5rem 1rem;
-  background: #0f172a;
-  color: white;
+  background: var(--brand-surface);
+  color: var(--brand-on-surface);
   border: none;
   border-radius: 8px;
   font-size: 0.8125rem;
@@ -155,7 +155,7 @@ const AddButton = styled(motion.button)`
   cursor: pointer;
 
   &:hover {
-    background: #334155;
+    background: var(--brand-surface-hover);
   }
 
   svg {
@@ -178,14 +178,14 @@ const ListItem = styled(motion.div)`
   align-items: center;
   justify-content: space-between;
   padding: 1rem 1.25rem;
-  background: #f8fafc;
+  background: var(--surface-2);
   border-radius: 12px;
   border: 1px solid transparent;
   transition: background-color 0.2s ease, border-color 0.2s ease;
 
   &:hover {
-    background: white;
-    border-color: #e2e8f0;
+    background: var(--surface);
+    border-color: var(--border);
   }
 `;
 
@@ -212,13 +212,13 @@ const ItemDetails = styled.div``;
 
 const ItemName = styled.div`
   font-weight: 600;
-  color: #0f172a;
+  color: var(--text);
   font-size: 0.9375rem;
 `;
 
 const ItemMeta = styled.div`
   font-size: 0.8125rem;
-  color: #64748b;
+  color: var(--text-muted);
   margin-top: 0.125rem;
 `;
 
@@ -237,21 +237,21 @@ const IconButton = styled(motion.button)<{ $variant?: 'danger' }>`
   border: none;
   cursor: pointer;
   transition: background-color 0.2s ease, color 0.2s ease;
-  background: ${props => props.$variant === 'danger' ? '#fef2f2' : '#f1f5f9'};
-  color: ${props => props.$variant === 'danger' ? '#dc2626' : '#64748b'};
+  background: ${props => props.$variant === 'danger' ? 'var(--danger-subtle)' : 'var(--surface-3)'};
+  color: ${props => props.$variant === 'danger' ? 'var(--danger)' : 'var(--text-muted)'};
 
   &:hover {
-    background: ${props => props.$variant === 'danger' ? '#dc2626' : '#0f172a'};
+    background: ${props => props.$variant === 'danger' ? 'var(--danger)' : 'var(--text)'};
     color: ${props => props.$variant === 'danger' ? 'white' : 'white'};
   }
 `;
 
 const FormPanel = styled(motion.div)`
   padding: 1.25rem;
-  background: #f8fafc;
+  background: var(--surface-2);
   border-radius: 12px;
   margin-bottom: 1rem;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--border);
 `;
 
 const FormGrid = styled.div`
@@ -274,25 +274,25 @@ const FormGroup = styled.div`
 const FormLabel = styled.label`
   font-size: 0.8125rem;
   font-weight: 600;
-  color: #475569;
+  color: var(--text);
 `;
 
 const FormInput = styled.input`
   padding: 0.625rem 0.875rem;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--border);
   border-radius: 8px;
   font-size: 0.875rem;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
-  background: white;
+  background: var(--surface);
 
   &:focus {
     outline: none;
-    border-color: #0f172a;
+    border-color: var(--text);
     box-shadow: 0 0 0 3px rgba(15, 23, 42, 0.1);
   }
 
   &::placeholder {
-    color: #94a3b8;
+    color: var(--text-subtle);
   }
 `;
 
@@ -317,30 +317,30 @@ const Button = styled(motion.button)<{ $variant?: 'primary' | 'secondary' }>`
   ${props =>
     props.$variant === 'primary'
       ? `
-    background: #0f172a;
-    color: white;
-    &:hover { background: #334155; }
+    background: var(--brand-surface-hover);
+    color: var(--brand-on-surface);
+    &:hover { background: var(--brand-surface); }
   `
       : `
-    background: white;
-    color: #64748b;
-    border: 1px solid #e2e8f0;
-    &:hover { background: #f8fafc; color: #0f172a; }
+    background: var(--surface);
+    color: var(--text-muted);
+    border: 1px solid var(--border);
+    &:hover { background: var(--surface-2); color: var(--text); }
   `}
 `;
 
 const EmptyState = styled.div`
   text-align: center;
   padding: 3rem 1.5rem;
-  color: #94a3b8;
+  color: var(--text-subtle);
 `;
 
 const EmptyIcon = styled.div`
   width: 56px;
   height: 56px;
   border-radius: 16px;
-  background: #f1f5f9;
-  color: #cbd5e1;
+  background: var(--surface-3);
+  color: var(--border-strong);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -355,10 +355,10 @@ const SettingsGrid = styled.div`
 `;
 
 const SettingsCard = styled.div`
-  background: #f8fafc;
+  background: var(--surface-2);
   border-radius: 12px;
   padding: 1.25rem;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--border);
 `;
 
 const SettingsRow = styled.div`
@@ -387,22 +387,22 @@ const SettingsLabel = styled.label`
   display: block;
   font-size: 0.8125rem;
   font-weight: 600;
-  color: #475569;
+  color: var(--text);
   margin-bottom: 0.25rem;
 `;
 
 const SettingsInput = styled.input`
   width: 100%;
   padding: 0.625rem 0.875rem;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--border);
   border-radius: 8px;
   font-size: 0.875rem;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
-  background: white;
+  background: var(--surface);
 
   &:focus {
     outline: none;
-    border-color: #0f172a;
+    border-color: var(--text);
     box-shadow: 0 0 0 3px rgba(15, 23, 42, 0.1);
   }
 `;
@@ -412,8 +412,8 @@ const SaveButton = styled(motion.button)`
   align-items: center;
   gap: 0.5rem;
   padding: 0.75rem 1.5rem;
-  background: #0f172a;
-  color: white;
+  background: var(--brand-surface);
+  color: var(--brand-on-surface);
   border: none;
   border-radius: 10px;
   font-size: 0.9375rem;
@@ -422,7 +422,7 @@ const SaveButton = styled(motion.button)`
   margin-top: 1.5rem;
 
   &:hover {
-    background: #334155;
+    background: var(--brand-surface-hover);
   }
 `;
 
@@ -443,7 +443,7 @@ const LoadingContainer = styled.div`
   justify-content: center;
   align-items: center;
   min-height: 300px;
-  color: #64748b;
+  color: var(--text-muted);
 `;
 
 type TabType = 'brands' | 'categories' | 'general';
@@ -750,7 +750,7 @@ const SettingsContent: React.FC = () => {
                           animate={{ opacity: 1, x: 0 }}
                         >
                           <ItemInfo>
-                            <ItemAvatar color="#16a34a">{category.name.charAt(0)}</ItemAvatar>
+                            <ItemAvatar color="var(--primary)">{category.name.charAt(0)}</ItemAvatar>
                             <ItemDetails>
                               <ItemName>{category.name}</ItemName>
                               <ItemMeta>{category.description}</ItemMeta>
@@ -793,7 +793,7 @@ const SettingsContent: React.FC = () => {
                   <SettingsGrid>
                     <SettingsCard>
                       <SettingsRow>
-                        <SettingsIcon color="#0f172a"><FiTag /></SettingsIcon>
+                        <SettingsIcon color="var(--text)"><FiTag /></SettingsIcon>
                         <SettingsInfo style={{ flex: 1 }}>
                           <SettingsLabel>Nombre de la Aplicación</SettingsLabel>
                           <SettingsInput
@@ -806,7 +806,7 @@ const SettingsContent: React.FC = () => {
 
                     <SettingsCard>
                       <SettingsRow>
-                        <SettingsIcon color="#3b82f6"><FiMail /></SettingsIcon>
+                        <SettingsIcon color="var(--info)"><FiMail /></SettingsIcon>
                         <SettingsInfo style={{ flex: 1 }}>
                           <SettingsLabel>Email de Contacto</SettingsLabel>
                           <SettingsInput

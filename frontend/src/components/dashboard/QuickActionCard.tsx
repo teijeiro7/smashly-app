@@ -4,11 +4,11 @@ import { motion } from 'framer-motion';
 import { IconType } from 'react-icons';
 
 const Card = styled(motion.div)`
-  background: white;
+  background: var(--surface);
   border-radius: 20px;
   padding: 2rem;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-  border: 1px solid rgba(22, 163, 74, 0.1);
+  box-shadow: 0 4px 20px var(--shadow-color);
+  border: 1px solid rgba(var(--primary-rgb), 0.1);
   cursor: pointer;
   transition: all 0.3s ease;
   display: flex;
@@ -19,12 +19,12 @@ const Card = styled(motion.div)`
 
   &:hover {
     transform: translateY(-5px);
-    box-shadow: 0 10px 30px rgba(22, 163, 74, 0.15);
-    border-color: #16a34a;
+    box-shadow: 0 10px 30px rgba(var(--primary-rgb), 0.15);
+    border-color: var(--primary);
 
     .icon-container {
-      background: #16a34a;
-      color: white;
+      background: var(--brand-surface);
+      color: var(--brand-on-surface);
       transform: scale(1.1);
     }
   }
@@ -43,8 +43,8 @@ const IconContainer = styled.div`
   width: 60px;
   height: 60px;
   border-radius: 15px;
-  background: #f0fdf4;
-  color: #16a34a;
+  background: var(--primary-subtle);
+  color: var(--primary);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -63,7 +63,7 @@ const IconContainer = styled.div`
 const Title = styled.h3`
   font-size: 1.125rem;
   font-weight: 700;
-  color: #1f2937;
+  color: var(--text);
   margin: 0;
 
   @media (max-width: 768px) {
@@ -74,7 +74,7 @@ const Title = styled.h3`
 
 const Description = styled.p`
   font-size: 0.875rem;
-  color: #6b7280;
+  color: var(--text-muted);
   margin: 0;
   line-height: 1.5;
 

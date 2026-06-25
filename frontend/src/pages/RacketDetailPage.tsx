@@ -128,12 +128,12 @@ const AuthBanner = styled.div`
 `;
 
 const AuthCard = styled.div`
-  background: #f0fdf4;
+  background: var(--primary-faint);
   border: 1px solid var(--color-gray-200);
     border-radius: 16px;
   padding: 2.5rem;
   text-align: center;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+  box-shadow: 0 4px 20px var(--shadow-color);
   position: relative;
   overflow: hidden;
 
@@ -144,7 +144,7 @@ const AuthCard = styled.div`
     right: -50%;
     width: 300px;
     height: 300px;
-    background: radial-gradient(circle, rgba(21, 128, 61, 0.05) 0%, transparent 70%);
+    background: radial-gradient(circle, rgba(var(--primary-rgb-dark), 0.05) 0%, transparent 70%);
     border-radius: 50%;
   }
 
@@ -169,23 +169,23 @@ const AuthLockIcon = styled.div`
   justify-content: center;
   width: 32px;
   height: 32px;
-  background: rgba(21, 128, 61, 0.1);
+  background: rgba(var(--primary-rgb-dark), 0.1);
   border-radius: 8px;
-  color: #166534;
+  color: var(--primary-hover);
   font-size: 1rem;
 `;
 
 const AuthTitle = styled.h3`
   font-size: 1.5rem;
   font-weight: 700;
-  color: #166534;
+  color: var(--primary-hover);
   margin: 0;
   letter-spacing: -0.01em;
 `;
 
 const AuthDescription = styled.p`
   font-size: 0.9375rem;
-  color: #166534;
+  color: var(--primary-hover);
   opacity: 0.8;
   line-height: 1.6;
   margin: 0 0 1.75rem;
@@ -223,24 +223,24 @@ const AuthButton = styled.a<{ $variant?: 'primary' | 'secondary' }>`
       ? `
     background: var(--color-primary);
     color: white;
-    box-shadow: 0 4px 12px rgba(21, 128, 61, 0.25);
+    box-shadow: 0 4px 12px rgba(var(--primary-rgb-dark), 0.25);
     
     &:hover {
       background: var(--color-primary-dark);
       transform: translateY(-2px);
-      box-shadow: 0 6px 16px rgba(21, 128, 61, 0.35);
+      box-shadow: 0 6px 16px rgba(var(--primary-rgb-dark), 0.35);
     }
   `
       : `
-    background: white;
-    color: #15803d;
+    background: var(--surface);
+    color: var(--primary-hover);
     border: 1px solid var(--color-gray-200);
     
     &:hover {
-      background: #f9fafb;
+      background: var(--surface-2);
       border-color: var(--color-primary);
       transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 4px 12px var(--shadow-color);
     }
   `}
 `;
@@ -272,8 +272,10 @@ const MainGrid = styled.div`
 
 // Left Column: Gallery
 const GallerySection = styled.div`
-  background: white;
-  border-radius: 16px;
+  background: var(--racket-image-bg);
+  border: var(--racket-image-border);
+  border-radius: var(--racket-image-radius-detail);
+  box-shadow: var(--racket-image-shadow), 0 4px 6px -1px var(--shadow-color), 0 2px 4px -1px var(--shadow-color);
   padding: 2rem;
   display: flex;
   flex-direction: column;
@@ -284,18 +286,17 @@ const GallerySection = styled.div`
   min-width: 0;
   min-height: 600px;
   overflow: hidden;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
   transition: box-shadow 0.2s ease, transform 0.2s ease;
 
   &:hover {
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    box-shadow: var(--racket-image-shadow), 0 10px 15px -3px var(--shadow-color), 0 4px 6px -2px var(--shadow-color);
     transform: translateY(-2px);
   }
 
   @media (max-width: 768px) {
     padding: 1rem;
     min-height: 400px;
-    border-radius: 16px;
+    border-radius: var(--racket-image-radius-detail);
   }
 `;
 
@@ -375,7 +376,7 @@ const ScrollButton = styled.button`
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  background: white;
+  background: var(--surface);
   border: 1px solid var(--color-gray-200);
   border-radius: 50%;
   width: 32px;
@@ -419,7 +420,8 @@ const Thumbnail = styled.img<{ $isActive: boolean }>`
   object-fit: contain;
   border-radius: 8px;
   border: 2px solid ${props => (props.$isActive ? 'var(--color-primary)' : 'var(--color-gray-200)')};
-  background: ${props => (props.$isActive ? '#f0fdf4' : 'white')};
+  background: var(--racket-image-bg);
+  box-shadow: var(--racket-image-shadow);
   cursor: pointer;
   transition: border-color 0.2s, background-color 0.2s, transform 0.2s;
   padding: 0.25rem;
@@ -436,7 +438,7 @@ const WishlistButton = styled.button`
   position: absolute;
   top: 1.5rem;
   right: 1.5rem;
-  background: white;
+  background: var(--surface);
   border: none;
   border-radius: 50%;
   width: 48px;
@@ -451,7 +453,7 @@ const WishlistButton = styled.button`
 
   &:hover {
     transform: scale(1.1);
-    background: #fef2f2;
+    background: var(--danger-subtle);
   }
 `;
 
@@ -490,8 +492,8 @@ const InfoSection = styled.div`
 `;
 
 const ProductTag = styled.span`
-  background: #dcfce7;
-  color: #166534;
+  background: var(--primary-subtle);
+  color: var(--primary-hover);
   font-size: 0.75rem;
   font-weight: 600;
   text-transform: uppercase;
@@ -528,14 +530,14 @@ const RatingRow = styled.div`
   .rating-score {
     font-size: 2rem;
     font-weight: 700;
-    color: #1f2937;
+    color: var(--text);
     line-height: 1;
   }
 
   .rating-max {
     font-size: 1rem;
     font-weight: 500;
-    color: #6b7280;
+    color: var(--text-muted);
     line-height: 1;
   }
 
@@ -552,11 +554,11 @@ const RatingRow = styled.div`
 
   .rating-count {
     font-size: 0.875rem;
-    color: #6b7280;
+    color: var(--text-muted);
     font-weight: 500;
 
     .count-number {
-      color: #374151;
+      color: var(--text);
       font-weight: 600;
     }
   }
@@ -569,12 +571,12 @@ const RatingRow = styled.div`
 
   .no-rating-text {
     font-size: 0.9375rem;
-    color: #6b7280;
+    color: var(--text-muted);
     font-weight: 500;
   }
 
   .loading-indicator {
-    color: #9ca3af;
+    color: var(--text-subtle);
     animation: spin 1s linear infinite;
   }
 
@@ -589,19 +591,19 @@ const RatingRow = styled.div`
 `;
 
 const PriceCard = styled.div`
-  background: white;
+  background: var(--surface);
   border-radius: 16px;
   padding: 1.5rem;
   border: 1px solid var(--color-gray-200);
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 4px 6px -1px var(--shadow-color), 0 2px 4px -1px var(--shadow-color);
 `;
 
 const BestPriceLabel = styled.div`
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
-  color: #166534;
+  background: linear-gradient(135deg, var(--primary-subtle) 0%, var(--primary-subtle) 100%);
+  color: var(--primary-hover);
   font-size: 0.75rem;
   font-weight: 700;
   text-transform: uppercase;
@@ -639,8 +641,8 @@ const OldPrice = styled.div`
 `;
 
 const SaveBadge = styled.div`
-  background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
-  color: #dc2626;
+  background: linear-gradient(135deg, var(--danger-subtle) 0%, var(--danger-strong) 100%);
+  color: var(--danger);
   font-weight: 700;
   font-size: 0.875rem;
   padding: 6px 12px;
@@ -672,7 +674,7 @@ const PrimaryButton = styled.a`
   font-size: 1.125rem;
   text-decoration: none;
   transition: background-color 0.2s, transform 0.2s, box-shadow 0.2s;
-  box-shadow: 0 4px 12px rgba(21, 128, 61, 0.3);
+  box-shadow: 0 4px 12px rgba(var(--brand-rgb), 0.3);
   position: relative;
   overflow: hidden;
 
@@ -690,7 +692,7 @@ const PrimaryButton = styled.a`
   &:hover {
     background: var(--color-primary-dark);
     transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(21, 128, 61, 0.4);
+    box-shadow: 0 6px 16px rgba(var(--primary-rgb-dark), 0.4);
     color: white;
     text-decoration: none;
 
@@ -707,7 +709,7 @@ const AlertButton = styled.button`
   gap: 0.75rem;
   width: 100%;
   padding: 1rem;
-  background: white;
+  background: var(--surface);
   color: var(--color-gray-700);
   border: 1px solid var(--color-gray-200);
   border-radius: 8px;
@@ -721,7 +723,7 @@ const AlertButton = styled.button`
     border-color: var(--color-primary);
     color: var(--color-primary);
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 4px 12px var(--shadow-color);
   }
 
   &:active {
@@ -730,12 +732,12 @@ const AlertButton = styled.button`
 `;
 
 const ComparisonOnlyCard = styled.div`
-  background: #f8fafc;
+  background: var(--surface-2);
   border: 1px solid var(--color-gray-200);
   border-radius: 16px;
   padding: 2rem;
   text-align: center;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 4px 6px -1px var(--shadow-color), 0 2px 4px -1px var(--shadow-color);
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
@@ -758,7 +760,7 @@ const ComparisonOnlyText = styled.p`
 `;
 
 const ComparisonOnlyBadge = styled.div`
-  background: #64748b;
+  background: var(--text-muted);
   color: white;
   padding: 0.5rem 1rem;
   border-radius: 8px;
@@ -807,11 +809,11 @@ const SpecIconWrapper = styled.div`
 `;
 
 const SpecCard = styled.div`
-  background: white;
+  background: var(--surface);
   padding: 1rem;
   border-radius: 10px;
   border: 1px solid var(--color-gray-100);
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  box-shadow: 0 1px 2px 0 var(--shadow-color);
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -820,8 +822,8 @@ const SpecCard = styled.div`
   cursor: default;
 
   &:hover {
-    border-color: rgba(21, 128, 61, 0.3);
-    box-shadow: 0 4px 6px -1px rgba(21, 128, 61, 0.1), 0 2px 4px -1px rgba(21, 128, 61, 0.06);
+    border-color: rgba(var(--primary-rgb-dark), 0.3);
+    box-shadow: 0 4px 6px -1px rgba(var(--primary-rgb-dark), 0.1), 0 2px 4px -1px rgba(var(--primary-rgb-dark), 0.06);
     transform: translateY(-2px);
 
     ${SpecIconWrapper} {
@@ -855,11 +857,11 @@ const SpecValue = styled.span`
 
 
 const PerformanceContainer = styled.div`
-  background: white;
+  background: var(--surface);
   border-radius: 16px;
   padding: 2rem;
   margin-top: 3rem;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 4px 6px -1px var(--shadow-color), 0 2px 4px -1px var(--shadow-color);
 `;
 
 const PerformanceGrid = styled.div`
@@ -927,10 +929,10 @@ const ProgressBarFill = styled.div<{ $value: number }>`
 `;
 
 const CompareTable = styled.div`
-  background: white;
+  background: var(--surface);
   border-radius: 16px;
   overflow: hidden;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 4px 6px -1px var(--shadow-color), 0 2px 4px -1px var(--shadow-color);
   margin-top: 3rem;
 `;
 
@@ -942,7 +944,7 @@ const CompareRow = styled.div<{ $isBestPrice?: boolean }>`
   border-bottom: 1px solid var(--color-gray-100);
   gap: 1rem;
   background: ${props =>
-    props.$isBestPrice ? 'linear-gradient(90deg, #f0fdf4 0%, #dcfce7 100%)' : 'transparent'};
+    props.$isBestPrice ? 'linear-gradient(90deg, var(--primary-faint) 0%, var(--primary-subtle) 100%)' : 'transparent'};
   position: relative;
   transition: background 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   cursor: default;
@@ -950,10 +952,10 @@ const CompareRow = styled.div<{ $isBestPrice?: boolean }>`
   &:hover {
     background: ${props =>
       props.$isBestPrice
-        ? 'linear-gradient(90deg, #dcfce7 0%, #bbf7d0 100%)'
+        ? 'linear-gradient(90deg, var(--primary-subtle) 0%, var(--primary-subtle) 100%)'
         : 'var(--color-gray-50)'};
     transform: translateY(-1px);
-    box-shadow: 0 4px 8px rgba(21, 128, 61, 0.08);
+    box-shadow: 0 4px 8px rgba(var(--primary-rgb-dark), 0.08);
   }
 
   &:last-child {
@@ -971,7 +973,7 @@ const BestPriceBadge = styled.span`
   position: absolute;
   top: 0.75rem;
   right: 1rem;
-  background: linear-gradient(135deg, #166534 0%, #15803d 100%);
+  background: var(--brand-surface-hover);
   color: white;
   font-size: 0.625rem;
   font-weight: 700;
@@ -979,7 +981,7 @@ const BestPriceBadge = styled.span`
   letter-spacing: 0.05em;
   padding: 4px 8px;
   border-radius: 4px;
-  box-shadow: 0 2px 4px rgba(21, 128, 61, 0.3);
+  box-shadow: 0 2px 4px rgba(var(--primary-rgb-dark), 0.3);
 
   @media (max-width: 768px) {
     position: static;
@@ -1023,7 +1025,7 @@ const PriceText = styled.div<{ $isBestPrice?: boolean }>`
 `;
 
 const ShopButton = styled.a`
-  background: white;
+  background: var(--surface);
   border: 1px solid var(--color-gray-200);
   color: var(--color-gray-800);
   padding: 0.5rem 1rem;
@@ -1057,14 +1059,14 @@ const StickyPriceBar = styled.div<{ $show: boolean }>`
   bottom: calc(78px + env(safe-area-inset-bottom, 0));
   left: env(safe-area-inset-left, 0);
   right: env(safe-area-inset-right, 0);
-  background: white;
+  background: var(--surface);
   border-top: 1px solid var(--color-gray-200);
   padding: 1rem 1.5rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
-  box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 -4px 12px var(--shadow-color);
   z-index: 999;
   transform: translateY(${props => (props.$show ? '0' : '100%')});
   transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -1387,29 +1389,29 @@ const RacketDetailPage: React.FC = () => {
         alignItems: 'center',
         justifyContent: 'center',
         padding: '2rem',
-        background: 'linear-gradient(135deg, #f0fdf4 0%, #ffffff 100%)'
+        background: 'linear-gradient(135deg, var(--primary-faint) 0%, var(--surface) 100%)'
       }}>
         <div style={{
-          background: 'white',
+          background: 'var(--surface)',
           borderRadius: '24px',
           padding: 'clamp(2rem, 5vw, 3rem)',
           maxWidth: '480px',
           width: '100%',
-          boxShadow: '0 10px 40px rgba(21, 128, 61, 0.08)',
-          border: '1px solid #dcfce7',
+          boxShadow: '0 10px 40px rgba(var(--primary-rgb-dark), 0.08)',
+          border: '1px solid var(--primary-subtle)',
           textAlign: 'center'
         }}>
           <div style={{ fontSize: '4rem', marginBottom: '1rem' }}>🎾</div>
           <h1 style={{
             fontSize: 'clamp(1.5rem, 4vw, 2rem)',
             fontWeight: 800,
-            color: '#1f2937',
+            color: 'var(--text)',
             marginBottom: '0.75rem'
           }}>
             Pala no encontrada
           </h1>
           <p style={{
-            color: '#6b7280',
+            color: 'var(--text-muted)',
             lineHeight: 1.6,
             marginBottom: '2rem',
             fontSize: '1rem'
@@ -1428,7 +1430,7 @@ const RacketDetailPage: React.FC = () => {
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: '0.5rem',
-                background: '#15803d',
+                background: 'var(--primary-hover)',
                 color: 'white',
                 padding: '0.75rem 1.5rem',
                 borderRadius: '10px',
@@ -1437,11 +1439,11 @@ const RacketDetailPage: React.FC = () => {
                 transition: 'all 0.2s ease'
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.background = '#15803d';
+                e.currentTarget.style.background = 'var(--primary-hover)';
                 e.currentTarget.style.transform = 'translateY(-2px)';
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.background = '#15803d';
+                e.currentTarget.style.background = 'var(--primary-hover)';
                 e.currentTarget.style.transform = 'translateY(0)';
               }}
             >
@@ -1454,23 +1456,23 @@ const RacketDetailPage: React.FC = () => {
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: '0.5rem',
-                background: 'white',
-                color: '#374151',
+                background: 'var(--surface)',
+                color: 'var(--text)',
                 padding: '0.75rem 1.5rem',
                 borderRadius: '10px',
                 fontWeight: 600,
                 textDecoration: 'none',
-                border: '1px solid #e5e7eb',
+                border: '1px solid var(--border)',
                 transition: 'all 0.2s ease'
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.borderColor = '#15803d';
-                e.currentTarget.style.color = '#15803d';
+                e.currentTarget.style.borderColor = 'var(--primary-hover)';
+                e.currentTarget.style.color = 'var(--primary-hover)';
                 e.currentTarget.style.transform = 'translateY(-2px)';
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.borderColor = '#e5e7eb';
-                e.currentTarget.style.color = '#374151';
+                e.currentTarget.style.borderColor = 'var(--border)';
+                e.currentTarget.style.color = 'var(--text)';
                 e.currentTarget.style.transform = 'translateY(0)';
               }}
             >

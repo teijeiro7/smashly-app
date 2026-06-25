@@ -4,7 +4,7 @@ import { FaInstagram, FaTiktok } from "react-icons/fa";
 import styled from "styled-components";
 
 const FooterContainer = styled.footer`
-  background: #1f2937;
+  background: var(--footer-bg);
   color: white;
   padding: 3rem 0 1.5rem;
   margin-top: auto;
@@ -17,7 +17,7 @@ const FooterContent = styled.div`
 `;
 
 const FooterBottom = styled.div`
-  border-top: 1px solid #374151;
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
   padding-top: 1.5rem;
   display: flex;
   justify-content: space-between;
@@ -33,7 +33,7 @@ const FooterBottom = styled.div`
 `;
 
 const Copyright = styled.p`
-  color: #9ca3af;
+  color: rgba(255, 255, 255, 0.75);
   margin: 0;
   display: flex;
   align-items: center;
@@ -52,15 +52,15 @@ const SocialLinks = styled.div`
   gap: 1rem;
 
   a {
-    color: #9ca3af;
+    color: rgba(255, 255, 255, 0.75);
     font-size: 1.25rem;
     transition: all 0.2s ease;
     padding: 8px;
     border-radius: 8px;
 
     &:hover {
-      color: #16a34a;
-      background: rgba(255, 255, 255, 0.05);
+      color: var(--brand-on-surface);
+      background: rgba(255, 255, 255, 0.1);
     }
   }
 
@@ -80,7 +80,7 @@ const Footer: React.FC = () => {
       <FooterContent>
         <FooterBottom>
           <Copyright>
-            © 2025 Smashly. Hecho con <FiHeart color="#ef4444" /> para los
+            © 2025 Smashly. Hecho con <FiHeart color="var(--error)" /> para los
             amantes del pádel.
           </Copyright>
 

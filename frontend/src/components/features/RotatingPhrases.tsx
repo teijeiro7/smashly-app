@@ -27,7 +27,7 @@ const rotateOut = keyframes`
 `;
 
 const RotatingContainer = styled.div`
-  color: #fbbf24;
+  color: var(--accent);
   display: flex;
   justify-content: center;
   align-items: center;

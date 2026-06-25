@@ -24,15 +24,15 @@ import { buildUrl, allKeywords } from '../config/seo';
 const Container = styled.div`
   min-height: 100vh;
   background:
-    radial-gradient(circle at 5% 0%, rgba(22, 163, 74, 0.08) 0%, transparent 42%),
-    linear-gradient(135deg, #f8faf8 0%, #e8f5e8 100%);
+    radial-gradient(circle at 5% 0%, rgba(var(--primary-rgb), 0.08) 0%, transparent 42%),
+    linear-gradient(135deg, var(--surface-2) 0%, var(--primary-faint) 100%);
 `;
 
 const Header = styled.div`
-  background: white;
-  border-bottom: 1px solid #e5e7eb;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
   padding: clamp(1.5rem, 4vw, 2.5rem) 0;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 1px 3px var(--shadow-color);
 `;
 
 const HeaderContent = styled.div`
@@ -45,19 +45,19 @@ const HeaderContent = styled.div`
 const Title = styled.h1`
   font-size: clamp(2rem, 5vw, 3rem);
   font-weight: 800;
-  color: #1f2937;
+  color: var(--text);
   margin-bottom: 0.75rem;
   line-height: 1.1;
   letter-spacing: -0.02em;
 
   .highlight {
-    color: #15803d;
+    color: var(--primary-hover);
   }
 `;
 
 const Subtitle = styled.p`
   font-size: 1.25rem;
-  color: #6b7280;
+  color: var(--text-muted);
   margin-bottom: 1.4rem;
   line-height: 1.6;
 
@@ -85,12 +85,12 @@ const StatItem = styled.div`
 const StatNumber = styled.div`
   font-size: 1.5rem;
   font-weight: 700;
-  color: #15803d;
+  color: var(--primary-hover);
 `;
 
 const StatLabel = styled.div`
   font-size: 0.875rem;
-  color: #6b7280;
+  color: var(--text-muted);
 `;
 
 const MainContent = styled.div`
@@ -100,12 +100,12 @@ const MainContent = styled.div`
 `;
 
 const FiltersSection = styled.div`
-  background: white;
+  background: var(--surface);
   border-radius: 12px;
   padding: clamp(1rem, 2vw, 1.5rem);
   margin-bottom: 1.5rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
-  border: 1px solid #e5e7eb;
+  box-shadow: 0 1px 3px var(--shadow-color), 0 1px 2px var(--shadow-color);
+  border: 1px solid var(--border);
 `;
 
 const FiltersRow = styled.div`
@@ -124,19 +124,19 @@ const SearchInput = styled.input`
   width: 100%;
   min-height: 46px;
   padding: 0.875rem 1rem 0.875rem 2.75rem;
-  border: 1.5px solid #e5e7eb;
+  border: 1.5px solid var(--border);
   border-radius: 8px;
   font-size: 0.875rem;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 
   &:focus {
     outline: none;
-    border-color: #15803d;
-    box-shadow: 0 0 0 3px rgba(21, 128, 61, 0.1);
+    border-color: var(--primary-hover);
+    box-shadow: 0 0 0 3px rgba(var(--primary-rgb-dark), 0.1);
   }
 
   &::placeholder {
-    color: #9ca3af;
+    color: var(--text-subtle);
   }
 `;
 
@@ -145,7 +145,7 @@ const SearchIcon = styled(FiSearch)`
   left: 1rem;
   top: 50%;
   transform: translateY(-50%);
-  color: #6b7280;
+  color: var(--text-muted);
 `;
 
 const FilterButton = styled.button<{ $active?: boolean }>`
@@ -154,19 +154,19 @@ const FilterButton = styled.button<{ $active?: boolean }>`
   gap: 0.5rem;
   min-height: 46px;
   padding: 0.5rem 1rem;
-  border: 1.5px solid ${props => (props.$active ? '#15803d' : '#e5e7eb')};
+  border: 1.5px solid ${props => (props.$active ? 'var(--primary-hover)' : 'var(--border)')};
   border-radius: 8px;
-  background: ${props => (props.$active ? '#f0fdf4' : 'white')};
-  color: ${props => (props.$active ? '#15803d' : '#6b7280')};
+  background: ${props => (props.$active ? 'var(--primary-subtle)' : 'var(--surface)')};
+  color: ${props => (props.$active ? 'var(--primary-hover)' : 'var(--text-muted)')};
   font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 
   &:hover {
-    border-color: #15803d;
-    color: #15803d;
-    background: ${props => (props.$active ? '#f0fdf4' : '#f9fafb')};
+    border-color: var(--primary-hover);
+    color: var(--primary-hover);
+    background: ${props => (props.$active ? 'var(--primary-subtle)' : 'var(--surface-2)')};
   }
 
   @media (max-width: 768px) {
@@ -178,10 +178,10 @@ const FilterButton = styled.button<{ $active?: boolean }>`
 const FilterSelect = styled.select`
   min-height: 46px;
   padding: 0.5rem 2.5rem 0.5rem 1rem;
-  border: 1.5px solid #e5e7eb;
+  border: 1.5px solid var(--border);
   border-radius: 8px;
-  background: white;
-  color: #6b7280;
+  background: var(--surface);
+  color: var(--text-muted);
   font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
@@ -195,14 +195,14 @@ const FilterSelect = styled.select`
   background-size: 16px;
 
   &:hover {
-    border-color: #15803d;
+    border-color: var(--primary-hover);
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2315803d' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
   }
 
   &:focus {
     outline: none;
-    border-color: #15803d;
-    box-shadow: 0 0 0 3px rgba(21, 128, 61, 0.1);
+    border-color: var(--primary-hover);
+    box-shadow: 0 0 0 3px rgba(var(--primary-rgb-dark), 0.1);
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2315803d' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
   }
 
@@ -220,19 +220,19 @@ const AdvancedFiltersToggle = styled.button<{ $active: boolean }>`
   min-height: 46px;
   margin-top: 1rem;
   width: 100%;
-  border: 1.5px dashed ${props => (props.$active ? '#15803d' : '#e5e7eb')};
+  border: 1.5px dashed ${props => (props.$active ? 'var(--primary-hover)' : 'var(--border)')};
   border-radius: 8px;
-  background: ${props => (props.$active ? '#f0fdf4' : 'white')};
-  color: ${props => (props.$active ? '#15803d' : '#6b7280')};
+  background: ${props => (props.$active ? 'var(--primary-subtle)' : 'var(--surface)')};
+  color: ${props => (props.$active ? 'var(--primary-hover)' : 'var(--text-muted)')};
   font-size: 0.875rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
   &:hover {
-    border-color: #15803d;
-    color: #15803d;
-    background: #f0fdf4;
+    border-color: var(--primary-hover);
+    color: var(--primary-hover);
+    background: var(--primary-subtle);
   }
 
   svg:last-child {
@@ -266,7 +266,7 @@ const FilterGroupLabel = styled.div`
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: #9ca3af;
+  color: var(--text-subtle);
   margin-bottom: 0.5rem;
 `;
 
@@ -296,7 +296,7 @@ const ResultsHeader = styled.div`
 
 const ResultsCount = styled.div`
   font-size: 1rem;
-  color: #6b7280;
+  color: var(--text-muted);
 `;
 
 const ResultsToolbar = styled.div`
@@ -322,10 +322,10 @@ const ResultsToolbar = styled.div`
 const ViewToggle = styled.div`
   display: flex;
   gap: 0.25rem;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--border);
   border-radius: 8px;
   padding: 0.125rem;
-  background: white;
+  background: var(--surface);
   min-height: 46px;
   align-items: center;
   flex-shrink: 0;
@@ -341,29 +341,29 @@ const ViewButton = styled.button<{ $active: boolean }>`
   padding: 0.25rem;
   border: none;
   border-radius: 6px;
-  background: ${props => (props.$active ? '#15803d' : 'transparent')};
-  color: ${props => (props.$active ? 'white' : '#6b7280')};
+  background: ${props => (props.$active ? 'var(--primary-hover)' : 'transparent')};
+  color: ${props => (props.$active ? 'white' : 'var(--text-muted)')};
   cursor: pointer;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 
   &:hover {
-    color: ${props => (props.$active ? 'white' : '#15803d')};
+    color: ${props => (props.$active ? 'white' : 'var(--primary-hover)')};
   }
 `;
 
 const SortSelect = styled.select`
   min-height: 46px;
   padding: 0.5rem 1rem;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--border);
   border-radius: 8px;
-  background: white;
-  color: #6b7280;
+  background: var(--surface);
+  color: var(--text-muted);
   font-size: 0.875rem;
   cursor: pointer;
 
   &:focus {
     outline: none;
-    border-color: #15803d;
+    border-color: var(--primary-hover);
   }
 
   @media (max-width: 768px) {
@@ -389,10 +389,10 @@ const RacketsGrid = styled.ul<{ $view: 'grid' | 'list' }>`
 const EmptyState = styled.div`
   text-align: center;
   padding: 4rem 2rem;
-  background: white;
+  background: var(--surface);
   border-radius: 12px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  border: 1px solid #e5e7eb;
+  box-shadow: 0 1px 3px var(--shadow-color);
+  border: 1px solid var(--border);
 `;
 
 const EmptyIcon = styled.div`
@@ -404,19 +404,19 @@ const EmptyIcon = styled.div`
 const EmptyTitle = styled.h3`
   font-size: 1.25rem;
   font-weight: 700;
-  color: #1f2937;
+  color: var(--text);
   margin-bottom: 0.5rem;
 `;
 
 const EmptyDescription = styled.p`
   font-size: 1rem;
-  color: #6b7280;
+  color: var(--text-muted);
   margin-bottom: 1.5rem;
   line-height: 1.6;
 `;
 
 const ClearFiltersButton = styled.button`
-  background: #15803d;
+  background: var(--primary-hover);
   color: white;
   border: none;
   padding: 0.625rem 1.25rem;
@@ -425,12 +425,12 @@ const ClearFiltersButton = styled.button`
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 1px 3px var(--shadow-color);
 
   &:hover {
-    background: #166534;
+    background: var(--primary-hover);
     transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(21, 128, 61, 0.2);
+    box-shadow: 0 4px 12px rgba(var(--primary-rgb-dark), 0.2);
   }
 
   &:active {
@@ -443,11 +443,11 @@ const FloatingPanel = styled.div<{ $visible: boolean }>`
   position: fixed;
   bottom: 2rem;
   right: 2rem;
-  background: white;
+  background: var(--surface);
   border-radius: 12px;
   padding: 1rem 1.5rem;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-  border: 1.5px solid #15803d;
+  box-shadow: 0 10px 30px var(--shadow-color);
+  border: 1.5px solid var(--primary-hover);
   z-index: 50;
   transform: translateY(${props => (props.$visible ? '0' : '120px')});
   opacity: ${props => (props.$visible ? 1 : 0)};
@@ -471,11 +471,11 @@ const PanelContent = styled.div`
 const PanelText = styled.div`
   font-size: 0.875rem;
   font-weight: 600;
-  color: #1f2937;
+  color: var(--text);
 `;
 
 const CompareButton = styled.button`
-  background: #15803d;
+  background: var(--primary-hover);
   color: white;
   border: none;
   padding: 0.5rem 1rem;
@@ -486,7 +486,7 @@ const CompareButton = styled.button`
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 
   &:hover {
-    background: #166534;
+    background: var(--primary-hover);
     transform: translateY(-1px);
   }
 `;
@@ -1002,13 +1002,13 @@ rackets,
           }}
         >
           <div style={{
-            color: '#15803d',
+            color: 'var(--primary-hover)',
             animation: 'spin 1s linear infinite',
           }}>
             <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
             <FiGrid size={48} />
           </div>
-          <div style={{ color: '#6b7280', fontSize: '1.125rem' }}>Cargando catálogo...</div>
+          <div style={{ color: 'var(--text-muted)', fontSize: '1.125rem' }}>Cargando catálogo...</div>
         </div>
       </Container>
     );
@@ -1280,7 +1280,7 @@ rackets,
                 style={{
                   textAlign: 'center',
                   padding: '2rem',
-                  color: '#6b7280',
+                  color: 'var(--text-muted)',
                   fontSize: '0.875rem',
                   fontWeight: 500,
                 }}
@@ -1295,7 +1295,7 @@ rackets,
                 style={{
                   textAlign: 'center',
                   padding: '2rem',
-                  color: '#9ca3af',
+                  color: 'var(--text-subtle)',
                   fontSize: '0.875rem',
                 }}
               >

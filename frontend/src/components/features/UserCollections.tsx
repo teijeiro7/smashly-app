@@ -26,10 +26,10 @@ const Container = styled.div`
 const TabsContainer = styled.div`
   display: flex;
   gap: 0.25rem;
-  background: white;
+  background: var(--surface);
   padding: 0.375rem;
   border-radius: 12px;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--border);
   width: fit-content;
 `;
 
@@ -44,25 +44,25 @@ const Tab = styled.button<{ $active: boolean }>`
   border: none;
   cursor: pointer;
   transition: all 0.2s ease;
-  background: ${props => (props.$active ? '#16a34a' : 'transparent')};
-  color: ${props => (props.$active ? 'white' : '#64748b')};
+  background: ${props => (props.$active ? 'var(--primary)' : 'transparent')};
+  color: ${props => (props.$active ? 'var(--brand-on-surface)' : 'var(--text-muted)')};
 
   &:hover {
-    background: ${props => (props.$active ? '#16a34a' : '#f1f5f9')};
-    color: ${props => (props.$active ? 'white' : '#16a34a')};
+    background: ${props => (props.$active ? 'var(--primary)' : 'var(--surface-3)')};
+    color: ${props => (props.$active ? 'var(--brand-on-surface)' : 'var(--primary)')};
   }
 `;
 
 const ContentCard = styled.div`
-  background: white;
+  background: var(--surface);
   border-radius: 16px;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--border);
   overflow: hidden;
 `;
 
 const CardHeader = styled.div`
   padding: 1.25rem 1.5rem;
-  border-bottom: 1px solid #f1f5f9;
+  border-bottom: 1px solid var(--surface-3);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -71,7 +71,7 @@ const CardHeader = styled.div`
 const CardTitle = styled.h3`
   font-size: 1rem;
   font-weight: 600;
-  color: #16a34a;
+  color: var(--primary);
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -82,8 +82,8 @@ const AddButton = styled(motion.button)`
   align-items: center;
   gap: 0.375rem;
   padding: 0.5rem 1rem;
-  background: #16a34a;
-  color: white;
+  background: var(--brand-surface);
+  color: var(--brand-on-surface);
   border: none;
   border-radius: 8px;
   font-size: 0.8125rem;
@@ -91,7 +91,7 @@ const AddButton = styled(motion.button)`
   cursor: pointer;
 
   &:hover {
-    background: #334155;
+    background: var(--brand-surface-hover);
   }
 `;
 
@@ -106,7 +106,7 @@ const ListGrid = styled.div`
 `;
 
 const ListCard = styled(motion.div)`
-  background: #f8fafc;
+  background: var(--surface-2);
   border-radius: 12px;
   padding: 1.25rem;
   border: 1px solid transparent;
@@ -114,8 +114,8 @@ const ListCard = styled(motion.div)`
   cursor: pointer;
 
   &:hover {
-    background: white;
-    border-color: #e2e8f0;
+    background: var(--surface);
+    border-color: var(--border);
   }
 `;
 
@@ -133,13 +133,13 @@ const ListInfo = styled.div`
 const ListName = styled.h4`
   font-size: 1rem;
   font-weight: 600;
-  color: #16a34a;
+  color: var(--primary);
   margin: 0 0 0.25rem 0;
 `;
 
 const ListMeta = styled.div`
   font-size: 0.8125rem;
-  color: #64748b;
+  color: var(--text-muted);
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -159,27 +159,27 @@ const ActionButton = styled(motion.button)<{ $danger?: boolean }>`
   justify-content: center;
   border: none;
   cursor: pointer;
-  background: ${props => props.$danger ? '#fef2f2' : 'transparent'};
-  color: ${props => props.$danger ? '#dc2626' : '#64748b'};
+  background: ${props => props.$danger ? 'rgba(220, 38, 38, 0.10)' : 'transparent'};
+  color: ${props => props.$danger ? 'var(--danger)' : 'var(--text-muted)'};
 
   &:hover {
-    background: ${props => props.$danger ? '#dc2626' : '#f1f5f9'};
-    color: ${props => props.$danger ? 'white' : '#16a34a'};
+    background: ${props => props.$danger ? 'var(--danger)' : 'var(--surface-3)'};
+    color: ${props => props.$danger ? 'var(--brand-on-surface)' : 'var(--primary)'};
   }
 `;
 
 const EmptyState = styled.div`
   text-align: center;
   padding: 3rem 1.5rem;
-  color: #94a3b8;
+  color: var(--text-subtle);
 `;
 
 const EmptyIcon = styled.div`
   width: 64px;
   height: 64px;
   border-radius: 16px;
-  background: #f1f5f9;
-  color: #cbd5e1;
+  background: var(--surface-3);
+  color: var(--border-strong);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -188,11 +188,11 @@ const EmptyIcon = styled.div`
 `;
 
 const CreateForm = styled(motion.div)`
-  background: #f8fafc;
+  background: var(--surface-2);
   border-radius: 12px;
   padding: 1.25rem;
   margin-bottom: 1rem;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--border);
 `;
 
 const FormGroup = styled.div`
@@ -203,20 +203,20 @@ const FormLabel = styled.label`
   display: block;
   font-size: 0.8125rem;
   font-weight: 600;
-  color: #475569;
+  color: var(--text);
   margin-bottom: 0.375rem;
 `;
 
 const FormInput = styled.input`
   width: 100%;
   padding: 0.625rem 0.875rem;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--border);
   border-radius: 8px;
   font-size: 0.875rem;
 
   &:focus {
     outline: none;
-    border-color: #16a34a;
+    border-color: var(--primary);
   }
 `;
 
@@ -225,7 +225,7 @@ const FormCheckbox = styled.label`
   align-items: center;
   gap: 0.5rem;
   font-size: 0.875rem;
-  color: #475569;
+  color: var(--text);
   cursor: pointer;
 `;
 
@@ -245,11 +245,8 @@ const Button = styled.button<{ $primary?: boolean }>`
   font-weight: 600;
   cursor: pointer;
   border: none;
-  background: ${props => props.$primary ? '#16a34a' : '#f1f5f9'};
-  color: ${props => props.$primary ? 'white' : '#64748b'};
-
-    background: ${props => props.$primary ? '#15803d' : '#e2e8f0'};
-  }
+  background: ${props => props.$primary ? 'var(--primary)' : 'var(--surface-3)'};
+  color: ${props => props.$primary ? 'var(--brand-on-surface)' : 'var(--text-muted)'};
 `;
 
 const UserCollections: React.FC = () => {
