@@ -10,16 +10,18 @@ const Button = styled.button`
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background: transparent;
-  border: 1px solid var(--border);
-  color: var(--text-muted);
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  color: var(--text);
   cursor: pointer;
-  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
+  box-shadow: var(--shadow-sm);
+  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
 
   &:hover {
     background: var(--surface-2);
-    color: var(--text);
-    border-color: var(--border-strong);
+    color: var(--primary);
+    border-color: var(--primary);
+    box-shadow: var(--shadow-md);
   }
 
   &:active {
