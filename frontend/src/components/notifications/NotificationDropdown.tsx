@@ -9,7 +9,7 @@ const DropdownContainer = styled.div`
   position: absolute;
   top: calc(100% + 8px);
   right: 0;
-  background: white;
+  background: var(--surface);
   border-radius: 12px;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
   width: 360px;
@@ -34,14 +34,14 @@ const DropdownHeader = styled.div`
   align-items: center;
   justify-content: space-between;
   padding: 16px;
-  border-bottom: 1px solid #e5e7eb;
-  background: #f9fafb;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface-2);
 `;
 
 const DropdownTitle = styled.h3`
   font-size: 1rem;
   font-weight: 600;
-  color: #111827;
+  color: var(--text);
   margin: 0;
   display: flex;
   align-items: center;
@@ -51,7 +51,7 @@ const DropdownTitle = styled.h3`
 const MarkAllButton = styled.button`
   background: none;
   border: none;
-  color: #16a34a;
+  color: var(--primary);
   font-size: 0.8rem;
   font-weight: 500;
   cursor: pointer;
@@ -60,11 +60,11 @@ const MarkAllButton = styled.button`
   transition: background 0.2s;
 
   &:hover {
-    background: rgba(22, 163, 74, 0.1);
+    background: rgba(var(--primary-rgb), 0.1);
   }
 
   &:disabled {
-    color: #9ca3af;
+    color: var(--text-subtle);
     cursor: not-allowed;
   }
 `;
@@ -80,13 +80,13 @@ const NotificationItem = styled.div<{ isRead: boolean }>`
   align-items: flex-start;
   gap: 12px;
   padding: 14px 16px;
-  border-bottom: 1px solid #f3f4f6;
+  border-bottom: 1px solid var(--surface-3);
   cursor: pointer;
   transition: background 0.2s;
-  background: ${props => props.isRead ? 'white' : '#f0fdf4'};
+  background: ${props => props.isRead ? 'var(--surface)' : 'var(--primary-subtle)'};
 
   &:hover {
-    background: #f9fafb;
+    background: var(--surface-2);
   }
 
   &:last-child {
@@ -105,14 +105,14 @@ const NotificationIcon = styled.div<{ type: NotificationType }>`
   background: ${props => {
     switch (props.type) {
       case 'price_drop':
-        return '#dcfce7';
+        return 'var(--primary-subtle)';
       case 'comparison_complete':
       case 'recommendation_complete':
         return '#dbeafe';
       case 'review':
         return '#fef3c7';
       case 'admin_update':
-        return '#fee2e2';
+        return 'var(--danger-subtle)';
       case 'new_user':
         return '#e0e7ff';
       case 'new_store':
@@ -120,20 +120,20 @@ const NotificationIcon = styled.div<{ type: NotificationType }>`
       case 'review_reply':
         return '#e0f2fe';
       default:
-        return '#f3f4f6';
+        return 'var(--surface-3)';
     }
   }};
   color: ${props => {
     switch (props.type) {
       case 'price_drop':
-        return '#16a34a';
+        return 'var(--primary)';
       case 'comparison_complete':
       case 'recommendation_complete':
         return '#2563eb';
       case 'review':
         return '#d97706';
       case 'admin_update':
-        return '#dc2626';
+        return 'var(--danger)';
       case 'new_user':
         return '#4f46e5';
       case 'new_store':
@@ -141,7 +141,7 @@ const NotificationIcon = styled.div<{ type: NotificationType }>`
       case 'review_reply':
         return '#0284c7';
       default:
-        return '#6b7280';
+        return 'var(--text-muted)';
     }
   }};
   font-size: 18px;
@@ -155,14 +155,14 @@ const NotificationContent = styled.div`
 const NotificationTitle = styled.p<{ isRead: boolean }>`
   font-size: 0.875rem;
   font-weight: ${props => props.isRead ? '500' : '600'};
-  color: #111827;
+  color: var(--text);
   margin: 0 0 4px 0;
   line-height: 1.3;
 `;
 
 const NotificationMessage = styled.p`
   font-size: 0.8rem;
-  color: #6b7280;
+  color: var(--text-muted);
   margin: 0 0 6px 0;
   line-height: 1.4;
   display: -webkit-box;
@@ -173,14 +173,14 @@ const NotificationMessage = styled.p`
 
 const NotificationTime = styled.span`
   font-size: 0.75rem;
-  color: #9ca3af;
+  color: var(--text-subtle);
 `;
 
 const UnreadDot = styled.div`
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: #16a34a;
+  background: var(--primary);
   flex-shrink: 0;
   margin-top: 6px;
 `;
@@ -188,7 +188,7 @@ const UnreadDot = styled.div`
 const DeleteButton = styled.button`
   background: none;
   border: none;
-  color: #9ca3af;
+  color: var(--text-subtle);
   cursor: pointer;
   padding: 4px;
   border-radius: 4px;
@@ -200,8 +200,8 @@ const DeleteButton = styled.button`
   }
 
   &:hover {
-    color: #dc2626;
-    background: #fee2e2;
+    color: var(--danger);
+    background: var(--danger-subtle);
   }
 `;
 
@@ -211,7 +211,7 @@ const EmptyState = styled.div`
   align-items: center;
   justify-content: center;
   padding: 40px 20px;
-  color: #9ca3af;
+  color: var(--text-subtle);
   text-align: center;
 `;
 
@@ -329,7 +329,7 @@ export const NotificationDropdown: React.FC<NotificationDropdownProps> = ({ onCl
           Notificaciones
           {unreadCount > 0 && (
             <span style={{ 
-              background: '#16a34a', 
+              background: 'var(--primary)', 
               color: 'white', 
               fontSize: '0.75rem', 
               padding: '2px 8px', 

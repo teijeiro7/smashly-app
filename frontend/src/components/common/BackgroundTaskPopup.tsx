@@ -16,12 +16,12 @@ const PopupContainer = styled(motion.div)<{ $minimized: boolean }>`
   width: ${props => (props.$minimized ? '80px' : '500px')};
   max-width: calc(100vw - 16px);
   height: ${props => (props.$minimized ? '80px' : 'auto')};
-  background: white;
+  background: var(--surface);
   border-radius: ${props => (props.$minimized ? '50%' : '20px')};
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
   z-index: 1000;
   overflow: hidden;
-  border: ${props => (props.$minimized ? 'none' : '2px solid #e5e7eb')};
+  border: ${props => (props.$minimized ? 'none' : '2px solid var(--border)')};
   cursor: ${props => (props.$minimized ? 'pointer' : 'default')};
   will-change: transform, opacity;
 
@@ -40,7 +40,7 @@ const CircularProgress = styled.svg<{ $status: string }>`
   width: 76px;
   height: 76px;
   transform: translate(-50%, -50%) rotate(-90deg);
-  filter: drop-shadow(0 0 6px rgba(22, 163, 74, 0.2));
+  filter: drop-shadow(0 0 6px rgba(var(--primary-rgb), 0.2));
   pointer-events: none;
 
   circle {
@@ -56,9 +56,9 @@ const CircularProgress = styled.svg<{ $status: string }>`
   .progress {
     stroke: ${props =>
       props.$status === 'completed'
-        ? '#16a34a'
+        ? 'var(--primary)'
         : props.$status === 'error'
-          ? '#dc2626'
+          ? 'var(--danger)'
           : 'url(#animatedGradient)'};
     stroke-dasharray: 220;
     stroke-dashoffset: 220;
@@ -75,15 +75,15 @@ const MinimizedContent = styled.div<{ $status: string }>`
   justify-content: center;
   background: ${props =>
     props.$status === 'completed'
-      ? 'linear-gradient(135deg, #16a34a 0%, #15803d 100%)'
+      ? 'linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%)'
       : props.$status === 'error'
-        ? 'linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)'
-        : '#f3f4f6'};
+        ? 'linear-gradient(135deg, var(--danger) 0%, var(--danger) 100%)'
+        : 'var(--surface-3)'};
   border-radius: 50%;
-  color: ${props => (props.$status === 'running' ? '#6b7280' : 'white')};
+  color: ${props => (props.$status === 'running' ? 'var(--text-muted)' : 'var(--text-inverse)')};
   position: relative;
   z-index: 1;
-  border: ${props => (props.$status === 'running' ? '3px solid #16a34a' : 'none')};
+  border: ${props => (props.$status === 'running' ? '3px solid var(--primary)' : 'none')};
 `;
 
 const MinimizedIcon = styled(motion.div)`
@@ -108,29 +108,29 @@ const CompletionBadge = styled(motion.div)`
   transform: translate(20%, -20%);
   width: 24px;
   height: 24px;
-  background: #16a34a;
+  background: var(--primary);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: white;
+  color: var(--text-inverse);
   font-size: 14px;
-  box-shadow: 0 2px 8px rgba(22, 163, 74, 0.4);
-  border: 2px solid white;
+  box-shadow: 0 2px 8px rgba(var(--primary-rgb), 0.4);
+  border: 2px solid var(--surface);
 `;
 
 const CompletionTooltip = styled(motion.div)`
   position: absolute;
   bottom: 90px;
   right: 0;
-  background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
-  color: white;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
+  color: var(--text-inverse);
   padding: 12px 16px;
   border-radius: 12px;
   font-size: 0.875rem;
   font-weight: 600;
   white-space: nowrap;
-  box-shadow: 0 4px 20px rgba(22, 163, 74, 0.4);
+  box-shadow: 0 4px 20px rgba(var(--primary-rgb), 0.4);
   z-index: 1001;
 
   &::after {
@@ -142,7 +142,7 @@ const CompletionTooltip = styled(motion.div)`
     height: 0;
     border-left: 8px solid transparent;
     border-right: 8px solid transparent;
-    border-top: 8px solid #15803d;
+    border-top: 8px solid var(--primary-hover);
   }
 `;
 
@@ -153,11 +153,11 @@ const Header = styled.div<{ $minimized: boolean; $status: string }>`
   padding: 16px 20px;
   background: ${props =>
     props.$status === 'completed'
-      ? 'linear-gradient(135deg, #16a34a 0%, #15803d 100%)'
+      ? 'linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%)'
       : props.$status === 'error'
-        ? 'linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)'
-        : 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)'};
-  color: white;
+        ? 'linear-gradient(135deg, var(--danger) 0%, var(--danger) 100%)'
+        : 'linear-gradient(135deg, var(--info) 0%, var(--info) 100%)'};
+  color: var(--text-inverse);
 `;
 
 const HeaderLeft = styled.div`
@@ -195,7 +195,7 @@ const HeaderActions = styled.div`
 const IconButton = styled.button`
   background: rgba(255, 255, 255, 0.2);
   border: none;
-  color: white;
+  color: var(--text-inverse);
   padding: 8px;
   border-radius: 8px;
   cursor: pointer;
@@ -222,7 +222,7 @@ const ProgressSection = styled.div`
 const ProgressBar = styled.div`
   width: 100%;
   height: 8px;
-  background: #e5e7eb;
+  background: var(--border);
   border-radius: 4px;
   overflow: hidden;
   margin-top: 8px;
@@ -230,18 +230,18 @@ const ProgressBar = styled.div`
 
 const ProgressFill = styled(motion.div)`
   height: 100%;
-  background: linear-gradient(90deg, #16a34a 0%, #22c55e 100%);
+  background: linear-gradient(90deg, var(--primary) 0%, var(--primary-light) 100%);
   border-radius: 4px;
 `;
 
 const ProgressText = styled.p`
   font-size: 0.9rem;
-  color: #6b7280;
+  color: var(--text-muted);
   margin: 8px 0 0 0;
 `;
 
 const ResultSection = styled.div`
-  background: #f9fafb;
+  background: var(--surface-2);
   border-radius: 12px;
   padding: 16px;
   margin-top: 12px;
@@ -250,7 +250,7 @@ const ResultSection = styled.div`
 const ResultTitle = styled.h4`
   margin: 0 0 12px 0;
   font-size: 1rem;
-  color: #1f2937;
+  color: var(--text);
   display: flex;
   align-items: center;
   gap: 8px;
@@ -259,8 +259,8 @@ const ResultTitle = styled.h4`
 const ViewResultButton = styled.button`
   width: 100%;
   padding: 12px;
-  background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
-  color: white;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
+  color: var(--text-inverse);
   border: none;
   border-radius: 10px;
   font-size: 1rem;
@@ -274,13 +274,13 @@ const ViewResultButton = styled.button`
 
   &:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(22, 163, 74, 0.3);
+    box-shadow: 0 6px 20px rgba(var(--primary-rgb), 0.3);
   }
 `;
 
 const ErrorMessage = styled.div`
-  background: #fee2e2;
-  color: #991b1b;
+  background: var(--surface-3);
+  color: var(--danger);
   padding: 12px;
   border-radius: 10px;
   font-size: 0.9rem;
@@ -296,10 +296,10 @@ const TaskList = styled.div`
 `;
 
 const TaskItem = styled.div`
-  background: #f9fafb;
+  background: var(--surface-2);
   border-radius: 10px;
   padding: 12px;
-  border-left: 4px solid #16a34a;
+  border-left: 4px solid var(--primary);
 `;
 
 const TaskInfo = styled.div`
@@ -313,13 +313,13 @@ const TaskName = styled.p`
   margin: 0;
   font-size: 0.9rem;
   font-weight: 600;
-  color: #1f2937;
+  color: var(--text);
 `;
 
 const TaskStatus = styled.span<{ $status: string }>`
   font-size: 0.8rem;
   color: ${props =>
-    props.$status === 'completed' ? '#16a34a' : props.$status === 'error' ? '#dc2626' : '#3b82f6'};
+    props.$status === 'completed' ? 'var(--primary)' : props.$status === 'error' ? 'var(--danger)' : 'var(--info)'};
   font-weight: 600;
 `;
 
@@ -470,26 +470,26 @@ export const BackgroundTaskPopup: React.FC = () => {
               <CircularProgress $status={visibleTask.status}>
                 <defs>
                   <linearGradient id='animatedGradient' x1='0%' y1='0%' x2='100%' y2='100%'>
-                    <stop offset='0%' stopColor='#16a34a'>
+                    <stop offset='0%' stopColor='var(--primary)'>
                       <animate
                         attributeName='stop-color'
-                        values='#16a34a; #22c55e; #4ade80; #22c55e; #16a34a'
+                        values='var(--primary); var(--primary-light); var(--primary-light); var(--primary-light); var(--primary)'
                         dur='3s'
                         repeatCount='indefinite'
                       />
                     </stop>
-                    <stop offset='50%' stopColor='#22c55e'>
+                    <stop offset='50%' stopColor='var(--primary-light)'>
                       <animate
                         attributeName='stop-color'
-                        values='#22c55e; #4ade80; #16a34a; #4ade80; #22c55e'
+                        values='var(--primary-light); var(--primary-light); var(--primary); var(--primary-light); var(--primary-light)'
                         dur='3s'
                         repeatCount='indefinite'
                       />
                     </stop>
-                    <stop offset='100%' stopColor='#4ade80'>
+                    <stop offset='100%' stopColor='var(--primary-light)'>
                       <animate
                         attributeName='stop-color'
-                        values='#4ade80; #16a34a; #22c55e; #16a34a; #4ade80'
+                        values='var(--primary-light); var(--primary); var(--primary-light); var(--primary); var(--primary-light)'
                         dur='3s'
                         repeatCount='indefinite'
                       />
@@ -613,7 +613,7 @@ export const BackgroundTaskPopup: React.FC = () => {
               {visibleTask.status === 'completed' && (
                 <ResultSection>
                   <ResultTitle>
-                    <FiCheckCircle color='#16a34a' />
+                    <FiCheckCircle color='var(--primary)' />
                     ¡Análisis Completado!
                   </ResultTitle>
                   <ViewResultButton onClick={handleViewResult}>Ver Resultado</ViewResultButton>
@@ -630,7 +630,7 @@ export const BackgroundTaskPopup: React.FC = () => {
               {/* Mostrar tareas anteriores si las hay */}
               {tasks.length > 1 && (
                 <div style={{ marginTop: '20px' }}>
-                  <h4 style={{ fontSize: '0.9rem', color: '#6b7280', marginBottom: '12px' }}>
+                  <h4 style={{ fontSize: '0.9rem', color: 'var(--text-muted)', marginBottom: '12px' }}>
                     Tareas Recientes
                   </h4>
                   <TaskList>

@@ -12,10 +12,10 @@ const FloatingButton = styled(motion.button)`
   width: 64px;
   height: 64px;
   border-radius: 50%;
-  background: #16a34a;
-  color: white;
+  background: var(--primary);
+  color: var(--text-inverse);
   border: none;
-  box-shadow: 0 8px 24px rgba(22, 163, 74, 0.3);
+  box-shadow: 0 8px 24px rgba(var(--primary-rgb), 0.3);
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -25,8 +25,8 @@ const FloatingButton = styled(motion.button)`
   transition: all 0.3s ease;
 
   &:hover {
-    background: #15803d;
-    box-shadow: 0 12px 32px rgba(22, 163, 74, 0.4);
+    background: var(--primary-hover);
+    box-shadow: 0 12px 32px rgba(var(--primary-rgb), 0.4);
     transform: scale(1.1);
   }
 
@@ -51,14 +51,14 @@ const Badge = styled(motion.div)`
   width: 24px;
   height: 24px;
   border-radius: 50%;
-  background: #dc2626;
-  color: white;
+  background: var(--danger);
+  color: var(--text-inverse);
   font-size: 0.75rem;
   font-weight: 700;
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 2px solid white;
+  border: 2px solid var(--surface);
 `;
 
 export const FloatingCompareButton: React.FC = () => {

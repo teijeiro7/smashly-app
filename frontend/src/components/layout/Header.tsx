@@ -10,7 +10,7 @@ import { NotificationBell, MobileNotificationBell } from '../notifications/Notif
 import ThemeToggle from '../common/ThemeToggle';
 
 const HeaderContainer = styled.header`
-  background: #15803d;
+  background: var(--primary);
   padding: 0;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
   position: sticky;
@@ -103,7 +103,7 @@ const MobileElements = styled.div`
 const MobileSearchButton = styled.button`
   background: none;
   border: none;
-  color: white;
+  color: var(--text-inverse);
   font-size: 1.25rem;
   cursor: pointer;
   min-width: 40px;
@@ -138,7 +138,7 @@ const MobileMenuDropdown = styled(motion.div)<{ $isOpen: boolean }>`
   top: 100%;
   left: 0;
   right: 0;
-  background: white;
+  background: var(--surface);
   border-radius: 0 0 20px 20px;
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
   z-index: 100;
@@ -182,14 +182,14 @@ const MobileNavSection = styled.div`
 const MobileNavTitle = styled.h4`
   font-size: 0.7rem;
   font-weight: 700;
-  color: #9ca3af;
+  color: var(--text-subtle);
   margin: 0 0 0.75rem 0.5rem;
   text-transform: uppercase;
   letter-spacing: 1.5px;
 `;
 
 const NavLink = styled(Link)<{ $isActive: boolean; $isMobile?: boolean }>`
-  color: ${props => (props.$isMobile ? '#374151' : 'white')};
+  color: ${props => (props.$isMobile ? 'var(--text)' : 'var(--text-inverse)')};
   text-decoration: none;
   font-weight: 500;
   padding: ${props => (props.$isMobile ? '12px 16px' : '8px 16px')};
@@ -207,25 +207,25 @@ const NavLink = styled(Link)<{ $isActive: boolean; $isMobile?: boolean }>`
   ${props =>
     props.$isMobile &&
     `
-    background: ${props.$isActive ? 'rgba(22, 163, 74, 0.06)' : 'transparent'};
-    color: ${props.$isActive ? '#15803d' : '#374151'};
+    background: ${props.$isActive ? 'rgba(var(--primary-rgb), 0.06)' : 'transparent'};
+    color: ${props.$isActive ? 'var(--primary-hover)' : 'var(--text)'};
     font-weight: ${props.$isActive ? '600' : '500'};
     
     svg {
-      color: ${props.$isActive ? '#15803d' : '#9ca3af'};
+      color: ${props.$isActive ? 'var(--primary-hover)' : 'var(--text-subtle)'};
       font-size: 1.1rem;
       transition: color 0.2s ease;
     }
   `}
 
   &:hover {
-    background: ${props => (props.$isMobile ? '#f9fafb' : 'rgba(255, 255, 255, 0.08)')};
-    color: ${props => (props.$isMobile ? '#15803d' : 'white')};
+    background: ${props => (props.$isMobile ? 'var(--surface-2)' : 'rgba(255, 255, 255, 0.08)')};
+    color: ${props => (props.$isMobile ? 'var(--primary-hover)' : 'var(--text-inverse)')};
     text-decoration: none;
     transform: ${props => (props.$isMobile ? 'translateX(3px)' : 'none')};
     
     svg {
-      color: #15803d;
+      color: var(--primary-hover);
     }
   }
 
@@ -238,7 +238,7 @@ const MobileMenuButton = styled.button`
   display: none;
   background: none;
   border: none;
-  color: white;
+  color: var(--text-inverse);
   font-size: 1.25rem;
   cursor: pointer;
   min-width: 40px;
@@ -306,44 +306,44 @@ const AuthButton = styled.button<{
     if (props.$isMobile) {
       return props.$variant === 'primary'
         ? `
-        background: #15803d;
-        color: white;
-        box-shadow: 0 2px 8px rgba(21, 128, 61, 0.2);
+        background: var(--primary-hover);
+        color: var(--text-inverse);
+        box-shadow: 0 2px 8px rgba(var(--primary-rgb-dark), 0.2);
         
         &:hover {
-          background: #166534;
+          background: var(--primary-hover);
           transform: translateY(-1px);
-          box-shadow: 0 4px 12px rgba(21, 128, 61, 0.25);
-          color: white;
+          box-shadow: 0 4px 12px rgba(var(--primary-rgb-dark), 0.25);
+          color: var(--text-inverse);
         }
       `
         : `
-        background: white;
-        color: #374151;
-        border: 1.5px solid #e5e7eb;
+        background: var(--surface);
+        color: var(--text);
+        border: 1.5px solid var(--border);
         
         &:hover {
-          background: #f9fafb;
-          border-color: #15803d;
-          color: #15803d;
+          background: var(--surface-2);
+          border-color: var(--primary-hover);
+          color: var(--primary-hover);
         }
       `;
     } else {
       return props.$variant === 'primary'
         ? `
-        background: white;
-        color: #15803d;
+        background: var(--surface);
+        color: var(--primary-hover);
         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         
         &:hover {
-          background: #f0fdf4;
+          background: var(--primary-subtle);
           transform: translateY(-1px);
           box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
         }
       `
         : `
         background: transparent;
-        color: white;
+        color: var(--text-inverse);
         border: 1.5px solid rgba(255, 255, 255, 0.25);
         
         &:hover {
@@ -376,28 +376,28 @@ const LogoutButton = styled.button<{
   cursor: pointer;
   border: none;
   background: transparent;
-  color: white;
+  color: var(--text-inverse);
   font-size: 0.875rem;
   font-family: inherit;
 
   &:hover {
     background: rgba(255, 255, 255, 0.08);
-    color: white;
+    color: var(--text-inverse);
     text-decoration: none;
   }
 
   ${props =>
     props.$isMobile &&
     `
-    background: white;
-    color: #374151;
-    border: 1.5px solid #e5e7eb;
+    background: var(--surface);
+    color: var(--text);
+    border: 1.5px solid var(--border);
     width: 100%;
     
     &:hover {
-      background: #f9fafb;
-      border-color: #dc2626;
-      color: #dc2626;
+      background: var(--surface-2);
+      border-color: var(--danger);
+      color: var(--danger);
       text-decoration: none;
     }
   `}
@@ -419,7 +419,7 @@ const AvatarButton = styled.button`
   height: 36px;
   border-radius: 50%;
   border: 2px solid rgba(255, 255, 255, 0.3);
-  background: white;
+  background: var(--surface);
   cursor: pointer;
   overflow: hidden;
   display: flex;
@@ -445,7 +445,7 @@ const AvatarButton = styled.button`
   }
 
   svg {
-    color: #15803d;
+    color: var(--primary-hover);
     font-size: 18px;
   }
 `;
@@ -454,7 +454,7 @@ const UserDropdown = styled.div<{ $isOpen: boolean }>`
   position: absolute;
   top: calc(100% + 10px);
   right: 0;
-  background: white;
+  background: var(--surface);
   border-radius: 12px;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.12);
   min-width: 200px;
@@ -473,7 +473,7 @@ const UserDropdown = styled.div<{ $isOpen: boolean }>`
     right: 14px;
     width: 12px;
     height: 12px;
-    background: white;
+    background: var(--surface);
     transform: rotate(45deg);
     border-left: 1px solid rgba(0, 0, 0, 0.04);
     border-top: 1px solid rgba(0, 0, 0, 0.04);
@@ -488,7 +488,7 @@ const DropdownItem = styled.button`
   text-align: left;
   font-size: 0.875rem;
   font-weight: 500;
-  color: #374151;
+  color: var(--text);
   cursor: pointer;
   transition: all 0.15s ease;
   display: flex;
@@ -498,8 +498,8 @@ const DropdownItem = styled.button`
   z-index: 1;
 
   &:hover {
-    background: #f9fafb;
-    color: #15803d;
+    background: var(--surface-2);
+    color: var(--primary-hover);
   }
 
   &:first-child {
@@ -508,30 +508,30 @@ const DropdownItem = styled.button`
 
   &:last-child {
     border-radius: 0 0 12px 12px;
-    color: #dc2626;
+    color: var(--danger);
     
     &:hover {
-      background: #fef2f2;
-      color: #b91c1c;
+      background: var(--surface-2);
+      color: var(--danger);
     }
   }
 
   svg {
     font-size: 18px;
-    color: #9ca3af;
+    color: var(--text-subtle);
     transition: color 0.15s ease;
   }
 
   &:hover svg {
-    color: #15803d;
+    color: var(--primary-hover);
   }
 
   &:last-child svg {
-    color: #ef4444;
+    color: var(--error);
   }
 
   &:last-child:hover svg {
-    color: #b91c1c;
+    color: var(--danger);
   }
 `;
 

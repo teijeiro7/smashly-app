@@ -14,14 +14,14 @@ const BellButton = styled.button`
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  border: 2px solid white;
+  border: 2px solid var(--text-inverse);
   background: rgba(255, 255, 255, 0.15);
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   transition: all 0.2s ease;
-  color: white;
+  color: var(--text-inverse);
   position: relative;
 
   &:hover {
@@ -39,8 +39,8 @@ const Badge = styled.span`
   top: 0;
   right: 0;
   transform: translate(20%, -20%);
-  background: #dc2626;
-  color: white;
+  background: var(--danger);
+  color: var(--text-inverse);
   font-size: 0.7rem;
   font-weight: 700;
   min-width: 18px;
@@ -50,7 +50,7 @@ const Badge = styled.span`
   align-items: center;
   justify-content: center;
   padding: 0 5px;
-  border: 2px solid #16a34a;
+  border: 2px solid var(--primary);
   animation: pulse 2s infinite;
 
   @media (hover: none) and (pointer: coarse) {
@@ -74,7 +74,7 @@ const MobileBellButton = styled.button`
   display: none;
   background: none;
   border: none;
-  color: white;
+  color: var(--text-inverse);
   font-size: 1.25rem;
   cursor: pointer;
   min-width: 44px;
@@ -99,8 +99,8 @@ const MobileBadge = styled.span`
   position: absolute;
   top: 2px;
   right: 2px;
-  background: #dc2626;
-  color: white;
+  background: var(--danger);
+  color: var(--text-inverse);
   font-size: 0.65rem;
   font-weight: 700;
   min-width: 16px;

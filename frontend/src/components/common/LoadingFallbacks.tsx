@@ -9,7 +9,7 @@ const fadeIn = keyframes`
 
 const FallbackContainer = styled.div`
   min-height: 100vh;
-  background: linear-gradient(135deg, #f8faf8 0%, #e8f5e8 100%);
+  background: linear-gradient(135deg, var(--primary-faint) 0%, var(--primary-faint) 100%);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -18,7 +18,7 @@ const FallbackContainer = styled.div`
 
 const SkeletonWrapper = styled.div`
   min-height: 100vh;
-  background: linear-gradient(135deg, #f8faf8 0%, #e8f5e8 100%);
+  background: linear-gradient(135deg, var(--primary-faint) 0%, var(--primary-faint) 100%);
   padding: 2rem 0;
   animation: ${fadeIn} 0.3s ease-in-out;
 `;

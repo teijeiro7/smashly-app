@@ -28,7 +28,7 @@ const StarContainer = styled.div`
 `;
 
 const StarBackground = styled(FiStar)<{ $size: number }>`
-  color: #e5e7eb;
+  color: var(--border);
   stroke-width: 1.5px;
 `;
 
@@ -44,7 +44,7 @@ const StarForeground = styled(FiStar)<{ $size: number; $fillPercentage: number }
 const RatingValue = styled.span`
   font-size: 0.9375rem;
   font-weight: 600;
-  color: #1f2937;
+  color: var(--text);
   line-height: 1;
 `;
 
