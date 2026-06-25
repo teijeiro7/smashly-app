@@ -300,10 +300,10 @@ export const GlobalStyles = createGlobalStyle`
     --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
   }
 
-  /* Dark mode — explicit choice via html[data-theme="dark"]
-     Using a high-specificity selector (html + attribute) so it always wins
-     over the bare :root rule regardless of cascade order. */
-  html[data-theme='dark'] {
+  /* Dark mode — selectors use BOTH attribute and class for maximum
+     compatibility across browsers and any caching layers. */
+  html[data-theme='dark'],
+  html.theme-dark {
     /* Forest-tinted dark palette: backgrounds are green-graphite (not pure black) */
     --color-primary: #22c55e;
     --color-primary-dark: #16a34a;
@@ -363,7 +363,7 @@ export const GlobalStyles = createGlobalStyle`
      (the anti-FOUC script sets data-theme='light'/'dark' when there is a stored
      preference, and leaves the attribute unset in auto mode). */
   @media (prefers-color-scheme: dark) {
-    html:not([data-theme='light']):not([data-theme='dark']) {
+    html:not([data-theme='light']):not([data-theme='dark']):not(.theme-light):not(.theme-dark) {
       --color-primary: #22c55e;
       --color-primary-dark: #16a34a;
       --color-primary-light: #4ade80;

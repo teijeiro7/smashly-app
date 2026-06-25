@@ -40,9 +40,14 @@ function resolveMode(mode: ThemeMode, systemDark: boolean): ResolvedTheme {
 
 function applyToDom(resolved: ResolvedTheme): void {
   if (typeof document === 'undefined') return;
-  document.documentElement.setAttribute(DOM_ATTRIBUTE, resolved);
+  const root = document.documentElement;
+  root.setAttribute(DOM_ATTRIBUTE, resolved);
+  // Mirror to a class as a belt-and-suspenders fallback (some browsers /
+  // shadow contexts can be flaky with attribute-only CSS variable cascading).
+  root.classList.remove('theme-light', 'theme-dark');
+  root.classList.add(resolved === 'dark' ? 'theme-dark' : 'theme-light');
   // Helps native form controls/scrollbars match the theme
-  document.documentElement.style.colorScheme = resolved;
+  root.style.colorScheme = resolved;
 }
 
 export const ThemeProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
