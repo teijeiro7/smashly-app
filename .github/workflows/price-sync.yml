@@ -2,8 +2,8 @@ name: Catalog & Price Sync
 
 on:
   schedule:
-    # Full sync: 1º domingo de cada mes a las 04:00 UTC
-    - cron: '0 4 1-7 * 0'
+    # Full sync: candidatos a 1er domingo del mes (cada domingo 04:00 UTC; guard interno filtra día 1-7)
+    - cron: '0 4 * * 0'
     # Prices sync: Todos los domingos a las 05:00 UTC
     - cron: '0 5 * * 0'
   workflow_dispatch:
@@ -105,10 +105,24 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 60
     if: >
-      (github.event_name == 'schedule' && github.event.schedule == '0 4 1-7 * 0') ||
+      (github.event_name == 'schedule' && github.event.schedule == '0 4 * * 0') ||
       (github.event_name == 'workflow_dispatch' && github.event.inputs.mode == 'full')
     steps:
+      - name: First-Sunday guard
+        id: first_sunday
+        run: |
+          DOM=$(date +%d)
+          echo "DOM=$DOM"
+          if [ "$DOM" -gt 7 ]; then
+            echo "Today is day $DOM (>7). Not first week of month — skipping full-sync."
+            echo "run=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "Today is day $DOM (<=7). First week of month — proceeding with full-sync."
+            echo "run=true" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Checkout repository
+        if: steps.first_sunday.outputs.run == 'true' || github.event_name == 'workflow_dispatch'
         uses: actions/checkout@v4
         with:
           sparse-checkout: |
@@ -117,20 +131,24 @@ jobs:
           sparse-checkout-cone-mode: false
 
       - name: Set up Python
+        if: steps.first_sunday.outputs.run == 'true' || github.event_name == 'workflow_dispatch'
         uses: actions/setup-python@v5
         with:
           python-version: '3.10'
           cache: pip
 
       - name: Install Python dependencies
+        if: steps.first_sunday.outputs.run == 'true' || github.event_name == 'workflow_dispatch'
         run: pip install -r src/scrapers/requirements.txt
 
       - name: Install Node dependencies
+        if: steps.first_sunday.outputs.run == 'true' || github.event_name == 'workflow_dispatch'
         run: |
           cd backend/api
           pnpm install
 
       - name: Run Full Sync
+        if: steps.first_sunday.outputs.run == 'true' || github.event_name == 'workflow_dispatch'
         run: |
           LIMIT_ARG=""
           if [ "${{ github.event.inputs.limit }}" != "" ]; then
@@ -148,6 +166,7 @@ jobs:
           exit $EXIT_CODE
 
       - name: Deduplicate rackets
+        if: steps.first_sunday.outputs.run == 'true' || github.event_name == 'workflow_dispatch'
         run: |
           cd src/scrapers
           set +e
@@ -160,6 +179,7 @@ jobs:
           fi
 
       - name: Sync Radar Metrics (External Sources)
+        if: steps.first_sunday.outputs.run == 'true' || github.event_name == 'workflow_dispatch'
         run: |
           echo "Scraping radar metrics from PadelZoom/TuMejorPala..."
           set +e
@@ -172,6 +192,7 @@ jobs:
           fi
 
       - name: Sync Radar Metrics (Fallback Algorithm)
+        if: steps.first_sunday.outputs.run == 'true' || github.event_name == 'workflow_dispatch'
         run: |
           echo "Running fallback algorithm for remaining rackets..."
           cd backend/api
@@ -185,6 +206,7 @@ jobs:
           fi
 
       - name: Commit and push changes
+        if: steps.first_sunday.outputs.run == 'true' || github.event_name == 'workflow_dispatch'
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
@@ -193,7 +215,7 @@ jobs:
           git push || echo "Push failed"
 
       - name: Send failure notification
-        if: env.sync_failed == 'true' || env.dedupe_failed == 'true' || env.metrics_failed == 'true' || env.fallback_failed == 'true'
+        if: (steps.first_sunday.outputs.run == 'true' || github.event_name == 'workflow_dispatch') && (env.sync_failed == 'true' || env.dedupe_failed == 'true' || env.metrics_failed == 'true' || env.fallback_failed == 'true')
         run: |
           echo "📧 Enviando notificación de fallo a ${{ env.EMAIL_TO }}"
           curl -s -X POST https://api.resend.com/emails \
