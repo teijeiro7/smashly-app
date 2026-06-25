@@ -208,6 +208,11 @@ const RacketImage = styled.img`
   height: 100px;
   object-fit: contain;
   margin-bottom: 1rem;
+  background: var(--racket-image-bg);
+  border: var(--racket-image-border);
+  border-radius: var(--racket-image-radius-card);
+  box-shadow: var(--racket-image-shadow);
+  padding: 0.5rem;
 `;
 
 const RacketName = styled.h3`
@@ -1009,6 +1014,16 @@ const CompareRacketsPage: React.FC = () => {
                   <img
                     src={racket.imagenes?.[0] || '/placeholder-racket.png'}
                     alt={racket.nombre}
+                    style={{
+                      width: 40,
+                      height: 40,
+                      objectFit: 'contain',
+                      borderRadius: 8,
+                      background: 'var(--racket-image-bg)',
+                      border: 'var(--racket-image-border)',
+                      boxShadow: 'var(--racket-image-shadow)',
+                      padding: 4,
+                    }}
                   />
                   <div>
                     <div style={{ fontWeight: 600 }}>{toTitleCase(racket.nombre)}</div>
@@ -1045,6 +1060,16 @@ const CompareRacketsPage: React.FC = () => {
                     <img
                       src={racket.imagenes?.[0] || '/placeholder-racket.png'}
                       alt={racket.nombre}
+                      style={{
+                        width: 60,
+                        height: 60,
+                        objectFit: 'contain',
+                        borderRadius: 8,
+                        background: 'var(--racket-image-bg)',
+                        border: 'var(--racket-image-border)',
+                        boxShadow: 'var(--racket-image-shadow)',
+                        padding: 4,
+                      }}
                     />
                     <FavoriteRacketInfo>
                       <FavoriteRacketName>{toTitleCase(racket.nombre)}</FavoriteRacketName>
