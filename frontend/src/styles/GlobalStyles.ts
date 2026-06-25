@@ -320,6 +320,13 @@ export const GlobalStyles = createGlobalStyle`
     --shadow-md: 0 4px 6px -1px var(--shadow-color), 0 2px 4px -1px var(--shadow-color);
     --shadow-lg: 0 10px 15px -3px var(--shadow-color), 0 4px 6px -2px var(--shadow-color);
     --shadow-xl: 0 20px 25px -5px var(--shadow-color), 0 10px 10px -5px var(--shadow-color);
+
+    /* Racket image card tokens (fixed across themes: always-white framed tile) */
+    --racket-image-bg: #ffffff;
+    --racket-image-radius-card: 12px;
+    --racket-image-radius-detail: 16px;
+    --racket-image-border: 1px solid #e5e7eb;
+    --racket-image-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
   }
 
   /* Dark mode — selectors use BOTH attribute and class for maximum
