@@ -47,7 +47,10 @@ const RacketImageContainer = styled.div<{ $view: 'grid' | 'list' }>`
   width: ${props => (props.$view === 'list' ? '160px' : '100%')};
   flex-shrink: 0;
   align-self: ${props => (props.$view === 'list' ? 'stretch' : 'auto')};
-  background: var(--surface);
+  background: var(--racket-image-bg);
+  border: var(--racket-image-border);
+  border-radius: var(--racket-image-radius-card);
+  box-shadow: var(--racket-image-shadow);
   display: flex;
   align-items: center;
   justify-content: center;
