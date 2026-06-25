@@ -261,10 +261,13 @@ const ResultIcon = styled.div<{ $variant?: 'racket' | 'brand' | 'category' }>`
 const ResultImage = styled.img`
   width: 36px;
   height: 36px;
-  border-radius: 10px;
-  background: var(--surface-2);
+  border-radius: 8px;
+  background: var(--racket-image-bg);
+  border: var(--racket-image-border);
+  box-shadow: var(--racket-image-shadow);
   object-fit: contain;
   flex-shrink: 0;
+  padding: 0.125rem;
 `;
 
 const ResultInfo = styled.div`
