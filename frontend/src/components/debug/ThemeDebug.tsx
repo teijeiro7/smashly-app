@@ -8,7 +8,7 @@ const Panel = styled.div`
   left: 12px;
   z-index: 99999;
   background: #000;
-  color: #fff;
+  color: var(--surface);
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
   font-size: 11px;
   line-height: 1.45;
@@ -22,7 +22,7 @@ const Panel = styled.div`
 `;
 
 const Row = styled.div<{ $ok?: boolean | null }>`
-  color: ${p => (p.$ok === true ? '#4ade80' : p.$ok === false ? '#f87171' : '#fff')};
+  color: ${p => (p.$ok === true ? 'var(--primary-light)' : p.$ok === false ? '#f87171' : 'var(--surface)')};
 `;
 
 /**
