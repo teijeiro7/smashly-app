@@ -4,7 +4,7 @@ import { FaInstagram, FaTiktok } from "react-icons/fa";
 import styled from "styled-components";
 
 const FooterContainer = styled.footer`
-  background: var(--brand-surface-deep);
+  background: var(--footer-bg);
   color: white;
   padding: 3rem 0 1.5rem;
   margin-top: auto;

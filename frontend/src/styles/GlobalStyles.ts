@@ -288,6 +288,7 @@ export const GlobalStyles = createGlobalStyle`
     --brand-rgb: 22, 163, 74;
     --brand-on-surface: #ffffff;
     --surface-inverse: #0f172a;
+    --footer-bg: #0f2818;
     --bg-glow-secondary: rgba(2, 132, 199, 0.08);
 
     /* Spacing */
@@ -385,6 +386,7 @@ export const GlobalStyles = createGlobalStyle`
     --brand-rgb: 22, 163, 74;
     --brand-on-surface: #ffffff;
     --surface-inverse: #0f172a;
+    --footer-bg: #051008;
 
     --shadow-color: rgba(0, 0, 0, 0.50);
     --surface-overlay: rgba(18, 26, 22, 0.85);
@@ -456,11 +458,12 @@ export const GlobalStyles = createGlobalStyle`
          See :root above for the rationale. */
       --brand-surface: #16a34a;
       --brand-surface-hover: #15803d;
-      --brand-surface-strong: #0f6e38;
-      --brand-surface-deep: #0f2818;
-      --brand-rgb: 22, 163, 74;
-      --brand-on-surface: #ffffff;
-      --surface-inverse: #0f172a;
+    --brand-surface-strong: #0f6e38;
+    --brand-surface-deep: #0f2818;
+    --brand-rgb: 22, 163, 74;
+    --brand-on-surface: #ffffff;
+    --surface-inverse: #0f172a;
+    --footer-bg: #051008;
 
       --shadow-color: rgba(0, 0, 0, 0.50);
       --surface-overlay: rgba(18, 26, 22, 0.85);
