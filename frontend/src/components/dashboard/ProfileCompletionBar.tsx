@@ -3,11 +3,11 @@ import styled from 'styled-components';
 import { useNavigate } from '@tanstack/react-router';
 
 const Container = styled.div`
-  background: white;
+  background: var(--surface);
   border-radius: 16px;
   padding: 1.5rem;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-  border: 1px solid rgba(22, 163, 74, 0.1);
+  border: 1px solid rgba(var(--primary-rgb), 0.1);
 `;
 
 const Header = styled.div`
@@ -20,24 +20,24 @@ const Header = styled.div`
 const Title = styled.h3`
   font-size: 1rem;
   font-weight: 600;
-  color: #1f2937;
+  color: var(--text);
   margin: 0;
 `;
 
 const Percentage = styled.span<{ $percentage: number }>`
   font-size: 1.25rem;
   font-weight: 700;
-  color: ${props => 
-    props.$percentage >= 80 ? '#16a34a' : 
-    props.$percentage >= 50 ? '#f59e0b' : 
-    '#ef4444'
+  color: ${props =>
+    props.$percentage >= 80 ? 'var(--primary)' :
+    props.$percentage >= 50 ? 'var(--accent)' :
+    'var(--error)'
   };
 `;
 
 const ProgressBarContainer = styled.div`
   width: 100%;
   height: 8px;
-  background: #e5e7eb;
+  background: var(--border);
   border-radius: 4px;
   overflow: hidden;
   margin-bottom: 1rem;
@@ -45,10 +45,10 @@ const ProgressBarContainer = styled.div`
 
 const ProgressBarFill = styled.div<{ $percentage: number }>`
   height: 100%;
-  background: ${props => 
-    props.$percentage >= 80 ? '#16a34a' : 
-    props.$percentage >= 50 ? '#f59e0b' : 
-    '#ef4444'
+  background: ${props =>
+    props.$percentage >= 80 ? 'var(--primary)' :
+    props.$percentage >= 50 ? 'var(--accent)' :
+    'var(--error)'
   };
   width: ${props => props.$percentage}%;
   transition: width 0.3s ease;
@@ -63,7 +63,7 @@ const Suggestions = styled.div`
 
 const Suggestion = styled.p`
   font-size: 0.875rem;
-  color: #6b7280;
+  color: var(--text-muted);
   margin: 0;
   display: flex;
   align-items: center;
@@ -71,7 +71,7 @@ const Suggestion = styled.p`
 
   &::before {
     content: '•';
-    color: #16a34a;
+    color: var(--primary);
     font-weight: bold;
   }
 `;
@@ -80,16 +80,16 @@ const CompleteButton = styled.button`
   margin-top: 1rem;
   width: 100%;
   padding: 0.75rem;
-  background: #f0fdf4;
-  border: 1px solid #16a34a;
-  color: #16a34a;
+  background: var(--primary-subtle);
+  border: 1px solid var(--primary);
+  color: var(--primary);
   border-radius: 8px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
 
   &:hover {
-    background: #dcfce7;
+    background: var(--primary-faint);
   }
 `;
 
@@ -130,7 +130,7 @@ export const ProfileCompletionBar: React.FC<ProfileCompletionBarProps> = ({
       )}
 
       {percentage === 100 && (
-        <Suggestion style={{ color: '#16a34a', fontWeight: 600 }}>
+        <Suggestion style={{ color: 'var(--primary)', fontWeight: 600 }}>
           {suggestions[0] || '¡Tu perfil está completo!'}
         </Suggestion>
       )}

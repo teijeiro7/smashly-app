@@ -7,18 +7,18 @@ const FormContainer = styled.div`
   max-width: 600px;
   margin: 0 auto;
   padding: 2rem;
-  background: white;
+  background: var(--surface);
   border-radius: 24px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
-  border: 1px solid rgba(21, 128, 61, 0.1);
+  border: 1px solid rgba(var(--primary-rgb-dark), 0.1);
 `;
 
 const SectionTitle = styled.h3`
-  color: #15803d;
+  color: var(--primary-hover);
   font-size: 1.1rem;
   margin: 1.5rem 0 1rem 0;
   padding-bottom: 0.5rem;
-  border-bottom: 2px solid #f0fdf4;
+  border-bottom: 2px solid var(--primary-subtle);
 
   &:first-of-type {
     margin-top: 0;
@@ -32,7 +32,7 @@ const FormGroup = styled.div`
 const Label = styled.label`
   display: block;
   margin-bottom: 0.5rem;
-  color: #374151;
+  color: var(--text);
   font-weight: 600;
   display: flex;
   align-items: center;
@@ -41,7 +41,7 @@ const Label = styled.label`
 
 const Tooltip = styled.span`
   font-size: 0.85rem;
-  color: #6b7280;
+  color: var(--text-muted);
   font-weight: 400;
   font-style: italic;
 `;
@@ -59,18 +59,18 @@ const RadioLabel = styled.label`
   cursor: pointer;
   padding: 0.5rem 1rem;
   border-radius: 8px;
-  border: 2px solid #e5e7eb;
-  background: white;
+  border: 2px solid var(--border);
+  background: var(--surface);
   transition: all 0.2s;
 
   &:hover {
-    border-color: #15803d;
-    background: #f0fdf4;
+    border-color: var(--primary-hover);
+    background: var(--primary-subtle);
   }
 
   input:checked + & {
-    border-color: #15803d;
-    background: #f0fdf4;
+    border-color: var(--primary-hover);
+    background: var(--primary-subtle);
   }
 `;
 
@@ -82,16 +82,16 @@ const Select = styled.select`
   width: 100%;
   padding: 0.75rem;
   border-radius: 12px;
-  border: 2px solid #e5e7eb;
-  background: white;
-  color: #1f2937;
+  border: 2px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
   font-size: 1rem;
   transition: all 0.2s;
 
   &:focus {
     outline: none;
-    border-color: #15803d;
-    box-shadow: 0 0 0 3px rgba(21, 128, 61, 0.1);
+    border-color: var(--primary-hover);
+    box-shadow: 0 0 0 3px rgba(var(--primary-rgb-dark), 0.1);
   }
 `;
 
@@ -99,16 +99,16 @@ const Input = styled.input`
   width: 100%;
   padding: 0.75rem;
   border-radius: 12px;
-  border: 2px solid #e5e7eb;
-  background: white;
-  color: #1f2937;
+  border: 2px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
   font-size: 1rem;
   transition: all 0.2s;
 
   &:focus {
     outline: none;
-    border-color: #15803d;
-    box-shadow: 0 0 0 3px rgba(21, 128, 61, 0.1);
+    border-color: var(--primary-hover);
+    box-shadow: 0 0 0 3px rgba(var(--primary-rgb-dark), 0.1);
   }
 `;
 
@@ -125,13 +125,13 @@ const Button = styled.button<{ $primary?: boolean }>`
   border: none;
   font-weight: 600;
   cursor: pointer;
-  background: ${props => (props.$primary ? '#15803d' : '#f3f4f6')};
-  color: ${props => (props.$primary ? 'white' : '#4b5563')};
+  background: ${props => (props.$primary ? 'var(--primary-hover)' : 'var(--surface-3)')};
+  color: ${props => (props.$primary ? 'var(--text-inverse)' : 'var(--text)')};
   transition: all 0.2s;
   font-size: 1rem;
 
   &:hover {
-    background: ${props => (props.$primary ? '#15803d' : '#e5e7eb')};
+    background: ${props => (props.$primary ? 'var(--primary-hover)' : 'var(--border)')};
     transform: translateY(-1px);
   }
 

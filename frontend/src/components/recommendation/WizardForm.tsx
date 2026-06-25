@@ -10,7 +10,7 @@ const WizardContainer = styled.div`
   max-width: 640px;
   margin: 0 auto;
   padding: 2rem;
-  background: #ffffff;
+  background: var(--surface);
   border-radius: 20px;
   border: 1px solid rgba(0, 0, 0, 0.06);
   box-shadow:
@@ -27,14 +27,14 @@ const ProgressBarContainer = styled.div`
 const ProgressBar = styled.div`
   position: relative;
   height: 4px;
-  background: #e2e8f0;
+  background: var(--border);
   border-radius: 2px;
   overflow: hidden;
 `;
 
 const ProgressFill = styled.div`
   height: 100%;
-  background: #15803d;
+  background: var(--primary-hover);
   border-radius: 2px;
   transition: width 0.3s ease;
 `;
@@ -49,7 +49,7 @@ const ProgressCounter = styled.div`
 const ProgressText = styled.span`
   font-size: 0.8rem;
   font-weight: 600;
-  color: #64748b;
+  color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 0.05em;
 `;
@@ -61,7 +61,7 @@ const QuestionContainer = styled(motion.div)`
 const QuestionTitle = styled.h2`
   font-size: 1.4rem;
   font-weight: 700;
-  color: #0f172a;
+  color: var(--text);
   margin-bottom: 0.4rem;
   text-align: center;
   letter-spacing: -0.01em;
@@ -70,7 +70,7 @@ const QuestionTitle = styled.h2`
 
 const QuestionSubtitle = styled.p`
   font-size: 0.9rem;
-  color: #64748b;
+  color: var(--text-muted);
   margin-bottom: 2rem;
   text-align: center;
   line-height: 1.5;
@@ -89,18 +89,18 @@ const OptionsGrid = styled.div`
 const OptionCard = styled.button<{ $selected: boolean }>`
   padding: 1rem 1.25rem;
   border-radius: 12px;
-  border: 1.5px solid ${props => (props.$selected ? '#15803d' : '#e2e8f0')};
-  background: ${props => (props.$selected ? '#f8fafc' : '#ffffff')};
+  border: 1.5px solid ${props => (props.$selected ? 'var(--primary-hover)' : 'var(--border)')};
+  background: ${props => (props.$selected ? 'var(--surface-2)' : 'var(--surface)')};
   cursor: pointer;
   transition: border-color 0.15s ease, background-color 0.15s ease, transform 0.15s ease;
   text-align: left;
   font-size: 0.95rem;
   font-weight: 500;
-  color: ${props => (props.$selected ? '#0f172a' : '#334155')};
+  color: ${props => (props.$selected ? 'var(--text)' : 'var(--text)')};
 
   &:hover {
-    border-color: ${props => (props.$selected ? '#111111' : '#94a3b8')};
-    background: ${props => (props.$selected ? '#f8fafc' : '#f8fafc')};
+    border-color: ${props => (props.$selected ? 'var(--text)' : 'var(--text-subtle)')};
+    background: ${props => (props.$selected ? 'var(--surface-2)' : 'var(--surface-2)')};
     transform: translateY(-1px);
   }
 
@@ -113,18 +113,18 @@ const Input = styled.input`
   width: 100%;
   padding: 0.85rem 1rem;
   border-radius: 12px;
-  border: 1.5px solid #e2e8f0;
-  background: #ffffff;
-  color: #0f172a;
+  border: 1.5px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
   font-size: 0.95rem;
   font-weight: 500;
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
 
-  &::placeholder { color: #94a3b8; }
+  &::placeholder { color: var(--text-subtle); }
 
   &:focus {
     outline: none;
-    border-color: #111111;
+    border-color: var(--text);
     box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.06);
   }
 `;
@@ -133,20 +133,20 @@ const TextArea = styled.textarea`
   width: 100%;
   padding: 0.85rem 1rem;
   border-radius: 12px;
-  border: 1.5px solid #e2e8f0;
-  background: #ffffff;
-  color: #0f172a;
+  border: 1.5px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
   font-size: 0.95rem;
   font-weight: 500;
   min-height: 100px;
   resize: vertical;
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
 
-  &::placeholder { color: #94a3b8; }
+  &::placeholder { color: var(--text-subtle); }
 
   &:focus {
     outline: none;
-    border-color: #111111;
+    border-color: var(--text);
     box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.06);
   }
 `;
@@ -172,8 +172,8 @@ const NavButton = styled.button<{ $primary?: boolean }>`
   border: none;
   font-weight: 600;
   cursor: pointer;
-  background: ${props => (props.$primary ? '#15803d' : '#f1f5f9')};
-  color: ${props => (props.$primary ? '#ffffff' : '#475569')};
+  background: ${props => (props.$primary ? 'var(--primary-hover)' : 'var(--surface-3)')};
+  color: ${props => (props.$primary ? 'var(--text-inverse)' : 'var(--text)')};
   transition: background-color 0.15s ease, transform 0.15s ease, color 0.15s ease;
   font-size: 0.95rem;
   flex: 1;
@@ -181,7 +181,7 @@ const NavButton = styled.button<{ $primary?: boolean }>`
   min-height: 48px;
 
   &:hover {
-    background: ${props => (props.$primary ? '#333333' : '#e2e8f0')};
+    background: ${props => (props.$primary ? 'var(--text)' : 'var(--border)')};
     transform: translateY(-1px);
   }
 
@@ -200,8 +200,8 @@ const OptionalBadge = styled.span`
   display: inline-block;
   margin-left: 0.5rem;
   padding: 0.2rem 0.5rem;
-  background: #f1f5f9;
-  color: #64748b;
+  background: var(--surface-3);
+  color: var(--text-muted);
   font-size: 0.7rem;
   font-weight: 600;
   border-radius: 6px;
@@ -226,21 +226,21 @@ const CheckboxLabel = styled.label`
   gap: 0.75rem;
   padding: 1rem;
   border-radius: 12px;
-  border: 1.5px solid #e2e8f0;
-  background: #ffffff;
+  border: 1.5px solid var(--border);
+  background: var(--surface);
   cursor: pointer;
   transition: border-color 0.15s ease, background-color 0.15s ease;
   font-weight: 500;
-  color: #334155;
+  color: var(--text);
   font-size: 0.95rem;
 
   &:hover {
-    border-color: #94a3b8;
-    background: #f8fafc;
+    border-color: var(--text-subtle);
+    background: var(--surface-2);
   }
 
   input {
-    accent-color: #111111;
+    accent-color: var(--text);
     width: 18px;
     height: 18px;
     flex-shrink: 0;

@@ -13,20 +13,20 @@ const SearchContainer = styled.div`
 const SearchInputWrapper = styled.div<{ $isFocused: boolean }>`
   display: flex;
   align-items: center;
-  border: 2px solid ${props => (props.$isFocused ? '#16a34a' : '#e5e7eb')};
+  border: 2px solid ${props => (props.$isFocused ? 'var(--primary)' : 'var(--border)')};
   border-radius: 12px;
-  background: white;
+  background: var(--surface);
   transition: all 0.2s;
   overflow: hidden;
 
   &:hover {
-    border-color: ${props => (props.$isFocused ? '#16a34a' : '#d1d5db')};
+    border-color: ${props => (props.$isFocused ? 'var(--primary)' : 'var(--border-strong)')};
   }
 `;
 
 const SearchIcon = styled.div`
   padding-left: 1rem;
-  color: #9ca3af;
+  color: var(--text-subtle);
   display: flex;
   align-items: center;
 `;
@@ -37,11 +37,11 @@ const Input = styled.input`
   border: none;
   outline: none;
   font-size: 1rem;
-  color: #1f2937;
+  color: var(--text);
   background: transparent;
 
   &::placeholder {
-    color: #9ca3af;
+    color: var(--text-subtle);
   }
 `;
 
@@ -49,14 +49,14 @@ const ClearButton = styled.button`
   padding: 0.75rem 1rem;
   background: none;
   border: none;
-  color: #9ca3af;
+  color: var(--text-subtle);
   cursor: pointer;
   display: flex;
   align-items: center;
   transition: color 0.2s;
 
   &:hover {
-    color: #6b7280;
+    color: var(--text-muted);
   }
 `;
 
@@ -65,10 +65,10 @@ const ResultsDropdown = styled(motion.div)`
   top: calc(100% + 8px);
   left: 0;
   right: 0;
-  background: white;
+  background: var(--surface);
   border-radius: 12px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--border);
   max-height: 320px;
   overflow-y: auto;
   z-index: 100;
@@ -81,14 +81,14 @@ const ResultItem = styled.div`
   padding: 0.75rem 1rem;
   cursor: pointer;
   transition: background 0.15s;
-  border-bottom: 1px solid #f3f4f6;
+  border-bottom: 1px solid var(--surface-3);
 
   &:last-child {
     border-bottom: none;
   }
 
   &:hover {
-    background: #f9fafb;
+    background: var(--surface-2);
   }
 `;
 
@@ -97,18 +97,18 @@ const ResultImage = styled.img`
   height: 40px;
   border-radius: 8px;
   object-fit: contain;
-  background: #f3f4f6;
+  background: var(--surface-3);
 `;
 
 const ResultPlaceholder = styled.div`
   width: 40px;
   height: 40px;
   border-radius: 8px;
-  background: #f3f4f6;
+  background: var(--surface-3);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #9ca3af;
+  color: var(--text-subtle);
   font-size: 0.75rem;
 `;
 
@@ -119,7 +119,7 @@ const ResultInfo = styled.div`
 
 const ResultName = styled.div`
   font-weight: 500;
-  color: #1f2937;
+  color: var(--text);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -127,21 +127,21 @@ const ResultName = styled.div`
 
 const ResultBrand = styled.div`
   font-size: 0.85rem;
-  color: #6b7280;
+  color: var(--text-muted);
 `;
 
 const NoResults = styled.div`
   padding: 1.5rem;
   text-align: center;
-  color: #6b7280;
+  color: var(--text-muted);
 `;
 
 const ManualEntryHint = styled.div`
   padding: 0.75rem 1rem;
   font-size: 0.85rem;
-  color: #6b7280;
-  background: #f9fafb;
-  border-top: 1px solid #e5e7eb;
+  color: var(--text-muted);
+  background: var(--surface-2);
+  border-top: 1px solid var(--border);
   text-align: center;
 `;
 

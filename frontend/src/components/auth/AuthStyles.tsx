@@ -4,20 +4,20 @@ import { Link } from '@tanstack/react-router';
 export const FormTitle = styled.h2`
   font-size: 2rem;
   font-weight: 700;
-  color: #111827;
+  color: var(--text);
   margin-bottom: 8px;
   text-align: center;
 `;
 
 export const FormSubtitle = styled.p`
-  color: #6b7280;
+  color: var(--text-muted);
   text-align: center;
   margin-bottom: 32px;
   font-size: 0.95rem;
 `;
 
 export const TabContainer = styled.div`
-  background: #f3f4f6;
+  background: var(--surface-3);
   padding: 4px;
   border-radius: 99px; // Pill shape
   display: flex;
@@ -32,13 +32,13 @@ export const Tab = styled(Link)<{ $active?: boolean }>`
   text-decoration: none;
   font-size: 0.95rem;
   font-weight: 600;
-  color: ${props => (props.$active ? '#111827' : '#6b7280')};
-  background: ${props => (props.$active ? 'white' : 'transparent')};
+  color: ${props => (props.$active ? 'var(--text)' : 'var(--text-muted)')};
+  background: ${props => (props.$active ? 'var(--surface)' : 'transparent')};
   box-shadow: ${props => (props.$active ? '0 1px 3px rgba(0,0,0,0.1)' : 'none')};
   transition: all 0.2s ease;
 
   &:hover {
-    color: #111827;
+    color: var(--text);
   }
 `;
 
@@ -57,7 +57,7 @@ export const FormGroup = styled.div`
 export const Label = styled.label`
   font-size: 0.9rem;
   font-weight: 600;
-  color: #374151;
+  color: var(--text);
   margin-left: 4px;
 `;
 
@@ -69,12 +69,12 @@ export const Input = styled.input<{ $hasError?: boolean }>`
   width: 100%;
   padding: 14px 16px;
   padding-left: 44px; // Check if we are using icons
-  border: 1px solid ${props => (props.$hasError ? '#ef4444' : '#e5e7eb')};
+  border: 1px solid ${props => (props.$hasError ? 'var(--error)' : 'var(--border)')};
   border-radius: 12px;
   font-size: 1rem;
   transition: all 0.2s;
   outline: none;
-  background: #fff;
+  background: var(--surface);
 
   &:focus {
     border-color: #a3e635;
@@ -82,7 +82,7 @@ export const Input = styled.input<{ $hasError?: boolean }>`
   }
 
   &::placeholder {
-    color: #9ca3af;
+    color: var(--text-subtle);
   }
 `;
 
@@ -91,7 +91,7 @@ export const IconWrapper = styled.div`
   left: 16px;
   top: 50%;
   transform: translateY(-50%);
-  color: #9ca3af;
+  color: var(--text-subtle);
   display: flex;
   align-items: center;
   font-size: 1.1rem;
@@ -104,26 +104,26 @@ export const PasswordToggle = styled.button`
   transform: translateY(-50%);
   background: none;
   border: none;
-  color: #9ca3af;
+  color: var(--text-subtle);
   cursor: pointer;
   padding: 4px;
   display: flex;
   align-items: center;
 
   &:hover {
-    color: #6b7280;
+    color: var(--text-muted);
   }
 `;
 
 export const ErrorText = styled.span`
-  color: #ef4444;
+  color: var(--error);
   font-size: 0.85rem;
   margin-left: 4px;
 `;
 
 export const SubmitButton = styled.button`
   width: 100%;
-  background: #ccff00; // Neon Green
+  background: var(--accent); // Neon Green
   color: #000;
   font-weight: 700;
   padding: 16px;
@@ -135,12 +135,12 @@ export const SubmitButton = styled.button`
   cursor: pointer;
   transition: all 0.2s;
   margin-top: 10px;
-  box-shadow: 0 4px 12px rgba(204, 255, 0, 0.2);
+  box-shadow: 0 4px 12px rgba(var(--accent-rgb), 0.2);
 
   &:hover {
     background: #b3e600;
     transform: translateY(-1px);
-    box-shadow: 0 6px 16px rgba(204, 255, 0, 0.3);
+    box-shadow: 0 6px 16px rgba(var(--accent-rgb), 0.3);
   }
 
   &:active {
@@ -158,7 +158,7 @@ export const Divider = styled.div`
   align-items: center;
   gap: 16px;
   margin: 32px 0;
-  color: #9ca3af;
+  color: var(--text-subtle);
   font-size: 0.9rem;
 
   &::before,
@@ -166,7 +166,7 @@ export const Divider = styled.div`
     content: '';
     flex: 1;
     height: 1px;
-    background: #e5e7eb;
+    background: var(--border);
   }
 `;
 
@@ -183,18 +183,18 @@ export const SocialButton = styled.button`
   gap: 10px;
   padding: 12px;
   width: 100%;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--border);
   border-radius: 99px; // Pill shape
-  background: white;
-  color: #374151;
+  background: var(--surface);
+  color: var(--text);
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
   font-size: 0.95rem;
 
   &:hover {
-    background: #f9fafb;
-    border-color: #d1d5db;
+    background: var(--surface-2);
+    border-color: var(--border-strong);
   }
 
   svg {
@@ -206,11 +206,11 @@ export const FooterText = styled.p`
   margin-top: 32px;
   text-align: center;
   font-size: 0.8rem;
-  color: #9ca3af;
+  color: var(--text-subtle);
 
   a {
-    color: #ccff00; /* Matching neon */
-    color: #84cc16; /* Slightly darker for text readability on white? Image has neon green links? "Terms of Service" looks yellow/green */
+    color: var(--accent); /* Matching neon */
+    color: var(--accent); /* Slightly darker for text readability on white? Image has neon green links? "Terms of Service" looks yellow/green */
     text-decoration: none;
     font-weight: 500;
 
@@ -221,8 +221,8 @@ export const FooterText = styled.p`
 `;
 
 export const ForgotPasswordLink = styled(Link)`
-  color: #ccff00;
-  color: #84cc16; // Using a readable lime green
+  color: var(--accent);
+  color: var(--accent); // Using a readable lime green
   font-size: 0.85rem;
   font-weight: 600;
   text-decoration: none;

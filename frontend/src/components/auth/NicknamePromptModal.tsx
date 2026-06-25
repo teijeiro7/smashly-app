@@ -17,7 +17,7 @@ const ModalOverlay = styled.div`
 `;
 
 const ModalContainer = styled.div`
-  background: white;
+  background: var(--surface);
   border-radius: 16px;
   padding: 2rem;
   max-width: 500px;
@@ -45,13 +45,13 @@ const ModalHeader = styled.div`
 const ModalTitle = styled.h2`
   font-size: 1.5rem;
   font-weight: 700;
-  color: #1f2937;
+  color: var(--text);
   margin: 0 0 0.5rem 0;
 `;
 
 const ModalDescription = styled.p`
   font-size: 0.9rem;
-  color: #6b7280;
+  color: var(--text-muted);
   margin: 0;
 `;
 
@@ -63,7 +63,7 @@ const Label = styled.label`
   display: block;
   font-size: 0.875rem;
   font-weight: 600;
-  color: #374151;
+  color: var(--text);
   margin-bottom: 0.5rem;
 `;
 
@@ -77,39 +77,39 @@ const InputWrapper = styled.div`
 const Input = styled.input<{ $hasError?: boolean }>`
   flex: 1;
   padding: 0.75rem 1rem;
-  border: 2px solid ${props => (props.$hasError ? '#ef4444' : '#e5e7eb')};
+  border: 2px solid ${props => (props.$hasError ? 'var(--error)' : 'var(--border)')};
   border-radius: 8px;
   font-size: 1rem;
   transition: all 0.2s ease;
   outline: none;
 
   &:focus {
-    border-color: ${props => (props.$hasError ? '#ef4444' : '#ccff00')};
+    border-color: ${props => (props.$hasError ? 'var(--error)' : 'var(--accent)')};
     box-shadow: 0 0 0 3px
-      ${props => (props.$hasError ? 'rgba(239, 68, 68, 0.1)' : 'rgba(204, 255, 0, 0.1)')};
+      ${props => (props.$hasError ? 'var(--danger-subtle)' : 'rgba(var(--accent-rgb), 0.10)')};
   }
 
   &:disabled {
-    background: #f9fafb;
+    background: var(--surface-2);
     cursor: not-allowed;
   }
 `;
 
 const EditButton = styled.button`
   padding: 0.75rem;
-  background: #f3f4f6;
+  background: var(--surface-3);
   border: none;
   border-radius: 8px;
   cursor: pointer;
-  color: #6b7280;
+  color: var(--text-muted);
   transition: all 0.2s ease;
   display: flex;
   align-items: center;
   justify-content: center;
 
   &:hover {
-    background: #e5e7eb;
-    color: #374151;
+    background: var(--border);
+    color: var(--text);
   }
 
   &:active {
@@ -119,14 +119,14 @@ const EditButton = styled.button`
 
 const ErrorText = styled.span`
   display: block;
-  color: #ef4444;
+  color: var(--error);
   font-size: 0.875rem;
   margin-top: 0.5rem;
 `;
 
 const SuccessText = styled.span`
   display: block;
-  color: #16a34a;
+  color: var(--primary);
   font-size: 0.875rem;
   margin-top: 0.5rem;
 `;
@@ -149,24 +149,24 @@ const Button = styled.button<{ $variant?: 'primary' | 'secondary' }>`
   ${props =>
     props.$variant === 'primary'
       ? `
-    background: #16a34a;
-    color: white;
+    background: var(--primary);
+    color: var(--text-inverse);
 
     &:hover {
-      background: #15803d;
+      background: var(--primary-hover);
     }
 
     &:disabled {
-      background: #9ca3af;
+      background: var(--text-subtle);
       cursor: not-allowed;
     }
   `
       : `
-    background: #f3f4f6;
-    color: #374151;
+    background: var(--surface-3);
+    color: var(--text);
 
     &:hover {
-      background: #e5e7eb;
+      background: var(--border);
     }
 
     &:disabled {

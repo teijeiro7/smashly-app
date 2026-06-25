@@ -44,17 +44,17 @@ const RegistrationTypeSelector = styled.div`
 const TypeCard = styled.button<{ $isSelected: boolean }>`
   flex: 1;
   padding: 1rem;
-  border: 2px solid ${props => (props.$isSelected ? '#ccff00' : '#e5e7eb')};
+  border: 2px solid ${props => (props.$isSelected ? 'var(--accent)' : 'var(--border)')};
   border-radius: 12px;
-  background: ${props => (props.$isSelected ? '#f7fee7' : 'white')};
+  background: ${props => (props.$isSelected ? 'var(--surface-2)' : 'var(--surface)')};
   cursor: pointer;
   transition: all 0.2s ease;
   text-align: center;
   outline: none;
 
   &:hover {
-    border-color: #ccff00;
-    background: #f7fee7;
+    border-color: var(--accent);
+    background: var(--surface-2);
   }
 `;
 
@@ -67,31 +67,31 @@ const TypeTitle = styled.h3`
   margin: 0;
   font-size: 0.9rem;
   font-weight: 600;
-  color: #1f2937;
+  color: var(--text);
 `;
 
 const PasswordRequirements = styled.div`
-  background: #f8f9fa;
+  background: var(--surface-2);
   padding: 1rem;
   border-radius: 8px;
   margin-top: 0.5rem;
-  border-left: 4px solid #ccff00;
+  border-left: 4px solid var(--accent);
 `;
 
 const RequirementsList = styled.ul`
   margin: 0;
   padding-left: 1.5rem;
-  color: #6b7280;
+  color: var(--text-muted);
   font-size: 0.875rem;
 `;
 
 const RequirementItem = styled.li<{ $met: boolean }>`
-  color: ${props => (props.$met ? '#16a34a' : '#6b7280')};
+  color: ${props => (props.$met ? 'var(--primary)' : 'var(--text-muted)')};
   margin: 0.25rem 0;
 `;
 
 const TermsLink = styled(Link)`
-  color: #ccff00;
+  color: var(--accent);
   text-decoration: none;
   font-weight: 600;
   transition: opacity 0.2s;
@@ -581,12 +581,12 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess, onLoginClick }) 
         )}
 
         <FormGroup>
-          <label style={{ display: 'flex', alignItems: 'flex-start', gap: '0.625rem', cursor: 'pointer', fontSize: '0.875rem', color: '#374151' }}>
+          <label style={{ display: 'flex', alignItems: 'flex-start', gap: '0.625rem', cursor: 'pointer', fontSize: '0.875rem', color: 'var(--text)' }}>
             <input
               type='checkbox'
               checked={formData.acceptedTerms}
               onChange={e => setFormData(p => ({ ...p, acceptedTerms: e.target.checked }))}
-              style={{ marginTop: '0.125rem', accentColor: '#16a34a', width: '1rem', height: '1rem', flexShrink: 0 }}
+              style={{ marginTop: '0.125rem', accentColor: 'var(--primary)', width: '1rem', height: '1rem', flexShrink: 0 }}
             />
             <span>
               Acepto los{' '}
@@ -603,14 +603,14 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess, onLoginClick }) 
         </SubmitButton>
 
         <div
-          style={{ marginTop: '1rem', textAlign: 'center', fontSize: '0.9rem', color: '#6b7280' }}
+          style={{ marginTop: '1rem', textAlign: 'center', fontSize: '0.9rem', color: 'var(--text-muted)' }}
         >
           ¿Ya tienes cuenta?{' '}
           <button
             type='button'
             onClick={onLoginClick}
             style={{
-              color: '#16a34a',
+              color: 'var(--primary)',
               fontWeight: 600,
               background: 'none',
               border: 'none',
@@ -635,7 +635,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess, onLoginClick }) 
         <p
           style={{
             fontSize: '0.8rem',
-            color: '#6b7280',
+            color: 'var(--text-muted)',
             textAlign: 'center',
             marginTop: '-0.5rem',
           }}

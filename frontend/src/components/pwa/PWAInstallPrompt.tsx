@@ -9,7 +9,7 @@ const PromptContainer = styled(motion.div)`
   left: 20px;
   right: 20px;
   z-index: 9999;
-  background: white;
+  background: var(--surface);
   border-radius: 16px;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
   padding: 20px;
@@ -18,7 +18,7 @@ const PromptContainer = styled(motion.div)`
   gap: 16px;
   max-width: 400px;
   margin: 0 auto;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--border);
 
   @media (min-width: 640px) {
     bottom: 30px;
@@ -37,21 +37,21 @@ const Header = styled.div`
 const Title = styled.h3`
   font-size: 1.1rem;
   font-weight: 700;
-  color: #1f2937;
+  color: var(--text);
   margin: 0;
   display: flex;
   align-items: center;
   gap: 10px;
 
   svg {
-    color: #16a34a;
+    color: var(--primary);
   }
 `;
 
 const CloseButton = styled.button`
   background: none;
   border: none;
-  color: #9ca3af;
+  color: var(--text-subtle);
   cursor: pointer;
   padding: 4px;
   display: flex;
@@ -59,20 +59,20 @@ const CloseButton = styled.button`
   transition: color 0.2s;
 
   &:hover {
-    color: #4b5563;
+    color: var(--text);
   }
 `;
 
 const Content = styled.p`
   font-size: 0.95rem;
-  color: #4b5563;
+  color: var(--text);
   line-height: 1.5;
   margin: 0;
 `;
 
 const ActionButton = styled.button`
-  background: #16a34a;
-  color: white;
+  background: var(--primary);
+  color: var(--text-inverse);
   border: none;
   border-radius: 10px;
   padding: 12px;
@@ -86,7 +86,7 @@ const ActionButton = styled.button`
   gap: 8px;
 
   &:hover {
-    background: #15803d;
+    background: var(--primary-hover);
     transform: translateY(-1px);
   }
 
@@ -99,11 +99,11 @@ const IOSInstructions = styled.div`
   display: flex;
   flex-direction: column;
   gap: 10px;
-  background: #f9fafb;
+  background: var(--surface-2);
   padding: 12px;
   border-radius: 10px;
   font-size: 0.85rem;
-  color: #4b5563;
+  color: var(--text);
 
   .step {
     display: flex;
@@ -111,7 +111,7 @@ const IOSInstructions = styled.div`
     gap: 8px;
 
     svg {
-      color: #111827;
+      color: var(--text);
       font-size: 1.1rem;
     }
   }
