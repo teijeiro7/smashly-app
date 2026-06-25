@@ -4,7 +4,7 @@ import { FaInstagram, FaTiktok } from "react-icons/fa";
 import styled from "styled-components";
 
 const FooterContainer = styled.footer`
-  background: var(--surface-inverse);
+  background: var(--brand-surface-deep);
   color: white;
   padding: 3rem 0 1.5rem;
   margin-top: auto;
@@ -17,7 +17,7 @@ const FooterContent = styled.div`
 `;
 
 const FooterBottom = styled.div`
-  border-top: 1px solid var(--color-gray-700);
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
   padding-top: 1.5rem;
   display: flex;
   justify-content: space-between;
@@ -33,7 +33,7 @@ const FooterBottom = styled.div`
 `;
 
 const Copyright = styled.p`
-  color: var(--text-subtle);
+  color: rgba(255, 255, 255, 0.75);
   margin: 0;
   display: flex;
   align-items: center;
@@ -52,15 +52,15 @@ const SocialLinks = styled.div`
   gap: 1rem;
 
   a {
-    color: var(--text-subtle);
+    color: rgba(255, 255, 255, 0.75);
     font-size: 1.25rem;
     transition: all 0.2s ease;
     padding: 8px;
     border-radius: 8px;
 
     &:hover {
-      color: var(--primary);
-      background: rgba(255, 255, 255, 0.05);
+      color: var(--brand-on-surface);
+      background: rgba(255, 255, 255, 0.1);
     }
   }
 
