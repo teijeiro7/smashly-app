@@ -182,7 +182,11 @@ const RacketImage = styled.img`
   height: 200px;
   object-fit: contain;
   margin-bottom: 1rem;
-  border-radius: 8px;
+  border-radius: var(--racket-image-radius-card);
+  background: var(--racket-image-bg);
+  border: var(--racket-image-border);
+  box-shadow: var(--racket-image-shadow);
+  padding: 0.5rem;
 `;
 
 const RacketName = styled.h3`
@@ -337,10 +341,11 @@ const RacketPosition = styled.span`
 `;
 
 const RacketImageWrap = styled.div`
-  border-radius: 16px;
+  border-radius: var(--racket-image-radius-detail);
   overflow: hidden;
-  background: var(--surface);
-  border: 1px solid rgba(22, 163, 74, 0.08);
+  background: var(--racket-image-bg);
+  border: var(--racket-image-border);
+  box-shadow: var(--racket-image-shadow);
   min-height: 180px;
   padding: 0.75rem;
   display: flex;
