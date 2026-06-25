@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Smashly - Padel Rackets Management System",
   "scripts": {
+    "dev": "node scripts/dev-server.mjs",
     "install:all": "npm install && cd backend/api && npm install && cd ../../frontend && npm install",
     "lint": "cd backend/api && npm run lint && cd ../../frontend && npm run lint",
     "lint:fix": "cd backend/api && npm run lint:fix && cd ../../frontend && npm run lint:fix",

@@ -5,6 +5,7 @@ import { filterRackets } from '../_lib/racket-filter';
 import { getTesteaMetrics } from '../_lib/testea-metrics';
 import { searchSimilarRackets, searchRelevantReviews, searchKnowledge } from '../_lib/vector-store';
 import { cacheGet, cacheSet, generateProfileHash } from '../_lib/cache';
+import { parseAiJson } from '../_lib/json-parse';
 
 function buildHyDEQuery(data: any): string {
   const parts: string[] = [];
@@ -293,9 +294,7 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
     });
 
     const aiResponse = await generateContent(ragPrompt);
-    const jsonMatch = aiResponse.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) throw new Error('Failed to parse AI response JSON');
-    const aiResult = JSON.parse(jsonMatch[0]);
+    const aiResult = parseAiJson(aiResponse);
 
     const enrichedRackets = enrichRAGResult(aiResult.rackets, filteredRackets);
 

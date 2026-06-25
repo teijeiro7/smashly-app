@@ -113,10 +113,16 @@ export default defineConfig(({ mode }) => ({
     },
   },
   server: {
-    port: 5173,
+    // When launched by `vercel dev`, bind the port Vercel assigns (env PORT);
+    // otherwise default to 5173 for standalone `vite`.
+    port: process.env.PORT ? Number(process.env.PORT) : 5173,
     host: true,
-    // In production: /api/* handled by Vercel serverless functions
-    // For local dev with Vercel functions: run `vercel dev` instead of `vite`
+    proxy: {
+      '/api': {
+        target: 'http://localhost:3000',
+        changeOrigin: true,
+      },
+    },
     watch: {
       ignored: [
         '**/node_modules/**',
@@ -166,18 +172,9 @@ export default defineConfig(({ mode }) => ({
   },
   // Optimize dependencies
   optimizeDeps: {
-    include: [
-      'react',
-      'react-dom',
-      '@tanstack/react-router',
-      '@tanstack/react-query',
-    ],
+    include: ['react', 'react-dom', '@tanstack/react-router', '@tanstack/react-query'],
     // Exclude heavy libs from optimization to load on demand
-    exclude: [
-      'jspdf',
-      'html2canvas',
-      '@dnd-kit/core',
-    ],
+    exclude: ['jspdf', 'html2canvas', '@dnd-kit/core'],
   },
   test: {
     globals: true,

@@ -67,3 +67,39 @@ function calculateFallbackMetrics(racket: any): TesteaMetrics {
 
   return { potencia, control, manejabilidad, confort, certificado: false };
 }
+
+/**
+ * Returns certified DB radar values for a racket, or null if Testea data is unavailable.
+ * puntoDulce and salidaDeBola are derived deterministically from shape and hardness.
+ */
+export function getDbRadarValues(racket: any): null | Record<string, number> {
+  const hasCertified = [
+    racket.testea_potencia,
+    racket.testea_control,
+    racket.testea_manejabilidad,
+    racket.testea_confort,
+  ].every(v => v !== null && v !== undefined);
+
+  if (!hasCertified) return null;
+
+  const forma = (racket.caracteristicas_forma || '').toLowerCase();
+  const dureza = (racket.caracteristicas_dureza || '').toLowerCase();
+
+  const puntoDulce =
+    forma.includes('redonda') ? 8
+    : forma.includes('lágrima') || forma.includes('lagrima') ? 6
+    : 4;
+
+  const salidaDeBola =
+    dureza.includes('blanda') || dureza.includes('soft') ? 8
+    : dureza.includes('media') ? 6
+    : 4;
+
+  return {
+    potencia: racket.testea_potencia,
+    control: racket.testea_control,
+    manejabilidad: racket.testea_manejabilidad,
+    puntoDulce,
+    salidaDeBola,
+  };
+}

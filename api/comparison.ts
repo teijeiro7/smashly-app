@@ -1,37 +1,8 @@
 import type { IncomingMessage, ServerResponse } from 'http';
 import { generateContent } from './_lib/ai';
 import { getRacketsByIds } from './_lib/racket-service';
-
-function getDbRadarValues(racket: any): null | Record<string, number> {
-  const hasCertified = [
-    racket.testea_potencia,
-    racket.testea_control,
-    racket.testea_manejabilidad,
-    racket.testea_confort,
-  ].every(v => v !== null && v !== undefined);
-
-  if (!hasCertified) return null;
-
-  // Map Testea metrics to radar format
-  const forma = (racket.caracteristicas_forma || '').toLowerCase();
-  const dureza = (racket.caracteristicas_dureza || '').toLowerCase();
-  const puntoDulce =
-    forma.includes('redonda') ? 8 : forma.includes('lágrima') || forma.includes('lagrima') ? 6 : 4;
-  const salidaDeBola =
-    dureza.includes('blanda') || dureza.includes('soft')
-      ? 8
-      : dureza.includes('media')
-        ? 6
-        : 4;
-
-  return {
-    potencia: racket.testea_potencia,
-    control: racket.testea_control,
-    manejabilidad: racket.testea_manejabilidad,
-    puntoDulce,
-    salidaDeBola,
-  };
-}
+import { getDbRadarValues } from './_lib/testea-metrics';
+import { parseAiJson } from './_lib/json-parse';
 
 function buildComparisonPrompt(rackets: any[], userProfile?: any): string {
   const racketsInfo = rackets
@@ -63,8 +34,19 @@ ${radarLine}`;
     ? `\nCONTEXTO DEL USUARIO:\nNivel: ${userProfile.gameLevel || 'No especificado'}\nEstilo: ${userProfile.playingStyle || 'No especificado'}\nGénero: ${userProfile.gender || 'No especificado'}\n`
     : '';
 
-  const r0 = rackets[0]?.nombre || 'Pala 1';
-  const r1 = rackets[1]?.nombre || 'Pala 2';
+  // Build dynamic column keys and table/metrics templates for N rackets (2 or 3)
+  const racketNames = rackets.map((r: any, i: number) => r.nombre || `Pala ${i + 1}`);
+
+  const tableRowTemplate = (feature: string) => {
+    const cols = racketNames.map((name: string) => `"${name}":"..."`).join(',');
+    return `    {"feature":"${feature}",${cols}}`;
+  };
+
+  const metricsTemplate = racketNames
+    .map((name: string, i: number) =>
+      `    {"racketId":${i},"racketName":"${name}","isCertified":false,"radarData":{"potencia":7,"control":7,"manejabilidad":7,"puntoDulce":6,"salidaDeBola":6}}`
+    )
+    .join(',\n');
 
   return `CONTEXTO: Eres "Smashly AI", experto en pádel. Análisis técnico comparativo.
 
@@ -78,7 +60,7 @@ REGLAS DE DOMINIO:
 DATOS DE PALAS:
 ${racketsInfo}
 ${userContext}
-INSTRUCCIÓN: Responde con UN ÚNICO objeto JSON válido. Estructura exacta:
+INSTRUCCIÓN: Responde con UN ÚNICO objeto JSON válido. Incluye columnas para TODAS las palas listadas. Estructura exacta:
 {
   "_reasoning": "chain-of-thought interno",
   "executiveSummary": "2-3 frases contundentes",
@@ -89,15 +71,15 @@ INSTRUCCIÓN: Responde con UN ÚNICO objeto JSON válido. Estructura exacta:
     {"title":"Confort","content":"..."}
   ],
   "comparisonTable": [
-    {"feature":"Forma","${r0}":"...","${r1}":"..."},
-    {"feature":"Balance","${r0}":"...","${r1}":"..."},
-    {"feature":"Dureza","${r0}":"...","${r1}":"..."},
-    {"feature":"Punto Dulce","${r0}":"...","${r1}":"..."},
-    {"feature":"Nivel recomendado","${r0}":"...","${r1}":"..."},
-    {"feature":"Precio aprox.","${r0}":"...","${r1}":"..."}
+${tableRowTemplate('Forma')},
+${tableRowTemplate('Balance')},
+${tableRowTemplate('Dureza')},
+${tableRowTemplate('Punto Dulce')},
+${tableRowTemplate('Nivel recomendado')},
+${tableRowTemplate('Precio aprox.')}
   ],
   "metrics": [
-    {"racketId":0,"racketName":"${r0}","isCertified":false,"radarData":{"potencia":7,"control":7,"manejabilidad":7,"puntoDulce":6,"salidaDeBola":6}}
+${metricsTemplate}
   ],
   "recommendedProfiles": "qué tipo de jugador se beneficia de cada pala",
   "biomechanicalConsiderations": "riesgos de lesiones por balance y dureza",
@@ -106,11 +88,7 @@ INSTRUCCIÓN: Responde con UN ÚNICO objeto JSON válido. Estructura exacta:
 }
 
 function parseAndOverrideMetrics(text: string, rackets: any[]): any {
-  const cleaned = text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
-  const jsonMatch = cleaned.match(/\{[\s\S]*\}/);
-  if (!jsonMatch) throw new Error('No JSON found in AI response');
-
-  const parsed = JSON.parse(jsonMatch[0]);
+  const parsed = parseAiJson(text);
 
   if (!parsed.metrics || !Array.isArray(parsed.metrics)) {
     parsed.metrics = rackets.map((r: any) => ({
@@ -121,7 +99,7 @@ function parseAndOverrideMetrics(text: string, rackets: any[]): any {
     }));
   }
 
-  // Override with DB radar values when available
+  // Override with certified DB radar values when available
   parsed.metrics = parsed.metrics.map((metric: any, i: number) => {
     const racket = rackets[i];
     if (!racket) return metric;
