@@ -272,8 +272,10 @@ const MainGrid = styled.div`
 
 // Left Column: Gallery
 const GallerySection = styled.div`
-  background: var(--surface);
-  border-radius: 16px;
+  background: var(--racket-image-bg);
+  border: var(--racket-image-border);
+  border-radius: var(--racket-image-radius-detail);
+  box-shadow: var(--racket-image-shadow), 0 4px 6px -1px var(--shadow-color), 0 2px 4px -1px var(--shadow-color);
   padding: 2rem;
   display: flex;
   flex-direction: column;
@@ -284,18 +286,17 @@ const GallerySection = styled.div`
   min-width: 0;
   min-height: 600px;
   overflow: hidden;
-  box-shadow: 0 4px 6px -1px var(--shadow-color), 0 2px 4px -1px var(--shadow-color);
   transition: box-shadow 0.2s ease, transform 0.2s ease;
 
   &:hover {
-    box-shadow: 0 10px 15px -3px var(--shadow-color), 0 4px 6px -2px var(--shadow-color);
+    box-shadow: var(--racket-image-shadow), 0 10px 15px -3px var(--shadow-color), 0 4px 6px -2px var(--shadow-color);
     transform: translateY(-2px);
   }
 
   @media (max-width: 768px) {
     padding: 1rem;
     min-height: 400px;
-    border-radius: 16px;
+    border-radius: var(--racket-image-radius-detail);
   }
 `;
 
@@ -419,7 +420,8 @@ const Thumbnail = styled.img<{ $isActive: boolean }>`
   object-fit: contain;
   border-radius: 8px;
   border: 2px solid ${props => (props.$isActive ? 'var(--color-primary)' : 'var(--color-gray-200)')};
-  background: ${props => (props.$isActive ? 'var(--primary-faint)' : 'var(--surface)')};
+  background: var(--racket-image-bg);
+  box-shadow: var(--racket-image-shadow);
   cursor: pointer;
   transition: border-color 0.2s, background-color 0.2s, transform 0.2s;
   padding: 0.25rem;
