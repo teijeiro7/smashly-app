@@ -17,7 +17,6 @@ import { ComparisonProvider } from './contexts/ComparisonContext';
 import { ListsProvider } from './contexts/ListsContext';
 import { BackgroundTasksProvider } from './contexts/BackgroundTasksContext';
 import { ThemeProvider } from './contexts/ThemeContext';
-import { ThemeDebug } from './components/debug/ThemeDebug';
 import ErrorBoundary from './components/ErrorBoundary';
 
 // Suppress all browser console output. Errors shown via sileo toasts.
@@ -63,7 +62,6 @@ createRoot(document.getElementById('root')!).render(
                           <GlobalStyles />
                           <RouterProvider router={router} />
                           <Toaster position='top-center' options={{ duration: 4000 }} />
-                          <ThemeDebug />
                         </AuthModalProvider>
                       </ListsProvider>
                     </ComparisonProvider>
