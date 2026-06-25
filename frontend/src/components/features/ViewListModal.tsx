@@ -159,7 +159,10 @@ const RacketImage = styled.img`
   height: 80px;
   object-fit: contain;
   border-radius: 8px;
-  background: var(--surface);
+  background: var(--racket-image-bg);
+  border: var(--racket-image-border);
+  box-shadow: var(--racket-image-shadow);
+  padding: 0.25rem;
 `;
 
 const RacketInfo = styled.div`
