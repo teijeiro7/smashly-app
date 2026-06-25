@@ -34,7 +34,7 @@ const Card = styled.div`
 `;
 
 const Header = styled.div`
-  background: linear-gradient(135deg, #16a34a 0%, #059669 100%);
+  background: linear-gradient(135deg, var(--primary) 0%, #059669 100%);
   color: white;
   padding: clamp(1rem, 3vw, 2rem);
   text-align: center;
@@ -72,7 +72,7 @@ const Meta = styled.div`
   gap: 1.5rem;
   margin-bottom: 1.5rem;
   padding-bottom: 1.5rem;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid var(--border);
   flex-wrap: wrap;
 `;
 
@@ -81,7 +81,7 @@ const MetaItem = styled.div`
   align-items: center;
   gap: 0.5rem;
   font-size: 0.875rem;
-  color: #6b7280;
+  color: var(--text-muted);
 `;
 
 const RacketsPreview = styled.div`
@@ -97,8 +97,8 @@ const RacketTag = styled.span`
   gap: 0.25rem;
   min-height: 36px;
   padding: 0.5rem 1rem;
-  background: #f0fdf4;
-  color: #16a34a;
+  background: var(--primary-faint);
+  color: var(--primary);
   border-radius: 20px;
   font-size: 0.875rem;
   font-weight: 500;
@@ -108,7 +108,7 @@ const MarkdownContent = styled.div`
   h1,
   h2,
   h3 {
-    color: #1f2937;
+    color: var(--text);
     margin-top: 1.5rem;
     margin-bottom: 1rem;
   }
@@ -126,14 +126,14 @@ const MarkdownContent = styled.div`
   }
 
   p {
-    color: #4b5563;
+    color: var(--text);
     line-height: 1.7;
     margin: 1rem 0;
   }
 
   ul,
   ol {
-    color: #4b5563;
+    color: var(--text);
     line-height: 1.7;
     margin: 1rem 0;
     padding-left: 1.5rem;
@@ -162,55 +162,55 @@ const MarkdownContent = styled.div`
 
   th,
   td {
-    border: 1px solid #e5e7eb;
+    border: 1px solid var(--border);
     padding: 0.75rem;
     text-align: left;
   }
 
   th {
-    background: #f9fafb;
+    background: var(--surface-2);
     font-weight: 600;
-    color: #1f2937;
+    color: var(--text);
   }
 
   td {
-    color: #4b5563;
+    color: var(--text);
   }
 
   code {
-    background: #f3f4f6;
+    background: var(--surface-3);
     padding: 0.25rem 0.5rem;
     border-radius: 4px;
     font-size: 0.875em;
   }
 
   strong {
-    color: #16a34a;
+    color: var(--primary);
     font-weight: 600;
   }
 `;
 
 const Footer = styled.div`
-  background: #f9fafb;
+  background: var(--surface-2);
   padding: 1.25rem clamp(1rem, 3vw, 2rem);
-  border-top: 1px solid #e5e7eb;
+  border-top: 1px solid var(--border);
   text-align: center;
 `;
 
 const FooterText = styled.p`
   font-size: 0.875rem;
-  color: #6b7280;
+  color: var(--text-muted);
   margin: 0 0 0.5rem;
 `;
 
 const FooterLink = styled(Link)`
-  color: #16a34a;
+  color: var(--primary);
   text-decoration: none;
   font-weight: 600;
   transition: color 0.2s ease;
 
   &:hover {
-    color: #15803d;
+    color: var(--primary-hover);
   }
 `;
 
@@ -222,8 +222,8 @@ const LoadingState = styled.div`
 const Spinner = styled.div`
   width: 50px;
   height: 50px;
-  border: 4px solid #e5e7eb;
-  border-top-color: #16a34a;
+  border: 4px solid var(--border);
+  border-top-color: var(--primary);
   border-radius: 50%;
   animation: spin 1s linear infinite;
   margin: 0 auto 1rem;
@@ -242,20 +242,20 @@ const ErrorState = styled.div`
 
 const ErrorIcon = styled.div`
   font-size: 4rem;
-  color: #ef4444;
+  color: var(--error);
   margin-bottom: 1rem;
 `;
 
 const ErrorTitle = styled.h2`
   font-size: 1.5rem;
   font-weight: 700;
-  color: #1f2937;
+  color: var(--text);
   margin: 0 0 0.5rem;
 `;
 
 const ErrorText = styled.p`
   font-size: 1rem;
-  color: #6b7280;
+  color: var(--text-muted);
   margin: 0 0 2rem;
 `;
 
@@ -266,7 +266,7 @@ const BackButton = styled(Link)`
   gap: 0.5rem;
   min-height: 48px;
   padding: 0.75rem 1.5rem;
-  background: linear-gradient(135deg, #16a34a 0%, #059669 100%);
+  background: linear-gradient(135deg, var(--primary) 0%, #059669 100%);
   color: white;
   text-decoration: none;
   border-radius: 8px;

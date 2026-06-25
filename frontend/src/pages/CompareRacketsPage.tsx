@@ -29,8 +29,8 @@ import { buildUrl, allKeywords } from '../config/seo';
 const Container = styled.div`
   min-height: 100dvh;
   background:
-    radial-gradient(circle at top right, rgba(21, 128, 61, 0.08), transparent 45%),
-    linear-gradient(145deg, #f8faf8 0%, #edf7ef 55%, #e8f5e8 100%);
+    radial-gradient(circle at top right, rgba(var(--primary-rgb-dark), 0.08), transparent 45%),
+    linear-gradient(145deg, var(--surface-2) 0%, var(--primary-subtle) 55%, var(--primary-faint) 100%);
   padding: 1rem;
   padding-bottom: calc(6.5rem + env(safe-area-inset-bottom));
 
@@ -52,11 +52,11 @@ const Header = styled.div`
 const Title = styled.h1`
   font-size: 2.5rem;
   font-weight: 800;
-  color: #1f2937;
+  color: var(--text);
   margin-bottom: 1rem;
 
   .highlight {
-    color: #15803d;
+    color: var(--primary-hover);
   }
 
   @media (max-width: 768px) {
@@ -67,7 +67,7 @@ const Title = styled.h1`
 
 const Subtitle = styled.p`
   font-size: 1.125rem;
-  color: #6b7280;
+  color: var(--text-muted);
   max-width: 600px;
   margin: 0 auto;
 
@@ -100,18 +100,18 @@ const SearchInput = styled.input`
   width: 100%;
   padding: 1rem 1rem 1rem 3rem;
   min-height: 48px;
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--border-strong);
   border-radius: 8px;
   font-size: 1rem;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
-  color: #1f2937;
+  color: var(--text);
 
-  &::placeholder { color: #9ca3af; }
+  &::placeholder { color: var(--text-subtle); }
 
   &:focus {
     outline: none;
-    border-color: #16a34a;
-    box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.1);
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.1);
   }
 `;
 
@@ -120,7 +120,7 @@ const SearchIcon = styled(FiSearch)`
   left: 1rem;
   top: 50%;
   transform: translateY(-50%);
-  color: #9ca3af;
+  color: var(--text-subtle);
   font-size: 1.25rem;
 `;
 
@@ -136,7 +136,7 @@ const SearchResults = styled.ul`
   overflow-y: auto;
   z-index: 50;
   margin-top: 0.5rem;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--border);
   list-style: none;
   padding: 0;
 `;
@@ -151,7 +151,7 @@ const SearchResultItem = styled.li`
   transition: background 0.2s;
 
   &:hover {
-    background: #f0fdf4;
+    background: var(--primary-subtle);
   }
 
   img {
@@ -186,19 +186,19 @@ const RemoveButton = styled.button`
   top: 0.5rem;
   right: 0.5rem;
   background: white;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--border);
   border-radius: 50%;
   width: 30px;
   height: 30px;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #ef4444;
+  color: var(--error);
   cursor: pointer;
   transition: all 0.2s;
 
   &:hover {
-    background: #fee2e2;
+    background: var(--danger-subtle);
     transform: scale(1.1);
   }
 `;
@@ -213,38 +213,38 @@ const RacketImage = styled.img`
 const RacketName = styled.h3`
   font-size: 0.875rem;
   font-weight: 600;
-  color: #1f2937;
+  color: var(--text);
   margin-bottom: 0.25rem;
 `;
 
 const RacketBrand = styled.span`
   font-size: 0.75rem;
-  color: #6b7280;
+  color: var(--text-muted);
 `;
 
 const EmptySlot = styled.div`
-  border: 2px dashed #d1d5db;
+  border: 2px dashed var(--border-strong);
   border-radius: 16px;
   height: 200px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  color: #9ca3af;
+  color: var(--text-subtle);
   gap: 0.5rem;
   transition: border-color 0.2s ease, background-color 0.2s ease;
   background: rgba(0, 0, 0, 0.01);
 
   &:hover {
-    border-color: rgba(21, 128, 61, 0.4);
-    background: rgba(22, 163, 74, 0.02);
-    color: #6b7280;
+    border-color: rgba(var(--primary-rgb-dark), 0.4);
+    background: rgba(var(--primary-rgb), 0.02);
+    color: var(--text-muted);
   }
 `;
 
 const CompareButton = styled.button`
   width: 100%;
-  background: #15803d;
+  background: var(--primary-hover);
   color: white;
   border: none;
   padding: 1rem;
@@ -260,14 +260,14 @@ const CompareButton = styled.button`
   gap: 0.5rem;
 
   &:disabled {
-    background: #d1d5db;
+    background: var(--border-strong);
     cursor: not-allowed;
   }
 
   &:not(:disabled):hover {
-    background: #166534;
+    background: var(--primary-hover);
     transform: translateY(-1px);
-    box-shadow: 0 10px 15px -3px rgba(21, 128, 61, 0.3), 0 4px 6px -2px rgba(21, 128, 61, 0.15);
+    box-shadow: 0 10px 15px -3px rgba(var(--primary-rgb-dark), 0.3), 0 4px 6px -2px rgba(var(--primary-rgb-dark), 0.15);
   }
 `;
 
@@ -299,7 +299,7 @@ const ResultHeader = styled.div`
   justify-content: space-between;
   align-items: center;
   margin-bottom: 2rem;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid var(--border);
   padding-bottom: 1rem;
   gap: 1rem;
   flex-wrap: wrap;
@@ -316,7 +316,7 @@ const ResultHeader = styled.div`
 const ResultTitle = styled.h2`
   font-size: 1.5rem;
   font-weight: 700;
-  color: #1f2937;
+  color: var(--text);
   display: flex;
   align-items: center;
   gap: 0.75rem;
@@ -365,21 +365,21 @@ const ActionButton = styled.button<{ variant?: 'secondary' }>`
     props.variant === 'secondary'
       ? `
     background: white;
-    border: 1px solid #e5e7eb;
-    color: #4b5563;
-    &:hover { background: #f9fafb; border-color: #d1d5db; }
+    border: 1px solid var(--border);
+    color: var(--text);
+    &:hover { background: var(--surface-2); border-color: var(--border-strong); }
   `
       : `
-    background: #f0fdf4;
-    border: 1px solid #15803d;
-    color: #15803d;
-    &:hover { background: #dcfce7; }
+    background: var(--primary-subtle);
+    border: 1px solid var(--primary-hover);
+    color: var(--primary-hover);
+    &:hover { background: var(--primary-faint); }
   `}
 `;
 
 const MarkdownContent = styled.div`
   line-height: 1.7;
-  color: #374151;
+  color: var(--text);
   font-size: 0.875rem;
 
   @media (max-width: 768px) {
@@ -389,7 +389,7 @@ const MarkdownContent = styled.div`
   h1,
   h2,
   h3 {
-    color: #1f2937;
+    color: var(--text);
     margin-top: 1.5rem;
     margin-bottom: 1rem;
   }
@@ -400,7 +400,7 @@ const MarkdownContent = styled.div`
 
   h3 {
     font-size: 1.125rem;
-    color: #15803d;
+    color: var(--primary-hover);
   }
 
   h4 {
@@ -418,7 +418,7 @@ const MarkdownContent = styled.div`
   }
 
   strong {
-    color: #111827;
+    color: var(--text);
     font-weight: 700;
   }
 
@@ -431,19 +431,19 @@ const MarkdownContent = styled.div`
 
   th,
   td {
-    border: 1px solid #e5e7eb;
+    border: 1px solid var(--border);
     padding: 0.75rem;
     text-align: left;
   }
 
   th {
-    background: #f9fafb;
+    background: var(--surface-2);
     font-weight: 600;
-    color: #374151;
+    color: var(--text);
   }
 
   tr:nth-child(even) {
-    background: #f9fafb;
+    background: var(--surface-2);
   }
 `;
 
@@ -495,7 +495,7 @@ const CloseButton = styled.button`
   position: absolute;
   top: 1.5rem;
   right: 1.5rem;
-  background: #f3f4f6;
+  background: var(--surface-3);
   border: none;
   width: 40px;
   height: 40px;
@@ -504,13 +504,13 @@ const CloseButton = styled.button`
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  color: #4b5563;
+  color: var(--text);
   transition: all 0.2s;
   z-index: 10;
 
   &:hover {
-    background: #e5e7eb;
-    color: #1f2937;
+    background: var(--border);
+    color: var(--text);
     transform: rotate(90deg);
   }
 `;
@@ -522,7 +522,7 @@ const FavoritesSection = styled.div`
 const FavoritesTitle = styled.h3`
   font-size: 0.6875rem;
   font-weight: 600;
-  color: #9ca3af;
+  color: var(--text-subtle);
   margin-bottom: 0.5rem;
   display: flex;
   align-items: center;
@@ -547,8 +547,8 @@ const FavoritesGrid = styled.div`
 `;
 
 const FavoriteRacketCard = styled(motion.div)<{ $isSelected?: boolean }>`
-  background: ${props => (props.$isSelected ? '#f3f4f6' : 'white')};
-  border: 1.5px solid ${props => (props.$isSelected ? '#d1d5db' : '#e5e7eb')};
+  background: ${props => (props.$isSelected ? 'var(--surface-3)' : 'white')};
+  border: 1.5px solid ${props => (props.$isSelected ? 'var(--border-strong)' : 'var(--border)')};
   border-radius: 6px;
   padding: 0.375rem 0.5rem;
   display: flex;
@@ -566,10 +566,10 @@ const FavoriteRacketCard = styled(motion.div)<{ $isSelected?: boolean }>`
     ${props =>
       !props.$isSelected &&
       `
-      border-color: #15803d;
-      background: #f0fdf4;
+      border-color: var(--primary-hover);
+      background: var(--primary-subtle);
       transform: translateY(-1px);
-      box-shadow: 0 2px 6px rgba(21, 128, 61, 0.12);
+      box-shadow: 0 2px 6px rgba(var(--primary-rgb-dark), 0.12);
     `}
   }
 
@@ -591,7 +591,7 @@ const FavoriteRacketInfo = styled.div`
 const FavoriteRacketName = styled.div`
   font-size: 0.6875rem;
   font-weight: 600;
-  color: #1f2937;
+  color: var(--text);
   line-height: 1;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -600,18 +600,18 @@ const FavoriteRacketName = styled.div`
 
 const FavoriteRacketBrand = styled.div`
   font-size: 0.5625rem;
-  color: #6b7280;
+  color: var(--text-muted);
   line-height: 1;
 `;
 
 const EmptyFavorites = styled.div`
   padding: 0.75rem;
   text-align: center;
-  color: #9ca3af;
+  color: var(--text-subtle);
   font-size: 0.6875rem;
-  background: #f9fafb;
+  background: var(--surface-2);
   border-radius: 6px;
-  border: 1px dashed #e5e7eb;
+  border: 1px dashed var(--border);
 `;
 
 const CompareRacketsPage: React.FC = () => {
@@ -720,7 +720,7 @@ const CompareRacketsPage: React.FC = () => {
         {/* Resumen Ejecutivo */}
         {comparisonResult.executiveSummary && (
           <div style={{ marginBottom: '2rem' }}>
-            <h3 style={{ color: '#15803d', marginBottom: '1rem' }}>Resumen Ejecutivo</h3>
+            <h3 style={{ color: 'var(--primary-hover)', marginBottom: '1rem' }}>Resumen Ejecutivo</h3>
             <ReactMarkdown remarkPlugins={[remarkGfm]}>
               {comparisonResult.executiveSummary}
             </ReactMarkdown>
@@ -747,10 +747,10 @@ const CompareRacketsPage: React.FC = () => {
         {/* Análisis Técnico */}
         {comparisonResult.technicalAnalysis && comparisonResult.technicalAnalysis.length > 0 && (
           <div style={{ marginBottom: '2rem' }}>
-            <h3 style={{ color: '#15803d', marginBottom: '1rem' }}>Análisis Técnico</h3>
+            <h3 style={{ color: 'var(--primary-hover)', marginBottom: '1rem' }}>Análisis Técnico</h3>
             {comparisonResult.technicalAnalysis.map((section, index) => (
               <div key={index} style={{ marginBottom: '1.5rem' }}>
-                <h4 style={{ color: '#1f2937', marginBottom: '0.5rem' }}>{section.title}</h4>
+                <h4 style={{ color: 'var(--text)', marginBottom: '0.5rem' }}>{section.title}</h4>
                 <ReactMarkdown remarkPlugins={[remarkGfm]}>{section.content}</ReactMarkdown>
               </div>
             ))}
@@ -760,7 +760,7 @@ const CompareRacketsPage: React.FC = () => {
         {/* Perfiles Recomendados */}
         {comparisonResult.recommendedProfiles && (
           <div style={{ marginBottom: '2rem' }}>
-            <h3 style={{ color: '#15803d', marginBottom: '1rem' }}>Perfiles Recomendados</h3>
+            <h3 style={{ color: 'var(--primary-hover)', marginBottom: '1rem' }}>Perfiles Recomendados</h3>
             <ReactMarkdown remarkPlugins={[remarkGfm]}>
               {comparisonResult.recommendedProfiles}
             </ReactMarkdown>
@@ -770,7 +770,7 @@ const CompareRacketsPage: React.FC = () => {
         {/* Consideraciones Biomecánicas */}
         {comparisonResult.biomechanicalConsiderations && (
           <div style={{ marginBottom: '2rem' }}>
-            <h3 style={{ color: '#15803d', marginBottom: '1rem' }}>Consideraciones Biomecánicas</h3>
+            <h3 style={{ color: 'var(--primary-hover)', marginBottom: '1rem' }}>Consideraciones Biomecánicas</h3>
             <ReactMarkdown remarkPlugins={[remarkGfm]}>
               {comparisonResult.biomechanicalConsiderations}
             </ReactMarkdown>
@@ -780,7 +780,7 @@ const CompareRacketsPage: React.FC = () => {
         {/* Conclusión */}
         {comparisonResult.conclusion && (
           <div style={{ marginBottom: '2rem' }}>
-            <h3 style={{ color: '#15803d', marginBottom: '1rem' }}>Conclusión</h3>
+            <h3 style={{ color: 'var(--primary-hover)', marginBottom: '1rem' }}>Conclusión</h3>
             <ReactMarkdown remarkPlugins={[remarkGfm]}>{comparisonResult.conclusion}</ReactMarkdown>
           </div>
         )}
@@ -1012,12 +1012,12 @@ const CompareRacketsPage: React.FC = () => {
                   />
                   <div>
                     <div style={{ fontWeight: 600 }}>{toTitleCase(racket.nombre)}</div>
-                    <div style={{ fontSize: '0.875rem', color: '#6b7280' }}>{racket.marca}</div>
+                    <div style={{ fontSize: '0.875rem', color: 'var(--text-muted)' }}>{racket.marca}</div>
                   </div>
                 </SearchResultItem>
               ))}
               {filteredRackets.length === 0 && (
-                <div style={{ padding: '1rem', textAlign: 'center', color: '#6b7280' }}>
+                <div style={{ padding: '1rem', textAlign: 'center', color: 'var(--text-muted)' }}>
                   No se encontraron palas
                 </div>
               )}
@@ -1142,7 +1142,7 @@ const CompareRacketsPage: React.FC = () => {
               >
                 <ResultHeader>
                   <ResultTitle>
-                    <FiCheck color='#15803d' /> Análisis Comparativo
+                    <FiCheck color='var(--primary-hover)' /> Análisis Comparativo
                   </ResultTitle>
                   <ActionButtons className='no-pdf'>
                     {isAuthenticated && (

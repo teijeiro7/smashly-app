@@ -28,7 +28,7 @@ import RacketSearchInput, { RacketSearchResult } from '../components/recommendat
 
 const Container = styled.div`
   min-height: 100vh;
-  background: #f8fafc;
+  background: var(--surface-2);
 `;
 
 const Header = styled.div`
@@ -126,7 +126,7 @@ const NavigationTabs = styled.div`
   background: white;
   padding: 0.5rem;
   border-radius: 16px;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--border);
   margin-bottom: 2rem;
   overflow-x: auto;
 
@@ -150,19 +150,19 @@ const NavTab = styled.button<{ $active: boolean }>`
   cursor: pointer;
   transition: all 0.2s ease;
   white-space: nowrap;
-  background: ${props => (props.$active ? '#16a34a' : 'transparent')};
-  color: ${props => (props.$active ? 'white' : '#64748b')};
+  background: ${props => (props.$active ? 'var(--primary)' : 'transparent')};
+  color: ${props => (props.$active ? 'white' : 'var(--text-muted)')};
 
   &:hover {
-    background: ${props => (props.$active ? '#16a34a' : '#f1f5f9')};
-    color: ${props => (props.$active ? 'white' : '#16a34a')};
+    background: ${props => (props.$active ? 'var(--primary)' : 'var(--surface-3)')};
+    color: ${props => (props.$active ? 'white' : 'var(--primary)')};
   }
 `;
 
 const ContentCard = styled.div`
   background: white;
   border-radius: 20px;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--border);
   overflow: hidden;
 `;
 
@@ -185,7 +185,7 @@ const FormSection = styled.div`
 const SectionTitle = styled.h3`
   font-size: 1rem;
   font-weight: 600;
-  color: #16a34a;
+  color: var(--primary);
   margin: 0 0 1rem 0;
   display: flex;
   align-items: center;
@@ -211,7 +211,7 @@ const FormGroup = styled.div`
 const FormLabel = styled.label`
   font-size: 0.8125rem;
   font-weight: 600;
-  color: #475569;
+  color: var(--text);
   display: flex;
   align-items: center;
   gap: 0.375rem;
@@ -219,7 +219,7 @@ const FormLabel = styled.label`
 
 const FormInput = styled.input`
   padding: 0.75rem 1rem;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--border);
   border-radius: 10px;
   font-size: 0.9375rem;
   transition: all 0.2s ease;
@@ -227,23 +227,23 @@ const FormInput = styled.input`
 
   &:focus {
     outline: none;
-    border-color: #16a34a;
+    border-color: var(--primary);
     box-shadow: 0 0 0 3px rgba(15, 23, 42, 0.1);
   }
 
   &:disabled {
-    background: #f8fafc;
-    color: #64748b;
+    background: var(--surface-2);
+    color: var(--text-muted);
   }
 
   &::placeholder {
-    color: #94a3b8;
+    color: var(--text-subtle);
   }
 `;
 
 const FormSelect = styled.select`
   padding: 0.75rem 1rem;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--border);
   border-radius: 10px;
   font-size: 0.9375rem;
   transition: all 0.2s ease;
@@ -252,19 +252,19 @@ const FormSelect = styled.select`
 
   &:focus {
     outline: none;
-    border-color: #16a34a;
+    border-color: var(--primary);
     box-shadow: 0 0 0 3px rgba(15, 23, 42, 0.1);
   }
 
   &:disabled {
-    background: #f8fafc;
-    color: #64748b;
+    background: var(--surface-2);
+    color: var(--text-muted);
   }
 `;
 
 const FormTextarea = styled.textarea`
   padding: 0.75rem 1rem;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--border);
   border-radius: 10px;
   font-size: 0.9375rem;
   transition: all 0.2s ease;
@@ -274,23 +274,23 @@ const FormTextarea = styled.textarea`
 
   &:focus {
     outline: none;
-    border-color: #16a34a;
+    border-color: var(--primary);
     box-shadow: 0 0 0 3px rgba(15, 23, 42, 0.1);
   }
 
   &:disabled {
-    background: #f8fafc;
-    color: #64748b;
+    background: var(--surface-2);
+    color: var(--text-muted);
   }
 
   &::placeholder {
-    color: #94a3b8;
+    color: var(--text-subtle);
   }
 `;
 
 const HelperText = styled.p`
   font-size: 0.75rem;
-  color: #64748b;
+  color: var(--text-muted);
   margin: 0.25rem 0 0 0;
 `;
 
@@ -324,7 +324,7 @@ const FormActions = styled.div`
   justify-content: flex-end;
   margin-top: 1.5rem;
   padding-top: 1.5rem;
-  border-top: 1px solid #f1f5f9;
+  border-top: 1px solid var(--surface-3);
 
   @media (max-width: 640px) {
     flex-direction: column-reverse;
@@ -345,11 +345,11 @@ const Button = styled(motion.button)<{ $primary?: boolean }>`
   cursor: pointer;
   border: none;
   transition: all 0.2s ease;
-  background: ${props => (props.$primary ? '#16a34a' : '#f1f5f9')};
-  color: ${props => (props.$primary ? 'white' : '#64748b')};
+  background: ${props => (props.$primary ? 'var(--primary)' : 'var(--surface-3)')};
+  color: ${props => (props.$primary ? 'white' : 'var(--text-muted)')};
 
   &:hover {
-    background: ${props => (props.$primary ? '#15803d' : '#e2e8f0')};
+    background: ${props => (props.$primary ? 'var(--primary-hover)' : 'var(--border)')};
   }
 
   &:disabled {
@@ -396,7 +396,7 @@ const LoadingContainer = styled.div`
   justify-content: center;
   align-items: center;
   min-height: 400px;
-  color: #64748b;
+  color: var(--text-muted);
 `;
 
 type TabType = 'profile' | 'activity' | 'collections' | 'account';

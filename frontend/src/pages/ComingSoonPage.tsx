@@ -6,7 +6,7 @@ import styled from "styled-components";
 
 const Container = styled.div`
   min-height: calc(100vh - 70px);
-  background: linear-gradient(135deg, #f8faf8 0%, #e8f5e8 100%);
+  background: linear-gradient(135deg, var(--surface-2) 0%, var(--primary-faint) 100%);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -16,7 +16,7 @@ const Container = styled.div`
 const ContentCard = styled(motion.div)`
   background: white;
   border-radius: 24px;
-  box-shadow: 0 20px 60px rgba(22, 163, 74, 0.1);
+  box-shadow: 0 20px 60px rgba(var(--primary-rgb), 0.1);
   padding: 3rem;
   max-width: 600px;
   width: 100%;
@@ -34,10 +34,10 @@ const IconWrapper = styled(motion.div)`
   justify-content: center;
   width: 120px;
   height: 120px;
-  background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
   border-radius: 50%;
   margin-bottom: 2rem;
-  box-shadow: 0 10px 30px rgba(22, 163, 74, 0.3);
+  box-shadow: 0 10px 30px rgba(var(--primary-rgb), 0.3);
 
   svg {
     width: 60px;
@@ -59,12 +59,12 @@ const IconWrapper = styled(motion.div)`
 const Title = styled.h1`
   font-size: 2.5rem;
   font-weight: 800;
-  color: #1f2937;
+  color: var(--text);
   margin-bottom: 1rem;
   line-height: 1.2;
 
   .highlight {
-    background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -77,7 +77,7 @@ const Title = styled.h1`
 
 const Subtitle = styled.p`
   font-size: 1.125rem;
-  color: #6b7280;
+  color: var(--text-muted);
   margin-bottom: 2rem;
   line-height: 1.6;
 
@@ -108,26 +108,26 @@ const Button = styled(Link)<{ variant?: "primary" | "secondary" }>`
   ${(props) =>
     props.variant === "primary"
       ? `
-    background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
     color: white;
     
     &:hover {
       transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(22, 163, 74, 0.4);
+      box-shadow: 0 6px 20px rgba(var(--primary-rgb), 0.4);
       color: white;
       text-decoration: none;
     }
   `
       : `
     background: white;
-    color: #16a34a;
-    border: 2px solid #16a34a;
+    color: var(--primary);
+    border: 2px solid var(--primary);
     
     &:hover {
-      background: #f0fdf4;
+      background: var(--primary-subtle);
       transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(22, 163, 74, 0.2);
-      color: #15803d;
+      box-shadow: 0 6px 20px rgba(var(--primary-rgb), 0.2);
+      color: var(--primary-hover);
       text-decoration: none;
     }
   `}

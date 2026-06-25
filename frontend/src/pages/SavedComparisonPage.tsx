@@ -45,17 +45,17 @@ const BackButton = styled.button`
   gap: 0.5rem;
   padding: 0.5rem 1rem;
   background: white;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--border);
   border-radius: 8px;
-  color: #4b5563;
+  color: var(--text);
   font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s;
 
   &:hover {
-    background: #f9fafb;
-    border-color: #d1d5db;
+    background: var(--surface-2);
+    border-color: var(--border-strong);
   }
 
   @media (max-width: 480px) {
@@ -90,16 +90,16 @@ const ActionButton = styled.button<{ variant?: 'primary' }>`
   ${props =>
     props.variant === 'primary'
       ? `
-    background: #16a34a;
+    background: var(--primary);
     border: none;
     color: white;
-    &:hover { background: #15803d; }
+    &:hover { background: var(--primary-hover); }
   `
       : `
     background: white;
-    border: 1px solid #e5e7eb;
-    color: #4b5563;
-    &:hover { background: #f9fafb; border-color: #d1d5db; }
+    border: 1px solid var(--border);
+    color: var(--text);
+    &:hover { background: var(--surface-2); border-color: var(--border-strong); }
   `}
 
   @media (max-width: 480px) {
@@ -136,7 +136,7 @@ const ResultHeader = styled.div`
   justify-content: space-between;
   align-items: center;
   margin-bottom: 2rem;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid var(--border);
   padding-bottom: 1rem;
   gap: 1rem;
   flex-wrap: wrap;
@@ -153,7 +153,7 @@ const ResultHeader = styled.div`
 const ResultTitle = styled.h2`
   font-size: 1.5rem;
   font-weight: 700;
-  color: #1f2937;
+  color: var(--text);
   display: flex;
   align-items: center;
   gap: 0.75rem;
@@ -168,7 +168,7 @@ const MetaInfo = styled.div`
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  color: #6b7280;
+  color: var(--text-muted);
   font-size: 0.875rem;
 
   @media (max-width: 480px) {
@@ -187,7 +187,7 @@ const Section = styled.div`
 const SectionTitle = styled.h3`
   font-size: 1.25rem;
   font-weight: 700;
-  color: #16a34a;
+  color: var(--primary);
   margin-bottom: 1rem;
 
   @media (max-width: 480px) {
@@ -196,7 +196,7 @@ const SectionTitle = styled.h3`
 `;
 
 const SectionContent = styled.div`
-  color: #374151;
+  color: var(--text);
   line-height: 1.7;
   font-size: 0.95rem;
 
@@ -231,8 +231,8 @@ const LoadingContainer = styled.div`
 const LoadingSpinner = styled.div`
   width: 48px;
   height: 48px;
-  border: 4px solid #e5e7eb;
-  border-top-color: #16a34a;
+  border: 4px solid var(--border);
+  border-top-color: var(--primary);
   border-radius: 50%;
   animation: spin 1s linear infinite;
 
@@ -256,12 +256,12 @@ const ErrorContainer = styled.div`
 
 const ErrorTitle = styled.h2`
   font-size: 1.5rem;
-  color: #1f2937;
+  color: var(--text);
   margin-bottom: 1rem;
 `;
 
 const ErrorMessage = styled.p`
-  color: #6b7280;
+  color: var(--text-muted);
   margin-bottom: 1.5rem;
 `;
 
@@ -467,7 +467,7 @@ const SavedComparisonPage: React.FC = () => {
                   <SectionTitle>Análisis Técnico</SectionTitle>
                   {comparisonResult.technicalAnalysis.map((section, index) => (
                     <SectionContent key={index}>
-                      <h4 style={{ color: '#1f2937', marginBottom: '0.5rem' }}>{section.title}</h4>
+                      <h4 style={{ color: 'var(--text)', marginBottom: '0.5rem' }}>{section.title}</h4>
                       <ReactMarkdown remarkPlugins={[remarkGfm]}>{section.content}</ReactMarkdown>
                     </SectionContent>
                   ))}

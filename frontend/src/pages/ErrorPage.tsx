@@ -37,7 +37,7 @@ const ErrorTitle = styled.h2`
 
 const ErrorMessage = styled.p`
   font-size: 1.1rem;
-  color: #4a5568;
+  color: var(--text);
   margin: 1.5rem 0;
   line-height: 1.6;
 `;
@@ -67,11 +67,11 @@ const Button = styled.button<{ variant?: 'primary' | 'secondary' }>`
       box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
     }
   ` : `
-    background: #e2e8f0;
-    color: #2d3748;
+    background: var(--border);
+    color: var(--text);
 
     &:hover {
-      background: #cbd5e0;
+      background: var(--border-strong);
     }
   `}
 `;

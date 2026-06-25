@@ -21,13 +21,13 @@ const heroFadeIn = keyframes`
 
 const Container = styled.div`
   min-height: 100dvh;
-  background: #f3f7f1;
+  background: var(--bg);
 `;
 
 const HeroSection = styled.section`
   padding: clamp(80px, 12vw, 140px) 20px clamp(60px, 8vw, 100px);
   text-align: center;
-  background: linear-gradient(145deg, #0f2818 0%, #14532d 30%, #166534 60%, #15803d 100%);
+  background: linear-gradient(145deg, #0f2818 0%, var(--primary-hover) 30%, var(--primary-hover) 60%, var(--primary-hover) 100%);
   color: white;
   position: relative;
   overflow: hidden;
@@ -48,7 +48,7 @@ const HeroSection = styled.section`
     background:
       radial-gradient(circle at 20% 50%, rgba(255, 255, 255, 0.06) 0%, transparent 50%),
       radial-gradient(circle at 80% 50%, rgba(255, 255, 255, 0.06) 0%, transparent 50%),
-      radial-gradient(circle at 50% 100%, rgba(22, 163, 74, 0.2) 0%, transparent 60%);
+      radial-gradient(circle at 50% 100%, rgba(var(--primary-rgb), 0.2) 0%, transparent 60%);
     pointer-events: none;
   }
 
@@ -219,7 +219,7 @@ const PrimaryButton = styled(Link)`
   justify-content: center;
   gap: 10px;
   background: white;
-  color: #15803d;
+  color: var(--primary-hover);
   min-height: 56px;
   padding: clamp(14px, 3vw, 18px) clamp(28px, 5vw, 40px);
   border-radius: 14px;
@@ -248,7 +248,7 @@ const PrimaryButton = styled(Link)`
     transform: translateY(-3px);
     box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
     text-decoration: none;
-    color: #14532d;
+    color: var(--primary-hover);
   }
 
   &:active {
@@ -403,7 +403,7 @@ const ScrollIndicator = styled.div`
 
 const HowItWorksSection = styled.section`
   padding: clamp(64px, 10vw, 96px) 20px;
-  background: #f3f7f1;
+  background: var(--bg);
 `;
 
 const HowItWorksContent = styled.div`
@@ -420,13 +420,13 @@ const SectionTitle = styled.h2`
   font-size: clamp(1.75rem, 4vw, 2.5rem);
   font-weight: 800;
   margin-bottom: 12px;
-  color: #1f2937;
+  color: var(--text);
   line-height: 1.2;
 `;
 
 const SectionSubtitle = styled.p`
   font-size: clamp(1rem, 2vw, 1.25rem);
-  color: #6b7280;
+  color: var(--text-muted);
   max-width: 600px;
   margin: 0 auto;
   line-height: 1.6;
@@ -461,7 +461,7 @@ const StepCard = styled.div<{ $inView: boolean }>`
 const StepNumber = styled.div`
   width: 48px;
   height: 48px;
-  background: #15803d;
+  background: var(--primary-hover);
   color: white;
   border-radius: 50%;
   display: flex;
@@ -476,11 +476,11 @@ const StepTitle = styled.h3`
   font-size: 1.25rem;
   font-weight: 700;
   margin-bottom: 8px;
-  color: #1f2937;
+  color: var(--text);
 `;
 
 const StepDescription = styled.p`
-  color: #6b7280;
+  color: var(--text-muted);
   line-height: 1.6;
   font-size: 1rem;
 `;
@@ -534,8 +534,8 @@ const FeatureTag = styled.span`
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  background: rgba(22, 163, 74, 0.1);
-  color: #15803d;
+  background: rgba(var(--primary-rgb), 0.1);
+  color: var(--primary-hover);
   padding: 6px 12px;
   border-radius: 20px;
   font-size: 0.875rem;
@@ -547,12 +547,12 @@ const FeatureTitle = styled.h3`
   font-size: clamp(1.5rem, 3vw, 2rem);
   font-weight: 700;
   margin-bottom: 16px;
-  color: #1f2937;
+  color: var(--text);
   line-height: 1.2;
 `;
 
 const FeatureDescription = styled.p`
-  color: #6b7280;
+  color: var(--text-muted);
   line-height: 1.6;
   font-size: clamp(1rem, 2vw, 1.125rem);
   margin-bottom: 24px;
@@ -562,21 +562,21 @@ const FeatureLink = styled(Link)`
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  color: #15803d;
+  color: var(--primary-hover);
   font-weight: 600;
   text-decoration: none;
   font-size: 1rem;
   transition: color 0.2s cubic-bezier(0.4, 0, 0.2, 1), gap 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 
   &:hover {
-    color: #166534;
+    color: var(--primary-hover);
     gap: 12px;
     text-decoration: none;
   }
 `;
 
 const FeatureVisual = styled.div`
-  background: linear-gradient(135deg, #f3f7f1 0%, #e8f5e9 100%);
+  background: linear-gradient(135deg, var(--bg) 0%, var(--primary-faint) 100%);
   border-radius: 16px;
   padding: clamp(32px, 5vw, 48px);
   display: flex;
@@ -589,19 +589,19 @@ const FeatureVisual = styled.div`
 const FeatureVisualIcon = styled.div`
   width: 80px;
   height: 80px;
-  background: #15803d;
+  background: var(--primary-hover);
   border-radius: 16px;
   display: flex;
   align-items: center;
   justify-content: center;
   color: white;
   font-size: 32px;
-  box-shadow: 0 10px 15px -3px rgba(21, 128, 61, 0.3);
+  box-shadow: 0 10px 15px -3px rgba(var(--primary-rgb-dark), 0.3);
 `;
 
 const SocialProofSection = styled.section`
   padding: clamp(48px, 8vw, 80px) 20px;
-  background: #f3f7f1;
+  background: var(--bg);
 `;
 
 const SocialProofContent = styled.div`
@@ -612,14 +612,14 @@ const SocialProofContent = styled.div`
 
 const Quote = styled.blockquote`
   font-size: clamp(1.125rem, 2.5vw, 1.5rem);
-  color: #1f2937;
+  color: var(--text);
   line-height: 1.6;
   font-style: italic;
   margin-bottom: 24px;
 
   &::before {
     content: '"';
-    color: #15803d;
+    color: var(--primary-hover);
     font-size: 3rem;
     line-height: 0;
     vertical-align: -0.5em;
@@ -630,12 +630,12 @@ const Quote = styled.blockquote`
 
 const QuoteAuthor = styled.div`
   font-weight: 600;
-  color: #374151;
+  color: var(--text);
   font-size: 1rem;
 `;
 
 const QuoteRole = styled.div`
-  color: #6b7280;
+  color: var(--text-muted);
   font-size: 0.875rem;
   margin-top: 4px;
 `;
@@ -722,11 +722,11 @@ const HomePage: React.FC = () => {
 
           <TrustBar>
             <TrustItem>
-              <FiCheck size={18} color="#22c55e" />
+              <FiCheck size={18} color="var(--primary-light)" />
               +800 palas analizadas
             </TrustItem>
             <TrustItem>
-              <FiCheck size={18} color="#22c55e" />
+              <FiCheck size={18} color="var(--primary-light)" />
               Sin registro obligatorio
             </TrustItem>
           </TrustBar>

@@ -58,8 +58,8 @@ const buildInitialData = (user: UserProfile | null): Partial<BasicFormData & Adv
 const PageContainer = styled.div`
   min-height: 100vh;
   padding: 80px 20px 40px;
-  background: linear-gradient(135deg, #f8faf8 0%, #e8f5e8 100%);
-  color: #1f2937;
+  background: linear-gradient(135deg, var(--surface-2) 0%, var(--primary-faint) 100%);
+  color: var(--text);
 `;
 
 const HeroSection = styled.div`
@@ -69,16 +69,16 @@ const HeroSection = styled.div`
   h1 {
     font-size: 3rem;
     margin-bottom: 1rem;
-    color: #1f2937;
+    color: var(--text);
     font-weight: 800;
   }
 
   h1 span {
-    color: #15803d;
+    color: var(--primary-hover);
   }
 
   p {
-    color: #6b7280;
+    color: var(--text-muted);
     font-size: 1.2rem;
     max-width: 600px;
     margin: 0 auto;
@@ -96,25 +96,25 @@ const ModeSelector = styled.div`
 const ModeButton = styled.button<{ $active: boolean }>`
   padding: 0.75rem 1.5rem;
   border-radius: 9999px;
-  border: 1.5px solid ${props => (props.$active ? '#15803d' : '#e5e7eb')};
-  background: ${props => (props.$active ? '#15803d' : 'white')};
-  color: ${props => (props.$active ? 'white' : '#6b7280')};
+  border: 1.5px solid ${props => (props.$active ? 'var(--primary-hover)' : 'var(--border)')};
+  background: ${props => (props.$active ? 'var(--primary-hover)' : 'white')};
+  color: ${props => (props.$active ? 'white' : 'var(--text-muted)')};
   cursor: pointer;
   transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
   font-weight: 600;
   font-size: 0.9375rem;
-  box-shadow: ${props => props.$active ? '0 4px 6px -1px rgba(21,128,61,0.25), 0 2px 4px -1px rgba(21,128,61,0.15)' : '0 1px 2px 0 rgba(0,0,0,0.05)'};
+  box-shadow: ${props => props.$active ? '0 4px 6px -1px rgba(var(--primary-rgb-dark), 0.25), 0 2px 4px -1px rgba(var(--primary-rgb-dark), 0.15)' : '0 1px 2px 0 rgba(0, 0, 0, 0.05)'};
 
   &:hover {
-    border-color: #15803d;
-    color: ${props => (props.$active ? 'white' : '#15803d')};
+    border-color: var(--primary-hover);
+    color: ${props => (props.$active ? 'white' : 'var(--primary-hover)')};
     transform: translateY(-1px);
   }
 `;
 
 const AlertBox = styled.div`
-  background: #f0fdf4;
-  border: 1px solid rgba(21, 128, 61, 0.3);
+  background: var(--primary-subtle);
+  border: 1px solid rgba(var(--primary-rgb-dark), 0.3);
   padding: 1rem 1.25rem;
   border-radius: 12px;
   max-width: 600px;
@@ -123,18 +123,18 @@ const AlertBox = styled.div`
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
-  box-shadow: 0 4px 6px -1px rgba(21, 128, 61, 0.08), 0 2px 4px -1px rgba(21, 128, 61, 0.04);
+  box-shadow: 0 4px 6px -1px rgba(var(--primary-rgb-dark), 0.08), 0 2px 4px -1px rgba(var(--primary-rgb-dark), 0.04);
 `;
 
 const AlertText = styled.p`
   margin: 0;
   font-size: 0.95rem;
-  color: #166534;
+  color: var(--primary-hover);
   font-weight: 500;
 `;
 
 const AlertButton = styled.button`
-  background: #15803d;
+  background: var(--primary-hover);
   color: white;
   border: none;
   padding: 0.5rem 1rem;
@@ -146,7 +146,7 @@ const AlertButton = styled.button`
   transition: background 0.2s;
 
   &:hover {
-    background: #15803d;
+    background: var(--primary-hover);
   }
 `;
 
@@ -463,7 +463,7 @@ export const BestRacketPage: React.FC = () => {
       {step === 'completing' && (
         <div style={{ textAlign: 'center', padding: '4rem' }}>
           <PalaRotatingScene isComplete={true} />
-          <h2 style={{ marginTop: '2rem', color: '#15803d' }}>¡Análisis completado!</h2>
+          <h2 style={{ marginTop: '2rem', color: 'var(--primary-hover)' }}>¡Análisis completado!</h2>
         </div>
       )}
 

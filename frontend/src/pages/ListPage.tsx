@@ -10,7 +10,7 @@ import { sileo } from 'sileo';
 
 const Container = styled.div`
   min-height: 100vh;
-  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  background: linear-gradient(135deg, var(--surface-2) 0%, var(--surface-3) 100%);
   padding: 2rem 1rem;
 `;
 
@@ -27,7 +27,7 @@ const BackLink = styled(Link)`
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  color: #64748b;
+  color: var(--text-muted);
   text-decoration: none;
   font-size: 0.875rem;
   font-weight: 500;
@@ -35,7 +35,7 @@ const BackLink = styled(Link)`
   transition: color 0.2s ease;
 
   &:hover {
-    color: #16a34a;
+    color: var(--primary);
   }
 `;
 
@@ -49,7 +49,7 @@ const TitleSection = styled.div`
 const Title = styled.h1`
   font-size: clamp(1.5rem, 4vw, 2.5rem);
   font-weight: 800;
-  color: #1e293b;
+  color: var(--text);
   margin: 0;
 `;
 
@@ -62,12 +62,12 @@ const Badge = styled.span`
   font-size: 0.75rem;
   font-weight: 600;
   background: white;
-  color: #64748b;
-  border: 1px solid #e2e8f0;
+  color: var(--text-muted);
+  border: 1px solid var(--border);
 `;
 
 const ListMeta = styled.p`
-  color: #64748b;
+  color: var(--text-muted);
   margin-top: 0.5rem;
   font-size: 1rem;
 `;
@@ -85,7 +85,7 @@ const LoadingState = styled.div`
   justify-content: center;
   min-height: 50vh;
   gap: 1rem;
-  color: #64748b;
+  color: var(--text-muted);
 `;
 
 const EmptyState = styled.div`
@@ -93,8 +93,8 @@ const EmptyState = styled.div`
   padding: 4rem 2rem;
   background: white;
   border-radius: 20px;
-  border: 2px dashed #e2e8f0;
-  color: #64748b;
+  border: 2px dashed var(--border);
+  color: var(--text-muted);
 `;
 
 const Spin = styled(motion.div)`
@@ -141,7 +141,7 @@ const ListPage: React.FC = () => {
             animate={{ rotate: 360 }}
             transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
           >
-            <FiLoader size={32} color="#16a34a" />
+            <FiLoader size={32} color="var(--primary)" />
           </Spin>
           <p>Cargando tu colección...</p>
         </LoadingState>
@@ -196,7 +196,7 @@ const ListPage: React.FC = () => {
               style={{ 
                 marginTop: '1.5rem', 
                 display: 'inline-block',
-                color: '#16a34a',
+                color: 'var(--primary)',
                 fontWeight: 600,
                 textDecoration: 'none'
               }}

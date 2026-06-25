@@ -12,7 +12,7 @@ const Container = styled.div`
   justify-content: center;
   text-align: center;
   padding: 2rem;
-  background: linear-gradient(135deg, #f0fdf4 0%, #ffffff 100%);
+  background: linear-gradient(135deg, var(--primary-faint) 0%, var(--surface) 100%);
 `;
 
 const Card = styled.div`
@@ -22,7 +22,7 @@ const Card = styled.div`
   max-width: 480px;
   width: 100%;
   box-shadow: 0 10px 40px rgba(22, 163, 74, 0.08);
-  border: 1px solid #dcfce7;
+  border: 1px solid var(--primary-subtle);
   position: relative;
   overflow: hidden;
 `;
@@ -35,12 +35,12 @@ const Emoji = styled.div`
 const Title = styled.h1`
   font-size: clamp(1.5rem, 4vw, 2rem);
   font-weight: 800;
-  color: #1f2937;
+  color: var(--text);
   margin-bottom: 0.75rem;
 `;
 
 const Description = styled.p`
-  color: #6b7280;
+  color: var(--text-muted);
   line-height: 1.6;
   margin-bottom: 2rem;
   font-size: 1rem;
@@ -57,7 +57,7 @@ const PrimaryBtn = styled(Link)`
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  background: #16a34a;
+  background: var(--primary);
   color: white;
   padding: 0.75rem 1.5rem;
   border-radius: 10px;
@@ -66,7 +66,7 @@ const PrimaryBtn = styled(Link)`
   transition: all 0.2s ease;
 
   &:hover {
-    background: #15803d;
+    background: var(--primary-hover);
     transform: translateY(-2px);
     text-decoration: none;
     color: white;
@@ -78,17 +78,17 @@ const SecondaryBtn = styled(Link)`
   align-items: center;
   gap: 0.5rem;
   background: white;
-  color: #374151;
+  color: var(--text);
   padding: 0.75rem 1.5rem;
   border-radius: 10px;
   font-weight: 600;
   text-decoration: none;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--border);
   transition: all 0.2s ease;
 
   &:hover {
-    border-color: #16a34a;
-    color: #16a34a;
+    border-color: var(--primary);
+    color: var(--primary);
     transform: translateY(-2px);
     text-decoration: none;
   }
