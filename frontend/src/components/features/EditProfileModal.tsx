@@ -30,7 +30,7 @@ const Overlay = styled(motion.div)`
 `;
 
 const Modal = styled(motion.div)`
-  background: white;
+  background: var(--surface);
   border-radius: 20px;
   padding: 2rem;
   max-width: 600px;
@@ -46,16 +46,16 @@ const Modal = styled(motion.div)`
   }
 
   &::-webkit-scrollbar-track {
-    background: #f3f4f6;
+    background: var(--surface-3);
     border-radius: 4px;
   }
 
   &::-webkit-scrollbar-thumb {
-    background: #d1d5db;
+    background: var(--border-strong);
     border-radius: 4px;
 
     &:hover {
-      background: #9ca3af;
+      background: var(--text-subtle);
     }
   }
 `;
@@ -66,13 +66,13 @@ const Header = styled.div`
   align-items: center;
   margin-bottom: 2rem;
   padding-bottom: 1rem;
-  border-bottom: 2px solid #f3f4f6;
+  border-bottom: 2px solid var(--surface-3);
 `;
 
 const Title = styled.h2`
   font-size: 1.75rem;
   font-weight: 700;
-  color: #1f2937;
+  color: var(--text);
   margin: 0;
   display: flex;
   align-items: center;
@@ -83,7 +83,7 @@ const CloseButton = styled.button`
   background: none;
   border: none;
   cursor: pointer;
-  color: #6b7280;
+  color: var(--text-muted);
   padding: 0.5rem;
   display: flex;
   align-items: center;
@@ -92,8 +92,8 @@ const CloseButton = styled.button`
   border-radius: 8px;
 
   &:hover {
-    background: #f3f4f6;
-    color: #1f2937;
+    background: var(--surface-3);
+    color: var(--text);
   }
 `;
 
@@ -112,7 +112,7 @@ const FormSection = styled.div`
 const SectionTitle = styled.h3`
   font-size: 1.125rem;
   font-weight: 600;
-  color: #16a34a;
+  color: var(--primary);
   margin: 0;
   display: flex;
   align-items: center;
@@ -128,7 +128,7 @@ const FormGroup = styled.div`
 const Label = styled.label`
   font-size: 0.875rem;
   font-weight: 600;
-  color: #374151;
+  color: var(--text);
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -136,26 +136,26 @@ const Label = styled.label`
 
 const Input = styled.input`
   padding: 0.75rem;
-  border: 2px solid #e5e7eb;
+  border: 2px solid var(--border);
   border-radius: 12px;
   font-size: 1rem;
   transition: all 0.2s ease;
 
   &:focus {
     outline: none;
-    border-color: #16a34a;
-    box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.1);
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.1);
   }
 
   &:disabled {
-    background: #f3f4f6;
+    background: var(--surface-3);
     cursor: not-allowed;
   }
 `;
 
 const TextArea = styled.textarea`
   padding: 0.75rem;
-  border: 2px solid #e5e7eb;
+  border: 2px solid var(--border);
   border-radius: 12px;
   font-size: 1rem;
   min-height: 100px;
@@ -165,24 +165,24 @@ const TextArea = styled.textarea`
 
   &:focus {
     outline: none;
-    border-color: #16a34a;
-    box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.1);
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.1);
   }
 `;
 
 const Select = styled.select`
   padding: 0.75rem;
-  border: 2px solid #e5e7eb;
+  border: 2px solid var(--border);
   border-radius: 12px;
   font-size: 1rem;
   transition: all 0.2s ease;
-  background: white;
+  background: var(--surface);
   cursor: pointer;
 
   &:focus {
     outline: none;
-    border-color: #16a34a;
-    box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.1);
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.1);
   }
 `;
 
@@ -223,30 +223,30 @@ const Button = styled.button<{ variant?: "primary" | "secondary" }>`
   ${(props) =>
     props.variant === "primary"
       ? `
-    background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
-    color: white;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
+    color: var(--text-inverse);
     &:hover {
       transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(22, 163, 74, 0.3);
+      box-shadow: 0 4px 12px rgba(var(--primary-rgb), 0.3);
     }
     &:disabled {
-      background: #9ca3af;
+      background: var(--text-subtle);
       cursor: not-allowed;
       transform: none;
     }
   `
       : `
-    background: #f3f4f6;
-    color: #374151;
+    background: var(--surface-3);
+    color: var(--text);
     &:hover {
-      background: #e5e7eb;
+      background: var(--border);
     }
   `}
 `;
 
 const HelperText = styled.span`
   font-size: 0.75rem;
-  color: #6b7280;
+  color: var(--text-muted);
   margin-top: -0.25rem;
 `;
 
@@ -256,7 +256,7 @@ const AvatarSection = styled.div`
   align-items: center;
   gap: 1rem;
   padding: 1.5rem;
-  background: #f9fafb;
+  background: var(--surface-2);
   border-radius: 12px;
   margin-bottom: 1rem;
 `;
@@ -266,8 +266,8 @@ const AvatarPreview = styled.div`
   height: 120px;
   border-radius: 50%;
   overflow: hidden;
-  border: 4px solid #16a34a;
-  background: #e5e7eb;
+  border: 4px solid var(--primary);
+  background: var(--border);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -280,7 +280,7 @@ const AvatarPreview = styled.div`
   }
 
   svg {
-    color: #9ca3af;
+    color: var(--text-subtle);
   }
 `;
 
@@ -306,17 +306,17 @@ const AvatarButton = styled.button<{ variant?: "primary" | "danger" }>`
   ${(props) =>
     props.variant === "danger"
       ? `
-    background: #fee;
-    color: #dc2626;
+    background: var(--danger-subtle);
+    color: var(--danger);
     &:hover {
-      background: #fecaca;
+      background: var(--danger-strong);
     }
   `
       : `
-    background: #16a34a;
-    color: white;
+    background: var(--primary);
+    color: var(--text-inverse);
     &:hover {
-      background: #15803d;
+      background: var(--primary-hover);
     }
   `}
 
@@ -332,7 +332,7 @@ const HiddenInput = styled.input`
 
 const ErrorText = styled.span`
   font-size: 0.75rem;
-  color: #dc2626;
+  color: var(--danger);
   text-align: center;
 `;
 

@@ -29,15 +29,15 @@ const SearchBar = styled.div`
 const SearchInput = styled.input`
   width: 100%;
   padding: 0.75rem 1rem 0.75rem 2.75rem;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--border);
   border-radius: 12px;
   font-size: 1rem;
   transition: all 0.3s ease;
 
   &:focus {
     outline: none;
-    border-color: #16a34a;
-    box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.1);
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.1);
   }
 `;
 
@@ -46,7 +46,7 @@ const SearchIcon = styled(FiSearch)`
   left: 1rem;
   top: 50%;
   transform: translateY(-50%);
-  color: #9ca3af;
+  color: var(--text-subtle);
   font-size: 1.25rem;
 `;
 
@@ -55,8 +55,8 @@ const AddButton = styled.button`
   align-items: center;
   gap: 0.5rem;
   padding: 0.75rem 1.5rem;
-  background: #16a34a;
-  color: white;
+  background: var(--primary);
+  color: var(--text-inverse);
   border: none;
   border-radius: 12px;
   font-size: 1rem;
@@ -65,9 +65,9 @@ const AddButton = styled.button`
   transition: all 0.3s ease;
 
   &:hover {
-    background: #15803d;
+    background: var(--primary-hover);
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(22, 163, 74, 0.3);
+    box-shadow: 0 4px 12px rgba(var(--primary-rgb), 0.3);
   }
 
   svg {
@@ -78,15 +78,15 @@ const AddButton = styled.button`
 const TabsContainer = styled.div`
   display: flex;
   gap: 0.5rem;
-  border-bottom: 2px solid #e5e7eb;
+  border-bottom: 2px solid var(--border);
 `;
 
 const Tab = styled.button<{ active: boolean }>`
   padding: 0.75rem 1.5rem;
-  background: ${props => (props.active ? 'white' : 'transparent')};
-  color: ${props => (props.active ? '#16a34a' : '#666')};
+  background: ${props => (props.active ? 'var(--surface)' : 'transparent')};
+  color: ${props => (props.active ? 'var(--primary)' : 'var(--text-muted)')};
   border: none;
-  border-bottom: 2px solid ${props => (props.active ? '#16a34a' : 'transparent')};
+  border-bottom: 2px solid ${props => (props.active ? 'var(--primary)' : 'transparent')};
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
@@ -94,12 +94,12 @@ const Tab = styled.button<{ active: boolean }>`
   margin-bottom: -2px;
 
   &:hover {
-    color: #16a34a;
+    color: var(--primary);
   }
 `;
 
 const Table = styled.div`
-  background: white;
+  background: var(--surface);
   border-radius: 12px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
   overflow: hidden;
@@ -109,10 +109,10 @@ const TableHeader = styled.div`
   display: grid;
   grid-template-columns: 1fr 1.5fr 1fr 1fr 1fr 1.5fr;
   padding: 1rem 1.5rem;
-  background: #f9fafb;
-  border-bottom: 1px solid #e5e7eb;
+  background: var(--surface-2);
+  border-bottom: 1px solid var(--border);
   font-weight: 600;
-  color: #666;
+  color: var(--text-muted);
   font-size: 0.875rem;
 
   @media (max-width: 1024px) {
@@ -124,12 +124,12 @@ const TableRow = styled.div`
   display: grid;
   grid-template-columns: 1fr 1.5fr 1fr 1fr 1fr 1.5fr;
   padding: 1rem 1.5rem;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid var(--border);
   align-items: center;
   transition: background 0.2s ease;
 
   &:hover {
-    background: #f9fafb;
+    background: var(--surface-2);
   }
 
   &:last-child {
@@ -143,7 +143,7 @@ const TableRow = styled.div`
 `;
 
 const Cell = styled.div`
-  color: #333;
+  color: var(--text);
   font-size: 0.875rem;
 
   @media (max-width: 1024px) {
@@ -155,7 +155,7 @@ const Cell = styled.div`
 
 const BrandCell = styled(Cell)`
   font-weight: 600;
-  color: #16a34a;
+  color: var(--primary);
 `;
 
 const StatusBadge = styled.span<{ status: 'pending' | 'approved' | 'rejected' }>`
@@ -166,19 +166,19 @@ const StatusBadge = styled.span<{ status: 'pending' | 'approved' | 'rejected' }>
   background: ${props => {
     switch (props.status) {
       case 'approved':
-        return '#dcfce7';
+        return 'var(--primary-subtle)';
       case 'rejected':
-        return '#fee2e2';
+        return 'rgba(220, 38, 38, 0.10)';
       case 'pending':
-        return '#fef3c7';
+        return 'rgba(217, 119, 6, 0.10)';
     }
   }};
   color: ${props => {
     switch (props.status) {
       case 'approved':
-        return '#15803d';
+        return 'var(--primary-hover)';
       case 'rejected':
-        return '#dc2626';
+        return 'var(--danger)';
       case 'pending':
         return '#d97706';
     }
@@ -193,8 +193,8 @@ const ActionsCell = styled(Cell)`
 
 const IconButton = styled.button<{ color?: string }>`
   padding: 0.5rem;
-  background: ${props => props.color || '#f3f4f6'};
-  color: ${props => (props.color ? 'white' : '#666')};
+  background: ${props => props.color || 'var(--surface-3)'};
+  color: ${props => (props.color ? 'var(--text-inverse)' : 'var(--text-muted)')};
   border: none;
   border-radius: 8px;
   cursor: pointer;
@@ -216,7 +216,7 @@ const IconButton = styled.button<{ color?: string }>`
 const EmptyState = styled.div`
   padding: 3rem;
   text-align: center;
-  color: #666;
+  color: var(--text-muted);
 `;
 
 const LoadingContainer = styled.div`
@@ -224,7 +224,7 @@ const LoadingContainer = styled.div`
   justify-content: center;
   align-items: center;
   padding: 3rem;
-  color: #666;
+  color: var(--text-muted);
 `;
 
 interface Racket {
@@ -440,14 +440,14 @@ const RacketRequestsManager: React.FC = () => {
                 {racket.status === 'pending' && (
                   <>
                     <IconButton
-                      color='#16a34a'
+                      color='var(--primary)'
                       onClick={() => handleApproveRequest(racket.id)}
                       title='Aprobar'
                     >
                       <FiCheck />
                     </IconButton>
                     <IconButton
-                      color='#dc2626'
+                      color='var(--danger)'
                       onClick={() => handleRejectRequest(racket.id)}
                       title='Rechazar'
                     >
@@ -459,7 +459,7 @@ const RacketRequestsManager: React.FC = () => {
                   <FiEdit2 />
                 </IconButton>
                 <IconButton
-                  color='#ef4444'
+                  color='var(--error)'
                   onClick={() => handleDeleteRacket(racket.id)}
                   title='Eliminar'
                 >

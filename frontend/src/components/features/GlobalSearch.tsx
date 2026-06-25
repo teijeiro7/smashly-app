@@ -27,16 +27,16 @@ const SearchInputContainer = styled(motion.div)<{
 }>`
   position: relative;
   background: ${props => {
-    if (props.$isMobileContext) return '#f8fafc';
+    if (props.$isMobileContext) return 'var(--surface-2)';
     if (props.$isInHeader) return 'rgba(255, 255, 255, 0.12)';
-    return '#f8fafc';
+    return 'var(--surface-2)';
   }};
   border-radius: 24px;
   overflow: hidden;
   width: ${props => (props.$isInHeader ? '100%' : '280px')};
   border: 1px solid
     ${props => {
-      if (props.$isMobileContext) return '#e2e8f0';
+      if (props.$isMobileContext) return 'var(--border)';
       if (props.$isInHeader) return 'rgba(255, 255, 255, 0.15)';
       return 'transparent';
     }};
@@ -44,27 +44,27 @@ const SearchInputContainer = styled(motion.div)<{
 
   &:hover {
     background: ${props => {
-      if (props.$isMobileContext) return '#f1f5f9';
+      if (props.$isMobileContext) return 'var(--surface-3)';
       if (props.$isInHeader) return 'rgba(255, 255, 255, 0.16)';
-      return '#f1f5f9';
+      return 'var(--surface-3)';
     }};
   }
 
   &:focus-within {
     background: ${props => {
-      if (props.$isMobileContext) return 'white';
+      if (props.$isMobileContext) return 'var(--surface)';
       if (props.$isInHeader) return 'rgba(255, 255, 255, 0.2)';
-      return 'white';
+      return 'var(--surface)';
     }};
     border-color: ${props => {
-      if (props.$isMobileContext) return '#16a34a';
+      if (props.$isMobileContext) return 'var(--primary)';
       if (props.$isInHeader) return 'rgba(255, 255, 255, 0.25)';
-      return '#16a34a20';
+      return 'rgba(var(--primary-rgb), 0.20)';
     }};
     box-shadow: ${props => {
-      if (props.$isMobileContext) return '0 0 0 3px #16a34a20';
+      if (props.$isMobileContext) return '0 0 0 3px rgba(var(--primary-rgb), 0.20)';
       if (props.$isInHeader) return '0 0 0 3px rgba(255, 255, 255, 0.1)';
-      return '0 0 0 3px #16a34a10';
+      return '0 0 0 3px rgba(var(--primary-rgb), 0.10)';
     }};
   }
 
@@ -81,18 +81,18 @@ const SearchInput = styled.input<{ $isInHeader?: boolean; $isMobileContext?: boo
   outline: none;
   font-size: 14px;
   color: ${props => {
-    if (props.$isMobileContext) return '#1e293b';
-    if (props.$isInHeader) return 'white';
-    return '#1e293b';
+    if (props.$isMobileContext) return 'var(--text)';
+    if (props.$isInHeader) return 'var(--text-inverse)';
+    return 'var(--text)';
   }};
   background: transparent;
   font-weight: 400;
 
   &::placeholder {
     color: ${props => {
-      if (props.$isMobileContext) return '#94a3b8';
+      if (props.$isMobileContext) return 'var(--text-subtle)';
       if (props.$isInHeader) return 'rgba(255, 255, 255, 0.6)';
-      return '#94a3b8';
+      return 'var(--text-subtle)';
     }};
   }
 
@@ -110,9 +110,9 @@ const ClearButton = styled.button<{ $isInHeader?: boolean; $isMobileContext?: bo
   background: none;
   border: none;
   color: ${props => {
-    if (props.$isMobileContext) return '#94a3b8';
+    if (props.$isMobileContext) return 'var(--text-subtle)';
     if (props.$isInHeader) return 'rgba(255, 255, 255, 0.7)';
-    return '#94a3b8';
+    return 'var(--text-subtle)';
   }};
   cursor: pointer;
   padding: 4px;
@@ -124,14 +124,14 @@ const ClearButton = styled.button<{ $isInHeader?: boolean; $isMobileContext?: bo
 
   &:hover {
     background: ${props => {
-      if (props.$isMobileContext) return '#f1f5f9';
+      if (props.$isMobileContext) return 'var(--surface-3)';
       if (props.$isInHeader) return 'rgba(255, 255, 255, 0.15)';
-      return '#f1f5f9';
+      return 'var(--surface-3)';
     }};
     color: ${props => {
-      if (props.$isMobileContext) return '#64748b';
-      if (props.$isInHeader) return 'white';
-      return '#64748b';
+      if (props.$isMobileContext) return 'var(--text-muted)';
+      if (props.$isInHeader) return 'var(--text-inverse)';
+      return 'var(--text-muted)';
     }};
   }
 
@@ -146,10 +146,10 @@ const SearchResultsDropdown = styled(motion.div)`
   top: calc(100% + 8px);
   left: 0;
   right: 0;
-  background: white;
+  background: var(--surface);
   border-radius: 16px;
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--border);
   max-height: 420px;
   overflow: hidden;
   z-index: 1001;
@@ -167,7 +167,7 @@ const SearchResultsDropdown = styled(motion.div)`
 
 const ResultsGroup = styled.div`
   &:not(:last-child) {
-    border-bottom: 1px solid #f1f5f9;
+    border-bottom: 1px solid var(--surface-3);
   }
 `;
 
@@ -176,7 +176,7 @@ const ResultsGroupHeader = styled.div`
   display: flex;
   align-items: center;
   gap: 8px;
-  background: #fafbfc;
+  background: var(--surface-2);
 `;
 
 const ResultsGroupTitle = styled.span`
@@ -184,12 +184,12 @@ const ResultsGroupTitle = styled.span`
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  color: #94a3b8;
+  color: var(--text-subtle);
 `;
 
 const ResultsGroupCount = styled.span`
   font-size: 11px;
-  color: #cbd5e1;
+  color: var(--text-subtle);
   margin-left: auto;
 `;
 
@@ -207,7 +207,7 @@ const SearchResultItem = styled.div<{ $variant?: 'racket' | 'brand' | 'category'
   transition: background-color 0.15s ease;
 
   &:hover {
-    background: #f8fafc;
+    background: var(--surface-2);
   }
 
   &:last-child {
@@ -232,17 +232,17 @@ const ResultIcon = styled.div<{ $variant?: 'racket' | 'brand' | 'category' }>`
   background: ${props => {
     switch (props.$variant) {
       case 'brand':
-        return '#16a34a10';
+        return 'var(--primary-subtle)';
       case 'category':
-        return '#0d948810';
+        return 'rgba(13, 148, 136, 0.10)';
       default:
-        return '#f1f5f9';
+        return 'var(--surface-3)';
     }
   }};
   color: ${props => {
     switch (props.$variant) {
       case 'brand':
-        return '#16a34a';
+        return 'var(--primary)';
       case 'category':
         return '#0d9488';
       default:
@@ -262,7 +262,7 @@ const ResultImage = styled.img`
   width: 36px;
   height: 36px;
   border-radius: 10px;
-  background: #f8fafc;
+  background: var(--surface-2);
   object-fit: contain;
   flex-shrink: 0;
 `;
@@ -279,7 +279,7 @@ const ResultInfo = styled.div`
 const ResultName = styled.div<{ $variant?: 'racket' | 'brand' | 'category' }>`
   font-size: 14px;
   font-weight: 500;
-  color: #1e293b;
+  color: var(--text);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -291,7 +291,7 @@ const ResultName = styled.div<{ $variant?: 'racket' | 'brand' | 'category' }>`
 
 const ResultSubtext = styled.div`
   font-size: 12px;
-  color: #94a3b8;
+  color: var(--text-subtle);
   margin-top: 2px;
 
   @media (max-width: 600px) {
@@ -302,7 +302,7 @@ const ResultSubtext = styled.div`
 const ResultPrice = styled.span`
   font-size: 14px;
   font-weight: 600;
-  color: #16a34a;
+  color: var(--primary);
   white-space: nowrap;
   margin-left: auto;
 `;
@@ -318,13 +318,13 @@ const NoResults = styled.div`
 
 const NoResultsText = styled.p`
   font-size: 14px;
-  color: #64748b;
+  color: var(--text-muted);
   margin: 0 0 8px 0;
 `;
 
 const NoResultsHint = styled.span`
   font-size: 12px;
-  color: #94a3b8;
+  color: var(--text-subtle);
 `;
 
 const ViewAllLink = styled.span`
@@ -332,14 +332,14 @@ const ViewAllLink = styled.span`
   padding: 12px 16px;
   text-align: center;
   font-size: 13px;
-  color: #16a34a;
+  color: var(--primary);
   font-weight: 500;
   cursor: pointer;
-  border-top: 1px solid #f1f5f9;
+  border-top: 1px solid var(--surface-3);
   transition: background 0.15s ease;
 
   &:hover {
-    background: #f8fafc;
+    background: var(--surface-2);
   }
 `;
 

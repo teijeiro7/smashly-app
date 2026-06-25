@@ -34,7 +34,7 @@ const WelcomeSection = styled.div`
 const WelcomeTitle = styled.h1`
   font-size: 1.75rem;
   font-weight: 700;
-  color: #0f172a;
+  color: var(--text);
   margin-bottom: 0.5rem;
   letter-spacing: -0.025em;
 
@@ -44,7 +44,7 @@ const WelcomeTitle = styled.h1`
 `;
 
 const WelcomeSubtitle = styled.p`
-  color: #64748b;
+  color: var(--text-muted);
   font-size: 1rem;
 `;
 
@@ -64,10 +64,10 @@ const StatsRow = styled.div`
 `;
 
 const StatCard = styled.div<{ $accent?: string }>`
-  background: white;
+  background: var(--surface);
   border-radius: 16px;
   padding: 1.5rem;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--border);
   position: relative;
   overflow: hidden;
   transition: all 0.2s ease;
@@ -79,11 +79,11 @@ const StatCard = styled.div<{ $accent?: string }>`
     left: 0;
     right: 0;
     height: 3px;
-    background: ${props => props.$accent || '#16a34a'};
+    background: ${props => props.$accent || 'var(--primary)'};
   }
 
   &:hover {
-    border-color: ${props => props.$accent || '#16a34a'}40;
+    border-color: ${props => props.$accent || 'var(--primary)'}40;
     transform: translateY(-2px);
     box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
   }
@@ -114,8 +114,8 @@ const StatTrend = styled.div<{ positive: boolean }>`
   gap: 0.25rem;
   font-size: 0.8125rem;
   font-weight: 600;
-  color: ${props => (props.positive ? '#16a34a' : '#ef4444')};
-  background: ${props => (props.positive ? '#16a34a10' : '#ef444410')};
+  color: ${props => (props.positive ? 'var(--primary)' : 'var(--error)')};
+  background: ${props => (props.positive ? 'var(--primary-subtle)' : 'rgba(239, 68, 68, 0.10)')};
   padding: 0.25rem 0.5rem;
   border-radius: 6px;
 `;
@@ -123,21 +123,21 @@ const StatTrend = styled.div<{ positive: boolean }>`
 const StatValue = styled.div`
   font-size: 2rem;
   font-weight: 700;
-  color: #0f172a;
+  color: var(--text);
   letter-spacing: -0.025em;
   line-height: 1.2;
 `;
 
 const StatLabel = styled.div`
   font-size: 0.875rem;
-  color: #64748b;
+  color: var(--text-muted);
   margin-top: 0.25rem;
 `;
 
 const SectionTitle = styled.h2`
   font-size: 1.125rem;
   font-weight: 600;
-  color: #0f172a;
+  color: var(--text);
   margin-bottom: 1rem;
   display: flex;
   align-items: center;
@@ -156,15 +156,15 @@ const Grid2Col = styled.div`
 `;
 
 const Card = styled.div`
-  background: white;
+  background: var(--surface);
   border-radius: 16px;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--border);
   overflow: hidden;
 `;
 
 const CardHeader = styled.div`
   padding: 1.25rem 1.5rem;
-  border-bottom: 1px solid #e2e8f0;
+  border-bottom: 1px solid var(--border);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -173,7 +173,7 @@ const CardHeader = styled.div`
 const CardTitle = styled.h3`
   font-size: 1rem;
   font-weight: 600;
-  color: #0f172a;
+  color: var(--text);
 `;
 
 const CardContent = styled.div`
@@ -190,7 +190,7 @@ const ActivityItem = styled.div`
   align-items: flex-start;
   gap: 1rem;
   padding: 1rem 0;
-  border-bottom: 1px solid #f1f5f9;
+  border-bottom: 1px solid var(--surface-3);
 
   &:last-child {
     border-bottom: none;
@@ -210,15 +210,15 @@ const ActivityIcon = styled.div<{ type: string }>`
   ${props => {
     switch (props.type) {
       case 'user':
-        return 'background: #3b82f615; color: #3b82f6;';
+        return 'background: var(--info)15; color: var(--info);';
       case 'racket':
         return 'background: #8b5cf615; color: #8b5cf6;';
       case 'review':
-        return 'background: #f59e0b15; color: #f59e0b;';
+        return 'background: var(--accent)15; color: var(--accent);';
       case 'store':
-        return 'background: #16a34a15; color: #16a34a;';
+        return 'background: var(--primary-subtle); color: var(--primary);';
       default:
-        return 'background: #64748b15; color: #64748b;';
+        return 'background: rgba(100, 116, 139, 0.10); color: var(--text-muted);';
     }
   }}
 `;
@@ -231,7 +231,7 @@ const ActivityContent = styled.div`
 const ActivityTitle = styled.div`
   font-size: 0.9375rem;
   font-weight: 500;
-  color: #0f172a;
+  color: var(--text);
   margin-bottom: 0.25rem;
   white-space: nowrap;
   overflow: hidden;
@@ -240,7 +240,7 @@ const ActivityTitle = styled.div`
 
 const ActivityTime = styled.div`
   font-size: 0.8125rem;
-  color: #94a3b8;
+  color: var(--text-subtle);
   display: flex;
   align-items: center;
   gap: 0.25rem;
@@ -253,10 +253,10 @@ const QuickActions = styled.div`
 `;
 
 const QuickActionCard = styled(Link)<{ $color: string }>`
-  background: white;
+  background: var(--surface);
   border-radius: 12px;
   padding: 1.25rem;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--border);
   text-decoration: none;
   transition: all 0.2s ease;
   display: flex;
@@ -290,18 +290,18 @@ const QuickActionText = styled.div`
 const QuickActionTitle = styled.div`
   font-size: 0.9375rem;
   font-weight: 600;
-  color: #0f172a;
+  color: var(--text);
   margin-bottom: 0.125rem;
 `;
 
 const QuickActionDesc = styled.div`
   font-size: 0.8125rem;
-  color: #64748b;
+  color: var(--text-muted);
 `;
 
 const AlertBadge = styled.div<{ count: number }>`
-  background: #ef4444;
-  color: white;
+  background: var(--error);
+  color: var(--text-inverse);
   font-size: 0.75rem;
   font-weight: 600;
   padding: 0.125rem 0.5rem;
@@ -314,7 +314,7 @@ const LoadingContainer = styled.div`
   justify-content: center;
   align-items: center;
   padding: 4rem;
-  color: #64748b;
+  color: var(--text-muted);
 `;
 
 const formatRelativeTime = (dateString: string): string => {
@@ -411,9 +411,9 @@ const AdminDashboard: React.FC = () => {
       </WelcomeSection>
 
       <StatsRow>
-        <StatCard $accent="#3b82f6">
+        <StatCard $accent="var(--info)">
           <StatHeader>
-            <StatIcon color="#3b82f6">
+            <StatIcon color="var(--info)">
               <FiUsers />
             </StatIcon>
             <StatTrend positive={metrics.usersChange > 0}>
@@ -441,9 +441,9 @@ const AdminDashboard: React.FC = () => {
           <StatLabel>Palas Registradas</StatLabel>
         </StatCard>
 
-        <StatCard $accent="#16a34a">
+        <StatCard $accent="var(--primary)">
           <StatHeader>
-            <StatIcon color="#16a34a">
+            <StatIcon color="var(--primary)">
               <FiShoppingBag />
             </StatIcon>
           </StatHeader>
@@ -451,13 +451,13 @@ const AdminDashboard: React.FC = () => {
           <StatLabel>Tiendas Asociadas</StatLabel>
         </StatCard>
 
-        <StatCard $accent={conflictsCount > 0 ? '#f59e0b' : '#10b981'}>
+        <StatCard $accent={conflictsCount > 0 ? 'var(--accent)' : '#10b981'}>
           <StatHeader>
-            <StatIcon color={conflictsCount > 0 ? '#f59e0b' : '#10b981'}>
+            <StatIcon color={conflictsCount > 0 ? 'var(--accent)' : '#10b981'}>
               {conflictsCount > 0 ? <FiAlertTriangle /> : <FiCheck />}
             </StatIcon>
           </StatHeader>
-          <StatValue style={{ color: conflictsCount > 0 ? '#f59e0b' : '#0f172a' }}>
+          <StatValue style={{ color: conflictsCount > 0 ? 'var(--accent)' : 'var(--text)' }}>
             {conflictsCount > 0 ? conflictsCount : 'Todo OK'}
           </StatValue>
           <StatLabel>
@@ -474,7 +474,7 @@ const AdminDashboard: React.FC = () => {
               to={"/admin/activity" as any}
               style={{
                 fontSize: '0.875rem',
-                color: '#16a34a',
+                color: 'var(--primary)',
                 textDecoration: 'none',
                 display: 'flex',
                 alignItems: 'center',
@@ -518,8 +518,8 @@ const AdminDashboard: React.FC = () => {
               <FiArrowRight size={16} color="#8b5cf6" />
             </QuickActionCard>
 
-            <QuickActionCard to="/admin/rackets/review" $color="#f59e0b">
-              <QuickActionIcon color="#f59e0b">
+            <QuickActionCard to="/admin/rackets/review" $color="var(--accent)">
+              <QuickActionIcon color="var(--accent)">
                 <FiAlertTriangle />
               </QuickActionIcon>
               <QuickActionText>
@@ -531,40 +531,40 @@ const AdminDashboard: React.FC = () => {
                 </QuickActionTitle>
                 <QuickActionDesc>Duplicados y errores</QuickActionDesc>
               </QuickActionText>
-              <FiArrowRight size={16} color="#f59e0b" />
+              <FiArrowRight size={16} color="var(--accent)" />
             </QuickActionCard>
 
-            <QuickActionCard to="/admin/users" $color="#3b82f6">
-              <QuickActionIcon color="#3b82f6">
+            <QuickActionCard to="/admin/users" $color="var(--info)">
+              <QuickActionIcon color="var(--info)">
                 <FiUsers />
               </QuickActionIcon>
               <QuickActionText>
                 <QuickActionTitle>Usuarios</QuickActionTitle>
                 <QuickActionDesc>Gestión de cuentas</QuickActionDesc>
               </QuickActionText>
-              <FiArrowRight size={16} color="#3b82f6" />
+              <FiArrowRight size={16} color="var(--info)" />
             </QuickActionCard>
 
-            <QuickActionCard to="/admin/stores" $color="#16a34a">
-              <QuickActionIcon color="#16a34a">
+            <QuickActionCard to="/admin/stores" $color="var(--primary)">
+              <QuickActionIcon color="var(--primary)">
                 <FiShoppingBag />
               </QuickActionIcon>
               <QuickActionText>
                 <QuickActionTitle>Tiendas</QuickActionTitle>
                 <QuickActionDesc>Asociaciones</QuickActionDesc>
               </QuickActionText>
-              <FiArrowRight size={16} color="#16a34a" />
+              <FiArrowRight size={16} color="var(--primary)" />
             </QuickActionCard>
 
-            <QuickActionCard to="/admin/settings" $color="#64748b">
-              <QuickActionIcon color="#64748b">
+            <QuickActionCard to="/admin/settings" $color="var(--text-muted)">
+              <QuickActionIcon color="var(--text-muted)">
                 <FiSettings />
               </QuickActionIcon>
               <QuickActionText>
                 <QuickActionTitle>Configuración</QuickActionTitle>
                 <QuickActionDesc>Marcas, categorías</QuickActionDesc>
               </QuickActionText>
-              <FiArrowRight size={16} color="#64748b" />
+              <FiArrowRight size={16} color="var(--text-muted)" />
             </QuickActionCard>
           </QuickActions>
 
@@ -592,7 +592,7 @@ const AdminDashboard: React.FC = () => {
                   </StatValue>
                   <StatLabel>Favoritos</StatLabel>
                 </StatCard>
-                <StatCard $accent="#f59e0b" style={{ padding: '1rem' }}>
+                <StatCard $accent="var(--accent)" style={{ padding: '1rem' }}>
                   <StatValue style={{ fontSize: '1.5rem' }}>
                     {metrics.pendingRequests}
                   </StatValue>

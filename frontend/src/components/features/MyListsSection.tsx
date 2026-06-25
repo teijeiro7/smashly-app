@@ -7,7 +7,7 @@ import { ViewListModal } from "./ViewListModal";
 import { ListWithRackets } from "../../types/list";
 
 const Section = styled.div`
-  background: white;
+  background: var(--surface);
   border-radius: 20px;
   padding: 2rem;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
@@ -20,7 +20,7 @@ const SectionHeader = styled.div`
   align-items: center;
   margin-bottom: 1.5rem;
   padding-bottom: 1rem;
-  border-bottom: 2px solid #f3f4f6;
+  border-bottom: 2px solid var(--surface-3);
 `;
 
 const SectionTitle = styled.h2`
@@ -29,13 +29,13 @@ const SectionTitle = styled.h2`
   gap: 0.75rem;
   font-size: 1.5rem;
   font-weight: 700;
-  color: #1f2937;
+  color: var(--text);
   margin: 0;
 `;
 
 const CreateButton = styled.button`
-  background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
-  color: white;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
+  color: var(--text-inverse);
   border: none;
   padding: 0.75rem 1.5rem;
   border-radius: 12px;
@@ -49,7 +49,7 @@ const CreateButton = styled.button`
 
   &:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(22, 163, 74, 0.3);
+    box-shadow: 0 4px 12px rgba(var(--primary-rgb), 0.3);
   }
 `;
 
@@ -64,8 +64,8 @@ const ListsGrid = styled.div`
 `;
 
 const ListCard = styled.div`
-  background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
-  border: 2px solid #bbf7d0;
+  background: linear-gradient(135deg, var(--primary-subtle) 0%, var(--primary-faint) 100%);
+  border: 2px solid var(--primary-subtle);
   border-radius: 16px;
   padding: 1.5rem;
   transition: all 0.2s ease;
@@ -73,8 +73,8 @@ const ListCard = styled.div`
 
   &:hover {
     transform: translateY(-4px);
-    box-shadow: 0 8px 24px rgba(22, 163, 74, 0.15);
-    border-color: #16a34a;
+    box-shadow: 0 8px 24px rgba(var(--primary-rgb), 0.15);
+    border-color: var(--primary);
   }
 `;
 
@@ -88,12 +88,12 @@ const ListHeader = styled.div`
 const ListIcon = styled.div`
   width: 48px;
   height: 48px;
-  background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
   border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: white;
+  color: var(--text-inverse);
   font-size: 1.5rem;
 `;
 
@@ -116,17 +116,17 @@ const ActionButton = styled.button<{ variant?: "danger" | "primary" }>`
   ${(props) =>
     props.variant === "danger"
       ? `
-    background: #fee2e2;
-    color: #dc2626;
+    background: var(--danger-subtle);
+    color: var(--danger);
     &:hover {
-      background: #fecaca;
+      background: var(--danger-strong);
     }
   `
       : `
-    background: white;
-    color: #16a34a;
+    background: var(--surface);
+    color: var(--primary);
     &:hover {
-      background: #f0fdf4;
+      background: var(--primary-subtle);
     }
   `}
 `;
@@ -136,7 +136,7 @@ const ListContent = styled.div``;
 const ListName = styled.h3`
   font-size: 1.125rem;
   font-weight: 700;
-  color: #1f2937;
+  color: var(--text);
   margin: 0 0 0.5rem 0;
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -146,7 +146,7 @@ const ListName = styled.h3`
 
 const ListDescription = styled.p`
   font-size: 0.875rem;
-  color: #6b7280;
+  color: var(--text-muted);
   margin: 0 0 1rem 0;
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -160,7 +160,7 @@ const ListMeta = styled.div`
   align-items: center;
   gap: 0.5rem;
   padding-top: 1rem;
-  border-top: 1px solid #bbf7d0;
+  border-top: 1px solid var(--primary-subtle);
 `;
 
 const RacketCount = styled.div`
@@ -169,20 +169,20 @@ const RacketCount = styled.div`
   gap: 0.5rem;
   font-size: 0.875rem;
   font-weight: 600;
-  color: #16a34a;
+  color: var(--primary);
 `;
 
 const LoadingState = styled.div`
   text-align: center;
   padding: 3rem 1rem;
-  color: #6b7280;
+  color: var(--text-muted);
 `;
 
 const Spinner = styled.div`
   width: 50px;
   height: 50px;
-  border: 4px solid #e5e7eb;
-  border-top: 4px solid #16a34a;
+  border: 4px solid var(--border);
+  border-top: 4px solid var(--primary);
   border-radius: 50%;
   animation: spin 1s linear infinite;
   margin: 0 auto 1rem;

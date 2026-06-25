@@ -188,7 +188,7 @@ export const UserReviews: React.FC<UserReviewsProps> = ({ userId }) => {
 const Container = styled.div`
   margin-top: 2rem;
   padding: 2rem;
-  background: white;
+  background: var(--surface);
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 `;
@@ -196,13 +196,13 @@ const Container = styled.div`
 const Header = styled.div`
   margin-bottom: 2rem;
   padding-bottom: 1rem;
-  border-bottom: 2px solid #f0f0f0;
+  border-bottom: 2px solid var(--surface-3);
 `;
 
 const Title = styled.h2`
   font-size: 1.5rem;
   font-weight: 700;
-  color: #1a1a1a;
+  color: var(--text);
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -210,7 +210,7 @@ const Title = styled.h2`
 
 const Count = styled.span`
   font-size: 1.125rem;
-  color: #666;
+  color: var(--text-muted);
   font-weight: 400;
 `;
 
@@ -228,8 +228,8 @@ const GalleryGrid = styled.div`
 `;
 
 const ReviewCard = styled.div`
-  background: white;
-  border: 1px solid #e0e0e0;
+  background: var(--surface);
+  border: 1px solid var(--border);
   border-radius: 12px;
   overflow: hidden;
   cursor: pointer;
@@ -246,7 +246,7 @@ const ReviewCard = styled.div`
 const RacketImageContainer = styled.div`
   width: 100%;
   height: 180px;
-  background: white;
+  background: var(--surface);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -272,7 +272,7 @@ const CardContent = styled.div`
 const RacketName = styled.div`
   font-size: 0.875rem;
   font-weight: 600;
-  color: #666;
+  color: var(--text-muted);
   text-transform: uppercase;
   margin-bottom: 0.5rem;
   white-space: nowrap;
@@ -294,7 +294,7 @@ const Star = styled.span<{ filled: boolean }>`
 const ReviewTitle = styled.h3`
   font-size: 1rem;
   font-weight: 700;
-  color: #1a1a1a;
+  color: var(--text);
   margin-bottom: 0.5rem;
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -306,7 +306,7 @@ const ReviewTitle = styled.h3`
 
 const ReviewDate = styled.div`
   font-size: 0.75rem;
-  color: #999;
+  color: var(--text-subtle);
 `;
 
 // Modal
@@ -326,7 +326,7 @@ const ModalOverlay = styled.div`
 `;
 
 const ModalContent = styled.div`
-  background: white;
+  background: var(--surface);
   border-radius: 12px;
   max-width: 800px;
   width: 100%;
@@ -345,9 +345,9 @@ const CloseButton = styled.button`
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background: white;
-  border: 2px solid #e0e0e0;
-  color: #666;
+  background: var(--surface);
+  border: 2px solid var(--border);
+  color: var(--text-muted);
   font-size: 1.5rem;
   cursor: pointer;
   display: flex;
@@ -358,7 +358,7 @@ const CloseButton = styled.button`
   margin: 1rem 1rem 0 0;
 
   &:hover {
-    background: #f5f5f5;
+    background: var(--surface-2);
     border-color: #d32f2f;
     color: #d32f2f;
     transform: rotate(90deg);
@@ -368,7 +368,7 @@ const CloseButton = styled.button`
 const LoadingMessage = styled.div`
   text-align: center;
   padding: 3rem 2rem;
-  color: #666;
+  color: var(--text-muted);
   font-size: 1rem;
 `;
 
@@ -394,13 +394,13 @@ const EmptyIcon = styled.div`
 const EmptyTitle = styled.h3`
   font-size: 1.25rem;
   font-weight: 600;
-  color: #333;
+  color: var(--text);
   margin-bottom: 0.5rem;
 `;
 
 const EmptyText = styled.p`
   font-size: 1rem;
-  color: #666;
+  color: var(--text-muted);
   max-width: 400px;
   margin: 0 auto;
 `;
@@ -412,22 +412,22 @@ const Pagination = styled.div`
   gap: 1rem;
   margin-top: 2rem;
   padding-top: 2rem;
-  border-top: 1px solid #e0e0e0;
+  border-top: 1px solid var(--border);
 `;
 
 const PaginationButton = styled.button`
   padding: 0.5rem 1rem;
-  background: white;
-  border: 1px solid #ddd;
+  background: var(--surface);
+  border: 1px solid var(--border);
   border-radius: 6px;
-  color: #333;
+  color: var(--text);
   font-size: 0.875rem;
   cursor: pointer;
   transition: all 0.2s;
 
   &:hover:not(:disabled) {
-    background: #f5f5f5;
-    border-color: #bbb;
+    background: var(--surface-2);
+    border-color: var(--border-strong);
   }
 
   &:disabled {
@@ -438,5 +438,5 @@ const PaginationButton = styled.button`
 
 const PageInfo = styled.div`
   font-size: 0.875rem;
-  color: #666;
+  color: var(--text-muted);
 `;

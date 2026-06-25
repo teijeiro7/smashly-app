@@ -28,7 +28,7 @@ const Overlay = styled(motion.div)`
 `;
 
 const Modal = styled(motion.div)`
-  background: white;
+  background: var(--surface);
   border-radius: 16px;
   padding: 2rem;
   max-width: 800px;
@@ -46,7 +46,7 @@ const Header = styled.div`
   align-items: flex-start;
   margin-bottom: 1.5rem;
   padding-bottom: 1rem;
-  border-bottom: 2px solid #f3f4f6;
+  border-bottom: 2px solid var(--surface-3);
 `;
 
 const HeaderContent = styled.div`
@@ -56,19 +56,19 @@ const HeaderContent = styled.div`
 const Title = styled.h2`
   font-size: 1.75rem;
   font-weight: 700;
-  color: #1f2937;
+  color: var(--text);
   margin: 0 0 0.5rem 0;
 `;
 
 const Description = styled.p`
   font-size: 0.95rem;
-  color: #6b7280;
+  color: var(--text-muted);
   margin: 0;
 `;
 
 const RacketCount = styled.div`
   font-size: 0.875rem;
-  color: #16a34a;
+  color: var(--primary);
   font-weight: 600;
   margin-top: 0.5rem;
 `;
@@ -77,7 +77,7 @@ const CloseButton = styled.button`
   background: none;
   border: none;
   cursor: pointer;
-  color: #6b7280;
+  color: var(--text-muted);
   padding: 0.5rem;
   display: flex;
   align-items: center;
@@ -86,8 +86,8 @@ const CloseButton = styled.button`
   border-radius: 8px;
 
   &:hover {
-    background: #f3f4f6;
-    color: #1f2937;
+    background: var(--surface-3);
+    color: var(--text);
   }
 `;
 
@@ -103,16 +103,16 @@ const Content = styled.div`
   }
 
   &::-webkit-scrollbar-track {
-    background: #f3f4f6;
+    background: var(--surface-3);
     border-radius: 4px;
   }
 
   &::-webkit-scrollbar-thumb {
-    background: #d1d5db;
+    background: var(--border-strong);
     border-radius: 4px;
 
     &:hover {
-      background: #9ca3af;
+      background: var(--text-subtle);
     }
   }
 `;
@@ -120,7 +120,7 @@ const Content = styled.div`
 const EmptyState = styled.div`
   text-align: center;
   padding: 3rem 1rem;
-  color: #6b7280;
+  color: var(--text-muted);
 `;
 
 const EmptyIcon = styled.div`
@@ -140,8 +140,8 @@ const RacketsList = styled.div`
 `;
 
 const RacketCard = styled.div`
-  background: #f9fafb;
-  border: 2px solid #f3f4f6;
+  background: var(--surface-2);
+  border: 2px solid var(--surface-3);
   border-radius: 12px;
   padding: 1rem;
   display: flex;
@@ -149,8 +149,8 @@ const RacketCard = styled.div`
   transition: all 0.2s ease;
 
   &:hover {
-    border-color: #16a34a;
-    box-shadow: 0 4px 12px rgba(22, 163, 74, 0.1);
+    border-color: var(--primary);
+    box-shadow: 0 4px 12px rgba(var(--primary-rgb), 0.1);
   }
 `;
 
@@ -159,7 +159,7 @@ const RacketImage = styled.img`
   height: 80px;
   object-fit: contain;
   border-radius: 8px;
-  background: white;
+  background: var(--surface);
 `;
 
 const RacketInfo = styled.div`
@@ -172,7 +172,7 @@ const RacketInfo = styled.div`
 const RacketBrand = styled.div`
   font-size: 0.75rem;
   font-weight: 600;
-  color: #16a34a;
+  color: var(--primary);
   text-transform: uppercase;
   letter-spacing: 0.5px;
 `;
@@ -180,13 +180,13 @@ const RacketBrand = styled.div`
 const RacketName = styled.div`
   font-size: 1rem;
   font-weight: 600;
-  color: #1f2937;
+  color: var(--text);
   margin: 0.25rem 0;
 `;
 
 const RacketPrice = styled.div`
   font-size: 0.875rem;
-  color: #6b7280;
+  color: var(--text-muted);
   font-weight: 500;
 `;
 
@@ -209,15 +209,15 @@ const ActionButton = styled.button<{ variant?: "danger" | "primary" }>`
   ${(props) =>
     props.variant === "danger"
       ? `
-    background: #fee2e2;
-    color: #dc2626;
+    background: rgba(220, 38, 38, 0.10);
+    color: var(--danger);
     &:hover {
-      background: #fecaca;
+      background: var(--danger-strong);
     }
   `
       : `
-    background: #dbeafe;
-    color: #2563eb;
+    background: rgba(37, 99, 235, 0.10);
+    color: var(--info);
     &:hover {
       background: #bfdbfe;
     }
@@ -232,7 +232,7 @@ const ActionButton = styled.button<{ variant?: "danger" | "primary" }>`
 const LoadingState = styled.div`
   text-align: center;
   padding: 3rem 1rem;
-  color: #6b7280;
+  color: var(--text-muted);
 `;
 
 export const ViewListModal: React.FC<ViewListModalProps> = ({

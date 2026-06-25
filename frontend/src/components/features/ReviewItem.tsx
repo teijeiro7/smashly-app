@@ -304,7 +304,7 @@ const CommentToggleButton = styled.button<{ active: boolean }>`
   background: transparent;
   border: none;
   font-size: 0.85rem;
-  color: ${p => (p.active ? '#4F46E5' : '#6B7280')};
+  color: ${p => (p.active ? 'var(--primary)' : 'var(--text-muted)')};
   font-weight: 600;
   cursor: pointer;
   display: flex;
@@ -315,15 +315,15 @@ const CommentToggleButton = styled.button<{ active: boolean }>`
   transition: all 0.2s;
 
   &:hover {
-    background: #eef2ff;
-    color: #4338ca;
+    background: var(--primary-subtle);
+    color: var(--primary-hover);
   }
 `;
 
 const ThreadsSection = styled.div`
   margin-top: 1rem;
   padding-top: 1.5rem;
-  border-top: 1px solid #f3f4f6;
+  border-top: 1px solid var(--surface-3);
   animation: slideDown 0.3s ease-out;
 
   @keyframes slideDown {
@@ -355,7 +355,7 @@ const CommentAvatar = styled.div`
   height: 32px;
   border-radius: 50%;
   overflow: hidden;
-  background: #f3f4f6;
+  background: var(--surface-3);
   flex-shrink: 0;
 
   img {
@@ -372,7 +372,7 @@ const SmallDefaultAvatar = styled.div`
   align-items: center;
   justify-content: center;
   background: #e0e7ff;
-  color: #4f46e5;
+  color: var(--primary);
   font-size: 0.75rem;
   font-weight: 700;
 `;
@@ -391,17 +391,17 @@ const CommentHeader = styled.div`
 const CommentAuthor = styled.span`
   font-size: 0.9rem;
   font-weight: 700;
-  color: #111827;
+  color: var(--text);
 `;
 
 const CommentDate = styled.span`
   font-size: 0.75rem;
-  color: #9ca3af;
+  color: var(--text-subtle);
 `;
 
 const CommentContent = styled.p`
   font-size: 0.95rem;
-  color: #4b5563;
+  color: var(--text);
   line-height: 1.5;
   margin: 0;
 `;
@@ -416,19 +416,19 @@ const ReplyInput = styled.input`
   flex: 1;
   padding: 0.6rem 1rem;
   border-radius: 99px;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--border);
   font-size: 0.9rem;
   outline: none;
 
   &:focus {
-    border-color: #4f46e5;
-    box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.1);
+    border-color: var(--primary);
+    box-shadow: 0 0 0 2px rgba(var(--primary-rgb), 0.1);
   }
 `;
 
 const ReplySubmit = styled.button`
-  background: #4f46e5;
-  color: white;
+  background: var(--primary);
+  color: var(--text-inverse);
   border: none;
   padding: 0.5rem 1.25rem;
   border-radius: 99px;
@@ -438,7 +438,7 @@ const ReplySubmit = styled.button`
   transition: background 0.2s;
 
   &:hover:not(:disabled) {
-    background: #4338ca;
+    background: var(--primary-hover);
   }
   &:disabled {
     opacity: 0.5;
@@ -448,14 +448,14 @@ const ReplySubmit = styled.button`
 
 const LoadingText = styled.div`
   font-size: 0.85rem;
-  color: #6b7280;
+  color: var(--text-muted);
   text-align: center;
   margin-bottom: 1rem;
 `;
 
 const LoginTip = styled.div`
   font-size: 0.85rem;
-  color: #6b7280;
+  color: var(--text-muted);
   font-style: italic;
   text-align: center;
 `;
@@ -463,14 +463,14 @@ const LoginTip = styled.div`
 // Styled Components
 const Container = styled.div`
   padding: 1.5rem;
-  background: white;
+  background: var(--surface);
   border-radius: 16px;
-  border: 1px solid #f3f4f6;
+  border: 1px solid var(--surface-3);
   transition: all 0.2s;
 
   &:hover {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
-    border-color: #e5e7eb;
+    border-color: var(--border);
   }
 `;
 
@@ -505,7 +505,7 @@ const Avatar = styled.div`
   height: 48px;
   border-radius: 50%;
   overflow: hidden;
-  background: #f3f4f6;
+  background: var(--surface-3);
 
   img {
     width: 100%;
@@ -521,14 +521,14 @@ const DefaultAvatar = styled.div`
   align-items: center;
   justify-content: center;
   background: #e0e7ff;
-  color: #4f46e5;
+  color: var(--primary);
   font-size: 1.2rem;
   font-weight: 700;
 `;
 
 const Username = styled.div`
   font-weight: 700;
-  color: #111827;
+  color: var(--text);
   font-size: 1rem;
 `;
 
@@ -539,12 +539,12 @@ const RatingRow = styled.div`
 `;
 
 const SmallStar = styled.span<{ filled: boolean }>`
-  color: ${p => (p.filled ? '#FFC107' : '#E5E7EB')};
+  color: ${p => (p.filled ? '#FFC107' : 'var(--border)')};
 `;
 
 const DateText = styled.div`
   font-size: 0.85rem;
-  color: #9ca3af;
+  color: var(--text-subtle);
 `;
 
 const DropdownActions = styled.div`
@@ -556,13 +556,13 @@ const ActionButton = styled.button<{ danger?: boolean }>`
   background: none;
   border: none;
   font-size: 0.75rem;
-  color: ${p => (p.danger ? '#EF4444' : '#6B7280')};
+  color: ${p => (p.danger ? 'var(--error)' : 'var(--text-muted)')};
   cursor: pointer;
   text-decoration: underline;
   padding: 0;
 
   &:hover {
-    color: ${p => (p.danger ? '#DC2626' : '#374151')};
+    color: ${p => (p.danger ? 'var(--danger)' : 'var(--text)')};
   }
 `;
 
@@ -573,14 +573,14 @@ const Body = styled.div`
 const ReviewTitle = styled.h4`
   font-size: 1.1rem;
   font-weight: 700;
-  color: #1f2937;
+  color: var(--text);
   margin: 0 0 0.5rem 0;
 `;
 
 const Content = styled.p`
   font-size: 1rem;
   line-height: 1.6;
-  color: #4b5563;
+  color: var(--text);
   margin: 0;
   white-space: pre-wrap;
 `;
@@ -590,7 +590,7 @@ const Footer = styled.div`
   align-items: center;
   gap: 1rem;
   padding-top: 1rem;
-  //   border-top: 1px solid #F9FAFB;
+  //   border-top: 1px solid var(--surface-2);
 `;
 
 const LikeButton = styled.button<{ liked: boolean }>`
@@ -598,22 +598,22 @@ const LikeButton = styled.button<{ liked: boolean }>`
   align-items: center;
   gap: 0.5rem;
   padding: 0.4rem 0.8rem;
-  background: ${p => (p.liked ? '#FEF2F2' : 'transparent')};
-  border: 1px solid ${p => (p.liked ? '#FEE2E2' : '#F3F4F6')};
+  background: ${p => (p.liked ? 'var(--danger-subtle)' : 'transparent')};
+  border: 1px solid ${p => (p.liked ? 'var(--danger-strong)' : 'var(--surface-3)')};
   border-radius: 20px;
   font-size: 0.85rem;
-  color: ${p => (p.liked ? '#EF4444' : '#6B7280')};
+  color: ${p => (p.liked ? 'var(--error)' : 'var(--text-muted)')};
   cursor: pointer;
   transition: all 0.2s;
 
   &:hover {
-    background: ${p => (p.liked ? '#FEE2E2' : '#F9FAFB')};
-    border-color: ${p => (p.liked ? '#FECACA' : '#E5E7EB')};
+    background: ${p => (p.liked ? 'rgba(239, 68, 68, 0.15)' : 'var(--surface-2)')};
+    border-color: ${p => (p.liked ? 'var(--danger-strong)' : 'var(--border)')};
   }
 `;
 
 const ErrorMessage = styled.span`
-  color: #ef4444;
+  color: var(--error);
   font-size: 0.75rem;
   font-weight: 600;
   animation: fadeIn 0.3s ease-in;
@@ -635,13 +635,13 @@ const RacketInfo = styled(Link)`
   gap: 1rem;
   padding: 1rem;
   margin-bottom: 1.5rem;
-  background: #f9fafb;
+  background: var(--surface-2);
   border-radius: 12px;
   text-decoration: none;
   transition: all 0.2s;
 
   &:hover {
-    background: #f3f4f6;
+    background: var(--surface-3);
   }
 `;
 
@@ -659,12 +659,12 @@ const RacketDetails = styled.div`
 const RacketBrand = styled.span`
   font-size: 0.75rem;
   font-weight: 600;
-  color: #6b7280;
+  color: var(--text-muted);
   text-transform: uppercase;
 `;
 
 const RacketName = styled.span`
   font-size: 0.9rem;
   font-weight: 700;
-  color: #111827;
+  color: var(--text);
 `;

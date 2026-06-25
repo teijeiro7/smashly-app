@@ -5,12 +5,12 @@ import { useNavigate } from '@tanstack/react-router';
 import styled from "styled-components";
 
 const BannerContainer = styled(motion.div)`
-  background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
   border-radius: 24px;
   padding: 3rem 2rem;
   margin: 4rem auto;
   max-width: 1000px;
-  color: white;
+  color: var(--text-inverse);
   position: relative;
   overflow: hidden;
   will-change: transform, opacity;
@@ -91,7 +91,7 @@ const FeatureIcon = styled.div`
   align-items: center;
   justify-content: center;
   margin-bottom: 1rem;
-  color: white;
+  color: var(--text-inverse);
   font-size: 1.5rem;
 `;
 
@@ -117,7 +117,7 @@ const CTAButton = styled.button<{ variant?: "primary" | "secondary" }>`
       : "none"};
   background: ${(props) =>
     props.variant === "secondary" ? "rgba(255, 255, 255, 0.1)" : "rgba(255, 255, 255, 0.25)"};
-  color: white;
+  color: var(--text-inverse);
   font-weight: 600;
   font-size: 1rem;
   cursor: pointer;

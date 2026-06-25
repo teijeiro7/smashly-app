@@ -15,7 +15,7 @@ import {
 const LayoutContainer = styled.div`
   display: flex;
   min-height: calc(100vh - 70px);
-  background: #f8fafc;
+  background: var(--surface-2);
   padding: 1.5rem;
   gap: 1.5rem;
   align-items: flex-start;
@@ -29,9 +29,9 @@ const LayoutContainer = styled.div`
 
 const Sidebar = styled.aside<{ $isOpen: boolean }>`
   width: 260px;
-  background: white;
+  background: var(--surface);
   border-radius: 16px;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--border);
   display: flex;
   flex-direction: column;
   position: sticky;
@@ -74,7 +74,7 @@ const SidebarHeader = styled.div`
     display: flex;
     align-items: center;
     justify-content: space-between;
-    border-bottom: 1px solid #e2e8f0;
+    border-bottom: 1px solid var(--border);
   }
 `;
 
@@ -85,13 +85,13 @@ const CloseButton = styled.button`
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #64748b;
-  background: #f1f5f9;
+  color: var(--text-muted);
+  background: var(--surface-3);
   border: none;
   
   &:hover {
-    background: #e2e8f0;
-    color: #0f172a;
+    background: var(--border);
+    color: var(--text);
   }
 `;
 
@@ -105,7 +105,7 @@ const NavSection = styled.nav`
 const NavLabel = styled.div`
   font-size: 0.75rem;
   font-weight: 600;
-  color: #94a3b8;
+  color: var(--text-subtle);
   text-transform: uppercase;
   letter-spacing: 0.05em;
   padding: 0.5rem 0.75rem;
@@ -118,8 +118,8 @@ const NavItem = styled(Link)<{ $active: boolean }>`
   gap: 0.75rem;
   padding: 0.75rem 1rem;
   border-radius: 10px;
-  color: ${props => (props.$active ? '#16a34a' : '#64748b')};
-  background: ${props => (props.$active ? '#16a34a10' : 'transparent')};
+  color: ${props => (props.$active ? 'var(--primary)' : 'var(--text-muted)')};
+  background: ${props => (props.$active ? 'var(--primary-subtle)' : 'transparent')};
   font-weight: ${props => (props.$active ? '600' : '500')};
   font-size: 0.9375rem;
   transition: all 0.2s ease;
@@ -128,8 +128,8 @@ const NavItem = styled(Link)<{ $active: boolean }>`
   white-space: nowrap;
 
   &:hover {
-    background: ${props => (props.$active ? '#16a34a15' : '#f1f5f9')};
-    color: ${props => (props.$active ? '#16a34a' : '#0f172a')};
+    background: ${props => (props.$active ? 'rgba(var(--primary-rgb), 0.15)' : 'var(--surface-3)')};
+    color: ${props => (props.$active ? 'var(--primary)' : 'var(--text)')};
   }
 
   svg {
@@ -149,8 +149,8 @@ const MainContent = styled.main`
 const MobileHeader = styled.div`
   display: none;
   padding: 0.75rem 1rem;
-  background: white;
-  border-bottom: 1px solid #e2e8f0;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
   position: sticky;
   top: 70px;
   z-index: 50;
@@ -171,18 +171,18 @@ const MobileMenuButton = styled.button`
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #f1f5f9;
-  color: #0f172a;
+  background: var(--surface-3);
+  color: var(--text);
   border: none;
 
   &:hover {
-    background: #e2e8f0;
+    background: var(--border);
   }
 `;
 
 const MobileTitle = styled.span`
   font-weight: 600;
-  color: #0f172a;
+  color: var(--text);
   font-size: 1rem;
 `;
 
@@ -214,7 +214,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
       
       <Sidebar $isOpen={mobileOpen}>
         <SidebarHeader>
-          <span style={{ fontWeight: 600, color: '#0f172a' }}>Menú</span>
+          <span style={{ fontWeight: 600, color: 'var(--text)' }}>Menú</span>
           <CloseButton onClick={() => setMobileOpen(false)}>
             <FiX size={18} />
           </CloseButton>

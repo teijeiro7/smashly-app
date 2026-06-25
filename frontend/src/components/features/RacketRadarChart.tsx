@@ -20,7 +20,7 @@ interface RacketRadarChartProps {
 }
 
 const ChartContainer = styled.div`
-  background: white;
+  background: var(--surface);
   border-radius: 16px;
   padding: 2rem;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
@@ -35,7 +35,7 @@ const ChartContainer = styled.div`
 
 const ChartSubtitle = styled.div`
   font-size: 0.875rem;
-  color: #6b7280;
+  color: var(--text-muted);
   text-align: center;
   margin-bottom: 0.75rem;
   display: flex;
@@ -52,7 +52,7 @@ const RadarWrapper = styled.div`
 `;
 
 // Colores para hasta 3 palas
-const COLORS = ['#16a34a', '#3b82f6', '#f59e0b'];
+const COLORS = ['var(--primary)', 'var(--info)', 'var(--accent)'];
 
 // Tooltip personalizado
 const CustomTooltip = memo(({ active, payload, metrics }: any) => {
@@ -67,7 +67,7 @@ const CustomTooltip = memo(({ active, payload, metrics }: any) => {
         padding: '12px',
         borderRadius: '8px',
         boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-        border: '1px solid #e5e7eb',
+        border: '1px solid var(--border)',
       }}
     >
       <p style={{ margin: 0, fontWeight: 600, marginBottom: '8px' }}>
@@ -88,7 +88,7 @@ const CustomTooltip = memo(({ active, payload, metrics }: any) => {
             }}
           >
             {racket?.racketName}: <strong>{entry.value}/10</strong>
-            {racket?.isCertified && <FiCheckCircle color='#16a34a' size={12} />}
+            {racket?.isCertified && <FiCheckCircle color='var(--primary)' size={12} />}
           </p>
         );
       })}
@@ -130,7 +130,7 @@ const Legend = memo(({ metrics }: { metrics: RacketComparisonData[] }) => {
           <span
             style={{
               fontSize: '0.875rem',
-              color: '#374151',
+              color: 'var(--text)',
               fontWeight: 500,
               display: 'flex',
               alignItems: 'center',
@@ -140,7 +140,7 @@ const Legend = memo(({ metrics }: { metrics: RacketComparisonData[] }) => {
             {toTitleCase(racket.racketName)}
             {racket.isCertified && (
               <span title='Datos certificados por Testea Padel'>
-                <FiCheckCircle color='#16a34a' size={14} />
+                <FiCheckCircle color='var(--primary)' size={14} />
               </span>
             )}
           </span>
@@ -208,7 +208,7 @@ const RacketRadarChart: React.FC<RacketRadarChartProps> = ({ metrics }) => {
             display: 'flex',
             alignItems: 'center',
             gap: '4px',
-            color: '#16a34a',
+            color: 'var(--primary)',
             fontWeight: 500,
           }}
         >
@@ -219,15 +219,15 @@ const RacketRadarChart: React.FC<RacketRadarChartProps> = ({ metrics }) => {
       <RadarWrapper>
       <ResponsiveContainer width='100%' height='100%'>
         <RadarChart data={chartData} outerRadius='75%' margin={{ top: 10, right: 40, bottom: 10, left: 40 }}>
-          <PolarGrid strokeDasharray='3 3' stroke='#e5e7eb' />
+          <PolarGrid strokeDasharray='3 3' stroke='var(--border)' />
           <PolarAngleAxis
             dataKey='metric'
-            tick={{ fill: '#374151', fontSize: 12, fontWeight: 600 }}
+            tick={{ fill: 'var(--text)', fontSize: 12, fontWeight: 600 }}
           />
           <PolarRadiusAxis
             angle={90}
             domain={[0, 10]}
-            tick={{ fill: '#9ca3af', fontSize: 10 }}
+            tick={{ fill: 'var(--text-subtle)', fontSize: 10 }}
             tickCount={6}
           />
           <Tooltip content={<CustomTooltip metrics={metrics} />} />

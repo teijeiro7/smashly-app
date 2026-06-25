@@ -37,7 +37,7 @@ const Overlay = styled(motion.div)`
 `;
 
 const Modal = styled(motion.div)`
-  background: white;
+  background: var(--surface);
   border-radius: 20px;
   padding: 2rem;
   max-width: 580px;
@@ -48,33 +48,33 @@ const Modal = styled(motion.div)`
   overflow-y: auto;
 
   &::-webkit-scrollbar { width: 6px; }
-  &::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 3px; }
-  &::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 3px; }
+  &::-webkit-scrollbar-track { background: var(--surface-3); border-radius: 3px; }
+  &::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 3px; }
 `;
 
 const IconContainer = styled.div`
   width: 72px;
   height: 72px;
-  background: linear-gradient(135deg, #dcfce7 0%, #f0fdf4 100%);
+  background: linear-gradient(135deg, var(--primary-subtle) 0%, var(--primary-faint) 100%);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   margin: 0 auto 1.25rem;
-  color: #16a34a;
+  color: var(--primary);
 `;
 
 const Title = styled.h2`
   font-size: 1.625rem;
   font-weight: 700;
-  color: #1f2937;
+  color: var(--text);
   margin: 0 0 0.75rem;
   line-height: 1.2;
   text-align: center;
 `;
 
 const Description = styled.p`
-  color: #4b5563;
+  color: var(--text);
   font-size: 1rem;
   line-height: 1.6;
   margin: 0 0 1.5rem;
@@ -89,8 +89,8 @@ const ButtonGroup = styled.div`
 `;
 
 const PrimaryButton = styled.button`
-  background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
-  color: white;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
+  color: var(--text-inverse);
   border: none;
   padding: 0.875rem;
   border-radius: 12px;
@@ -110,7 +110,7 @@ const PrimaryButton = styled.button`
 
 const SecondaryButton = styled.button`
   background: transparent;
-  color: #6b7280;
+  color: var(--text-muted);
   border: none;
   padding: 0.625rem;
   border-radius: 10px;
@@ -119,7 +119,7 @@ const SecondaryButton = styled.button`
   cursor: pointer;
   transition: color 0.15s ease, background 0.15s ease;
 
-  &:hover { color: #374151; background: #f9fafb; }
+  &:hover { color: var(--text); background: var(--surface-2); }
 `;
 
 const CloseButton = styled.button`
@@ -128,7 +128,7 @@ const CloseButton = styled.button`
   right: 1.25rem;
   background: none;
   border: none;
-  color: #9ca3af;
+  color: var(--text-subtle);
   cursor: pointer;
   padding: 0.375rem;
   border-radius: 50%;
@@ -137,7 +137,7 @@ const CloseButton = styled.button`
   justify-content: center;
   transition: background 0.15s ease, color 0.15s ease;
 
-  &:hover { background: #f3f4f6; color: #4b5563; }
+  &:hover { background: var(--surface-3); color: var(--text); }
 `;
 
 const Form = styled.form`
@@ -166,7 +166,7 @@ const FormGroup = styled.div`
 const Label = styled.label`
   font-size: 0.8125rem;
   font-weight: 600;
-  color: #374151;
+  color: var(--text);
   display: flex;
   align-items: center;
   gap: 0.375rem;
@@ -174,7 +174,7 @@ const Label = styled.label`
 
 const Input = styled.input`
   padding: 0.625rem 0.875rem;
-  border: 1.5px solid #e5e7eb;
+  border: 1.5px solid var(--border);
   border-radius: 10px;
   font-size: 0.9375rem;
   width: 100%;
@@ -182,31 +182,31 @@ const Input = styled.input`
 
   &:focus {
     outline: none;
-    border-color: #16a34a;
-    box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.08);
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.08);
   }
 `;
 
 const Select = styled.select`
   padding: 0.625rem 0.875rem;
-  border: 1.5px solid #e5e7eb;
+  border: 1.5px solid var(--border);
   border-radius: 10px;
   font-size: 0.9375rem;
-  background: white;
+  background: var(--surface);
   cursor: pointer;
   width: 100%;
   transition: border-color 0.15s ease;
 
   &:focus {
     outline: none;
-    border-color: #16a34a;
-    box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.08);
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.08);
   }
 `;
 
 const TextArea = styled.textarea`
   padding: 0.625rem 0.875rem;
-  border: 1.5px solid #e5e7eb;
+  border: 1.5px solid var(--border);
   border-radius: 10px;
   font-size: 0.9375rem;
   resize: vertical;
@@ -217,20 +217,20 @@ const TextArea = styled.textarea`
 
   &:focus {
     outline: none;
-    border-color: #16a34a;
-    box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.08);
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.08);
   }
 `;
 
 const HelperText = styled.span`
   font-size: 0.75rem;
-  color: #9ca3af;
+  color: var(--text-subtle);
 `;
 
 const SectionLabel = styled.p`
   font-size: 0.8125rem;
   font-weight: 700;
-  color: #16a34a;
+  color: var(--primary);
   margin: 0 0 0.25rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -240,7 +240,7 @@ const RacketSearchWrapper = styled.div`
   input {
     padding: 0.625rem 0.875rem !important;
     border-radius: 10px !important;
-    border: 1.5px solid #e5e7eb !important;
+    border: 1.5px solid var(--border) !important;
     font-size: 0.9375rem !important;
   }
 `;

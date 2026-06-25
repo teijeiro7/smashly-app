@@ -21,10 +21,10 @@ const StatsGrid = styled.div`
 `;
 
 const StatCard = styled(motion.div)<{ $color: string }>`
-  background: white;
+  background: var(--surface);
   border-radius: 16px;
   padding: 1.5rem;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--border);
   text-align: center;
   transition: all 0.2s ease;
   cursor: pointer;
@@ -52,29 +52,29 @@ const StatIcon = styled.div<{ color: string }>`
 const StatValue = styled.div`
   font-size: 2rem;
   font-weight: 700;
-  color: #16a34a;
+  color: var(--primary);
   line-height: 1;
 `;
 
 const StatLabel = styled.div`
   font-size: 0.875rem;
-  color: #64748b;
+  color: var(--text-muted);
   margin-top: 0.5rem;
 `;
 
 const SectionTitle = styled.h3`
   font-size: 1.0625rem;
   font-weight: 600;
-  color: #16a34a;
+  color: var(--primary);
   display: flex;
   align-items: center;
   gap: 0.5rem;
 `;
 
 const RecentList = styled.div`
-  background: white;
+  background: var(--surface);
   border-radius: 16px;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--border);
   overflow: hidden;
 `;
 
@@ -83,7 +83,7 @@ const RecentItem = styled(Link)`
   align-items: center;
   justify-content: space-between;
   padding: 1rem 1.25rem;
-  border-bottom: 1px solid #f1f5f9;
+  border-bottom: 1px solid var(--surface-3);
   text-decoration: none;
   transition: all 0.2s ease;
 
@@ -92,7 +92,7 @@ const RecentItem = styled(Link)`
   }
 
   &:hover {
-    background: #f8fafc;
+    background: var(--surface-2);
   }
 `;
 
@@ -119,13 +119,13 @@ const RecentItemText = styled.div`
 
 const RecentItemTitle = styled.div`
   font-weight: 600;
-  color: #16a34a;
+  color: var(--primary);
   font-size: 0.9375rem;
 `;
 
 const RecentItemMeta = styled.div`
   font-size: 0.8125rem;
-  color: #64748b;
+  color: var(--text-muted);
   margin-top: 0.125rem;
 `;
 
@@ -133,21 +133,21 @@ const ViewAllLink = styled(Link)`
   display: block;
   padding: 1rem;
   text-align: center;
-  color: #16a34a;
+  color: var(--primary);
   text-decoration: none;
   font-weight: 600;
   font-size: 0.875rem;
-  border-top: 1px solid #f1f5f9;
+  border-top: 1px solid var(--surface-3);
 
   &:hover {
-    background: #f8fafc;
+    background: var(--surface-2);
   }
 `;
 
 const EmptyState = styled.div`
   padding: 2rem;
   text-align: center;
-  color: #94a3b8;
+  color: var(--text-subtle);
 `;
 
 interface ActivityStatsProps {
@@ -200,10 +200,10 @@ const ActivityStats: React.FC<ActivityStatsProps> = ({
     <Container>
       <StatsGrid>
         <StatCard
-          $color="#f59e0b"
+          $color="var(--accent)"
           whileHover={{ y: -4 }}
         >
-          <StatIcon color="#f59e0b">
+          <StatIcon color="var(--accent)">
             <FiStar />
           </StatIcon>
           <StatValue>{stats.reviewsCount}</StatValue>
@@ -242,7 +242,7 @@ const ActivityStats: React.FC<ActivityStatsProps> = ({
             {recentReviews.slice(0, 3).map(review => (
               <RecentItem key={review.id} to={`/racket/${review.rackets?.nombre?.toLowerCase().replace(/\s+/g, '-')}`}>
                 <RecentItemInfo>
-                  <RecentItemIcon color="#f59e0b">
+                  <RecentItemIcon color="var(--accent)">
                     <FiStar size={16} />
                   </RecentItemIcon>
                   <RecentItemText>

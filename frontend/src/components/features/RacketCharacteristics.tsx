@@ -5,7 +5,7 @@ import { RacketCharacteristics as RacketCharacteristicsType } from "../../types/
 import { shouldDisplayCharacteristic } from "../../utils/characteristicsUtils";
 
 const CharacteristicsContainer = styled(motion.div)`
-  background: white;
+  background: var(--surface);
   border-radius: 16px;
   padding: 1.5rem;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
@@ -15,7 +15,7 @@ const CharacteristicsContainer = styled(motion.div)`
 const SectionTitle = styled.h3`
   font-size: 1.25rem;
   font-weight: 600;
-  color: #1f2937;
+  color: var(--text);
   margin-bottom: 1rem;
   display: flex;
   align-items: center;
@@ -33,41 +33,41 @@ const CharacteristicItem = styled.div`
   justify-content: space-between;
   align-items: center;
   padding: 0.75rem;
-  background: #f8fafc;
+  background: var(--surface-2);
   border-radius: 8px;
-  border: 1px solid rgba(22, 163, 74, 0.15);
+  border: 1px solid rgba(var(--primary-rgb), 0.15);
   box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
 `;
 
 const CharacteristicLabel = styled.span`
   font-weight: 500;
-  color: #374151;
+  color: var(--text);
   text-transform: capitalize;
 `;
 
 const CharacteristicValue = styled.span`
   font-weight: 600;
-  color: #16a34a;
+  color: var(--primary);
 `;
 
 const DescriptionContainer = styled.div`
-  background: #f0fdf4;
+  background: var(--primary-subtle);
   border-radius: 12px;
   padding: 1.25rem;
   margin-top: 1rem;
-  border: 1px solid rgba(22, 163, 74, 0.2);
+  border: 1px solid rgba(var(--primary-rgb), 0.2);
   box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
 `;
 
 const DescriptionTitle = styled.h4`
   font-size: 1rem;
   font-weight: 600;
-  color: #1f2937;
+  color: var(--text);
   margin-bottom: 0.75rem;
 `;
 
 const DescriptionText = styled.p`
-  color: #4b5563;
+  color: var(--text);
   line-height: 1.6;
   margin: 0;
 `;
@@ -75,7 +75,7 @@ const DescriptionText = styled.p`
 const EmptyState = styled.div`
   text-align: center;
   padding: 2rem;
-  color: #6b7280;
+  color: var(--text-muted);
   font-style: italic;
 `;
 

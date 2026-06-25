@@ -24,7 +24,7 @@ const Overlay = styled(motion.div)`
 `;
 
 const Modal = styled(motion.div)`
-  background: white;
+  background: var(--surface);
   border-radius: 16px;
   padding: 2rem;
   max-width: 500px;
@@ -42,7 +42,7 @@ const Header = styled.div`
 const Title = styled.h2`
   font-size: 1.5rem;
   font-weight: 700;
-  color: #1f2937;
+  color: var(--text);
   margin: 0;
 `;
 
@@ -50,7 +50,7 @@ const CloseButton = styled.button`
   background: none;
   border: none;
   cursor: pointer;
-  color: #6b7280;
+  color: var(--text-muted);
   padding: 0.5rem;
   display: flex;
   align-items: center;
@@ -59,8 +59,8 @@ const CloseButton = styled.button`
   border-radius: 8px;
 
   &:hover {
-    background: #f3f4f6;
-    color: #1f2937;
+    background: var(--surface-3);
+    color: var(--text);
   }
 `;
 
@@ -79,25 +79,25 @@ const FormGroup = styled.div`
 const Label = styled.label`
   font-size: 0.875rem;
   font-weight: 600;
-  color: #374151;
+  color: var(--text);
 `;
 
 const Input = styled.input`
   padding: 0.75rem;
-  border: 2px solid #e5e7eb;
+  border: 2px solid var(--border);
   border-radius: 8px;
   font-size: 1rem;
   transition: all 0.2s ease;
 
   &:focus {
     outline: none;
-    border-color: #16a34a;
+    border-color: var(--primary);
   }
 `;
 
 const TextArea = styled.textarea`
   padding: 0.75rem;
-  border: 2px solid #e5e7eb;
+  border: 2px solid var(--border);
   border-radius: 8px;
   font-size: 1rem;
   min-height: 100px;
@@ -107,7 +107,7 @@ const TextArea = styled.textarea`
 
   &:focus {
     outline: none;
-    border-color: #16a34a;
+    border-color: var(--primary);
   }
 `;
 
@@ -134,21 +134,21 @@ const Button = styled.button<{ variant?: "primary" | "secondary" }>`
   ${(props) =>
     props.variant === "primary"
       ? `
-    background: #16a34a;
-    color: white;
+    background: var(--primary);
+    color: var(--text-inverse);
     &:hover {
-      background: #15803d;
+      background: var(--primary-hover);
     }
     &:disabled {
-      background: #9ca3af;
+      background: var(--text-subtle);
       cursor: not-allowed;
     }
   `
       : `
-    background: #f3f4f6;
-    color: #374151;
+    background: var(--surface-3);
+    color: var(--text);
     &:hover {
-      background: #e5e7eb;
+      background: var(--border);
     }
   `}
 `;

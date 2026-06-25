@@ -16,7 +16,7 @@ import { RacketService, PriceHistoryResult } from '../../services/racketService'
 // ── Styled components ────────────────────────────────────────────────────────
 
 const ChartContainer = styled.div`
-  background: white;
+  background: var(--surface);
   border-radius: 16px;
   padding: 1.5rem;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
@@ -36,7 +36,7 @@ const Header = styled.div`
 const Title = styled.h3`
   font-size: 1.1rem;
   font-weight: 700;
-  color: #1f2937;
+  color: var(--text);
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -52,7 +52,7 @@ const PriceRow = styled.div`
 const CurrentPrice = styled.span`
   font-size: 1.75rem;
   font-weight: 800;
-  color: #1f2937;
+  color: var(--text);
 `;
 
 const PriceBadge = styled.span<{ variant: 'low' | 'neutral' | 'high' }>`
@@ -61,9 +61,9 @@ const PriceBadge = styled.span<{ variant: 'low' | 'neutral' | 'high' }>`
   padding: 2px 8px;
   border-radius: 99px;
   background: ${({ variant }) =>
-    variant === 'low' ? '#dcfce7' : variant === 'high' ? '#fee2e2' : '#f3f4f6'};
+    variant === 'low' ? 'var(--primary-subtle)' : variant === 'high' ? 'rgba(220, 38, 38, 0.10)' : 'var(--surface-3)'};
   color: ${({ variant }) =>
-    variant === 'low' ? '#16a34a' : variant === 'high' ? '#dc2626' : '#6b7280'};
+    variant === 'low' ? 'var(--primary)' : variant === 'high' ? 'var(--danger)' : 'var(--text-muted)'};
 `;
 
 const Controls = styled.div`
@@ -78,14 +78,14 @@ const PillButton = styled.button<{ active?: boolean }>`
   font-weight: 600;
   padding: 4px 12px;
   border-radius: 99px;
-  border: 1.5px solid ${({ active }) => (active ? '#16a34a' : '#e5e7eb')};
-  background: ${({ active }) => (active ? '#dcfce7' : 'white')};
-  color: ${({ active }) => (active ? '#16a34a' : '#6b7280')};
+  border: 1.5px solid ${({ active }) => (active ? 'var(--primary)' : 'var(--border)')};
+  background: ${({ active }) => (active ? 'var(--primary-subtle)' : 'var(--surface)')};
+  color: ${({ active }) => (active ? 'var(--primary)' : 'var(--text-muted)')};
   cursor: pointer;
   transition: all 0.15s;
   &:hover {
-    border-color: #16a34a;
-    color: #16a34a;
+    border-color: var(--primary);
+    color: var(--primary);
   }
 `;
 
@@ -95,7 +95,7 @@ const EmptyState = styled.div`
   align-items: center;
   justify-content: center;
   height: 200px;
-  color: #9ca3af;
+  color: var(--text-subtle);
   font-size: 0.875rem;
   gap: 0.5rem;
 `;
@@ -103,7 +103,7 @@ const EmptyState = styled.div`
 // ── Colores por tienda ────────────────────────────────────────────────────────
 
 const STORE_COLORS: Record<string, string> = {
-  padelmarket:  '#16a34a',
+  padelmarket:  'var(--primary)',
   padelnuestro: '#2563eb',
   padelproshop: '#d97706',
   otras:       '#8b5cf6', // Agregado: color para tiendas restantes
@@ -244,7 +244,7 @@ export const PriceHistoryChart: React.FC<PriceHistoryChartProps> = ({
             <PriceBadge variant={badgeVariant}>{badgeLabel}</PriceBadge>
           </PriceRow>
           {globalMin !== null && globalMax !== null && globalMin !== globalMax && (
-            <div style={{ fontSize: '0.75rem', color: '#9ca3af', marginTop: '2px' }}>
+            <div style={{ fontSize: '0.75rem', color: 'var(--text-subtle)', marginTop: '2px' }}>
               Mín: <strong>{globalMin.toFixed(2)}€</strong>
               {' · '}
               Máx: <strong>{globalMax.toFixed(2)}€</strong>
@@ -285,8 +285,8 @@ export const PriceHistoryChart: React.FC<PriceHistoryChartProps> = ({
                 {/* Gradientes para tiendas principales */}
                 {historyData.stores.filter(s => MAIN_STORES.includes(s.store)).map(s => (
                   <linearGradient key={s.store} id={`grad-${s.store}`} x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%"  stopColor={STORE_COLORS[s.store] || '#6b7280'} stopOpacity={0.15} />
-                    <stop offset="95%" stopColor={STORE_COLORS[s.store] || '#6b7280'} stopOpacity={0} />
+                    <stop offset="5%"  stopColor={STORE_COLORS[s.store] || 'var(--text-muted)'} stopOpacity={0.15} />
+                    <stop offset="95%" stopColor={STORE_COLORS[s.store] || 'var(--text-muted)'} stopOpacity={0} />
                   </linearGradient>
                 ))}
                 {/* Gradiente para "otras" tiendas */}
@@ -296,12 +296,12 @@ export const PriceHistoryChart: React.FC<PriceHistoryChartProps> = ({
                 </linearGradient>
               </defs>
 
-              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f3f4f6" />
+              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--surface-3)" />
               <XAxis
                 dataKey="date"
                 axisLine={false}
                 tickLine={false}
-                tick={{ fontSize: 11, fill: '#9ca3af' }}
+                tick={{ fontSize: 11, fill: 'var(--text-subtle)' }}
                 minTickGap={30}
               />
               <YAxis
@@ -337,11 +337,11 @@ export const PriceHistoryChart: React.FC<PriceHistoryChartProps> = ({
                     key={s.store}
                     type="monotone"
                     dataKey={dataKey}
-                    stroke={STORE_COLORS[dataKey] || '#6b7280'}
+                    stroke={STORE_COLORS[dataKey] || 'var(--text-muted)'}
                     strokeWidth={2.5}
                     fill={`url(#grad-${dataKey})`}
                     fillOpacity={1}
-                    dot={{ r: 3, strokeWidth: 2, fill: '#fff' }}
+                    dot={{ r: 3, strokeWidth: 2, fill: 'var(--surface)' }}
                     activeDot={{ r: 5, strokeWidth: 2 }}
                     connectNulls
                     animationDuration={800}

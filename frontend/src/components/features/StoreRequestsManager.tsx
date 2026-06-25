@@ -28,15 +28,15 @@ const SearchBar = styled.div`
 const SearchInput = styled.input`
   width: 100%;
   padding: 0.75rem 1rem 0.75rem 2.75rem;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--border);
   border-radius: 12px;
   font-size: 1rem;
   transition: all 0.3s ease;
 
   &:focus {
     outline: none;
-    border-color: #16a34a;
-    box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.1);
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.1);
   }
 `;
 
@@ -45,22 +45,22 @@ const SearchIcon = styled(FiSearch)`
   left: 1rem;
   top: 50%;
   transform: translateY(-50%);
-  color: #9ca3af;
+  color: var(--text-subtle);
   font-size: 1.25rem;
 `;
 
 const TabsContainer = styled.div`
   display: flex;
   gap: 0.5rem;
-  border-bottom: 2px solid #e5e7eb;
+  border-bottom: 2px solid var(--border);
 `;
 
 const Tab = styled.button<{ active: boolean }>`
   padding: 0.75rem 1.5rem;
-  background: ${props => (props.active ? 'white' : 'transparent')};
-  color: ${props => (props.active ? '#16a34a' : '#666')};
+  background: ${props => (props.active ? 'var(--surface)' : 'transparent')};
+  color: ${props => (props.active ? 'var(--primary)' : 'var(--text-muted)')};
   border: none;
-  border-bottom: 2px solid ${props => (props.active ? '#16a34a' : 'transparent')};
+  border-bottom: 2px solid ${props => (props.active ? 'var(--primary)' : 'transparent')};
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
@@ -68,7 +68,7 @@ const Tab = styled.button<{ active: boolean }>`
   margin-bottom: -2px;
 
   &:hover {
-    color: #16a34a;
+    color: var(--primary);
   }
 `;
 
@@ -79,7 +79,7 @@ const RequestsGrid = styled.div`
 `;
 
 const RequestCard = styled.div`
-  background: white;
+  background: var(--surface);
   border-radius: 12px;
   padding: 1.5rem;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
@@ -101,7 +101,7 @@ const CardHeader = styled.div`
 const StoreName = styled.h3`
   margin: 0;
   font-size: 1.25rem;
-  color: #16a34a;
+  color: var(--primary);
   font-weight: 700;
 `;
 
@@ -113,19 +113,19 @@ const StatusBadge = styled.span<{ status: 'pending' | 'approved' | 'rejected' }>
   background: ${props => {
     switch (props.status) {
       case 'approved':
-        return '#dcfce7';
+        return 'var(--primary-subtle)';
       case 'rejected':
-        return '#fee2e2';
+        return 'rgba(220, 38, 38, 0.10)';
       case 'pending':
-        return '#fef3c7';
+        return 'rgba(217, 119, 6, 0.10)';
     }
   }};
   color: ${props => {
     switch (props.status) {
       case 'approved':
-        return '#15803d';
+        return 'var(--primary-hover)';
       case 'rejected':
-        return '#dc2626';
+        return 'var(--danger)';
       case 'pending':
         return '#d97706';
     }
@@ -137,17 +137,17 @@ const InfoItem = styled.div`
   align-items: center;
   gap: 0.5rem;
   margin-bottom: 0.75rem;
-  color: #666;
+  color: var(--text-muted);
   font-size: 0.875rem;
 
   svg {
-    color: #16a34a;
+    color: var(--primary);
     flex-shrink: 0;
   }
 `;
 
 const RequestDate = styled.div`
-  color: #999;
+  color: var(--text-subtle);
   font-size: 0.75rem;
   margin-bottom: 1rem;
 `;
@@ -157,7 +157,7 @@ const ActionsContainer = styled.div`
   gap: 0.75rem;
   margin-top: 1.5rem;
   padding-top: 1rem;
-  border-top: 1px solid #e5e7eb;
+  border-top: 1px solid var(--border);
 `;
 
 const ActionButton = styled.button<{ variant: 'approve' | 'reject' }>`
@@ -177,21 +177,21 @@ const ActionButton = styled.button<{ variant: 'approve' | 'reject' }>`
   ${props =>
     props.variant === 'approve'
       ? `
-    background: #dcfce7;
-    color: #15803d;
+    background: var(--primary-subtle);
+    color: var(--primary-hover);
 
     &:hover {
-      background: #16a34a;
-      color: white;
+      background: var(--primary);
+      color: var(--text-inverse);
     }
   `
       : `
-    background: #fee2e2;
-    color: #dc2626;
+    background: rgba(220, 38, 38, 0.10);
+    color: var(--danger);
 
     &:hover {
-      background: #dc2626;
-      color: white;
+      background: var(--danger);
+      color: var(--text-inverse);
     }
   `}
 
@@ -203,8 +203,8 @@ const ActionButton = styled.button<{ variant: 'approve' | 'reject' }>`
 const EmptyState = styled.div`
   padding: 3rem;
   text-align: center;
-  color: #666;
-  background: white;
+  color: var(--text-muted);
+  background: var(--surface);
   border-radius: 12px;
 `;
 
@@ -213,7 +213,7 @@ const LoadingContainer = styled.div`
   justify-content: center;
   align-items: center;
   padding: 3rem;
-  color: #666;
+  color: var(--text-muted);
 `;
 
 type ViewMode = 'all' | 'pending';
@@ -370,7 +370,7 @@ const StoreRequestsManager: React.FC = () => {
                     href={request.website_url}
                     target='_blank'
                     rel='noopener noreferrer'
-                    style={{ color: '#16a34a', textDecoration: 'none' }}
+                    style={{ color: 'var(--primary)', textDecoration: 'none' }}
                   >
                     {request.website_url}
                   </a>
@@ -383,7 +383,7 @@ const StoreRequestsManager: React.FC = () => {
                 </InfoItem>
               )}
 
-              <InfoItem style={{ display: 'block', fontSize: '0.875rem', color: '#6b7280' }}>
+              <InfoItem style={{ display: 'block', fontSize: '0.875rem', color: 'var(--text-muted)' }}>
                 <strong>Razón Social:</strong> {request.legal_name} ({request.cif_nif})
               </InfoItem>
 

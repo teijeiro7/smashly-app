@@ -178,9 +178,9 @@ export const ReviewForm: React.FC<ReviewFormProps> = ({
 // Styled Components
 
 const Container = styled.form`
-  background: white;
+  background: var(--surface);
   border-radius: 12px;
-  border: 1px solid var(--color-gray-200);
+  border: 1px solid var(--border);
   padding: 1.5rem;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
 `;
@@ -190,8 +190,8 @@ const ErrorBanner = styled.div`
   align-items: center;
   gap: 0.5rem;
   padding: 0.75rem 1rem;
-  background: #fef2f2;
-  border-left: 3px solid #dc2626;
+  background: rgba(220, 38, 38, 0.08);
+  border-left: 3px solid var(--danger);
   border-radius: 8px;
   margin-bottom: 1rem;
 `;
@@ -202,7 +202,7 @@ const ErrorIcon = styled.span`
 `;
 
 const ErrorText = styled.span`
-  color: #dc2626;
+  color: var(--danger);
   font-weight: 600;
   font-size: 0.9rem;
   line-height: 1.4;
@@ -215,7 +215,7 @@ const RatingSection = styled.div`
 const SectionLabel = styled.div`
   font-size: 0.9rem;
   font-weight: 700;
-  color: var(--color-gray-900);
+  color: var(--text);
   margin-bottom: 0.75rem;
   text-align: center;
 `;
@@ -237,7 +237,7 @@ const StarButton = styled.button<{ $active: boolean; $hovered: boolean }>`
   font-size: 1.75rem;
   cursor: pointer;
   transition: all 0.15s;
-  color: ${props => (props.$active ? '#FDB022' : '#D1D5DB')};
+  color: ${props => (props.$active ? '#FDB022' : 'var(--border-strong)')};
   filter: ${props => (props.$active ? 'drop-shadow(0 1px 3px rgba(253, 176, 34, 0.3))' : 'none')};
   padding: 0.125rem;
   line-height: 1;
@@ -254,7 +254,7 @@ const StarButton = styled.button<{ $active: boolean; $hovered: boolean }>`
 const RatingLabel = styled.div`
   font-size: 0.95rem;
   font-weight: 600;
-  color: var(--color-primary);
+  color: var(--primary);
 `;
 
 const FormField = styled.div`
@@ -266,7 +266,7 @@ const FieldLabel = styled.label`
   justify-content: space-between;
   align-items: center;
   font-weight: 600;
-  color: var(--color-gray-700);
+  color: var(--text);
   margin-bottom: 0.5rem;
   font-size: 0.875rem;
 `;
@@ -274,59 +274,59 @@ const FieldLabel = styled.label`
 const CharCounter = styled.span<{ $warning?: boolean }>`
   font-weight: 600;
   font-size: 0.8rem;
-  color: ${props => (props.$warning ? '#F59E0B' : 'var(--color-gray-400)')};
+  color: ${props => (props.$warning ? 'var(--accent)' : 'var(--text-subtle)')};
   font-variant-numeric: tabular-nums;
 `;
 
 const TitleInput = styled.input`
   width: 100%;
   padding: 0.75rem 1rem;
-  border: 1px solid var(--color-gray-300);
+  border: 1px solid var(--border-strong);
   border-radius: 8px;
   font-size: 0.95rem;
   font-family: inherit;
   transition: all 0.2s;
-  background: white;
+  background: var(--surface);
 
   &:focus {
     outline: none;
-    border-color: var(--color-primary);
-    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.1);
   }
 
   &::placeholder {
-    color: var(--color-gray-400);
+    color: var(--text-subtle);
   }
 `;
 
 const ContentTextarea = styled.textarea`
   width: 100%;
   padding: 0.75rem 1rem;
-  border: 1px solid var(--color-gray-300);
+  border: 1px solid var(--border-strong);
   border-radius: 8px;
   font-size: 0.95rem;
   font-family: inherit;
   resize: vertical;
   min-height: 100px;
   transition: all 0.2s;
-  background: white;
+  background: var(--surface);
   line-height: 1.5;
 
   &:focus {
     outline: none;
-    border-color: var(--color-primary);
-    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.1);
   }
 
   &::placeholder {
-    color: var(--color-gray-400);
+    color: var(--text-subtle);
   }
 `;
 
 const FieldHint = styled.div`
   margin-top: 0.5rem;
   font-size: 0.8rem;
-  color: var(--color-gray-500);
+  color: var(--text-muted);
   line-height: 1.4;
 `;
 
@@ -336,23 +336,23 @@ const ActionBar = styled.div`
   justify-content: flex-end;
   margin-top: 1.5rem;
   padding-top: 1.25rem;
-  border-top: 1px solid var(--color-gray-200);
+  border-top: 1px solid var(--border);
 `;
 
 const CancelButton = styled.button`
   padding: 0.625rem 1.25rem;
-  background: white;
-  border: 1px solid var(--color-gray-300);
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
   border-radius: 8px;
   font-size: 0.9rem;
   font-weight: 600;
-  color: var(--color-gray-700);
+  color: var(--text);
   cursor: pointer;
   transition: all 0.2s;
 
   &:hover:not(:disabled) {
-    background: var(--color-gray-50);
-    border-color: var(--color-gray-400);
+    background: var(--surface-2);
+    border-color: var(--text-subtle);
   }
 
   &:disabled {
@@ -363,22 +363,22 @@ const CancelButton = styled.button`
 
 const SubmitButton = styled.button`
   padding: 0.625rem 1.75rem;
-  background: var(--color-primary);
+  background: var(--primary);
   border: none;
   border-radius: 8px;
   font-size: 0.9rem;
   font-weight: 700;
-  color: white;
+  color: var(--text-inverse);
   cursor: pointer;
   transition: all 0.2s;
-  box-shadow: 0 2px 4px rgba(16, 185, 129, 0.2);
+  box-shadow: 0 2px 4px rgba(var(--primary-rgb), 0.2);
   display: flex;
   align-items: center;
   gap: 0.5rem;
 
   &:hover:not(:disabled) {
-    background: #059669;
-    box-shadow: 0 3px 6px rgba(16, 185, 129, 0.3);
+    background: var(--primary-hover);
+    box-shadow: 0 3px 6px rgba(var(--primary-rgb), 0.3);
   }
 
   &:disabled {

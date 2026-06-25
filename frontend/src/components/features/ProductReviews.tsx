@@ -209,7 +209,7 @@ const SectionContainer = styled.div`
 const SectionTitle = styled.h2`
   font-size: 1.5rem;
   font-weight: 700;
-  color: var(--color-gray-900);
+  color: var(--text);
   margin-bottom: 1rem;
   display: flex;
   align-items: center;
@@ -219,7 +219,7 @@ const SectionTitle = styled.h2`
     content: '';
     width: 4px;
     height: 24px;
-    background: var(--color-primary);
+    background: var(--primary);
     border-radius: 2px;
   }
 `;
@@ -239,7 +239,7 @@ const ContentGrid = styled.div`
 // -- Summary Card --
 
 const SummaryCard = styled.div`
-  background: white;
+  background: var(--surface);
   padding: 2rem;
   border-radius: 20px;
   box-shadow:
@@ -257,7 +257,7 @@ const RatingHeader = styled.div`
 const BigRating = styled.div`
   font-size: 4rem;
   font-weight: 800;
-  color: #111827;
+  color: var(--text);
   line-height: 1;
   margin-bottom: 0.5rem;
   letter-spacing: -0.05em;
@@ -278,11 +278,11 @@ const StarsContainer = styled.div`
 `;
 
 const StarIcon = styled.span<{ filled: boolean }>`
-  color: ${p => (p.filled ? '#FFC107' : '#E5E7EB')};
+  color: ${p => (p.filled ? '#FFC107' : 'var(--border)')};
 `;
 
 const TotalReviews = styled.div`
-  color: #6b7280;
+  color: var(--text-muted);
   font-size: 0.95rem;
   margin-top: 0.5rem;
 `;
@@ -293,7 +293,7 @@ const DistributionContainer = styled.div`
   gap: 0.75rem;
   margin-bottom: 2rem;
   padding-bottom: 2rem;
-  border-bottom: 1px solid #f3f4f6;
+  border-bottom: 1px solid var(--surface-3);
 `;
 
 const DistRow = styled.div`
@@ -301,7 +301,7 @@ const DistRow = styled.div`
   align-items: center;
   gap: 1rem;
   font-size: 0.9rem;
-  color: #374151;
+  color: var(--text);
 `;
 
 const StarNum = styled.span`
@@ -312,7 +312,7 @@ const StarNum = styled.span`
 const BarTrack = styled.div`
   flex: 1;
   height: 10px;
-  background: #f3f4f6;
+  background: var(--surface-3);
   border-radius: 99px;
   overflow: hidden;
 `;
@@ -326,7 +326,7 @@ const BarFill = styled.div<{ width: number }>`
 `;
 
 const Percent = styled.span`
-  color: #9ca3af;
+  color: var(--text-subtle);
   min-width: 35px;
   text-align: right;
   font-variant-numeric: tabular-nums;
@@ -340,7 +340,7 @@ const WriteReviewButton = styled.button`
   width: 100%;
   padding: 1rem;
   background: #ecfdf5;
-  color: #059669;
+  color: var(--success);
   font-weight: 700;
   font-size: 1rem;
   border: 1px solid transparent;
@@ -364,15 +364,15 @@ const LoginPrompt = styled(Link)`
   width: 100%;
   padding: 1rem;
   text-align: center;
-  background: #f3f4f6;
-  color: #4b5563;
+  background: var(--surface-3);
+  color: var(--text);
   font-weight: 600;
   border-radius: 12px;
   text-decoration: none;
   transition: background 0.2s;
 
   &:hover {
-    background: #e5e7eb;
+    background: var(--border);
   }
 `;
 
@@ -385,16 +385,16 @@ const ReviewsColumn = styled.div`
 `;
 
 const FormContainer = styled.div`
-  background: white;
+  background: var(--surface);
   padding: 1.5rem;
   border-radius: 16px;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--border);
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
 `;
 
 const EmptyStateBanner = styled.div`
-  background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
-  border: 2px solid #bbf7d0;
+  background: linear-gradient(135deg, var(--primary-subtle) 0%, var(--primary-faint) 100%);
+  border: 2px solid var(--primary-subtle);
   border-radius: 16px;
   padding: 2rem 2.5rem;
   display: flex;
@@ -421,13 +421,13 @@ const EmptyStateIcon = styled.div`
 const EmptyStateTitle = styled.h3`
   font-size: 1.25rem;
   font-weight: 700;
-  color: #065f46;
+  color: var(--primary-hover);
   margin: 0 0 0.25rem 0;
 `;
 
 const EmptyStateText = styled.p`
   font-size: 0.95rem;
-  color: #047857;
+  color: var(--success);
   line-height: 1.5;
   margin: 0;
 `;

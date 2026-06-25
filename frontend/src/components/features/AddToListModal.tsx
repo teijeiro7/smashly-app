@@ -27,7 +27,7 @@ const Overlay = styled(motion.div)`
 `;
 
 const Modal = styled(motion.div)`
-  background: white;
+  background: var(--surface);
   border-radius: 16px;
   padding: 2rem;
   max-width: 500px;
@@ -45,7 +45,7 @@ const Header = styled.div`
   align-items: flex-start;
   margin-bottom: 1.5rem;
   padding-bottom: 1rem;
-  border-bottom: 2px solid #f3f4f6;
+  border-bottom: 2px solid var(--surface-3);
 `;
 
 const HeaderContent = styled.div`
@@ -55,13 +55,13 @@ const HeaderContent = styled.div`
 const Title = styled.h2`
   font-size: 1.5rem;
   font-weight: 700;
-  color: #1f2937;
+  color: var(--text);
   margin: 0 0 0.5rem 0;
 `;
 
 const Subtitle = styled.p`
   font-size: 0.875rem;
-  color: #6b7280;
+  color: var(--text-muted);
   margin: 0;
 `;
 
@@ -69,7 +69,7 @@ const CloseButton = styled.button`
   background: none;
   border: none;
   cursor: pointer;
-  color: #6b7280;
+  color: var(--text-muted);
   padding: 0.5rem;
   display: flex;
   align-items: center;
@@ -78,8 +78,8 @@ const CloseButton = styled.button`
   border-radius: 8px;
 
   &:hover {
-    background: #f3f4f6;
-    color: #1f2937;
+    background: var(--surface-3);
+    color: var(--text);
   }
 `;
 
@@ -95,16 +95,16 @@ const Content = styled.div`
   }
 
   &::-webkit-scrollbar-track {
-    background: #f3f4f6;
+    background: var(--surface-3);
     border-radius: 4px;
   }
 
   &::-webkit-scrollbar-thumb {
-    background: #d1d5db;
+    background: var(--border-strong);
     border-radius: 4px;
 
     &:hover {
-      background: #9ca3af;
+      background: var(--text-subtle);
     }
   }
 `;
@@ -112,8 +112,8 @@ const Content = styled.div`
 const CreateNewButton = styled.button`
   width: 100%;
   padding: 1rem;
-  background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
-  color: white;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
+  color: var(--text-inverse);
   border: none;
   border-radius: 12px;
   font-weight: 600;
@@ -128,7 +128,7 @@ const CreateNewButton = styled.button`
 
   &:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(22, 163, 74, 0.3);
+    box-shadow: 0 4px 12px rgba(var(--primary-rgb), 0.3);
   }
 `;
 
@@ -141,8 +141,8 @@ const ListsGrid = styled.div`
 const ListItem = styled.button<{ isAdded?: boolean }>`
   width: 100%;
   padding: 1rem;
-  background: ${(props) => (props.isAdded ? "#f0fdf4" : "white")};
-  border: 2px solid ${(props) => (props.isAdded ? "#16a34a" : "#e5e7eb")};
+  background: ${(props) => (props.isAdded ? "var(--primary-subtle)" : "var(--surface)")};
+  border: 2px solid ${(props) => (props.isAdded ? "var(--primary)" : "var(--border)")};
   border-radius: 12px;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -152,8 +152,8 @@ const ListItem = styled.button<{ isAdded?: boolean }>`
   text-align: left;
 
   &:hover {
-    border-color: #16a34a;
-    background: #f0fdf4;
+    border-color: var(--primary);
+    background: var(--primary-subtle);
   }
 
   &:disabled {
@@ -165,8 +165,8 @@ const ListItem = styled.button<{ isAdded?: boolean }>`
 const ListIcon = styled.div<{ isAdded?: boolean }>`
   width: 40px;
   height: 40px;
-  background: ${(props) => (props.isAdded ? "#16a34a" : "#f3f4f6")};
-  color: ${(props) => (props.isAdded ? "white" : "#6b7280")};
+  background: ${(props) => (props.isAdded ? "var(--primary)" : "var(--surface-3)")};
+  color: ${(props) => (props.isAdded ? "var(--text-inverse)" : "var(--text-muted)")};
   border-radius: 10px;
   display: flex;
   align-items: center;
@@ -181,7 +181,7 @@ const ListInfo = styled.div`
 
 const ListName = styled.div`
   font-weight: 600;
-  color: #1f2937;
+  color: var(--text);
   margin-bottom: 0.25rem;
   white-space: nowrap;
   overflow: hidden;
@@ -190,13 +190,13 @@ const ListName = styled.div`
 
 const ListMeta = styled.div`
   font-size: 0.75rem;
-  color: #6b7280;
+  color: var(--text-muted);
 `;
 
 const EmptyState = styled.div`
   text-align: center;
   padding: 2rem 1rem;
-  color: #6b7280;
+  color: var(--text-muted);
 `;
 
 const EmptyIcon = styled.div`
@@ -213,7 +213,7 @@ const EmptyText = styled.p`
 const LoadingState = styled.div`
   text-align: center;
   padding: 2rem 1rem;
-  color: #6b7280;
+  color: var(--text-muted);
 `;
 
 export const AddToListModal: React.FC<AddToListModalProps> = ({
