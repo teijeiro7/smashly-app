@@ -300,8 +300,10 @@ export const GlobalStyles = createGlobalStyle`
     --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
   }
 
-  /* Dark mode — explicit choice via [data-theme="dark"] (manual or resolved from auto) */
-  [data-theme='dark'] {
+  /* Dark mode — explicit choice via html[data-theme="dark"]
+     Using a high-specificity selector (html + attribute) so it always wins
+     over the bare :root rule regardless of cascade order. */
+  html[data-theme='dark'] {
     /* Forest-tinted dark palette: backgrounds are green-graphite (not pure black) */
     --color-primary: #22c55e;
     --color-primary-dark: #16a34a;
@@ -353,13 +355,15 @@ export const GlobalStyles = createGlobalStyle`
     --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.50), 0 2px 4px -1px rgba(0, 0, 0, 0.40);
     --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.55), 0 4px 6px -2px rgba(0, 0, 0, 0.40);
     --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.60), 0 10px 10px -5px rgba(0, 0, 0, 0.45);
+
+    color-scheme: dark;
   }
 
   /* Auto mode: follow OS, but only when user has NOT made an explicit choice
      (the anti-FOUC script sets data-theme='light'/'dark' when there is a stored
      preference, and leaves the attribute unset in auto mode). */
   @media (prefers-color-scheme: dark) {
-    :root:not([data-theme='light']):not([data-theme='dark']) {
+    html:not([data-theme='light']):not([data-theme='dark']) {
       --color-primary: #22c55e;
       --color-primary-dark: #16a34a;
       --color-primary-light: #4ade80;
@@ -410,6 +414,8 @@ export const GlobalStyles = createGlobalStyle`
       --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.50), 0 2px 4px -1px rgba(0, 0, 0, 0.40);
       --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.55), 0 4px 6px -2px rgba(0, 0, 0, 0.40);
       --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.60), 0 10px 10px -5px rgba(0, 0, 0, 0.45);
+
+      color-scheme: dark;
     }
   }
 
