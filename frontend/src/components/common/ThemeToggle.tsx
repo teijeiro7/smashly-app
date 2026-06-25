@@ -3,7 +3,9 @@ import { FiMonitor, FiMoon, FiSun } from 'react-icons/fi';
 import styled from 'styled-components';
 import { useTheme, ThemeMode } from '../../contexts/ThemeContext';
 
-const Button = styled.button`
+type Variant = 'default' | 'onBrand';
+
+const Button = styled.button<{ $variant: Variant }>`
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -11,15 +13,15 @@ const Button = styled.button`
   height: 40px;
   border-radius: 50%;
   background: transparent;
-  border: 1px solid var(--text);
-  color: var(--text);
+  border: 1px solid ${p => (p.$variant === 'onBrand' ? 'rgba(255, 255, 255, 0.4)' : 'var(--text)')};
+  color: ${p => (p.$variant === 'onBrand' ? 'var(--brand-on-surface)' : 'var(--text)')};
   cursor: pointer;
   transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
 
   &:hover {
-    background: var(--primary-subtle);
-    color: var(--primary);
-    border-color: var(--primary);
+    background: ${p => (p.$variant === 'onBrand' ? 'rgba(255, 255, 255, 0.12)' : 'var(--primary-subtle)')};
+    color: ${p => (p.$variant === 'onBrand' ? 'var(--brand-on-surface)' : 'var(--primary)')};
+    border-color: ${p => (p.$variant === 'onBrand' ? 'rgba(255, 255, 255, 0.7)' : 'var(--primary)')};
   }
 
   &:active {
@@ -27,7 +29,7 @@ const Button = styled.button`
   }
 
   &:focus-visible {
-    outline: 3px solid var(--primary);
+    outline: 3px solid ${p => (p.$variant === 'onBrand' ? 'var(--brand-on-surface)' : 'var(--primary)')};
     outline-offset: 2px;
   }
 
@@ -105,7 +107,7 @@ const ARIA_LABEL: Record<ThemeMode, string> = {
  * Renders a single button showing the icon of the current mode; click opens
  * the popover with explicit choices. Persists the choice in localStorage.
  */
-const ThemeToggle: React.FC = () => {
+const ThemeToggle: React.FC<{ variant?: Variant }> = ({ variant = 'default' }) => {
   const { mode, setMode } = useTheme();
   const [open, setOpen] = useState(false);
   const wrapperRef = useRef<HTMLDivElement | null>(null);
@@ -132,6 +134,7 @@ const ThemeToggle: React.FC = () => {
     <Wrapper ref={wrapperRef}>
       <Button
         type='button'
+        $variant={variant}
         aria-label={ARIA_LABEL[mode]}
         aria-haspopup='menu'
         aria-expanded={open}

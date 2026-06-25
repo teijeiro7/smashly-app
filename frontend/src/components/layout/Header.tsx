@@ -10,7 +10,7 @@ import { NotificationBell, MobileNotificationBell } from '../notifications/Notif
 import ThemeToggle from '../common/ThemeToggle';
 
 const HeaderContainer = styled.header`
-  background: var(--brand-surface);
+  background: var(--header-bg);
   padding: 0;
   box-shadow: 0 1px 3px var(--shadow-color), 0 1px 2px var(--shadow-color);
   position: sticky;
@@ -601,7 +601,7 @@ const Header: React.FC = () => {
         </CentralSearchContainer>
 
         <AuthButtons>
-          <ThemeToggle />
+          <ThemeToggle variant='onBrand' />
           {userProfile ? (
             <UserMenuContainer ref={userMenuRef}>
               <NotificationBell />
@@ -649,7 +649,7 @@ const Header: React.FC = () => {
 
         <MobileElements>
           <MobileNotificationBell />
-          <ThemeToggle />
+          <ThemeToggle variant='onBrand' />
           <MobileSearchButton onClick={toggleMobileSearch} aria-label="Buscar">
             <FiSearch />
           </MobileSearchButton>

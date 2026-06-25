@@ -289,6 +289,7 @@ export const GlobalStyles = createGlobalStyle`
     --brand-on-surface: #ffffff;
     --surface-inverse: #0f172a;
     --footer-bg: #0f2818;
+    --header-bg: #15803d;
     --bg-glow-secondary: rgba(2, 132, 199, 0.08);
 
     /* Spacing */
@@ -387,6 +388,7 @@ export const GlobalStyles = createGlobalStyle`
     --brand-on-surface: #ffffff;
     --surface-inverse: #0f172a;
     --footer-bg: #051008;
+    --header-bg: #0a3818;
 
     --shadow-color: rgba(0, 0, 0, 0.50);
     --surface-overlay: rgba(18, 26, 22, 0.85);
@@ -464,6 +466,7 @@ export const GlobalStyles = createGlobalStyle`
     --brand-on-surface: #ffffff;
     --surface-inverse: #0f172a;
     --footer-bg: #051008;
+    --header-bg: #0a3818;
 
       --shadow-color: rgba(0, 0, 0, 0.50);
       --surface-overlay: rgba(18, 26, 22, 0.85);
