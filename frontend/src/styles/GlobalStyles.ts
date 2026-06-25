@@ -29,11 +29,11 @@ export const GlobalStyles = createGlobalStyle`
 
   body {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-    color: #1f2937;
+    color: var(--text);
     background:
-      radial-gradient(circle at 90% -10%, rgba(22, 163, 74, 0.14), transparent 38%),
-      radial-gradient(circle at -5% 20%, rgba(2, 132, 199, 0.08), transparent 28%),
-      #f3f7f1;
+      radial-gradient(circle at 90% -10%, var(--bg-glow-primary), transparent 38%),
+      radial-gradient(circle at -5% 20%, var(--bg-glow-secondary), transparent 28%),
+      var(--bg);
     line-height: 1.6;
     font-size: 16px;
     font-weight: 400;
@@ -44,6 +44,7 @@ export const GlobalStyles = createGlobalStyle`
     width: 100%;
     max-width: 100%;
     overflow-x: hidden;
+    transition: background-color 0.2s ease, color 0.2s ease;
   }
 
   #root {
@@ -244,7 +245,33 @@ export const GlobalStyles = createGlobalStyle`
     --color-gray-900: #111827;
     --color-white: #ffffff;
     --color-black: #000000;
-    
+
+    /* Semantic tokens (light mode defaults) */
+    --bg: #f3f7f1;
+    --surface: #ffffff;
+    --surface-2: #f9fafb;
+    --surface-3: #f3f4f6;
+    --text: #1f2937;
+    --text-muted: #6b7280;
+    --text-subtle: #9ca3af;
+    --text-inverse: #ffffff;
+    --border: #e5e7eb;
+    --border-strong: #d1d5db;
+    --primary: #16a34a;
+    --primary-hover: #15803d;
+    --primary-light: #22c55e;
+    --primary-rgb: 22, 163, 74;
+    --primary-subtle: rgba(22, 163, 74, 0.10);
+    --primary-faint: rgba(22, 163, 74, 0.04);
+    --accent: #f59e0b;
+    --success: #10b981;
+    --warning: #f59e0b;
+    --error: #ef4444;
+    --danger: #dc2626;
+    --info: #3b82f6;
+    --bg-glow-primary: rgba(22, 163, 74, 0.14);
+    --bg-glow-secondary: rgba(2, 132, 199, 0.08);
+
     /* Spacing */
     --space-1: 0.25rem;
     --space-2: 0.5rem;
@@ -258,19 +285,132 @@ export const GlobalStyles = createGlobalStyle`
     --space-16: 4rem;
     --space-20: 5rem;
     --space-24: 6rem;
-    
+
     /* Border radius */
     --radius-sm: 0.25rem;
     --radius-md: 0.5rem;
     --radius-lg: 0.75rem;
     --radius-xl: 1rem;
     --radius-2xl: 1.5rem;
-    
+
     /* Shadows */
     --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
     --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
     --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
     --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  }
+
+  /* Dark mode — explicit choice via [data-theme="dark"] (manual or resolved from auto) */
+  [data-theme='dark'] {
+    /* Forest-tinted dark palette: backgrounds are green-graphite (not pure black) */
+    --color-primary: #22c55e;
+    --color-primary-dark: #16a34a;
+    --color-primary-light: #4ade80;
+    --color-secondary: #60a5fa;
+    --color-accent: #84cc16;
+    --color-success: #34d399;
+    --color-warning: #fbbf24;
+    --color-error: #f87171;
+    --color-gray-50: #1a2420;
+    --color-gray-100: #121a16;
+    --color-gray-200: #243029;
+    --color-gray-300: #2f3d34;
+    --color-gray-400: #5a6e62;
+    --color-gray-500: #8a9d91;
+    --color-gray-600: #b5c2ba;
+    --color-gray-700: #d4dcd8;
+    --color-gray-800: #e8efe9;
+    --color-gray-900: #f0f4f1;
+    --color-white: #e8efe9;
+    --color-black: #0a0f0d;
+
+    --bg: #0a0f0d;
+    --surface: #121a16;
+    --surface-2: #1a2420;
+    --surface-3: #243029;
+    --text: #e8efe9;
+    --text-muted: #94a89c;
+    --text-subtle: #6b7d72;
+    --text-inverse: #0a0f0d;
+    --border: #243029;
+    --border-strong: #2f3d34;
+    --primary: #22c55e;
+    --primary-hover: #4ade80;
+    --primary-light: #4ade80;
+    --primary-rgb: 34, 197, 94;
+    --primary-subtle: rgba(34, 197, 94, 0.18);
+    --primary-faint: rgba(34, 197, 94, 0.06);
+    --accent: #84cc16;
+    --success: #34d399;
+    --warning: #fbbf24;
+    --error: #f87171;
+    --danger: #f87171;
+    --info: #60a5fa;
+    --bg-glow-primary: rgba(34, 197, 94, 0.10);
+    --bg-glow-secondary: rgba(96, 165, 250, 0.06);
+
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.40);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.50), 0 2px 4px -1px rgba(0, 0, 0, 0.40);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.55), 0 4px 6px -2px rgba(0, 0, 0, 0.40);
+    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.60), 0 10px 10px -5px rgba(0, 0, 0, 0.45);
+  }
+
+  /* Auto mode: follow OS, but only when user has NOT made an explicit choice
+     (the anti-FOUC script sets data-theme='light'/'dark' when there is a stored
+     preference, and leaves the attribute unset in auto mode). */
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme='light']):not([data-theme='dark']) {
+      --color-primary: #22c55e;
+      --color-primary-dark: #16a34a;
+      --color-primary-light: #4ade80;
+      --color-secondary: #60a5fa;
+      --color-accent: #84cc16;
+      --color-success: #34d399;
+      --color-warning: #fbbf24;
+      --color-error: #f87171;
+      --color-gray-50: #1a2420;
+      --color-gray-100: #121a16;
+      --color-gray-200: #243029;
+      --color-gray-300: #2f3d34;
+      --color-gray-400: #5a6e62;
+      --color-gray-500: #8a9d91;
+      --color-gray-600: #b5c2ba;
+      --color-gray-700: #d4dcd8;
+      --color-gray-800: #e8efe9;
+      --color-gray-900: #f0f4f1;
+      --color-white: #e8efe9;
+      --color-black: #0a0f0d;
+
+      --bg: #0a0f0d;
+      --surface: #121a16;
+      --surface-2: #1a2420;
+      --surface-3: #243029;
+      --text: #e8efe9;
+      --text-muted: #94a89c;
+      --text-subtle: #6b7d72;
+      --text-inverse: #0a0f0d;
+      --border: #243029;
+      --border-strong: #2f3d34;
+      --primary: #22c55e;
+      --primary-hover: #4ade80;
+      --primary-light: #4ade80;
+      --primary-rgb: 34, 197, 94;
+      --primary-subtle: rgba(34, 197, 94, 0.18);
+      --primary-faint: rgba(34, 197, 94, 0.06);
+      --accent: #84cc16;
+      --success: #34d399;
+      --warning: #fbbf24;
+      --error: #f87171;
+      --danger: #f87171;
+      --info: #60a5fa;
+      --bg-glow-primary: rgba(34, 197, 94, 0.10);
+      --bg-glow-secondary: rgba(96, 165, 250, 0.06);
+
+      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.40);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.50), 0 2px 4px -1px rgba(0, 0, 0, 0.40);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.55), 0 4px 6px -2px rgba(0, 0, 0, 0.40);
+      --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.60), 0 10px 10px -5px rgba(0, 0, 0, 0.45);
+    }
   }
 
   /* Media queries */

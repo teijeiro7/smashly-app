@@ -16,6 +16,7 @@ import { RacketsProvider } from './contexts/RacketsContext';
 import { ComparisonProvider } from './contexts/ComparisonContext';
 import { ListsProvider } from './contexts/ListsContext';
 import { BackgroundTasksProvider } from './contexts/BackgroundTasksContext';
+import { ThemeProvider } from './contexts/ThemeContext';
 import ErrorBoundary from './components/ErrorBoundary';
 
 // Suppress all browser console output. Errors shown via sileo toasts.
@@ -45,28 +46,30 @@ registerSW({ immediate: true });
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <HelmetProvider>
-      <QueryClientProvider client={queryClient}>
-        <ErrorBoundary>
-          <AuthProvider>
-            <NotificationProvider>
-              <BackgroundTasksProvider>
-                <RacketsProvider>
-                  <ComparisonProvider>
-                    <ListsProvider>
-                      <AuthModalProvider>
-                        <GlobalStyles />
-                        <RouterProvider router={router} />
-                        <Toaster position='top-center' options={{ duration: 4000 }} />
-                      </AuthModalProvider>
-                    </ListsProvider>
-                  </ComparisonProvider>
-                </RacketsProvider>
-              </BackgroundTasksProvider>
-            </NotificationProvider>
-          </AuthProvider>
-        </ErrorBoundary>
-      </QueryClientProvider>
-    </HelmetProvider>
+    <ThemeProvider>
+      <HelmetProvider>
+        <QueryClientProvider client={queryClient}>
+          <ErrorBoundary>
+            <AuthProvider>
+              <NotificationProvider>
+                <BackgroundTasksProvider>
+                  <RacketsProvider>
+                    <ComparisonProvider>
+                      <ListsProvider>
+                        <AuthModalProvider>
+                          <GlobalStyles />
+                          <RouterProvider router={router} />
+                          <Toaster position='top-center' options={{ duration: 4000 }} />
+                        </AuthModalProvider>
+                      </ListsProvider>
+                    </ComparisonProvider>
+                  </RacketsProvider>
+                </BackgroundTasksProvider>
+              </NotificationProvider>
+            </AuthProvider>
+          </ErrorBoundary>
+        </QueryClientProvider>
+      </HelmetProvider>
+    </ThemeProvider>
   </StrictMode>
 );

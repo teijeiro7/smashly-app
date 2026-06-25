@@ -7,6 +7,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { useAuthModal } from '../../contexts/AuthModalContext';
 import GlobalSearch from '../features/GlobalSearch';
 import { NotificationBell, MobileNotificationBell } from '../notifications/NotificationBell';
+import ThemeToggle from '../common/ThemeToggle';
 
 const HeaderContainer = styled.header`
   background: #15803d;
@@ -600,6 +601,7 @@ const Header: React.FC = () => {
         </CentralSearchContainer>
 
         <AuthButtons>
+          <ThemeToggle />
           {userProfile ? (
             <UserMenuContainer ref={userMenuRef}>
               <NotificationBell />
@@ -647,6 +649,7 @@ const Header: React.FC = () => {
 
         <MobileElements>
           <MobileNotificationBell />
+          <ThemeToggle />
           <MobileSearchButton onClick={toggleMobileSearch} aria-label="Buscar">
             <FiSearch />
           </MobileSearchButton>
