@@ -246,7 +246,10 @@ const ReviewCard = styled.div`
 const RacketImageContainer = styled.div`
   width: 100%;
   height: 180px;
-  background: var(--surface);
+  background: var(--racket-image-bg);
+  border: var(--racket-image-border);
+  border-radius: var(--racket-image-radius-card) var(--racket-image-radius-card) 0 0;
+  box-shadow: var(--racket-image-shadow);
   display: flex;
   align-items: center;
   justify-content: center;
