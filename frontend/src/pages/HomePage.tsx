@@ -27,8 +27,8 @@ const Container = styled.div`
 const HeroSection = styled.section`
   padding: clamp(80px, 12vw, 140px) 20px clamp(60px, 8vw, 100px);
   text-align: center;
-  background: linear-gradient(145deg, #0f2818 0%, var(--primary-hover) 30%, var(--primary-hover) 60%, var(--primary-hover) 100%);
-  color: white;
+  background: linear-gradient(145deg, var(--brand-surface-deep) 0%, var(--brand-surface-strong) 30%, var(--brand-surface) 60%, var(--brand-surface-hover) 100%);
+  color: var(--brand-on-surface);
   position: relative;
   overflow: hidden;
   will-change: transform, opacity;
@@ -48,7 +48,7 @@ const HeroSection = styled.section`
     background:
       radial-gradient(circle at 20% 50%, rgba(255, 255, 255, 0.06) 0%, transparent 50%),
       radial-gradient(circle at 80% 50%, rgba(255, 255, 255, 0.06) 0%, transparent 50%),
-      radial-gradient(circle at 50% 100%, rgba(var(--primary-rgb), 0.2) 0%, transparent 60%);
+      radial-gradient(circle at 50% 100%, rgba(var(--brand-rgb), 0.2) 0%, transparent 60%);
     pointer-events: none;
   }
 

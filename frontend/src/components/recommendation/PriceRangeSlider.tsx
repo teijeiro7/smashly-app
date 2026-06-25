@@ -29,7 +29,7 @@ const SliderRange = styled.div<{ left: number; width: number }>`
   left: calc(12px + ${props => props.left}%);
   width: ${props => props.width}%;
   height: 8px;
-  background: linear-gradient(90deg, var(--primary) 0%, var(--primary-light) 100%);
+  background: linear-gradient(90deg, var(--brand-surface) 0%, var(--brand-surface-hover) 100%);
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(var(--primary-rgb), 0.3);
   transition: all 0.2s ease;

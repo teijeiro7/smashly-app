@@ -363,15 +363,15 @@ const CancelButton = styled.button`
 
 const SubmitButton = styled.button`
   padding: 0.625rem 1.75rem;
-  background: var(--primary);
+  background: var(--brand-surface);
   border: none;
   border-radius: 8px;
   font-size: 0.9rem;
   font-weight: 700;
-  color: var(--text-inverse);
+  color: var(--brand-on-surface);
   cursor: pointer;
   transition: all 0.2s;
-  box-shadow: 0 2px 4px rgba(var(--primary-rgb), 0.2);
+  box-shadow: 0 2px 4px rgba(var(--brand-rgb), 0.2);
   display: flex;
   align-items: center;
   gap: 0.5rem;

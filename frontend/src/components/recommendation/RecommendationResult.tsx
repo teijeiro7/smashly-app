@@ -56,7 +56,7 @@ const AnalysisHeader = styled.div`
 const IconWrapper = styled.div`
   width: 40px;
   height: 40px;
-  background: linear-gradient(135deg, var(--primary-hover) 0%, var(--primary-hover) 100%);
+  background: var(--brand-surface-hover);
   border-radius: 10px;
   display: flex;
   align-items: center;
@@ -297,7 +297,7 @@ const CertificationNote = styled.div`
 const ViewButton = styled(Link)`
   display: block;
   text-align: center;
-  background: linear-gradient(135deg, var(--primary-hover) 0%, var(--primary-hover) 100%);
+  background: var(--brand-surface-hover);
   color: var(--text-inverse);
   padding: 0.75rem;
   border-radius: 12px;
@@ -308,7 +308,7 @@ const ViewButton = styled(Link)`
   margin-top: auto;
 
   &:hover {
-    background: linear-gradient(135deg, var(--primary-hover) 0%, var(--primary-hover) 100%);
+    background: var(--brand-surface-hover);
     color: var(--text-inverse);
     transform: translateY(-2px);
     box-shadow: 0 6px 12px rgba(var(--primary-rgb-dark), 0.3);

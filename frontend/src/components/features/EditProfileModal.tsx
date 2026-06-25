@@ -223,7 +223,7 @@ const Button = styled.button<{ variant?: "primary" | "secondary" }>`
   ${(props) =>
     props.variant === "primary"
       ? `
-    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
+    background: linear-gradient(135deg, var(--brand-surface) 0%, var(--brand-surface-hover) 100%);
     color: var(--text-inverse);
     &:hover {
       transform: translateY(-2px);
@@ -313,8 +313,8 @@ const AvatarButton = styled.button<{ variant?: "primary" | "danger" }>`
     }
   `
       : `
-    background: var(--primary);
-    color: var(--text-inverse);
+    background: var(--brand-surface);
+    color: var(--brand-on-surface);
     &:hover {
       background: var(--primary-hover);
     }

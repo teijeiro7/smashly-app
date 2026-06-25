@@ -181,8 +181,8 @@ const ActionButton = styled.button<{ variant: 'approve' | 'reject' }>`
     color: var(--primary-hover);
 
     &:hover {
-      background: var(--primary);
-      color: var(--text-inverse);
+      background: var(--brand-surface);
+      color: var(--brand-on-surface);
     }
   `
       : `

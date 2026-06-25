@@ -84,7 +84,7 @@ const FeatureIcon = styled.div`
   width: 48px;
   height: 48px;
   border-radius: 12px;
-  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
+  background: linear-gradient(135deg, var(--brand-surface) 0%, var(--brand-surface-hover) 100%);
   display: flex;
   align-items: center;
   justify-content: center;

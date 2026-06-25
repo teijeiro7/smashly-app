@@ -112,7 +112,7 @@ const Content = styled.div`
 const CreateNewButton = styled.button`
   width: 100%;
   padding: 1rem;
-  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
+  background: linear-gradient(135deg, var(--brand-surface) 0%, var(--brand-surface-hover) 100%);
   color: var(--text-inverse);
   border: none;
   border-radius: 12px;

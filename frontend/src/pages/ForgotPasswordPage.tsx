@@ -108,8 +108,8 @@ const Input = styled.input<{ $hasError?: boolean }>`
 `;
 
 const SubmitButton = styled.button`
-  background: var(--primary);
-  color: white;
+  background: var(--brand-surface);
+  color: var(--brand-on-surface);
   padding: 0.875rem;
   border: none;
   border-radius: 12px;

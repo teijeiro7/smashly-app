@@ -12,8 +12,8 @@ const FloatingButton = styled(motion.button)`
   width: 64px;
   height: 64px;
   border-radius: 50%;
-  background: var(--primary);
-  color: var(--text-inverse);
+  background: var(--brand-surface);
+  color: var(--brand-on-surface);
   border: none;
   box-shadow: 0 8px 24px rgba(var(--primary-rgb), 0.3);
   cursor: pointer;

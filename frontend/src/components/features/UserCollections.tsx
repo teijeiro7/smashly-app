@@ -82,8 +82,8 @@ const AddButton = styled(motion.button)`
   align-items: center;
   gap: 0.375rem;
   padding: 0.5rem 1rem;
-  background: var(--primary);
-  color: var(--text-inverse);
+  background: var(--brand-surface);
+  color: var(--brand-on-surface);
   border: none;
   border-radius: 8px;
   font-size: 0.8125rem;

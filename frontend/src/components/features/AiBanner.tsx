@@ -5,7 +5,7 @@ import { useNavigate } from '@tanstack/react-router';
 import styled from "styled-components";
 
 const BannerContainer = styled(motion.div)`
-  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
+  background: linear-gradient(135deg, var(--brand-surface) 0%, var(--brand-surface-hover) 100%);
   border-radius: 24px;
   padding: 3rem 2rem;
   margin: 4rem auto;

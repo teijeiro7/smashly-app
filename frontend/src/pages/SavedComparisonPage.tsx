@@ -90,10 +90,10 @@ const ActionButton = styled.button<{ variant?: 'primary' }>`
   ${props =>
     props.variant === 'primary'
       ? `
-    background: var(--primary);
+    background: var(--brand-surface);
     border: none;
-    color: white;
-    &:hover { background: var(--primary-hover); }
+    color: var(--brand-on-surface);
+    &:hover { background: var(--brand-surface-hover); }
   `
       : `
     background: white;

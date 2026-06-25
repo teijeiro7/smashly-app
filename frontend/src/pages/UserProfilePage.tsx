@@ -32,7 +32,7 @@ const Container = styled.div`
 `;
 
 const Header = styled.div`
-  background: linear-gradient(140deg, #169b47 0%, #12793a 100%);
+  background: linear-gradient(140deg, var(--brand-surface) 0%, var(--brand-surface-hover) 100%);
   padding: 2rem;
   position: relative;
   overflow: hidden;

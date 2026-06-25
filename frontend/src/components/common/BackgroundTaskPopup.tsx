@@ -123,7 +123,7 @@ const CompletionTooltip = styled(motion.div)`
   position: absolute;
   bottom: 90px;
   right: 0;
-  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
+  background: linear-gradient(135deg, var(--brand-surface) 0%, var(--brand-surface-hover) 100%);
   color: var(--text-inverse);
   padding: 12px 16px;
   border-radius: 12px;
@@ -230,7 +230,7 @@ const ProgressBar = styled.div`
 
 const ProgressFill = styled(motion.div)`
   height: 100%;
-  background: linear-gradient(90deg, var(--primary) 0%, var(--primary-light) 100%);
+  background: linear-gradient(90deg, var(--brand-surface) 0%, var(--brand-surface-hover) 100%);
   border-radius: 4px;
 `;
 
@@ -259,7 +259,7 @@ const ResultTitle = styled.h4`
 const ViewResultButton = styled.button`
   width: 100%;
   padding: 12px;
-  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
+  background: linear-gradient(135deg, var(--brand-surface) 0%, var(--brand-surface-hover) 100%);
   color: var(--text-inverse);
   border: none;
   border-radius: 10px;

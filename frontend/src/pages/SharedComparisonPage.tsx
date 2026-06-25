@@ -34,8 +34,8 @@ const Card = styled.div`
 `;
 
 const Header = styled.div`
-  background: linear-gradient(135deg, var(--primary) 0%, #059669 100%);
-  color: white;
+  background: linear-gradient(135deg, var(--brand-surface) 0%, var(--brand-surface-strong) 100%);
+  color: var(--brand-on-surface);
   padding: clamp(1rem, 3vw, 2rem);
   text-align: center;
 `;
@@ -266,7 +266,7 @@ const BackButton = styled(Link)`
   gap: 0.5rem;
   min-height: 48px;
   padding: 0.75rem 1.5rem;
-  background: linear-gradient(135deg, var(--primary) 0%, #059669 100%);
+  background: linear-gradient(135deg, var(--brand-surface) 0%, var(--brand-surface-strong) 100%);
   color: white;
   text-decoration: none;
   border-radius: 8px;

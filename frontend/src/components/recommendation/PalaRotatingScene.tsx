@@ -87,11 +87,11 @@ const Checkmark = styled.div<{ $isPaused: boolean }>`
   width: 80px;
   height: 80px;
   border-radius: 50%;
-  background: var(--primary);
+  background: var(--brand-surface);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--text-inverse);
+  color: var(--brand-on-surface);
   font-size: 40px;
   animation: ${float} 2s ease-in-out infinite;
   animation-delay: 1s;

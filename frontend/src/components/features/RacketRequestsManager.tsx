@@ -55,8 +55,8 @@ const AddButton = styled.button`
   align-items: center;
   gap: 0.5rem;
   padding: 0.75rem 1.5rem;
-  background: var(--primary);
-  color: var(--text-inverse);
+  background: var(--brand-surface);
+  color: var(--brand-on-surface);
   border: none;
   border-radius: 12px;
   font-size: 1rem;

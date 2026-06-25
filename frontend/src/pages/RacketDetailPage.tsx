@@ -144,7 +144,7 @@ const AuthCard = styled.div`
     right: -50%;
     width: 300px;
     height: 300px;
-    background: radial-gradient(circle, rgba(21, 128, 61, 0.05) 0%, transparent 70%);
+    background: radial-gradient(circle, rgba(var(--primary-rgb-dark), 0.05) 0%, transparent 70%);
     border-radius: 50%;
   }
 
@@ -169,7 +169,7 @@ const AuthLockIcon = styled.div`
   justify-content: center;
   width: 32px;
   height: 32px;
-  background: rgba(21, 128, 61, 0.1);
+  background: rgba(var(--primary-rgb-dark), 0.1);
   border-radius: 8px;
   color: var(--primary-hover);
   font-size: 1rem;
@@ -223,12 +223,12 @@ const AuthButton = styled.a<{ $variant?: 'primary' | 'secondary' }>`
       ? `
     background: var(--color-primary);
     color: white;
-    box-shadow: 0 4px 12px rgba(21, 128, 61, 0.25);
+    box-shadow: 0 4px 12px rgba(var(--primary-rgb-dark), 0.25);
     
     &:hover {
       background: var(--color-primary-dark);
       transform: translateY(-2px);
-      box-shadow: 0 6px 16px rgba(21, 128, 61, 0.35);
+      box-shadow: 0 6px 16px rgba(var(--primary-rgb-dark), 0.35);
     }
   `
       : `
@@ -672,7 +672,7 @@ const PrimaryButton = styled.a`
   font-size: 1.125rem;
   text-decoration: none;
   transition: background-color 0.2s, transform 0.2s, box-shadow 0.2s;
-  box-shadow: 0 4px 12px rgba(21, 128, 61, 0.3);
+  box-shadow: 0 4px 12px rgba(var(--brand-rgb), 0.3);
   position: relative;
   overflow: hidden;
 
@@ -690,7 +690,7 @@ const PrimaryButton = styled.a`
   &:hover {
     background: var(--color-primary-dark);
     transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(21, 128, 61, 0.4);
+    box-shadow: 0 6px 16px rgba(var(--primary-rgb-dark), 0.4);
     color: white;
     text-decoration: none;
 
@@ -820,8 +820,8 @@ const SpecCard = styled.div`
   cursor: default;
 
   &:hover {
-    border-color: rgba(21, 128, 61, 0.3);
-    box-shadow: 0 4px 6px -1px rgba(21, 128, 61, 0.1), 0 2px 4px -1px rgba(21, 128, 61, 0.06);
+    border-color: rgba(var(--primary-rgb-dark), 0.3);
+    box-shadow: 0 4px 6px -1px rgba(var(--primary-rgb-dark), 0.1), 0 2px 4px -1px rgba(var(--primary-rgb-dark), 0.06);
     transform: translateY(-2px);
 
     ${SpecIconWrapper} {
@@ -953,7 +953,7 @@ const CompareRow = styled.div<{ $isBestPrice?: boolean }>`
         ? 'linear-gradient(90deg, var(--primary-subtle) 0%, var(--primary-subtle) 100%)'
         : 'var(--color-gray-50)'};
     transform: translateY(-1px);
-    box-shadow: 0 4px 8px rgba(21, 128, 61, 0.08);
+    box-shadow: 0 4px 8px rgba(var(--primary-rgb-dark), 0.08);
   }
 
   &:last-child {
@@ -971,7 +971,7 @@ const BestPriceBadge = styled.span`
   position: absolute;
   top: 0.75rem;
   right: 1rem;
-  background: linear-gradient(135deg, var(--primary-hover) 0%, var(--primary-hover) 100%);
+  background: var(--brand-surface-hover);
   color: white;
   font-size: 0.625rem;
   font-weight: 700;
@@ -979,7 +979,7 @@ const BestPriceBadge = styled.span`
   letter-spacing: 0.05em;
   padding: 4px 8px;
   border-radius: 4px;
-  box-shadow: 0 2px 4px rgba(21, 128, 61, 0.3);
+  box-shadow: 0 2px 4px rgba(var(--primary-rgb-dark), 0.3);
 
   @media (max-width: 768px) {
     position: static;
@@ -1395,7 +1395,7 @@ const RacketDetailPage: React.FC = () => {
           padding: 'clamp(2rem, 5vw, 3rem)',
           maxWidth: '480px',
           width: '100%',
-          boxShadow: '0 10px 40px rgba(21, 128, 61, 0.08)',
+          boxShadow: '0 10px 40px rgba(var(--primary-rgb-dark), 0.08)',
           border: '1px solid var(--primary-subtle)',
           textAlign: 'center'
         }}>

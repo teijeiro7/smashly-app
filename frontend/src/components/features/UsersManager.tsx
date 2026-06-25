@@ -134,7 +134,7 @@ const Avatar = styled.div`
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
+  background: linear-gradient(135deg, var(--brand-surface) 0%, var(--brand-surface-hover) 100%);
   color: var(--text-inverse);
   display: flex;
   align-items: center;

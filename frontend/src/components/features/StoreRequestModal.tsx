@@ -75,7 +75,7 @@ const SuccessIcon = styled.div`
   width: 80px;
   height: 80px;
   border-radius: 50%;
-  background: linear-gradient(135deg, var(--primary) 0%, var(--success) 100%);
+  background: linear-gradient(135deg, var(--brand-surface) 0%, var(--success) 100%);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -155,7 +155,7 @@ const Button = styled.button<{ variant?: "primary" | "secondary" }>`
     }
   `
       : `
-    background: linear-gradient(135deg, var(--primary) 0%, var(--success) 100%);
+    background: linear-gradient(135deg, var(--brand-surface) 0%, var(--success) 100%);
     color: var(--text-inverse);
     &:hover {
       transform: translateY(-2px);

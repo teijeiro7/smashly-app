@@ -34,7 +34,7 @@ const IconWrapper = styled(motion.div)`
   justify-content: center;
   width: 120px;
   height: 120px;
-  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
+  background: linear-gradient(135deg, var(--brand-surface) 0%, var(--brand-surface-hover) 100%);
   border-radius: 50%;
   margin-bottom: 2rem;
   box-shadow: 0 10px 30px rgba(var(--primary-rgb), 0.3);
@@ -64,7 +64,7 @@ const Title = styled.h1`
   line-height: 1.2;
 
   .highlight {
-    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
+    background: linear-gradient(135deg, var(--brand-surface) 0%, var(--brand-surface-hover) 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -108,7 +108,7 @@ const Button = styled(Link)<{ variant?: "primary" | "secondary" }>`
   ${(props) =>
     props.variant === "primary"
       ? `
-    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
+    background: linear-gradient(135deg, var(--brand-surface) 0%, var(--brand-surface-hover) 100%);
     color: white;
     
     &:hover {

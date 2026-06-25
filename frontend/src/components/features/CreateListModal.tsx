@@ -134,8 +134,8 @@ const Button = styled.button<{ variant?: "primary" | "secondary" }>`
   ${(props) =>
     props.variant === "primary"
       ? `
-    background: var(--primary);
-    color: var(--text-inverse);
+    background: var(--brand-surface);
+    color: var(--brand-on-surface);
     &:hover {
       background: var(--primary-hover);
     }

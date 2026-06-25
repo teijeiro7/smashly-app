@@ -133,8 +133,8 @@ const PopupButtons = styled.div`
 `;
 
 const PrimaryButton = styled.button`
-  background: var(--primary);
-  color: var(--text-inverse);
+  background: var(--brand-surface);
+  color: var(--brand-on-surface);
   border: none;
   border-radius: 12px;
   padding: 0.875rem 1rem;
@@ -148,7 +148,7 @@ const PrimaryButton = styled.button`
   transition: background 0.2s;
 
   &:hover {
-    background: var(--primary-hover);
+    background: var(--brand-surface-hover);
   }
 `;
 

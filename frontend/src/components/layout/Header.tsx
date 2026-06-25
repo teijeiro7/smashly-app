@@ -10,7 +10,7 @@ import { NotificationBell, MobileNotificationBell } from '../notifications/Notif
 import ThemeToggle from '../common/ThemeToggle';
 
 const HeaderContainer = styled.header`
-  background: var(--primary);
+  background: var(--brand-surface);
   padding: 0;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
   position: sticky;

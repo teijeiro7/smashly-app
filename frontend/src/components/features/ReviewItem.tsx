@@ -427,8 +427,8 @@ const ReplyInput = styled.input`
 `;
 
 const ReplySubmit = styled.button`
-  background: var(--primary);
-  color: var(--text-inverse);
+  background: var(--brand-surface);
+  color: var(--brand-on-surface);
   border: none;
   padding: 0.5rem 1.25rem;
   border-radius: 99px;

@@ -29,7 +29,7 @@ const ContentWrapper = styled.div`
 `;
 
 const ProfileHeader = styled.div`
-  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
+  background: linear-gradient(135deg, var(--brand-surface) 0%, var(--brand-surface-hover) 100%);
   border-radius: 20px;
   padding: 2.5rem;
   box-shadow: 0 4px 20px rgba(22, 163, 74, 0.1);
@@ -227,7 +227,7 @@ const Avatar = styled.div`
   width: 120px;
   height: 120px;
   border-radius: 50%;
-  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
+  background: linear-gradient(135deg, var(--brand-surface) 0%, var(--brand-surface-hover) 100%);
   display: flex;
   align-items: center;
   justify-content: center;

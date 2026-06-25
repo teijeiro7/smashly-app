@@ -134,7 +134,7 @@ const IconWrapper = styled.div`
   width: 80px;
   height: 80px;
   margin: 0 auto 1.5rem;
-  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
+  background: linear-gradient(135deg, var(--brand-surface) 0%, var(--brand-surface-hover) 100%);
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -179,8 +179,8 @@ const LoginButton = styled(Link)`
   justify-content: center;
   gap: 0.5rem;
   padding: 1rem 1.5rem;
-  background: var(--primary);
-  color: var(--text-inverse);
+  background: var(--brand-surface);
+  color: var(--brand-on-surface);
   border-radius: 12px;
   font-weight: 700;
   font-size: 1rem;

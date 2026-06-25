@@ -45,8 +45,8 @@ const UploadButton = styled(motion.button)`
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  background: var(--primary);
-  color: var(--text-inverse);
+  background: var(--brand-surface);
+  color: var(--brand-on-surface);
   border: 2px solid var(--surface);
   display: flex;
   align-items: center;
@@ -121,9 +121,9 @@ const Button = styled.button<{ $variant?: 'primary' | 'secondary' }>`
   border: none;
 
   ${props => props.$variant === 'primary' ? `
-    background: var(--primary);
-    color: var(--text-inverse);
-    &:hover { background: var(--primary-hover); }
+    background: var(--brand-surface);
+    color: var(--brand-on-surface);
+    &:hover { background: var(--brand-surface-hover); }
   ` : `
     background: var(--surface-3);
     color: var(--text-muted);

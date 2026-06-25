@@ -275,6 +275,19 @@ export const GlobalStyles = createGlobalStyle`
     --danger-strong: #fecaca;
     --info: #3b82f6;
     --bg-glow-primary: rgba(22, 163, 74, 0.14);
+
+    /* Brand surface tokens — FIXED (do NOT flip with theme).
+       These represent always-dark-green surfaces (hero gradients, header bar,
+       solid CTA buttons, banners). They stay the same in light and dark so
+       the brand identity is preserved; only foreground text/icons use the
+       theme-aware --primary* tokens. */
+    --brand-surface: #16a34a;
+    --brand-surface-hover: #15803d;
+    --brand-surface-strong: #0f6e38;
+    --brand-surface-deep: #0f2818;
+    --brand-rgb: 22, 163, 74;
+    --brand-on-surface: #ffffff;
+    --surface-inverse: #0f172a;
     --bg-glow-secondary: rgba(2, 132, 199, 0.08);
 
     /* Spacing */
@@ -361,6 +374,16 @@ export const GlobalStyles = createGlobalStyle`
     --bg-glow-primary: rgba(34, 197, 94, 0.10);
     --bg-glow-secondary: rgba(96, 165, 250, 0.06);
 
+    /* Brand surface tokens — FIXED (identical in light and dark).
+       See :root above for the rationale. */
+    --brand-surface: #16a34a;
+    --brand-surface-hover: #15803d;
+    --brand-surface-strong: #0f6e38;
+    --brand-surface-deep: #0f2818;
+    --brand-rgb: 22, 163, 74;
+    --brand-on-surface: #ffffff;
+    --surface-inverse: #0f172a;
+
     --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.40);
     --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.50), 0 2px 4px -1px rgba(0, 0, 0, 0.40);
     --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.55), 0 4px 6px -2px rgba(0, 0, 0, 0.40);
@@ -424,6 +447,16 @@ export const GlobalStyles = createGlobalStyle`
       --info: #60a5fa;
       --bg-glow-primary: rgba(34, 197, 94, 0.10);
       --bg-glow-secondary: rgba(96, 165, 250, 0.06);
+
+      /* Brand surface tokens — FIXED (identical in light and dark).
+         See :root above for the rationale. */
+      --brand-surface: #16a34a;
+      --brand-surface-hover: #15803d;
+      --brand-surface-strong: #0f6e38;
+      --brand-surface-deep: #0f2818;
+      --brand-rgb: 22, 163, 74;
+      --brand-on-surface: #ffffff;
+      --surface-inverse: #0f172a;
 
       --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.40);
       --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.50), 0 2px 4px -1px rgba(0, 0, 0, 0.40);

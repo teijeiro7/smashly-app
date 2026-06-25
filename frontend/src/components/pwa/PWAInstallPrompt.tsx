@@ -71,8 +71,8 @@ const Content = styled.p`
 `;
 
 const ActionButton = styled.button`
-  background: var(--primary);
-  color: var(--text-inverse);
+  background: var(--brand-surface);
+  color: var(--brand-on-surface);
   border: none;
   border-radius: 10px;
   padding: 12px;

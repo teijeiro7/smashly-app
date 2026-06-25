@@ -34,7 +34,7 @@ const SectionTitle = styled.h2`
 `;
 
 const CreateButton = styled.button`
-  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
+  background: linear-gradient(135deg, var(--brand-surface) 0%, var(--brand-surface-hover) 100%);
   color: var(--text-inverse);
   border: none;
   padding: 0.75rem 1.5rem;
@@ -88,7 +88,7 @@ const ListHeader = styled.div`
 const ListIcon = styled.div`
   width: 48px;
   height: 48px;
-  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
+  background: linear-gradient(135deg, var(--brand-surface) 0%, var(--brand-surface-hover) 100%);
   border-radius: 12px;
   display: flex;
   align-items: center;

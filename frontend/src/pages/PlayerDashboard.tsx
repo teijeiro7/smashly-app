@@ -233,7 +233,7 @@ const RecommendationSection = styled.section`
 `;
 
 const RecommendationHero = styled.div`
-  background: linear-gradient(135deg, var(--text) 0%, #14532d 55%, var(--primary) 100%);
+  background: linear-gradient(135deg, var(--brand-surface-deep) 0%, var(--brand-surface-strong) 55%, var(--brand-surface) 100%);
   border-radius: 24px;
   padding: clamp(1.25rem, 3vw, 2rem);
   color: white;
@@ -295,7 +295,7 @@ const RecommendationActionButton = styled.button`
   min-height: 48px;
   padding: 0.9rem 1rem;
   background: white;
-  color: #14532d;
+  color: var(--brand-surface-strong);
   font-weight: 700;
   cursor: pointer;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
