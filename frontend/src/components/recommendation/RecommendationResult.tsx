@@ -198,7 +198,11 @@ const RacketImage = styled.img`
   height: auto;
   object-fit: contain;
   margin: 0 auto;
-  border-radius: 8px;
+  border-radius: var(--racket-image-radius-card);
+  background: var(--racket-image-bg);
+  border: var(--racket-image-border);
+  box-shadow: var(--racket-image-shadow);
+  padding: 0.5rem;
 `;
 
 const Section = styled.div`

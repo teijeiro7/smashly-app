@@ -97,7 +97,10 @@ const ResultImage = styled.img`
   height: 40px;
   border-radius: 8px;
   object-fit: contain;
-  background: var(--surface-3);
+  background: var(--racket-image-bg);
+  border: var(--racket-image-border);
+  box-shadow: var(--racket-image-shadow);
+  padding: 0.125rem;
 `;
 
 const ResultPlaceholder = styled.div`
