@@ -135,12 +135,12 @@ export const SubmitButton = styled.button`
   cursor: pointer;
   transition: all 0.2s;
   margin-top: 10px;
-  box-shadow: 0 4px 12px rgba(var(--accent-rgb), 0.2);
+  box-shadow: 0 4px 12px rgba(var(--brand-rgb), 0.2);
 
   &:hover {
     background: var(--brand-surface-hover);
     transform: translateY(-1px);
-    box-shadow: 0 6px 16px rgba(var(--accent-rgb), 0.3);
+    box-shadow: 0 6px 16px rgba(var(--brand-rgb), 0.3);
   }
 
   &:active {
@@ -210,7 +210,6 @@ export const FooterText = styled.p`
 
   a {
     color: var(--primary);
-    color: var(--primary);
     text-decoration: none;
     font-weight: 500;
 
@@ -221,7 +220,6 @@ export const FooterText = styled.p`
 `;
 
 export const ForgotPasswordLink = styled(Link)`
-  color: var(--primary);
   color: var(--primary);
   font-size: 0.85rem;
   font-weight: 600;
