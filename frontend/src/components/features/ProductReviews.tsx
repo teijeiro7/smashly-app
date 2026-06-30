@@ -200,7 +200,7 @@ export const ProductReviews: React.FC<ProductReviewsProps> = ({ racketId }) => {
 const SectionContainer = styled.div`
   margin-top: 3rem;
   font-family:
-    'Inter',
+    'Satoshi',
     system-ui,
     -apple-system,
     sans-serif;

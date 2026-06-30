@@ -10,7 +10,7 @@ const Container = styled.div`
   margin: 0 auto;
   padding: 3rem 2rem;
   font-family:
-    'Inter',
+    'Satoshi',
     -apple-system,
     BlinkMacSystemFont,
     'Segoe UI',
