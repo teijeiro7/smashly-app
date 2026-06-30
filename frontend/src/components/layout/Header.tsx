@@ -565,7 +565,7 @@ const Header: React.FC = () => {
               <Button variant='ghost' $inverse onClick={openLogin}>
                 Iniciar sesión
               </Button>
-              <Button variant='secondary' onClick={openRegister}>
+              <Button variant='secondary' $inverse onClick={openRegister}>
                 Registrarse
               </Button>
             </>
