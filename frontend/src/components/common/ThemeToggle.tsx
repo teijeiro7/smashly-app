@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { FiMonitor, FiMoon, FiSun } from 'react-icons/fi';
+import { Monitor, Moon, Sun } from '@phosphor-icons/react';
 import styled from 'styled-components';
 import { useTheme, ThemeMode } from '../../contexts/ThemeContext';
 
@@ -85,9 +85,9 @@ const Wrapper = styled.div`
 `;
 
 const ICON_FOR_MODE: Record<ThemeMode, React.ReactNode> = {
-  light: <FiSun aria-hidden />,
-  dark: <FiMoon aria-hidden />,
-  auto: <FiMonitor aria-hidden />,
+  light: <Sun aria-hidden />,
+  dark: <Moon aria-hidden />,
+  auto: <Monitor aria-hidden />,
 };
 
 const LABEL_FOR_MODE: Record<ThemeMode, string> = {

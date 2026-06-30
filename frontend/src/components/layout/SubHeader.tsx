@@ -1,5 +1,5 @@
 import React from 'react';
-import { FiBook, FiCompass, FiHome, FiLayers } from 'react-icons/fi';
+import { Book, Compass, House, Stack } from '@phosphor-icons/react';
 import { Link, useRouterState } from '@tanstack/react-router';
 import styled from 'styled-components';
 import { useAuth } from '../../contexts/AuthContext';
@@ -103,25 +103,25 @@ const SubHeader: React.FC = () => {
   const navigationItems = [
     {
       to: homePath,
-      icon: <FiHome />,
+      icon: <House />,
       text: 'Inicio',
       isActive: isActive(homePath) || (homePath === '/dashboard' && isActive('/')),
     },
     {
       to: '/catalog',
-      icon: <FiCompass />,
+      icon: <Compass />,
       text: 'Catálogo de Palas',
       isActive: isActive('/catalog'),
     },
     {
       to: '/compare',
-      icon: <FiLayers />,
+      icon: <Stack />,
       text: 'Comparar Palas',
       isActive: isActive('/compare'),
     },
     {
       to: '/faq',
-      icon: <FiBook />,
+      icon: <Book />,
       text: 'FAQ',
       isActive: isActive('/faq'),
     },

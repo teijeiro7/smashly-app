@@ -1,5 +1,5 @@
 import React, { memo, useState, useEffect } from 'react';
-import { FiEye, FiTag, FiHeart } from 'react-icons/fi';
+import { Eye, Tag, Heart, Lightning, Crosshair, Cloud, RocketLaunch, Sparkle } from '@phosphor-icons/react';
 import styled from 'styled-components';
 import { Racket } from '../../types/racket';
 import { getLowestPrice } from '../../utils/priceUtils';
@@ -295,19 +295,19 @@ const RacketCardComponent: React.FC<RacketCardProps> = memo(
           />
           {racket.view_count !== undefined && racket.view_count > 10 && (
             <RacketBadge $variant='bestseller'>
-              <FiEye size={12} />
+              <Eye size={12} />
               Popular
             </RacketBadge>
           )}
           {racket.en_oferta && !racket.solo_comparacion && (
             <RacketBadge $variant='offer'>
-              <FiTag size={12} />
+              <Tag size={12} />
               Oferta
             </RacketBadge>
           )}
           {racket.solo_comparacion && (
             <RacketBadge $variant='comparison'>
-              <FiTag size={12} />
+              <Tag size={12} />
               Solo comparación
             </RacketBadge>
           )}
@@ -346,23 +346,23 @@ const RacketCardComponent: React.FC<RacketCardProps> = memo(
           {racket.radar_potencia && (
             <MetricsSummary>
               <MetricBadge title="Potencia">
-                <MetricLabel>⚡ Pot</MetricLabel>
+                <MetricLabel><Lightning size={14} /> Pot</MetricLabel>
                 <MetricValue>{racket.radar_potencia.toFixed(1)}</MetricValue>
               </MetricBadge>
               <MetricBadge title="Control">
-                <MetricLabel>🎯 Ctrl</MetricLabel>
+                <MetricLabel><Crosshair size={14} /> Ctrl</MetricLabel>
                 <MetricValue>{racket.radar_control?.toFixed(1)}</MetricValue>
               </MetricBadge>
               <MetricBadge title="Manejabilidad">
-                <MetricLabel>☁️ Man</MetricLabel>
+                <MetricLabel><Cloud size={14} /> Man</MetricLabel>
                 <MetricValue>{racket.radar_manejabilidad?.toFixed(1)}</MetricValue>
               </MetricBadge>
               <MetricBadge title="Salida de Bola">
-                <MetricLabel>🚀 Sal</MetricLabel>
+                <MetricLabel><RocketLaunch size={14} /> Sal</MetricLabel>
                 <MetricValue>{racket.radar_salida_bola?.toFixed(1)}</MetricValue>
               </MetricBadge>
               <MetricBadge title="Punto Dulce">
-                <MetricLabel>✨ Dul</MetricLabel>
+                <MetricLabel><Sparkle size={14} /> Dul</MetricLabel>
                 <MetricValue>{racket.radar_punto_dulce?.toFixed(1)}</MetricValue>
               </MetricBadge>
             </MetricsSummary>
@@ -372,7 +372,7 @@ const RacketCardComponent: React.FC<RacketCardProps> = memo(
             <ViewDetailsButton onClick={() => onClick(racket)}>Ver detalles</ViewDetailsButton>
             {isAuthenticated && onAddToList && (
               <ViewDetailsButton onClick={handleAddToList} style={{ background: 'var(--primary-hover)' }}>
-                <FiHeart size={14} />
+                <Heart size={14} />
                 Mis listas
               </ViewDetailsButton>
             )}

@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { FiMenu, FiSearch, FiX, FiUser, FiLogOut, FiHome, FiGrid, FiBarChart2, FiHelpCircle, FiLogIn, FiUserPlus } from 'react-icons/fi';
+import { List, MagnifyingGlass, X, User, SignOut, House, GridFour, ChartBar, Question, SignIn, UserPlus } from '@phosphor-icons/react';
 import { Link, useRouterState, useNavigate } from '@tanstack/react-router';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
@@ -534,7 +534,7 @@ const Header: React.FC = () => {
                 {userProfile.avatar_url ? (
                   <img src={userProfile.avatar_url} alt='Avatar' />
                 ) : (
-                  <FiUser />
+                  <User />
                 )}
               </AvatarButton>
               <UserDropdown $isOpen={isUserMenuOpen}>
@@ -544,7 +544,7 @@ const Header: React.FC = () => {
                     setIsUserMenuOpen(false);
                   }}
                 >
-                  <FiUser />
+                  <User />
                   Mi cuenta
                 </DropdownItem>
                 <Divider />
@@ -555,7 +555,7 @@ const Header: React.FC = () => {
                     navigate({ to: '/' });
                   }}
                 >
-                  <FiLogOut />
+                  <SignOut />
                   Cerrar sesión
                 </DropdownItem>
               </UserDropdown>
@@ -576,10 +576,10 @@ const Header: React.FC = () => {
           <MobileNotificationBell />
           <ThemeToggle variant='onBrand' />
           <MobileSearchButton onClick={toggleMobileSearch} aria-label="Buscar">
-            <FiSearch />
+            <MagnifyingGlass />
           </MobileSearchButton>
           <MobileMenuButton onClick={toggleMenu} aria-label={isMenuOpen ? 'Cerrar menú' : 'Abrir menú'}>
-            {isMenuOpen ? <FiX /> : <FiMenu />}
+            {isMenuOpen ? <X /> : <List />}
           </MobileMenuButton>
         </MobileElements>
 
@@ -603,7 +603,7 @@ const Header: React.FC = () => {
             <MobileNavSection>
               <MobileNavTitle>Navegación</MobileNavTitle>
               <NavLink to='/' $isActive={isActive('/')} $isMobile onClick={closeAllMenus}>
-                <FiHome />
+                <House />
                 Inicio
               </NavLink>
               <NavLink
@@ -612,7 +612,7 @@ const Header: React.FC = () => {
                 $isMobile
                 onClick={closeAllMenus}
               >
-                <FiGrid />
+                <GridFour />
                 Catálogo de Palas
               </NavLink>
               <NavLink
@@ -621,7 +621,7 @@ const Header: React.FC = () => {
                 $isMobile
                 onClick={closeAllMenus}
               >
-                <FiBarChart2 />
+                <ChartBar />
                 Comparar palas
               </NavLink>
               <NavLink
@@ -630,7 +630,7 @@ const Header: React.FC = () => {
                 $isMobile
                 onClick={closeAllMenus}
               >
-                <FiHelpCircle />
+                <Question />
                 FAQ
               </NavLink>
             </MobileNavSection>
@@ -645,7 +645,7 @@ const Header: React.FC = () => {
                     $isMobile
                     onClick={closeAllMenus}
                   >
-                    <FiUser />
+                    <User />
                     Mi cuenta
                   </NavLink>
                   <LogoutButton
@@ -658,7 +658,7 @@ const Header: React.FC = () => {
                     }}
                     style={{ cursor: 'pointer', marginTop: '0.5rem', width: '100%' }}
                   >
-                    <FiLogOut style={{ marginRight: '8px' }} />
+                    <SignOut style={{ marginRight: '8px' }} />
                     Cerrar sesión
                   </LogoutButton>
                 </>
@@ -672,7 +672,7 @@ const Header: React.FC = () => {
                     }}
                     style={{ width: '100%' }}
                   >
-                    <FiLogIn />
+                    <SignIn />
                     Iniciar sesión
                   </Button>
                   <Button
@@ -683,7 +683,7 @@ const Header: React.FC = () => {
                     }}
                     style={{ width: '100%' }}
                   >
-                    <FiUserPlus />
+                    <UserPlus />
                     Registrarse
                   </Button>
                 </div>

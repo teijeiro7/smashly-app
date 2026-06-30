@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { FiArrowRight, FiCheck, FiSearch, FiTarget, FiZap } from 'react-icons/fi';
+import { ArrowRight, Check, MagnifyingGlass, Crosshair, Lightning } from '@phosphor-icons/react';
 import { Link, useNavigate } from '@tanstack/react-router';
 import styled, { keyframes } from 'styled-components';
 import Button from '../components/common/Button';
@@ -614,7 +614,7 @@ const HomePage: React.FC = () => {
       <HeroSection>
         <HeroContent>
           <Badge>
-            <FiZap size={16} />
+            <Lightning size={16} />
             Impulsado por IA
           </Badge>
 
@@ -629,22 +629,22 @@ const HomePage: React.FC = () => {
 
           <CTAButtons>
             <Button as={Link} to='/compare' variant='primary' size='lg'>
-              <FiTarget size={20} />
+              <Crosshair size={20} />
               Encontrar mi pala ideal
             </Button>
             <Button as={Link} to='/catalog' variant='secondary' size='lg' $inverse>
-              <FiSearch size={20} />
+              <MagnifyingGlass size={20} />
               Explorar catálogo
             </Button>
           </CTAButtons>
 
           <TrustBar>
             <TrustItem>
-              <FiCheck size={18} color="var(--primary-light)" />
+              <Check size={18} color="var(--primary-light)" />
               +800 palas analizadas
             </TrustItem>
             <TrustItem>
-              <FiCheck size={18} color="var(--primary-light)" />
+              <Check size={18} color="var(--primary-light)" />
               Sin registro obligatorio
             </TrustItem>
           </TrustBar>
@@ -703,7 +703,7 @@ const HomePage: React.FC = () => {
           <FeatureLayout>
             <FeatureText>
               <FeatureTag>
-                <FiTarget size={14} />
+                <Crosshair size={14} />
                 Comparador Inteligente
               </FeatureTag>
               <FeatureTitle>Compara hasta 3 palas lado a lado</FeatureTitle>
@@ -712,12 +712,12 @@ const HomePage: React.FC = () => {
               </FeatureDescription>
               <FeatureLink to='/compare'>
                 Probar comparador
-                <FiArrowRight size={18} />
+                <ArrowRight size={18} />
               </FeatureLink>
             </FeatureText>
             <FeatureVisual>
               <FeatureVisualIcon>
-                <FiTarget size={32} />
+                <Crosshair size={32} />
               </FeatureVisualIcon>
             </FeatureVisual>
           </FeatureLayout>
@@ -725,7 +725,7 @@ const HomePage: React.FC = () => {
           <FeatureLayout>
             <FeatureText>
               <FeatureTag>
-                <FiSearch size={14} />
+                <MagnifyingGlass size={14} />
                 Búsqueda Avanzada
               </FeatureTag>
               <FeatureTitle>Encuentra tu pala en segundos</FeatureTitle>
@@ -734,12 +734,12 @@ const HomePage: React.FC = () => {
               </FeatureDescription>
               <FeatureLink to='/catalog'>
                 Explorar catálogo
-                <FiArrowRight size={18} />
+                <ArrowRight size={18} />
               </FeatureLink>
             </FeatureText>
             <FeatureVisual>
               <FeatureVisualIcon>
-                <FiSearch size={32} />
+                <MagnifyingGlass size={32} />
               </FeatureVisualIcon>
             </FeatureVisual>
           </FeatureLayout>

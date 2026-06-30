@@ -1,5 +1,5 @@
 import React from "react";
-import { FiHeart, FiMail } from "react-icons/fi";
+import { Heart, Envelope } from "@phosphor-icons/react";
 import { FaInstagram, FaTiktok } from "react-icons/fa";
 import styled from "styled-components";
 
@@ -80,7 +80,7 @@ const Footer: React.FC = () => {
       <FooterContent>
         <FooterBottom>
           <Copyright>
-            © 2025 Smashly. Hecho con <FiHeart color="var(--error)" /> para los
+            © 2025 Smashly. Hecho con <Heart color="var(--error)" /> para los
             amantes del pádel.
           </Copyright>
 
@@ -102,7 +102,7 @@ const Footer: React.FC = () => {
               <FaTiktok />
             </a>
             <a href="mailto:hello@smashly.app" aria-label="Enviar correo">
-              <FiMail />
+              <Envelope />
             </a>
           </SocialLinks>
         </FooterBottom>

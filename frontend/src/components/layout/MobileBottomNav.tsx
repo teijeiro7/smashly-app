@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { FiCompass, FiHelpCircle, FiHome, FiLayers, FiUser, FiX, FiLogIn } from 'react-icons/fi';
+import { Compass, Question, House, Stack, User, X, SignIn } from '@phosphor-icons/react';
 import { Link, useRouterState, useNavigate } from '@tanstack/react-router';
 import styled from 'styled-components';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -187,11 +187,11 @@ const MobileBottomNav: React.FC = () => {
   };
 
   const items = [
-    { to: homePath, label: 'Inicio', icon: <FiHome /> },
-    { to: '/catalog', label: 'Catalogo', icon: <FiCompass /> },
-    { to: '/compare', label: 'Comparar', icon: <FiLayers /> },
-    { to: '/faq', label: 'FAQ', icon: <FiHelpCircle /> },
-    { to: '/profile', label: 'Perfil', icon: <FiUser />, onClick: handleProfileClick },
+    { to: homePath, label: 'Inicio', icon: <House /> },
+    { to: '/catalog', label: 'Catalogo', icon: <Compass /> },
+    { to: '/compare', label: 'Comparar', icon: <Stack /> },
+    { to: '/faq', label: 'FAQ', icon: <Question /> },
+    { to: '/profile', label: 'Perfil', icon: <User />, onClick: handleProfileClick },
   ];
 
   return (
@@ -248,10 +248,10 @@ const MobileBottomNav: React.FC = () => {
               onClick={e => e.stopPropagation()}
             >
               <CloseButton onClick={handleClosePopup}>
-                <FiX size={20} />
+                <X size={20} />
               </CloseButton>
               <PopupTitle>
-                <FiUser size={22} />
+                <User size={22} />
                 Inicia sesión
               </PopupTitle>
               <PopupText>
@@ -259,7 +259,7 @@ const MobileBottomNav: React.FC = () => {
               </PopupText>
               <PopupButtons>
                 <Button variant='primary' onClick={handleLogin}>
-                  <FiLogIn size={18} />
+                  <SignIn size={18} />
                   Iniciar sesión
                 </Button>
                 <Button variant='ghost' onClick={handleClosePopup}>
@@ -285,10 +285,10 @@ const MobileBottomNav: React.FC = () => {
               onClick={e => e.stopPropagation()}
             >
               <CloseButton onClick={handleClosePopup}>
-                <FiX size={20} />
+                <X size={20} />
               </CloseButton>
               <PopupTitle>
-                <FiUser size={22} />
+                <User size={22} />
                 Completa tu perfil
               </PopupTitle>
               <PopupText>
@@ -296,7 +296,7 @@ const MobileBottomNav: React.FC = () => {
               </PopupText>
               <PopupButtons>
                 <Button variant='primary' onClick={handleGoToOnboarding}>
-                  <FiLogIn size={18} />
+                  <SignIn size={18} />
                   Completar perfil
                 </Button>
                 <Button variant='ghost' onClick={handleClosePopup}>
