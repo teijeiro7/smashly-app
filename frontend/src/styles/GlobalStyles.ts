@@ -264,8 +264,8 @@ export const GlobalStyles = createGlobalStyle`
     --primary-rgb-dark: 21, 128, 61;
     --primary-subtle: rgba(22, 163, 74, 0.10);
     --primary-faint: rgba(22, 163, 74, 0.04);
-    --accent: #f59e0b;
-    --accent-rgb: 245, 158, 11;
+    --accent: #d97706;
+    --accent-rgb: 217, 119, 6;
     --success: #10b981;
     --warning: #f59e0b;
     --error: #ef4444;
@@ -314,7 +314,7 @@ export const GlobalStyles = createGlobalStyle`
     --radius-2xl: 1.5rem;
 
     /* Shadows */
-    --shadow-color: rgba(0, 0, 0, 0.10);
+    --shadow-color: rgba(15, 40, 24, 0.10);
     --surface-overlay: rgba(255, 255, 255, 0.85);
     --shadow-sm: 0 1px 2px 0 var(--shadow-color);
     --shadow-md: 0 4px 6px -1px var(--shadow-color), 0 2px 4px -1px var(--shadow-color);
@@ -372,8 +372,8 @@ export const GlobalStyles = createGlobalStyle`
     --primary-rgb-dark: 22, 163, 74;
     --primary-subtle: rgba(34, 197, 94, 0.18);
     --primary-faint: rgba(34, 197, 94, 0.06);
-    --accent: #84cc16;
-    --accent-rgb: 132, 204, 22;
+    --accent: #f59e0b;
+    --accent-rgb: 245, 158, 11;
     --success: #34d399;
     --warning: #fbbf24;
     --error: #f87171;
@@ -397,7 +397,7 @@ export const GlobalStyles = createGlobalStyle`
     --footer-bg: #051008;
     --header-bg: #0a3818;
 
-    --shadow-color: rgba(0, 0, 0, 0.50);
+    --shadow-color: rgba(0, 0, 0, 0.55);
     --surface-overlay: rgba(18, 26, 22, 0.85);
     --shadow-sm: 0 1px 2px 0 var(--shadow-color);
     --shadow-md: 0 4px 6px -1px var(--shadow-color), 0 2px 4px -1px var(--shadow-color);
@@ -450,8 +450,8 @@ export const GlobalStyles = createGlobalStyle`
       --primary-rgb-dark: 22, 163, 74;
       --primary-subtle: rgba(34, 197, 94, 0.18);
       --primary-faint: rgba(34, 197, 94, 0.06);
-      --accent: #84cc16;
-      --accent-rgb: 132, 204, 22;
+      --accent: #f59e0b;
+      --accent-rgb: 245, 158, 11;
       --success: #34d399;
       --warning: #fbbf24;
       --error: #f87171;
@@ -475,7 +475,7 @@ export const GlobalStyles = createGlobalStyle`
     --footer-bg: #051008;
     --header-bg: #0a3818;
 
-      --shadow-color: rgba(0, 0, 0, 0.50);
+      --shadow-color: rgba(0, 0, 0, 0.55);
       --surface-overlay: rgba(18, 26, 22, 0.85);
       --shadow-sm: 0 1px 2px 0 var(--shadow-color);
       --shadow-md: 0 4px 6px -1px var(--shadow-color), 0 2px 4px -1px var(--shadow-color);

@@ -77,8 +77,8 @@ export const Input = styled.input<{ $hasError?: boolean }>`
   background: var(--surface);
 
   &:focus {
-    border-color: #a3e635;
-    box-shadow: 0 0 0 4px rgba(163, 230, 53, 0.1);
+    border-color: var(--primary);
+    box-shadow: 0 0 0 4px rgba(var(--primary-rgb), 0.1);
   }
 
   &::placeholder {
@@ -123,7 +123,7 @@ export const ErrorText = styled.span`
 
 export const SubmitButton = styled.button`
   width: 100%;
-  background: var(--accent); // Neon Green
+  background: var(--brand-surface);
   color: #000;
   font-weight: 700;
   padding: 16px;
@@ -138,7 +138,7 @@ export const SubmitButton = styled.button`
   box-shadow: 0 4px 12px rgba(var(--accent-rgb), 0.2);
 
   &:hover {
-    background: #b3e600;
+    background: var(--brand-surface-hover);
     transform: translateY(-1px);
     box-shadow: 0 6px 16px rgba(var(--accent-rgb), 0.3);
   }
@@ -209,8 +209,8 @@ export const FooterText = styled.p`
   color: var(--text-subtle);
 
   a {
-    color: var(--accent); /* Matching neon */
-    color: var(--accent); /* Slightly darker for text readability on white? Image has neon green links? "Terms of Service" looks yellow/green */
+    color: var(--primary);
+    color: var(--primary);
     text-decoration: none;
     font-weight: 500;
 
@@ -221,8 +221,8 @@ export const FooterText = styled.p`
 `;
 
 export const ForgotPasswordLink = styled(Link)`
-  color: var(--accent);
-  color: var(--accent); // Using a readable lime green
+  color: var(--primary);
+  color: var(--primary);
   font-size: 0.85rem;
   font-weight: 600;
   text-decoration: none;
