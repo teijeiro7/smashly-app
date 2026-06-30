@@ -39,12 +39,28 @@ export const GlobalStyles = createGlobalStyle`
     font-weight: 400;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    font-variant-numeric: tabular-nums;
     overscroll-behavior-y: contain;
     min-height: 100dvh;
     width: 100%;
     max-width: 100%;
     overflow-x: hidden;
     transition: background-color 0.2s ease, color 0.2s ease;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0.03;
+    pointer-events: none;
+    z-index: 9998;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+    background-repeat: repeat;
+    background-size: 256px 256px;
   }
 
   #root {
@@ -66,11 +82,13 @@ export const GlobalStyles = createGlobalStyle`
   h1 {
     font-size: 2.5rem;
     font-weight: 800;
+    letter-spacing: -0.02em;
   }
 
   h2 {
     font-size: 2rem;
     font-weight: 700;
+    letter-spacing: -0.01em;
   }
 
   h3 {
@@ -327,6 +345,15 @@ export const GlobalStyles = createGlobalStyle`
     --racket-image-radius-detail: 16px;
     --racket-image-border: 1px solid #e5e7eb;
     --racket-image-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
+
+    /* z-index scale */
+    --z-base: 1;
+    --z-sticky: 100;
+    --z-header: 350;
+    --z-nav: 380;
+    --z-overlay: 500;
+    --z-modal: 1000;
+    --z-toast: 9999;
   }
 
   /* Dark mode — selectors use BOTH attribute and class for maximum

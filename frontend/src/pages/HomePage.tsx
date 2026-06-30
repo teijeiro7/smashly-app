@@ -27,7 +27,6 @@ const Container = styled.div`
 
 const HeroSection = styled.section`
   padding: clamp(80px, 12vw, 140px) 20px clamp(60px, 8vw, 100px);
-  text-align: center;
   background: linear-gradient(145deg, var(--brand-surface-deep) 0%, var(--brand-surface-strong) 30%, var(--brand-surface) 60%, var(--brand-surface-hover) 100%);
   color: var(--brand-on-surface);
   position: relative;
@@ -76,6 +75,11 @@ const HeroContent = styled.div`
   margin: 0 auto;
   position: relative;
   z-index: 1;
+  text-align: left;
+
+  @media (max-width: 768px) {
+    text-align: center;
+  }
 `;
 
 const Badge = styled.div`
@@ -117,14 +121,11 @@ const Title = styled.h1`
   font-weight: 800;
   margin-bottom: clamp(16px, 4vw, 32px);
   line-height: 1.05;
-  text-align: center;
+  text-align: left;
   max-width: 1100px;
-  margin-left: auto;
-  margin-right: auto;
-  padding: 0 20px;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-start;
   gap: 0.5rem;
   position: relative;
   animation: ${heroFadeIn} 0.8s ease forwards;
@@ -149,6 +150,11 @@ const Title = styled.h1`
     font-size: clamp(1.5rem, 9vw, 2rem);
     padding: 0 16px;
   }
+
+  @media (max-width: 768px) {
+    text-align: center;
+    align-items: center;
+  }
 `;
 
 const TitleStaticBefore = styled.span`
@@ -172,7 +178,6 @@ const Subtitle = styled.p`
   opacity: 0.92;
   line-height: 1.6;
   max-width: 560px;
-  margin-left: auto;
   margin-right: auto;
   padding: 0 20px;
   animation: ${heroFadeIn} 0.8s ease forwards;
@@ -182,6 +187,12 @@ const Subtitle = styled.p`
   @media (prefers-reduced-motion: reduce) {
     animation: none;
     opacity: 1;
+  }
+
+  @media (max-width: 768px) {
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
   }
 
   @media (max-width: 480px) {
@@ -194,7 +205,7 @@ const Subtitle = styled.p`
 const CTAButtons = styled.div`
   display: flex;
   gap: 16px;
-  justify-content: center;
+  justify-content: flex-start;
   flex-wrap: wrap;
   padding: 0 20px;
   animation: ${heroFadeIn} 0.8s ease forwards;
@@ -203,6 +214,10 @@ const CTAButtons = styled.div`
   @media (prefers-reduced-motion: reduce) {
     animation: none;
     opacity: 1;
+  }
+
+  @media (max-width: 768px) {
+    justify-content: center;
   }
 
   @media (max-width: 640px) {
@@ -219,7 +234,7 @@ const CTAButtons = styled.div`
 const TrustBar = styled.div`
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   gap: 24px;
   margin-top: 32px;
   padding: 0 20px;
@@ -230,6 +245,10 @@ const TrustBar = styled.div`
   @media (prefers-reduced-motion: reduce) {
     animation: none;
     opacity: 1;
+  }
+
+  @media (max-width: 768px) {
+    justify-content: center;
   }
 
   @media (max-width: 640px) {
