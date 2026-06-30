@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { FiArrowRight, FiCheck, FiSearch, FiTarget, FiZap } from 'react-icons/fi';
 import { Link, useNavigate } from '@tanstack/react-router';
 import styled, { keyframes } from 'styled-components';
+import Button from '../components/common/Button';
 import RotatingPhrases from '../components/features/RotatingPhrases';
 import { useAuth } from '../contexts/AuthContext';
 import { useInView } from '../hooks/useInView';
@@ -213,90 +214,7 @@ const CTAButtons = styled.div`
   }
 `;
 
-const PrimaryButton = styled(Link)`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  background: var(--surface);
-  color: var(--primary-hover);
-  min-height: 56px;
-  padding: clamp(14px, 3vw, 18px) clamp(28px, 5vw, 40px);
-  border-radius: 14px;
-  text-decoration: none;
-  font-weight: 700;
-  font-size: clamp(0.95rem, 2vw, 1.125rem);
-  transition: transform 0.2s ease, box-shadow 0.2s ease, color 0.2s ease;
-  box-shadow: 0 4px 24px var(--shadow-color);
-  white-space: nowrap;
-  letter-spacing: -0.01em;
 
-  @media (max-width: 640px) {
-    width: 100%;
-    min-height: 52px;
-    padding: 14px 24px;
-    font-size: 0.95rem;
-  }
-
-  @media (max-width: 480px) {
-    min-height: 48px;
-    padding: 12px 20px;
-    font-size: 0.9rem;
-  }
-
-  &:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 12px 40px var(--shadow-color);
-    text-decoration: none;
-    color: var(--primary-hover);
-  }
-
-  &:active {
-    transform: translateY(-1px);
-  }
-`;
-
-const SecondaryButton = styled(Link)`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  min-height: 56px;
-  background: transparent;
-  color: white;
-  padding: clamp(14px, 3vw, 18px) clamp(28px, 5vw, 40px);
-  border: 2px solid rgba(255, 255, 255, 0.35);
-  border-radius: 14px;
-  text-decoration: none;
-  font-weight: 600;
-  font-size: clamp(0.95rem, 2vw, 1.125rem);
-  transition: all 0.2s ease;
-  white-space: nowrap;
-
-  @media (max-width: 640px) {
-    width: 100%;
-    min-height: 52px;
-    padding: 14px 24px;
-    font-size: 0.95rem;
-  }
-
-  @media (max-width: 480px) {
-    min-height: 48px;
-    padding: 12px 20px;
-    font-size: 0.9rem;
-  }
-
-  &:hover {
-    background: rgba(255, 255, 255, 0.12);
-    border-color: rgba(255, 255, 255, 0.6);
-    text-decoration: none;
-    transform: translateY(-2px);
-  }
-
-  &:active {
-    transform: translateY(0);
-  }
-`;
 
 const TrustBar = styled.div`
   display: flex;
@@ -710,14 +628,14 @@ const HomePage: React.FC = () => {
           </Subtitle>
 
           <CTAButtons>
-            <PrimaryButton to='/compare'>
+            <Button as={Link} to='/compare' variant='primary' size='lg'>
               <FiTarget size={20} />
               Encontrar mi pala ideal
-            </PrimaryButton>
-            <SecondaryButton to='/catalog'>
+            </Button>
+            <Button as={Link} to='/catalog' variant='secondary' size='lg' $inverse>
               <FiSearch size={20} />
               Explorar catálogo
-            </SecondaryButton>
+            </Button>
           </CTAButtons>
 
           <TrustBar>

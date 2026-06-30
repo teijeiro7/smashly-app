@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { motion } from 'framer-motion';
 import { FiCamera, FiUpload, FiX } from 'react-icons/fi';
 import { sileo } from 'sileo';
+import Button from '../common/Button';
 
 const AvatarContainer = styled.div`
   position: relative;
@@ -108,28 +109,7 @@ const ModalActions = styled.div`
   justify-content: flex-end;
 `;
 
-const Button = styled.button<{ $variant?: 'primary' | 'secondary' }>`
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.625rem 1.25rem;
-  border-radius: 8px;
-  font-size: 0.875rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  border: none;
 
-  ${props => props.$variant === 'primary' ? `
-    background: var(--brand-surface);
-    color: var(--brand-on-surface);
-    &:hover { background: var(--brand-surface-hover); }
-  ` : `
-    background: var(--surface-3);
-    color: var(--text-muted);
-    &:hover { background: var(--border); }
-  `}
-`;
 
 interface ProfileAvatarProps {
   currentAvatar?: string | null;
@@ -263,11 +243,11 @@ const ProfileAvatar: React.FC<ProfileAvatarProps> = ({
               </p>
             </ModalContent>
             <ModalActions>
-              <Button onClick={handleCancel}>
+              <Button variant='ghost' size='sm' onClick={handleCancel}>
                 <FiX size={16} />
                 Cancelar
               </Button>
-              <Button $variant="primary" onClick={handleUpload} disabled={uploading}>
+              <Button variant='primary' size='sm' onClick={handleUpload} disabled={uploading}>
                 <FiUpload size={16} />
                 {uploading ? 'Subiendo...' : 'Confirmar'}
               </Button>

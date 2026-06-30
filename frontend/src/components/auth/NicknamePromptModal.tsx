@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import { FiEdit2, FiCheck } from 'react-icons/fi';
+import Button from '../common/Button';
 
 const ModalOverlay = styled.div`
   position: fixed;
@@ -136,49 +137,7 @@ const ButtonGroup = styled.div`
   gap: 0.75rem;
 `;
 
-const Button = styled.button<{ $variant?: 'primary' | 'secondary' }>`
-  flex: 1;
-  padding: 0.875rem 1.5rem;
-  border: none;
-  border-radius: 8px;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
 
-  ${props =>
-    props.$variant === 'primary'
-      ? `
-    background: var(--brand-surface);
-    color: var(--brand-on-surface);
-
-    &:hover {
-      background: var(--primary-hover);
-    }
-
-    &:disabled {
-      background: var(--text-subtle);
-      cursor: not-allowed;
-    }
-  `
-      : `
-    background: var(--surface-3);
-    color: var(--text);
-
-    &:hover {
-      background: var(--border);
-    }
-
-    &:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-  `}
-
-  &:active:not(:disabled) {
-    transform: scale(0.98);
-  }
-`;
 
 interface NicknamePromptModalProps {
   isOpen: boolean;
@@ -300,15 +259,15 @@ const NicknamePromptModal: React.FC<NicknamePromptModalProps> = ({
         <ButtonGroup>
           {isEditing ? (
             <>
-              <Button $variant='secondary' onClick={handleUseDefault} disabled={isLoading}>
+              <Button variant='secondary' onClick={handleUseDefault} disabled={isLoading}>
                 Usar sugerido
               </Button>
-              <Button $variant='primary' onClick={handleConfirm} disabled={isLoading || !!error}>
+              <Button variant='primary' onClick={handleConfirm} disabled={isLoading || !!error}>
                 {isLoading ? 'Guardando...' : 'Confirmar'}
               </Button>
             </>
           ) : (
-            <Button $variant='primary' onClick={handleConfirm} disabled={isLoading}>
+            <Button variant='primary' onClick={handleConfirm} disabled={isLoading}>
               {isLoading ? (
                 'Continuando...'
               ) : (

@@ -3,6 +3,7 @@ import { FiMenu, FiSearch, FiX, FiUser, FiLogOut, FiHome, FiGrid, FiBarChart2, F
 import { Link, useRouterState, useNavigate } from '@tanstack/react-router';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
+import Button from '../common/Button';
 import { useAuth } from '../../contexts/AuthContext';
 import { useAuthModal } from '../../contexts/AuthModalContext';
 import GlobalSearch from '../features/GlobalSearch';
@@ -281,83 +282,7 @@ const AuthButtons = styled.div`
   }
 `;
 
-const AuthButton = styled.button<{
-  $variant?: 'primary' | 'secondary';
-  $isMobile?: boolean;
-}>`
-  padding: ${props => (props.$isMobile ? '12px 16px' : '7px 18px')};
-  border-radius: ${props => (props.$isMobile ? '12px' : '8px')};
-  font-weight: 600;
-  text-decoration: none;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  text-align: center;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  cursor: pointer;
-  border: none;
-  font-size: 0.875rem;
-  font-family: inherit;
-  width: ${props => (props.$isMobile ? '100%' : 'auto')};
-  letter-spacing: -0.01em;
 
-  ${props => {
-    if (props.$isMobile) {
-      return props.$variant === 'primary'
-        ? `
-        background: var(--primary-hover);
-        color: var(--brand-on-surface);
-        box-shadow: 0 2px 8px rgba(var(--primary-rgb-dark), 0.2);
-        
-        &:hover {
-          background: var(--primary-hover);
-          transform: translateY(-1px);
-          box-shadow: 0 4px 12px rgba(var(--primary-rgb-dark), 0.25);
-          color: var(--brand-on-surface);
-        }
-      `
-        : `
-        background: var(--surface);
-        color: var(--text);
-        border: 1.5px solid var(--border);
-        
-        &:hover {
-          background: var(--surface-2);
-          border-color: var(--primary-hover);
-          color: var(--primary-hover);
-        }
-      `;
-    } else {
-      return props.$variant === 'primary'
-        ? `
-        background: var(--surface);
-        color: var(--primary-hover);
-        box-shadow: 0 1px 3px var(--shadow-color);
-        
-        &:hover {
-          background: var(--primary-subtle);
-          transform: translateY(-1px);
-          box-shadow: 0 4px 12px var(--shadow-color);
-        }
-      `
-        : `
-        background: transparent;
-        color: var(--brand-on-surface);
-        border: 1.5px solid rgba(255, 255, 255, 0.25);
-        
-        &:hover {
-          background: rgba(255, 255, 255, 0.08);
-          border-color: rgba(255, 255, 255, 0.4);
-        }
-      `;
-    }
-  }}
-
-  &:active {
-    transform: scale(0.97) translateY(0);
-  }
-`;
 
 const LogoutButton = styled.button<{
   $variant?: 'primary' | 'secondary';
@@ -637,12 +562,12 @@ const Header: React.FC = () => {
             </UserMenuContainer>
           ) : (
             <>
-              <AuthButton onClick={openLogin} $variant='secondary'>
+              <Button variant='ghost' $inverse onClick={openLogin}>
                 Iniciar sesión
-              </AuthButton>
-              <AuthButton onClick={openRegister} $variant='primary'>
+              </Button>
+              <Button variant='secondary' onClick={openRegister}>
                 Registrarse
-              </AuthButton>
+              </Button>
             </>
           )}
         </AuthButtons>
@@ -739,28 +664,28 @@ const Header: React.FC = () => {
                 </>
               ) : (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                  <AuthButton
-                    $variant='secondary'
-                    $isMobile
+                  <Button
+                    variant='secondary'
                     onClick={() => {
                       closeAllMenus();
                       openLogin();
                     }}
+                    style={{ width: '100%' }}
                   >
                     <FiLogIn />
                     Iniciar sesión
-                  </AuthButton>
-                  <AuthButton
-                    $variant='primary'
-                    $isMobile
+                  </Button>
+                  <Button
+                    variant='primary'
                     onClick={() => {
                       closeAllMenus();
                       openRegister();
                     }}
+                    style={{ width: '100%' }}
                   >
                     <FiUserPlus />
                     Registrarse
-                  </AuthButton>
+                  </Button>
                 </div>
               )}
             </MobileNavSection>
