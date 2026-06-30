@@ -134,7 +134,7 @@ const Subtitle = styled.p`
   margin-bottom: clamp(32px, 6vw, 48px);
   opacity: 0.92;
   line-height: 1.6;
-  max-width: 560px;
+  max-width: 720px;
   margin-left: auto;
   margin-right: auto;
   padding: 0 20px;
