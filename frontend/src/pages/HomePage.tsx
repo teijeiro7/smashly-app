@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { ArrowRight, Check, MagnifyingGlass, Crosshair, Lightning } from '@phosphor-icons/react';
+import { ArrowRight, Check, MagnifyingGlass, Crosshair } from '@phosphor-icons/react';
 import { Link, useNavigate } from '@tanstack/react-router';
 import styled, { keyframes } from 'styled-components';
 import Button from '../components/common/Button';
@@ -79,40 +79,6 @@ const HeroContent = styled.div`
 
   @media (max-width: 768px) {
     text-align: center;
-  }
-`;
-
-const Badge = styled.div`
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  background: rgba(255, 255, 255, 0.12);
-  padding: 10px 20px;
-  border-radius: 100px;
-  font-size: clamp(0.8rem, 1.8vw, 0.95rem);
-  margin-bottom: clamp(24px, 5vw, 40px);
-  border: 1px solid rgba(255, 255, 255, 0.25);
-  backdrop-filter: blur(10px);
-  font-weight: 600;
-  letter-spacing: 0.02em;
-  will-change: transform, opacity;
-  animation: ${heroFadeIn} 0.6s ease forwards;
-  box-shadow: 0 4px 24px var(--shadow-color);
-
-  @media (prefers-reduced-motion: reduce) {
-    animation: none;
-    opacity: 1;
-  }
-
-  @media (max-width: 768px) {
-    backdrop-filter: none;
-    background: rgba(255, 255, 255, 0.2);
-  }
-
-  @media (max-width: 480px) {
-    padding: 8px 16px;
-    font-size: 0.8rem;
-    gap: 6px;
   }
 `;
 
@@ -632,18 +598,13 @@ const HomePage: React.FC = () => {
       />
       <HeroSection>
         <HeroContent>
-          <Badge>
-            <Lightning size={16} />
-            Impulsado por IA
-          </Badge>
-
           <Title>
             <TitleStaticBefore>La herramienta que te permite</TitleStaticBefore>
             <RotatingPhrases phrases={phrases} />
           </Title>
 
           <Subtitle>
-            Descubre la pala perfecta para tu estilo de juego entre cientos de modelos analizados con inteligencia artificial.
+            Compara más de 800 palas de pádel con datos reales: peso, balance, forma, materiales y precio. Filtra, compara y encuentra la pala que se ajusta a tu juego.
           </Subtitle>
 
           <CTAButtons>
