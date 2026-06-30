@@ -12,8 +12,7 @@ const RacketCardContainer = styled.li<{ $view: 'grid' | 'list'; $index: number }
   overflow: hidden;
   box-shadow: 0 1px 3px var(--shadow-color), 0 1px 2px var(--shadow-color);
   cursor: pointer;
-  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  border: 1px solid var(--border);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1), background 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   contain: layout style paint;
   will-change: transform, opacity;
   display: flex;
@@ -37,7 +36,7 @@ const RacketCardContainer = styled.li<{ $view: 'grid' | 'list'; $index: number }
   &:hover {
     transform: translateY(-4px);
     box-shadow: 0 10px 25px var(--shadow-color);
-    border-color: var(--primary-hover);
+    background: var(--primary-faint);
   }
 `;
 
@@ -49,7 +48,7 @@ const RacketImageContainer = styled.div<{ $view: 'grid' | 'list' }>`
   align-self: ${props => (props.$view === 'list' ? 'stretch' : 'auto')};
   background: var(--racket-image-bg);
   border: var(--racket-image-border);
-  border-radius: var(--racket-image-radius-card);
+  border-radius: 8px;
   box-shadow: var(--racket-image-shadow);
   display: flex;
   align-items: center;
