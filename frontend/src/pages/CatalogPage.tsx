@@ -126,6 +126,8 @@ const SearchInput = styled.input`
   padding: 0.875rem 1rem 0.875rem 2.75rem;
   border: 1.5px solid var(--border);
   border-radius: 8px;
+  background: var(--surface);
+  color: var(--text);
   font-size: 0.875rem;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 
