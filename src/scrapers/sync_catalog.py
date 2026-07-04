@@ -55,7 +55,7 @@ from .deduplicate_rackets import run as run_deduplication
 # ── Configuración ─────────────────────────────────────────────────────────────
 
 STORE_CONFIGS = {
-    "padelmarket":  (PadelMarketScraper,  "https://padelmarket.com/collections/palas"),
+    "padelmarket":  (PadelMarketScraper,  "https://padelmarket.com/es-eu/collections/palas"),
     "padelnuestro": (PadelNuestroScraper,  "https://www.padelnuestro.com/palas-padel"),
     "padelproshop": (PadelProShopScraper,  "https://padelproshop.com/collections/palas-padel"),
 }
@@ -556,7 +556,6 @@ async def _process_single_price(
     db_id: Optional[int],
     scrapers: dict,
     target_stores: list,
-    store_data_map: Dict[str, Optional[dict]],
     current_db_prices: Dict[int, Dict[str, Optional[float]]],
     supabase: Optional[Client],
     dry_run: bool,
@@ -634,8 +633,6 @@ async def _process_single_price(
 
     return slug, resolved_db_id, db_updates, racket_changed, prices_info
 
-    return slug, resolved_db_id, db_updates, racket_changed
-
 
 async def run_prices_sync(
     target_stores: list,
@@ -698,7 +695,7 @@ async def run_prices_sync(
 
             result = await _process_single_price(
                 slug, racket, model_name, db_id,
-                scrapers, target_stores, {}, current_db_prices,
+                scrapers, target_stores, current_db_prices,
                 supabase, dry_run, slug_id_map,
             )
             # Unpack new return value (including prices_info)

@@ -106,8 +106,8 @@ def normalize_spec_value(key: str, value: str) -> str:
 
     # Normalización de Peso (Estricta numérica)
     if 'peso' in key_lower:
-        # Extraer todos los grupos de 3 dígitos
-        nums = re.findall(r'\b\d{3}\b', value)
+        # Extraer todos los grupos de 3 dígitos (lookaround para no partir 4+ digit numbers)
+        nums = re.findall(r'(?<!\d)\d{3}(?!\d)', value)
         if len(nums) >= 2:
             # Ordenar para asegurar min-max
             nums = sorted([int(n) for n in nums])
@@ -120,7 +120,13 @@ def normalize_spec_value(key: str, value: str) -> str:
     if 'núcleo' in key_lower or 'goma' in key_lower:
         if 'eva' in value.lower(): return value.replace('eva', 'EVA').replace('Eva', 'EVA')
         if 'foam' in value.lower(): return value.replace('foam', 'Foam').replace('FOAM', 'Foam')
-    
+
+    if 'perfil' in key_lower:
+        m = re.search(r'(\d+(?:[.,]\d+)?)', value)
+        if m:
+            return m.group(1).replace(',', '.') + ' mm'
+        return value
+
     return value
 
 _JUNIOR_PATTERN = re.compile(

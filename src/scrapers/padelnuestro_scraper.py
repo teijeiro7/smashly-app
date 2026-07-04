@@ -1,3 +1,4 @@
+import html as _html
 import json
 import re
 import urllib.request
@@ -10,6 +11,8 @@ from .base_scraper import BaseScraper, Product, clean_price, normalize_specs, is
 
 class PadelNuestroScraper(BaseScraper):
     """Scraper for PadelNuestro online store using GraphQL API."""
+
+    _graphql_blocked: bool = False  # class-level flag: skip GraphQL after first 403
 
     # ── Magento option‑ID → human‑readable label mappings ──────────────
     _ATTR_OPTIONS: Dict[str, Dict[str, str]] = {
@@ -119,15 +122,18 @@ class PadelNuestroScraper(BaseScraper):
                 "Content-Type": "application/json",
                 "Accept": "application/json, text/plain, */*",
                 "Accept-Language": "es-ES,es;q=0.9,en;q=0.8",
-                "Accept-Encoding": "gzip, deflate, br",
+                "Accept-Encoding": "gzip, deflate",
                 "Store": "es",
                 "Origin": "https://www.padelnuestro.com",
                 "Referer": "https://www.padelnuestro.com/palas-padel",
                 "Connection": "keep-alive",
+                "Sec-Fetch-Site": "same-origin",
+                "Sec-Fetch-Mode": "cors",
+                "Sec-Fetch-Dest": "empty",
                 "User-Agent": (
                     "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
                     "AppleWebKit/537.36 (KHTML, like Gecko) "
-                    "Chrome/122.0.0.0 Safari/537.36"
+                    "Chrome/124.0.0.0 Safari/537.36"
                 ),
             },
         )
@@ -149,9 +155,17 @@ class PadelNuestroScraper(BaseScraper):
                         import brotli
                         raw = brotli.decompress(raw)
                     except ImportError:
-                        pass  # Si no está brotli, intentar decodificar igualmente
+                        pass
                 data = json.loads(raw.decode("utf-8"))
                 return data if data is not None else {}
+        except urllib.error.HTTPError as e:
+            if e.code == 403:
+                if not PadelNuestroScraper._graphql_blocked:
+                    print("[PadelNuestro] GraphQL blocked (403) — falling back to HTML-only parsing")
+                    PadelNuestroScraper._graphql_blocked = True
+            else:
+                print(f"[PadelNuestro] GraphQL Error: {e}")
+            return {}
         except Exception as e:
             print(f"[PadelNuestro] GraphQL Error: {e}")
             return {}
@@ -162,8 +176,9 @@ class PadelNuestroScraper(BaseScraper):
         if not body_html:
             return specs
 
+        text = _html.unescape(body_html)
         text = (
-            body_html.replace("&nbsp;", " ")
+            text.replace("&nbsp;", " ")
             .replace("<br>", " ")
             .replace("</p>", " ")
             .replace("<p>", " ")
@@ -202,42 +217,61 @@ class PadelNuestroScraper(BaseScraper):
         if match:
             specs["Peso"] = match.group(1) + " g"
 
-        # 4. Núcleo/Goma
+        # 4. Núcleo/Goma — accepts "núcleo de goma EVA X", "goma EVA X", "núcleo EVA X"
         match = re.search(
-            r"(?:goma|núcleo|core)\s+(?:de\s+)?([a-zA-Z0-9\s]+?)(?:(?=\.|,)|$)",
+            r"(?:núcleo|goma|core)\s+(?:de\s+goma\s+|de\s+)?([A-Za-záéíóúÁÉÍÓÚñÑ0-9][A-Za-záéíóúÁÉÍÓÚñÑ0-9 ]+?)(?=[,.]|\s+con\s|\s+y\s|$)",
             text,
             re.IGNORECASE,
         )
+        if match:
+            val = match.group(1).strip()
+            if len(val) < 35 and any(kw in val.lower() for kw in ["eva", "foam", "goma", "poly", "soft"]):
+                specs["Núcleo"] = val.title()
+
+        # 5. Cara/Material — "caras de Black Carbon 12K", "fabricada con carbono 24K"
+        match = re.search(
+            r"cara(?:s)?\s+(?:de\s+)?"
+            r"((?:[A-Za-záéíóúÁÉÍÓÚñÑ0-9]+\s+)*(?:carbono|carbon|fibra[\w ]+|grafeno)(?:\s+\d+[kK])?)",
+            text, re.IGNORECASE,
+        )
+        if not match:
+            match = re.search(
+                r"(?:fabricad[ao]s?\s+con|material\s+(?:de\s+)?)"
+                r"((?:[A-Za-záéíóúÁÉÍÓÚñÑ0-9]+\s+)*(?:carbono|carbon|fibra[\w ]+|grafeno)(?:\s+\d+[kK])?)",
+                text, re.IGNORECASE,
+            )
         if match:
             val = match.group(1).strip()
             if len(val) < 40:
-                specs["Núcleo"] = val.title()
+                specs["Cara"] = val.title()
 
-        # 5. Cara/Material
+        # 5b. Acabado — "acabado rugoso", "acabado mate", "relieve 3D"
         match = re.search(
-            r"(?:caras|superficie|fabricad[ao]s?)\s+(?:de\s+|con\s+)?(carbono\s+[0-9]+[kK]|fibra de vidrio|carbono)",
+            r"acabado\s+(rugoso|liso|mate|brillante|3D|relieve|arenoso|s[aá]ndwich)",
             text,
             re.IGNORECASE,
         )
         if match:
-            specs["Cara"] = match.group(1).title()
+            specs["Acabado"] = match.group(1).title()
 
         # 6. Nivel
+        text_l_nivel = text.lower()
+        if "profesional" in text_l_nivel and ("jugador" in text_l_nivel or "nivel" in text_l_nivel):
+            specs["Nivel"] = "Profesional"
+        elif "avanzado" in text_l_nivel and ("jugador" in text_l_nivel or "nivel" in text_l_nivel):
+            specs["Nivel"] = "Avanzado"
+        elif "intermedio" in text_l_nivel and ("jugador" in text_l_nivel or "nivel" in text_l_nivel):
+            specs["Nivel"] = "Intermedio"
+        elif ("iniciaci" in text_l_nivel or "principiante" in text_l_nivel) and ("jugador" in text_l_nivel or "nivel" in text_l_nivel):
+            specs["Nivel"] = "Iniciación"
+
+        # 7. Perfil
         match = re.search(
-            r"jugador(?:es)?\s+(?:de\s+)?(?:nivel\s+)?([a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+)",
-            text,
-            re.IGNORECASE,
+            r'(?:perfil|grosor|espesor|thickness)[:\s]+(\d+(?:[.,]\d+)?)\s*mm',
+            text, re.IGNORECASE
         )
         if match:
-            val = match.group(1).strip()
-            if "avanzado" in val.lower():
-                specs["Nivel"] = "Avanzado"
-            elif "intermedio" in val.lower():
-                specs["Nivel"] = "Intermedio"
-            elif "profesional" in val.lower():
-                specs["Nivel"] = "Profesional/Avanzado"
-            elif "iniciación" in val.lower():
-                specs["Nivel"] = "Iniciación"
+            specs["Perfil"] = match.group(1).replace(",", ".") + " mm"
 
         return specs
 
@@ -360,6 +394,11 @@ class PadelNuestroScraper(BaseScraper):
         ctx.verify_mode = ssl.CERT_NONE
         try:
             with urllib.request.urlopen(req, timeout=20, context=ctx) as resp:
+                # Detect redirect to category page (discontinued product)
+                final_url = resp.url.split("?")[0].rstrip("/")
+                req_url = url.split("?")[0].rstrip("/")
+                if final_url != req_url:
+                    return None  # redirected → discontinued, skip silently
                 raw = resp.read()
                 enc = resp.headers.get("Content-Encoding", "")
                 if enc == "gzip":
@@ -473,22 +512,60 @@ class PadelNuestroScraper(BaseScraper):
             description=description_html,
         )
 
+    def _scrape_specs_via_graphql(self, url_key: str) -> Dict[str, str]:
+        """Fetch structured padel spec attributes via Magento GraphQL API."""
+        if PadelNuestroScraper._graphql_blocked:
+            return {}
+        fields = " ".join(self._FIELD_TO_SPEC.keys())
+        query = (
+            '{ products(filter: {url_key: {eq: "%s"}}) { items { %s } } }'
+            % (url_key, fields)
+        )
+        data = self._fetch_graphql(query)
+        specs: Dict[str, str] = {}
+        try:
+            items = data.get("data", {}).get("products", {}).get("items", [])
+            if not items:
+                return specs
+            item = items[0]
+            for field, spec_key in self._FIELD_TO_SPEC.items():
+                raw_val = item.get(field)
+                if raw_val is None:
+                    continue
+                label = self._resolve_option(field, raw_val)
+                if label:
+                    specs[spec_key] = label
+        except Exception as e:
+            print(f"[PadelNuestro] GraphQL spec parse error for {url_key}: {e}")
+        return specs
+
     async def scrape_product(self, url: str) -> Optional[Product]:
-        """Scrape product data from HTML page using JSON-LD."""
+        """Scrape product data from HTML page using JSON-LD, enriched with GraphQL specs."""
         try:
             # Normalise URL (strip .html suffix)
             if url.endswith(".html"):
                 url = url[:-5]
 
-            loop = asyncio.get_event_loop()
+            loop = asyncio.get_running_loop()
             html = await loop.run_in_executor(None, self._fetch_html, url)
             if not html:
-                print(f"[PadelNuestro] No HTML for {url}")
-                return None
+                return None  # redirect (discontinued) or fetch error — already logged
 
             product = self._extract_product_from_html(html, url)
             if not product:
-                print(f"[PadelNuestro] Could not parse product from {url}")
+                return None
+
+            # Enrich with GraphQL structured spec attributes (option-ID → label)
+            url_key = url.rstrip("/").split("/")[-1]
+            graphql_specs = await loop.run_in_executor(
+                None, self._scrape_specs_via_graphql, url_key
+            )
+            for k, v in graphql_specs.items():
+                if v and k not in product.specs:
+                    product.specs[k] = v
+            if graphql_specs:
+                product.specs = normalize_specs(product.specs)
+
             return product
 
         except Exception as e:
@@ -520,7 +597,7 @@ class PadelNuestroScraper(BaseScraper):
 
         print("[PadelNuestro] Scraping category via HTML pagination...")
 
-        loop = asyncio.get_event_loop()
+        loop = asyncio.get_running_loop()
         while page_num <= max_pages:
             links = await loop.run_in_executor(
                 None, self._fetch_category_page, page_num

@@ -1,3 +1,4 @@
+import html as _html
 import json
 import re
 import ssl
@@ -53,10 +54,72 @@ class PadelMarketScraper(BaseScraper):
             if key and val:
                 specs[normalize_spec_name(key)] = val
 
-        # Weight regex
-        match = re.search(r'(\d{3}\s*[-–]\s*\d{3})\s*(?:gr|gramos|g)', html, re.IGNORECASE)
-        if match:
-            specs['Peso'] = match.group(1) + " g"
+        # Unescape and clean text for further extraction
+        text = _html.unescape(html)
+        text = text.replace('&nbsp;', ' ').replace('<br>', ' ').replace('</p>', ' ').replace('<p>', ' ')
+        text = re.sub(r'<[^>]+>', '', text)
+        text = re.sub(r'\s+', ' ', text).strip()
+        text_l = text.lower()
+
+        # Forma
+        if 'Forma' not in specs:
+            shape = self._infer_shape_from_text(text)
+            if shape:
+                specs['Forma'] = shape
+
+        # Balance
+        if 'Balance' not in specs:
+            match = re.search(r'balance\s+([a-zA-ZáéíóúÁÉÍÓÚñÑ]+)', text, re.IGNORECASE)
+            if match:
+                specs['Balance'] = match.group(1).title()
+
+        # Peso
+        if 'Peso' not in specs:
+            match = re.search(r'(\d{3}\s*[-–]\s*\d{3})\s*(?:gr|gramos|g)', text, re.IGNORECASE)
+            if match:
+                specs['Peso'] = match.group(1) + " g"
+
+        # Cara/Material
+        if 'Cara' not in specs:
+            match = re.search(
+                r'(?:(?:con|de)\s+)?'
+                r'((?:black\s+)?(?:carbono|carbon|fibra\s+de\s+(?:carbono|vidrio)|grafeno)'
+                r'(?:\s+\d+[kK])?)',
+                text, re.IGNORECASE
+            )
+            if match:
+                val = match.group(1).strip()
+                if len(val) < 40:
+                    specs['Cara'] = val.title()
+
+        # Núcleo
+        if 'Núcleo' not in specs:
+            match = re.search(
+                r'(?:n[uú]cleo|goma|core)\s+(?:de\s+goma\s+|de\s+)?'
+                r'([A-Za-záéíóúÁÉÍÓÚñÑ0-9][A-Za-záéíóúÁÉÍÓÚñÑ0-9 ]+?(?:eva|foam|poly)(?:\s+[A-Za-z]+)?)',
+                text, re.IGNORECASE
+            )
+            if match:
+                val = match.group(1).strip()
+                if len(val) < 30:
+                    specs['Núcleo'] = val.title()
+
+        # Nivel
+        if 'Nivel' not in specs:
+            if 'profesional' in text_l and ('jugador' in text_l or 'nivel' in text_l):
+                specs['Nivel'] = 'Profesional'
+            elif 'avanzado' in text_l and ('jugador' in text_l or 'nivel' in text_l):
+                specs['Nivel'] = 'Avanzado'
+            elif 'intermedio' in text_l and ('jugador' in text_l or 'nivel' in text_l):
+                specs['Nivel'] = 'Intermedio'
+            elif ('iniciaci' in text_l or 'principiante' in text_l) and ('jugador' in text_l or 'nivel' in text_l):
+                specs['Nivel'] = 'Iniciación'
+
+        # Perfil / grosor
+        if 'Perfil' not in specs:
+            match = re.search(r'(?:perfil|grosor|espesor|thickness)[:\s]+(\d+(?:[.,]\d+)?)\s*mm', text, re.IGNORECASE)
+            if match:
+                specs['Perfil'] = match.group(1).replace(',', '.') + ' mm'
 
         return specs
 
@@ -65,8 +128,9 @@ class PadelMarketScraper(BaseScraper):
         time.sleep(random.uniform(0.8, 1.5))
         api_url = f"https://padelmarket.com/es-eu/products/{handle}.json"
         req = urllib.request.Request(api_url, headers={
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
             'Accept': 'application/json',
+            'Accept-Language': 'es-ES,es;q=0.9',
         })
         for attempt in range(3):
             try:
@@ -74,12 +138,20 @@ class PadelMarketScraper(BaseScraper):
                     data = json.loads(resp.read().decode('utf-8'))
                 return data.get('product', {})
             except urllib.error.HTTPError as e:
+                if e.code == 404:
+                    return {}  # product removed from store
                 if e.code == 403 and attempt < 2:
                     wait = 10 * (attempt + 1)
                     print(f"[PadelMarket] 403 on {handle}, retrying in {wait}s...")
                     time.sleep(wait)
                     continue
                 raise
+            except urllib.error.URLError as e:
+                if attempt < 2:
+                    time.sleep(5 * (attempt + 1))
+                    continue
+                print(f"[PadelMarket] Network error for {handle}: {e.reason}")
+                return {}
         return {}
 
     async def scrape_product(self, url: str) -> Optional[Product]:
@@ -91,7 +163,7 @@ class PadelMarketScraper(BaseScraper):
             return None
         
         try:
-            loop = asyncio.get_event_loop()
+            loop = asyncio.get_running_loop()
             product_data = await loop.run_in_executor(
                 None, self._fetch_product_json, handle
             )
@@ -160,8 +232,8 @@ class PadelMarketScraper(BaseScraper):
                 
                 more_specs = self._parse_specs_from_html(full_html)
                 specs.update(more_specs)
-            except:
-                pass
+            except Exception as e:
+                print(f"[PadelMarket] HTML fallback error for {handle}: {e}")
 
         # Final shape inference from cumulative text if still missing
         if 'Forma' not in specs:
@@ -185,14 +257,26 @@ class PadelMarketScraper(BaseScraper):
 
     def _fetch_api_page(self, collection_path: str, page_num: int) -> list:
         """Fetch a single page of products from the Shopify JSON API (sync, run in executor)."""
+        time.sleep(random.uniform(1.5, 3.0))
         api_url = f"https://padelmarket.com{collection_path}/products.json?limit=250&page={page_num}"
         req = urllib.request.Request(api_url, headers={
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
             'Accept': 'application/json',
+            'Accept-Language': 'es-ES,es;q=0.9',
         })
-        with urllib.request.urlopen(req, timeout=30, context=_ssl_ctx()) as resp:
-            data = json.loads(resp.read().decode('utf-8'))
-        return data.get('products', [])
+        for attempt in range(3):
+            try:
+                with urllib.request.urlopen(req, timeout=30, context=_ssl_ctx()) as resp:
+                    data = json.loads(resp.read().decode('utf-8'))
+                return data.get('products', [])
+            except urllib.error.HTTPError as e:
+                if e.code == 403 and attempt < 2:
+                    wait = 20 * (attempt + 1)
+                    print(f"[PadelMarket] 403 on category page {page_num}, retrying in {wait}s...")
+                    time.sleep(wait)
+                    continue
+                raise
+        return []
 
     async def scrape_category(self, url: str) -> List[str]:
         """Scrape product URLs using the Shopify products.json API.

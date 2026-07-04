@@ -1,3 +1,4 @@
+import html as _html
 import json
 import re
 import ssl
@@ -27,8 +28,9 @@ class PadelProShopScraper(BaseScraper):
         time.sleep(random.uniform(2.0, 4.0))
         api_url = f"https://padelproshop.com{collection_path}/products.json?limit=250&page={page_num}"
         req = urllib.request.Request(api_url, headers={
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
             'Accept': 'application/json',
+            'Accept-Language': 'es-ES,es;q=0.9',
         })
         for attempt in range(3):
             try:
@@ -49,8 +51,9 @@ class PadelProShopScraper(BaseScraper):
         time.sleep(random.uniform(3.0, 5.0))
         api_url = f"https://padelproshop.com/products/{handle}.json"
         req = urllib.request.Request(api_url, headers={
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
             'Accept': 'application/json',
+            'Accept-Language': 'es-ES,es;q=0.9',
         })
         for attempt in range(3):
             try:
@@ -58,12 +61,20 @@ class PadelProShopScraper(BaseScraper):
                     data = json.loads(resp.read().decode('utf-8'))
                 return data.get('product', {})
             except urllib.error.HTTPError as e:
+                if e.code == 404:
+                    return {}  # product removed from store
                 if e.code == 403 and attempt < 2:
                     wait = 30 * (attempt + 1)
                     print(f"[PadelProShop] 403 on {handle}, retrying in {wait}s...")
                     time.sleep(wait)
                     continue
                 raise
+            except urllib.error.URLError as e:
+                if attempt < 2:
+                    time.sleep(5 * (attempt + 1))
+                    continue
+                print(f"[PadelProShop] Network error for {handle}: {e.reason}")
+                return {}
         return {}
 
     # Palabras clave de forma y su valor normalizado
@@ -123,9 +134,11 @@ class PadelProShopScraper(BaseScraper):
                 specs[normalize_spec_name(key)] = val
 
         # If still missing essential specs, try general regex on cleaned text
-        text = html.replace('&nbsp;', ' ').replace('<br>', ' ').replace('</p>', ' ').replace('<p>', ' ')
+        text = _html.unescape(html)
+        text = text.replace('&nbsp;', ' ').replace('<br>', ' ').replace('</p>', ' ').replace('<p>', ' ')
         text = re.sub(r'<[^>]+>', '', text)
         text = re.sub(r'\s+', ' ', text).strip()
+        text_l = text.lower()
 
         # 1. Forma (Fallback extraction from text)
         if 'Forma' not in specs:
@@ -147,6 +160,48 @@ class PadelProShopScraper(BaseScraper):
             if match:
                 specs['Peso'] = match.group(1) + " g"
 
+        # 4. Cara/Material — "carbono 24K", "fibra de vidrio", "grafeno"
+        if 'Cara' not in specs:
+            match = re.search(
+                r'(?:(?:con|de)\s+)?'
+                r'((?:black\s+)?(?:carbono|carbon|fibra\s+de\s+(?:carbono|vidrio)|grafeno)'
+                r'(?:\s+\d+[kK])?)',
+                text, re.IGNORECASE
+            )
+            if match:
+                val = match.group(1).strip()
+                if len(val) < 40:
+                    specs['Cara'] = val.title()
+
+        # 5. Núcleo — "núcleo Black EVA", "núcleo de goma EVA", "foam EVA"
+        if 'Núcleo' not in specs:
+            match = re.search(
+                r'(?:n[uú]cleo|goma|core)\s+(?:de\s+goma\s+|de\s+)?'
+                r'([A-Za-záéíóúÁÉÍÓÚñÑ0-9][A-Za-záéíóúÁÉÍÓÚñÑ0-9 ]+?(?:eva|foam|poly)(?:\s+[A-Za-z]+)?)',
+                text, re.IGNORECASE
+            )
+            if match:
+                val = match.group(1).strip()
+                if len(val) < 30:
+                    specs['Núcleo'] = val.title()
+
+        # 6. Nivel
+        if 'Nivel' not in specs:
+            if 'profesional' in text_l and ('jugador' in text_l or 'nivel' in text_l):
+                specs['Nivel'] = 'Profesional'
+            elif 'avanzado' in text_l and ('jugador' in text_l or 'nivel' in text_l):
+                specs['Nivel'] = 'Avanzado'
+            elif 'intermedio' in text_l and ('jugador' in text_l or 'nivel' in text_l):
+                specs['Nivel'] = 'Intermedio'
+            elif ('iniciaci' in text_l or 'principiante' in text_l) and ('jugador' in text_l or 'nivel' in text_l):
+                specs['Nivel'] = 'Iniciación'
+
+        # 7. Perfil / grosor
+        if 'Perfil' not in specs:
+            match = re.search(r'(?:perfil|grosor|espesor|thickness)[:\s]+(\d+(?:[.,]\d+)?)\s*mm', text, re.IGNORECASE)
+            if match:
+                specs['Perfil'] = match.group(1).replace(',', '.') + ' mm'
+
         return specs
 
     async def scrape_product(self, url: str) -> Optional[Product]:
@@ -158,7 +213,7 @@ class PadelProShopScraper(BaseScraper):
             return None
         
         try:
-            loop = asyncio.get_event_loop()
+            loop = asyncio.get_running_loop()
             product_data = await loop.run_in_executor(
                 None, self._fetch_product_json, handle
             )
@@ -220,7 +275,7 @@ class PadelProShopScraper(BaseScraper):
         # Si no se encontró Forma en el JSON (body_html), intentamos descargar el HTML completo
         if 'Forma' not in specs:
             try:
-                loop = asyncio.get_event_loop()
+                loop = asyncio.get_running_loop()
                 req = urllib.request.Request(url, headers={'User-Agent': self.user_agent})
                 with urllib.request.urlopen(req, timeout=15, context=_ssl_ctx()) as resp:
                     full_html = resp.read().decode('utf-8')
