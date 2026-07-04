@@ -28,7 +28,7 @@ export const GlobalStyles = createGlobalStyle`
   }
 
   body {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    font-family: 'Satoshi', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
     color: var(--text);
     background:
       radial-gradient(circle at 90% -10%, var(--bg-glow-primary), transparent 38%),
@@ -39,12 +39,28 @@ export const GlobalStyles = createGlobalStyle`
     font-weight: 400;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    font-variant-numeric: tabular-nums;
     overscroll-behavior-y: contain;
     min-height: 100dvh;
     width: 100%;
     max-width: 100%;
     overflow-x: hidden;
     transition: background-color 0.2s ease, color 0.2s ease;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0.03;
+    pointer-events: none;
+    z-index: 9998;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+    background-repeat: repeat;
+    background-size: 256px 256px;
   }
 
   #root {
@@ -66,11 +82,13 @@ export const GlobalStyles = createGlobalStyle`
   h1 {
     font-size: 2.5rem;
     font-weight: 800;
+    letter-spacing: -0.02em;
   }
 
   h2 {
     font-size: 2rem;
     font-weight: 700;
+    letter-spacing: -0.01em;
   }
 
   h3 {
@@ -264,8 +282,8 @@ export const GlobalStyles = createGlobalStyle`
     --primary-rgb-dark: 21, 128, 61;
     --primary-subtle: rgba(22, 163, 74, 0.10);
     --primary-faint: rgba(22, 163, 74, 0.04);
-    --accent: #f59e0b;
-    --accent-rgb: 245, 158, 11;
+    --accent: #d97706;
+    --accent-rgb: 217, 119, 6;
     --success: #10b981;
     --warning: #f59e0b;
     --error: #ef4444;
@@ -314,7 +332,7 @@ export const GlobalStyles = createGlobalStyle`
     --radius-2xl: 1.5rem;
 
     /* Shadows */
-    --shadow-color: rgba(0, 0, 0, 0.10);
+    --shadow-color: rgba(15, 40, 24, 0.10);
     --surface-overlay: rgba(255, 255, 255, 0.85);
     --shadow-sm: 0 1px 2px 0 var(--shadow-color);
     --shadow-md: 0 4px 6px -1px var(--shadow-color), 0 2px 4px -1px var(--shadow-color);
@@ -327,6 +345,15 @@ export const GlobalStyles = createGlobalStyle`
     --racket-image-radius-detail: 16px;
     --racket-image-border: 1px solid #e5e7eb;
     --racket-image-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
+
+    /* z-index scale */
+    --z-base: 1;
+    --z-sticky: 100;
+    --z-header: 350;
+    --z-nav: 380;
+    --z-overlay: 500;
+    --z-modal: 1000;
+    --z-toast: 9999;
   }
 
   /* Dark mode — selectors use BOTH attribute and class for maximum
@@ -372,8 +399,8 @@ export const GlobalStyles = createGlobalStyle`
     --primary-rgb-dark: 22, 163, 74;
     --primary-subtle: rgba(34, 197, 94, 0.18);
     --primary-faint: rgba(34, 197, 94, 0.06);
-    --accent: #84cc16;
-    --accent-rgb: 132, 204, 22;
+    --accent: #f59e0b;
+    --accent-rgb: 245, 158, 11;
     --success: #34d399;
     --warning: #fbbf24;
     --error: #f87171;
@@ -397,7 +424,7 @@ export const GlobalStyles = createGlobalStyle`
     --footer-bg: #051008;
     --header-bg: #0a3818;
 
-    --shadow-color: rgba(0, 0, 0, 0.50);
+    --shadow-color: rgba(0, 0, 0, 0.55);
     --surface-overlay: rgba(18, 26, 22, 0.85);
     --shadow-sm: 0 1px 2px 0 var(--shadow-color);
     --shadow-md: 0 4px 6px -1px var(--shadow-color), 0 2px 4px -1px var(--shadow-color);
@@ -450,8 +477,8 @@ export const GlobalStyles = createGlobalStyle`
       --primary-rgb-dark: 22, 163, 74;
       --primary-subtle: rgba(34, 197, 94, 0.18);
       --primary-faint: rgba(34, 197, 94, 0.06);
-      --accent: #84cc16;
-      --accent-rgb: 132, 204, 22;
+      --accent: #f59e0b;
+      --accent-rgb: 245, 158, 11;
       --success: #34d399;
       --warning: #fbbf24;
       --error: #f87171;
@@ -475,7 +502,7 @@ export const GlobalStyles = createGlobalStyle`
     --footer-bg: #051008;
     --header-bg: #0a3818;
 
-      --shadow-color: rgba(0, 0, 0, 0.50);
+      --shadow-color: rgba(0, 0, 0, 0.55);
       --surface-overlay: rgba(18, 26, 22, 0.85);
       --shadow-sm: 0 1px 2px 0 var(--shadow-color);
       --shadow-md: 0 4px 6px -1px var(--shadow-color), 0 2px 4px -1px var(--shadow-color);

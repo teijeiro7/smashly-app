@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { FiCompass, FiHelpCircle, FiHome, FiLayers, FiUser, FiX, FiLogIn } from 'react-icons/fi';
+import { Compass, Question, House, Stack, User, X, SignIn } from '@phosphor-icons/react';
 import { Link, useRouterState, useNavigate } from '@tanstack/react-router';
 import styled from 'styled-components';
 import { motion, AnimatePresence } from 'framer-motion';
+import Button from '../common/Button';
 import { useAuth } from '../../contexts/AuthContext';
 import { useAuthModal } from '../../contexts/AuthModalContext';
 
@@ -132,41 +133,7 @@ const PopupButtons = styled.div`
   gap: 0.75rem;
 `;
 
-const PrimaryButton = styled.button`
-  background: var(--brand-surface);
-  color: var(--brand-on-surface);
-  border: none;
-  border-radius: 12px;
-  padding: 0.875rem 1rem;
-  font-size: 0.95rem;
-  font-weight: 600;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  transition: background 0.2s;
 
-  &:hover {
-    background: var(--brand-surface-hover);
-  }
-`;
-
-const SecondaryButton = styled.button`
-  background: transparent;
-  color: var(--text-muted);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 0.875rem 1rem;
-  font-size: 0.95rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background 0.2s;
-
-  &:hover {
-    background: var(--surface-2);
-  }
-`;
 
 const CloseButton = styled.button`
   position: absolute;
@@ -220,11 +187,11 @@ const MobileBottomNav: React.FC = () => {
   };
 
   const items = [
-    { to: homePath, label: 'Inicio', icon: <FiHome /> },
-    { to: '/catalog', label: 'Catalogo', icon: <FiCompass /> },
-    { to: '/compare', label: 'Comparar', icon: <FiLayers /> },
-    { to: '/faq', label: 'FAQ', icon: <FiHelpCircle /> },
-    { to: '/profile', label: 'Perfil', icon: <FiUser />, onClick: handleProfileClick },
+    { to: homePath, label: 'Inicio', icon: <House /> },
+    { to: '/catalog', label: 'Catalogo', icon: <Compass /> },
+    { to: '/compare', label: 'Comparar', icon: <Stack /> },
+    { to: '/faq', label: 'FAQ', icon: <Question /> },
+    { to: '/profile', label: 'Perfil', icon: <User />, onClick: handleProfileClick },
   ];
 
   return (
@@ -281,23 +248,23 @@ const MobileBottomNav: React.FC = () => {
               onClick={e => e.stopPropagation()}
             >
               <CloseButton onClick={handleClosePopup}>
-                <FiX size={20} />
+                <X size={20} />
               </CloseButton>
               <PopupTitle>
-                <FiUser size={22} />
+                <User size={22} />
                 Inicia sesión
               </PopupTitle>
               <PopupText>
                 Para acceder a tu perfil y personalizar tus recomendaciones, necesitas iniciar sesión.
               </PopupText>
               <PopupButtons>
-                <PrimaryButton onClick={handleLogin}>
-                  <FiLogIn size={18} />
+                <Button variant='primary' onClick={handleLogin}>
+                  <SignIn size={18} />
                   Iniciar sesión
-                </PrimaryButton>
-                <SecondaryButton onClick={handleClosePopup}>
+                </Button>
+                <Button variant='ghost' onClick={handleClosePopup}>
                   Ahora no
-                </SecondaryButton>
+                </Button>
               </PopupButtons>
             </PopupCard>
           </PopupOverlay>
@@ -318,23 +285,23 @@ const MobileBottomNav: React.FC = () => {
               onClick={e => e.stopPropagation()}
             >
               <CloseButton onClick={handleClosePopup}>
-                <FiX size={20} />
+                <X size={20} />
               </CloseButton>
               <PopupTitle>
-                <FiUser size={22} />
+                <User size={22} />
                 Completa tu perfil
               </PopupTitle>
               <PopupText>
                 Para ver tu perfil personalizado, primero complétalo con tu nivel de juego y preferencias.
               </PopupText>
               <PopupButtons>
-                <PrimaryButton onClick={handleGoToOnboarding}>
-                  <FiLogIn size={18} />
+                <Button variant='primary' onClick={handleGoToOnboarding}>
+                  <SignIn size={18} />
                   Completar perfil
-                </PrimaryButton>
-                <SecondaryButton onClick={handleClosePopup}>
+                </Button>
+                <Button variant='ghost' onClick={handleClosePopup}>
                   Ahora no
-                </SecondaryButton>
+                </Button>
               </PopupButtons>
             </PopupCard>
           </PopupOverlay>

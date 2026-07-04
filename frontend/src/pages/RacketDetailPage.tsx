@@ -19,6 +19,7 @@ import {
 
 import { Link, useSearch } from '@tanstack/react-router';
 import styled from 'styled-components';
+import Button from '../components/common/Button';
 import { AddToListModal } from '../components/features/AddToListModal';
 import { ProductReviews } from '../components/features/ProductReviews';
 import { RacketService } from '../services/racketService';
@@ -206,44 +207,7 @@ const AuthActions = styled.div`
   z-index: 1;
 `;
 
-const AuthButton = styled.a<{ $variant?: 'primary' | 'secondary' }>`
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0.75rem 1.75rem;
-  min-height: 44px;
-  font-size: 0.9375rem;
-  font-weight: 600;
-  text-decoration: none;
-  border-radius: 8px;
-  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 
-  ${props =>
-    props.$variant === 'primary'
-      ? `
-    background: var(--color-primary);
-    color: white;
-    box-shadow: 0 4px 12px rgba(var(--primary-rgb-dark), 0.25);
-    
-    &:hover {
-      background: var(--color-primary-dark);
-      transform: translateY(-2px);
-      box-shadow: 0 6px 16px rgba(var(--primary-rgb-dark), 0.35);
-    }
-  `
-      : `
-    background: var(--surface);
-    color: var(--primary-hover);
-    border: 1px solid var(--color-gray-200);
-    
-    &:hover {
-      background: var(--surface-2);
-      border-color: var(--color-primary);
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px var(--shadow-color);
-    }
-  `}
-`;
 
 const MainGrid = styled.div`
   display: grid;
@@ -1893,12 +1857,12 @@ const RacketDetailPage: React.FC = () => {
               Historial de precios, comparativas de tiendas, reseñas de jugadores y mucho más.
             </AuthDescription>
             <AuthActions>
-              <AuthButton href='/login' $variant='primary'>
+              <Button as='a' variant='primary' href='/login'>
                 Iniciar sesión
-              </AuthButton>
-              <AuthButton href='/register' $variant='secondary'>
+              </Button>
+              <Button as='a' variant='secondary' href='/register'>
                 Crear cuenta
-              </AuthButton>
+              </Button>
             </AuthActions>
           </AuthCard>
         </AuthBanner>

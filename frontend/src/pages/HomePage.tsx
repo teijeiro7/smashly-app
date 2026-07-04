@@ -1,7 +1,8 @@
 import React, { useEffect } from 'react';
-import { FiArrowRight, FiCheck, FiSearch, FiTarget, FiZap } from 'react-icons/fi';
+import { ArrowRight, Check, MagnifyingGlass, Crosshair } from '@phosphor-icons/react';
 import { Link, useNavigate } from '@tanstack/react-router';
 import styled, { keyframes } from 'styled-components';
+import Button from '../components/common/Button';
 import RotatingPhrases from '../components/features/RotatingPhrases';
 import { useAuth } from '../contexts/AuthContext';
 import { useInView } from '../hooks/useInView';
@@ -26,7 +27,6 @@ const Container = styled.div`
 
 const HeroSection = styled.section`
   padding: clamp(80px, 12vw, 140px) 20px clamp(60px, 8vw, 100px);
-  text-align: center;
   background: linear-gradient(145deg, var(--brand-surface-deep) 0%, var(--brand-surface-strong) 30%, var(--brand-surface) 60%, var(--brand-surface-hover) 100%);
   color: var(--brand-on-surface);
   position: relative;
@@ -75,40 +75,7 @@ const HeroContent = styled.div`
   margin: 0 auto;
   position: relative;
   z-index: 1;
-`;
-
-const Badge = styled.div`
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  background: rgba(255, 255, 255, 0.12);
-  padding: 10px 20px;
-  border-radius: 100px;
-  font-size: clamp(0.8rem, 1.8vw, 0.95rem);
-  margin-bottom: clamp(24px, 5vw, 40px);
-  border: 1px solid rgba(255, 255, 255, 0.25);
-  backdrop-filter: blur(10px);
-  font-weight: 600;
-  letter-spacing: 0.02em;
-  will-change: transform, opacity;
-  animation: ${heroFadeIn} 0.6s ease forwards;
-  box-shadow: 0 4px 24px var(--shadow-color);
-
-  @media (prefers-reduced-motion: reduce) {
-    animation: none;
-    opacity: 1;
-  }
-
-  @media (max-width: 768px) {
-    backdrop-filter: none;
-    background: rgba(255, 255, 255, 0.2);
-  }
-
-  @media (max-width: 480px) {
-    padding: 8px 16px;
-    font-size: 0.8rem;
-    gap: 6px;
-  }
+  text-align: center;
 `;
 
 const Title = styled.h1`
@@ -118,9 +85,6 @@ const Title = styled.h1`
   line-height: 1.05;
   text-align: center;
   max-width: 1100px;
-  margin-left: auto;
-  margin-right: auto;
-  padding: 0 20px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -170,13 +134,14 @@ const Subtitle = styled.p`
   margin-bottom: clamp(32px, 6vw, 48px);
   opacity: 0.92;
   line-height: 1.6;
-  max-width: 560px;
+  max-width: 720px;
   margin-left: auto;
   margin-right: auto;
   padding: 0 20px;
   animation: ${heroFadeIn} 0.8s ease forwards;
   animation-delay: 0.4s;
   font-weight: 400;
+  text-align: center;
 
   @media (prefers-reduced-motion: reduce) {
     animation: none;
@@ -213,90 +178,7 @@ const CTAButtons = styled.div`
   }
 `;
 
-const PrimaryButton = styled(Link)`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  background: var(--surface);
-  color: var(--primary-hover);
-  min-height: 56px;
-  padding: clamp(14px, 3vw, 18px) clamp(28px, 5vw, 40px);
-  border-radius: 14px;
-  text-decoration: none;
-  font-weight: 700;
-  font-size: clamp(0.95rem, 2vw, 1.125rem);
-  transition: transform 0.2s ease, box-shadow 0.2s ease, color 0.2s ease;
-  box-shadow: 0 4px 24px var(--shadow-color);
-  white-space: nowrap;
-  letter-spacing: -0.01em;
 
-  @media (max-width: 640px) {
-    width: 100%;
-    min-height: 52px;
-    padding: 14px 24px;
-    font-size: 0.95rem;
-  }
-
-  @media (max-width: 480px) {
-    min-height: 48px;
-    padding: 12px 20px;
-    font-size: 0.9rem;
-  }
-
-  &:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 12px 40px var(--shadow-color);
-    text-decoration: none;
-    color: var(--primary-hover);
-  }
-
-  &:active {
-    transform: translateY(-1px);
-  }
-`;
-
-const SecondaryButton = styled(Link)`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  min-height: 56px;
-  background: transparent;
-  color: white;
-  padding: clamp(14px, 3vw, 18px) clamp(28px, 5vw, 40px);
-  border: 2px solid rgba(255, 255, 255, 0.35);
-  border-radius: 14px;
-  text-decoration: none;
-  font-weight: 600;
-  font-size: clamp(0.95rem, 2vw, 1.125rem);
-  transition: all 0.2s ease;
-  white-space: nowrap;
-
-  @media (max-width: 640px) {
-    width: 100%;
-    min-height: 52px;
-    padding: 14px 24px;
-    font-size: 0.95rem;
-  }
-
-  @media (max-width: 480px) {
-    min-height: 48px;
-    padding: 12px 20px;
-    font-size: 0.9rem;
-  }
-
-  &:hover {
-    background: rgba(255, 255, 255, 0.12);
-    border-color: rgba(255, 255, 255, 0.6);
-    text-decoration: none;
-    transform: translateY(-2px);
-  }
-
-  &:active {
-    transform: translateY(0);
-  }
-`;
 
 const TrustBar = styled.div`
   display: flex;
@@ -322,7 +204,7 @@ const TrustBar = styled.div`
   @media (max-width: 480px) {
     gap: 10px;
     flex-direction: column;
-    align-items: flex-start;
+    align-items: center;
     max-width: 280px;
     margin: 24px auto 0;
   }
@@ -695,38 +577,33 @@ const HomePage: React.FC = () => {
       />
       <HeroSection>
         <HeroContent>
-          <Badge>
-            <FiZap size={16} />
-            Impulsado por IA
-          </Badge>
-
           <Title>
             <TitleStaticBefore>La herramienta que te permite</TitleStaticBefore>
             <RotatingPhrases phrases={phrases} />
           </Title>
 
           <Subtitle>
-            Descubre la pala perfecta para tu estilo de juego entre cientos de modelos analizados con inteligencia artificial.
+            Compara más de 800 palas de pádel con datos reales: peso, balance, forma, materiales y precio. Filtra, compara y encuentra la pala que se ajusta a tu juego.
           </Subtitle>
 
           <CTAButtons>
-            <PrimaryButton to='/compare'>
-              <FiTarget size={20} />
+            <Button as={Link} to='/compare' variant='primary' size='lg'>
+              <Crosshair size={20} />
               Encontrar mi pala ideal
-            </PrimaryButton>
-            <SecondaryButton to='/catalog'>
-              <FiSearch size={20} />
+            </Button>
+            <Button as={Link} to='/catalog' variant='secondary' size='lg' $inverse>
+              <MagnifyingGlass size={20} />
               Explorar catálogo
-            </SecondaryButton>
+            </Button>
           </CTAButtons>
 
           <TrustBar>
             <TrustItem>
-              <FiCheck size={18} color="var(--primary-light)" />
+              <Check size={18} color="var(--primary-light)" />
               +800 palas analizadas
             </TrustItem>
             <TrustItem>
-              <FiCheck size={18} color="var(--primary-light)" />
+              <Check size={18} color="var(--primary-light)" />
               Sin registro obligatorio
             </TrustItem>
           </TrustBar>
@@ -785,7 +662,7 @@ const HomePage: React.FC = () => {
           <FeatureLayout>
             <FeatureText>
               <FeatureTag>
-                <FiTarget size={14} />
+                <Crosshair size={14} />
                 Comparador Inteligente
               </FeatureTag>
               <FeatureTitle>Compara hasta 3 palas lado a lado</FeatureTitle>
@@ -794,12 +671,12 @@ const HomePage: React.FC = () => {
               </FeatureDescription>
               <FeatureLink to='/compare'>
                 Probar comparador
-                <FiArrowRight size={18} />
+                <ArrowRight size={18} />
               </FeatureLink>
             </FeatureText>
             <FeatureVisual>
               <FeatureVisualIcon>
-                <FiTarget size={32} />
+                <Crosshair size={32} />
               </FeatureVisualIcon>
             </FeatureVisual>
           </FeatureLayout>
@@ -807,7 +684,7 @@ const HomePage: React.FC = () => {
           <FeatureLayout>
             <FeatureText>
               <FeatureTag>
-                <FiSearch size={14} />
+                <MagnifyingGlass size={14} />
                 Búsqueda Avanzada
               </FeatureTag>
               <FeatureTitle>Encuentra tu pala en segundos</FeatureTitle>
@@ -816,12 +693,12 @@ const HomePage: React.FC = () => {
               </FeatureDescription>
               <FeatureLink to='/catalog'>
                 Explorar catálogo
-                <FiArrowRight size={18} />
+                <ArrowRight size={18} />
               </FeatureLink>
             </FeatureText>
             <FeatureVisual>
               <FeatureVisualIcon>
-                <FiSearch size={32} />
+                <MagnifyingGlass size={32} />
               </FeatureVisualIcon>
             </FeatureVisual>
           </FeatureLayout>

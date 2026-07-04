@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../contexts/AuthContext';
 import { Navigate } from '@tanstack/react-router';
 import AdminLayout from '../components/features/AdminLayout';
+import Button from '../components/common/Button';
 import {
   FiTag,
   FiGrid,
@@ -302,32 +303,7 @@ const FormActions = styled.div`
   justify-content: flex-end;
 `;
 
-const Button = styled(motion.button)<{ $variant?: 'primary' | 'secondary' }>`
-  display: flex;
-  align-items: center;
-  gap: 0.375rem;
-  padding: 0.625rem 1rem;
-  border-radius: 8px;
-  font-size: 0.8125rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
-  border: none;
 
-  ${props =>
-    props.$variant === 'primary'
-      ? `
-    background: var(--brand-surface-hover);
-    color: var(--brand-on-surface);
-    &:hover { background: var(--brand-surface); }
-  `
-      : `
-    background: var(--surface);
-    color: var(--text-muted);
-    border: 1px solid var(--border);
-    &:hover { background: var(--surface-2); color: var(--text); }
-  `}
-`;
 
 const EmptyState = styled.div`
   text-align: center;
@@ -624,8 +600,8 @@ const SettingsContent: React.FC = () => {
                           </FormGroup>
                         </FormGrid>
                         <FormActions>
-                          <Button onClick={() => setIsAdding(false)}>Cancelar</Button>
-                          <Button $variant="primary" onClick={handleAddBrand}>
+                          <Button variant='secondary' onClick={() => setIsAdding(false)}>Cancelar</Button>
+                          <Button variant='primary' onClick={handleAddBrand}>
                             <FiCheck /> Guardar
                           </Button>
                         </FormActions>
@@ -728,8 +704,8 @@ const SettingsContent: React.FC = () => {
                           </FormGroup>
                         </FormGrid>
                         <FormActions>
-                          <Button onClick={() => setIsAdding(false)}>Cancelar</Button>
-                          <Button $variant="primary" onClick={handleAddCategory}>
+                          <Button variant='secondary' onClick={() => setIsAdding(false)}>Cancelar</Button>
+                          <Button variant='primary' onClick={handleAddCategory}>
                             <FiCheck /> Guardar
                           </Button>
                         </FormActions>
