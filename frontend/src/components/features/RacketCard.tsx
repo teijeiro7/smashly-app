@@ -1,26 +1,26 @@
 import React, { memo, useState, useEffect } from 'react';
-import { FiEye, FiTag, FiHeart } from 'react-icons/fi';
+import { Eye, Tag, Heart, Lightning, Crosshair, Cloud, RocketLaunch, Sparkle } from '@phosphor-icons/react';
 import styled from 'styled-components';
 import { Racket } from '../../types/racket';
 import { getLowestPrice } from '../../utils/priceUtils';
-import { API_URL } from '../../config/api';
+import { racketImageUrl } from '../../utils/imageUrl';
 
 // Styled Components
 const RacketCardContainer = styled.li<{ $view: 'grid' | 'list'; $index: number }>`
-  background: white;
+  background: var(--surface);
   border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 1px 3px var(--shadow-color), 0 1px 2px var(--shadow-color);
   cursor: pointer;
-  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  border: 1px solid #e5e7eb;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1), background 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   contain: layout style paint;
-  display: ${props => (props.$view === 'list' ? 'flex' : 'flex')};
+  will-change: transform, opacity;
+  display: flex;
   flex-direction: ${props => (props.$view === 'list' ? 'row' : 'column')};
   height: ${props => (props.$view === 'grid' ? '100%' : 'auto')};
-  animation: cardFadeIn 0.4s ease forwards;
-  animation-delay: ${props => Math.min(props.$index * 0.05, 0.5)}s;
-  opacity: 0;
+  animation: ${props => props.$index < 12 ? 'cardFadeIn 0.4s ease forwards' : 'none'};
+  animation-delay: ${props => props.$index < 12 ? `${Math.min(props.$index * 0.05, 0.5)}s` : '0s'};
+  opacity: ${props => props.$index < 12 ? 0 : 1};
 
   @keyframes cardFadeIn {
     from {
@@ -35,20 +35,26 @@ const RacketCardContainer = styled.li<{ $view: 'grid' | 'list'; $index: number }
 
   &:hover {
     transform: translateY(-4px);
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-    border-color: #15803d;
+    box-shadow: 0 10px 25px var(--shadow-color);
+    background: var(--primary-faint);
   }
 `;
 
 const RacketImageContainer = styled.div<{ $view: 'grid' | 'list' }>`
   position: relative;
-  height: ${props => (props.$view === 'grid' ? '220px' : '120px')};
-  width: ${props => (props.$view === 'list' ? '120px' : '100%')};
-  background: white;
+  height: ${props => (props.$view === 'grid' ? '220px' : 'auto')};
+  width: ${props => (props.$view === 'list' ? '160px' : '100%')};
+  flex-shrink: 0;
+  align-self: ${props => (props.$view === 'list' ? 'stretch' : 'auto')};
+  background: var(--racket-image-bg);
+  border: var(--racket-image-border);
+  border-radius: 8px;
+  box-shadow: var(--racket-image-shadow);
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 1rem;
+  padding: ${props => (props.$view === 'list' ? '0.75rem' : '1rem')};
+  border-right: ${props => (props.$view === 'list' ? '1px solid var(--surface-3)' : 'none')};
   overflow: hidden;
 `;
 
@@ -56,12 +62,10 @@ const RacketImage = styled.img`
   max-width: 100%;
   max-height: 100%;
   object-fit: contain;
-  animation: imgFadeIn 0.4s ease-in-out;
-
-  @keyframes imgFadeIn {
-    from { opacity: 0.4; }
-    to { opacity: 1; }
-  }
+  aspect-ratio: 1 / 1;
+  width: 100%;
+  height: 100%;
+  transition: opacity 0.3s ease-in-out;
 `;
 
 const RacketBadge = styled.div<{ $variant: 'bestseller' | 'offer' | 'comparison' }>`
@@ -73,11 +77,11 @@ const RacketBadge = styled.div<{ $variant: 'bestseller' | 'offer' | 'comparison'
     return 'left: 0.75rem;';
   }}
   background: ${props => {
-    if (props.$variant === 'bestseller') return '#f59e0b';
-    if (props.$variant === 'comparison') return '#64748b'; // Gray-Slate for comparison
-    return '#ef4444'; // Offer
+    if (props.$variant === 'bestseller') return 'var(--accent)';
+    if (props.$variant === 'comparison') return 'var(--text-muted)'; // Gray-Slate for comparison
+    return 'var(--error)'; // Offer
   }};
-  color: white;
+  color: var(--brand-on-surface);
   padding: 0.375rem 0.75rem;
   border-radius: 6px;
   font-size: 0.75rem;
@@ -100,14 +104,14 @@ const RacketInfo = styled.div<{ $view: 'grid' | 'list' }>`
 const RacketBrand = styled.div`
   font-size: 0.875rem;
   font-weight: 600;
-  color: #15803d;
+  color: var(--primary-hover);
   margin-bottom: 0.25rem;
 `;
 
 const RacketName = styled.h3<{ $view: 'grid' | 'list' }>`
   font-size: ${props => (props.$view === 'grid' ? '1.125rem' : '1rem')};
   font-weight: 600;
-  color: #1f2937;
+  color: var(--text);
   margin-bottom: 0.75rem;
   line-height: 1.4;
   display: -webkit-box;
@@ -129,18 +133,18 @@ const PriceContainer = styled.div<{ $view: 'grid' | 'list' }>`
 const CurrentPrice = styled.div`
   font-size: 1.25rem;
   font-weight: 700;
-  color: #15803d;
+  color: var(--primary-hover);
 `;
 
 const OriginalPrice = styled.div`
   font-size: 0.875rem;
-  color: #9ca3af;
+  color: var(--text-subtle);
   text-decoration: line-through;
 `;
 
 const DiscountBadge = styled.div`
-  background: #ef4444;
-  color: white;
+  background: var(--error);
+  color: var(--brand-on-surface);
   padding: 0.25rem 0.5rem;
   border-radius: 4px;
   font-size: 0.75rem;
@@ -159,8 +163,8 @@ const ActionButtons = styled.div<{ $view: 'grid' | 'list' }>`
 
 const ViewDetailsButton = styled.button`
   flex: 1;
-  background: #15803d;
-  color: white;
+  background: var(--primary-hover);
+  color: var(--brand-on-surface);
   border: none;
   padding: 0.75rem 1rem;
   border-radius: 8px;
@@ -174,7 +178,7 @@ const ViewDetailsButton = styled.button`
   transition: background-color 0.2s cubic-bezier(0.4, 0, 0.2, 1), transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 
   &:hover {
-    background: #166534;
+    background: var(--primary);
     transform: translateY(-1px);
   }
 `;
@@ -197,7 +201,7 @@ const MetricBadge = styled.div`
 
 const MetricLabel = styled.span`
   font-size: 0.75rem;
-  color: #6b7280;
+  color: var(--text-muted);
   display: flex;
   align-items: center;
   gap: 0.25rem;
@@ -206,7 +210,7 @@ const MetricLabel = styled.span`
 const MetricValue = styled.span`
   font-size: 0.875rem;
   font-weight: 700;
-  color: #1f2937;
+  color: var(--text);
 `;
 
 // Helper function to capitalize first letter of each word
@@ -278,32 +282,32 @@ const RacketCardComponent: React.FC<RacketCardProps> = memo(
       >
         <RacketImageContainer $view={view}>
           <RacketImage
-            key={currentImageIndex}
-            src={
-              (racket.imagenes?.[currentImageIndex] || racket.imagenes?.[0])?.startsWith('http')
-                ? `${API_URL}/api/v1/proxy/image?url=${encodeURIComponent(racket.imagenes?.[currentImageIndex] || racket.imagenes?.[0])}`
-                : racket.imagenes?.[currentImageIndex] || racket.imagenes?.[0]
-            }
+            src={(() => {
+              return racketImageUrl(racket.imagenes?.[currentImageIndex] || racket.imagenes?.[0]);
+            })()}
             alt={racket.modelo}
             onError={handleImageError}
-            loading="lazy"
-            decoding="async"
+            loading={index < 4 ? 'eager' : 'lazy'}
+            fetchPriority={index === 0 ? 'high' : 'auto'}
+            decoding={index < 4 ? 'sync' : 'async'}
+            width="200"
+            height="200"
           />
           {racket.view_count !== undefined && racket.view_count > 10 && (
             <RacketBadge $variant='bestseller'>
-              <FiEye size={12} />
+              <Eye size={12} />
               Popular
             </RacketBadge>
           )}
           {racket.en_oferta && !racket.solo_comparacion && (
             <RacketBadge $variant='offer'>
-              <FiTag size={12} />
+              <Tag size={12} />
               Oferta
             </RacketBadge>
           )}
           {racket.solo_comparacion && (
             <RacketBadge $variant='comparison'>
-              <FiTag size={12} />
+              <Tag size={12} />
               Solo comparación
             </RacketBadge>
           )}
@@ -317,7 +321,7 @@ const RacketCardComponent: React.FC<RacketCardProps> = memo(
 
           <PriceContainer $view={view}>
             {racket.solo_comparacion ? (
-              <CurrentPrice style={{ color: '#64748b', fontSize: '1rem' }}>
+              <CurrentPrice style={{ color: 'var(--text-muted)', fontSize: '1rem' }}>
                 No disponible para venta
               </CurrentPrice>
             ) : lowestPrice ? (
@@ -342,23 +346,23 @@ const RacketCardComponent: React.FC<RacketCardProps> = memo(
           {racket.radar_potencia && (
             <MetricsSummary>
               <MetricBadge title="Potencia">
-                <MetricLabel>⚡ Pot</MetricLabel>
+                <MetricLabel><Lightning size={14} /> Pot</MetricLabel>
                 <MetricValue>{racket.radar_potencia.toFixed(1)}</MetricValue>
               </MetricBadge>
               <MetricBadge title="Control">
-                <MetricLabel>🎯 Ctrl</MetricLabel>
+                <MetricLabel><Crosshair size={14} /> Ctrl</MetricLabel>
                 <MetricValue>{racket.radar_control?.toFixed(1)}</MetricValue>
               </MetricBadge>
               <MetricBadge title="Manejabilidad">
-                <MetricLabel>☁️ Man</MetricLabel>
+                <MetricLabel><Cloud size={14} /> Man</MetricLabel>
                 <MetricValue>{racket.radar_manejabilidad?.toFixed(1)}</MetricValue>
               </MetricBadge>
               <MetricBadge title="Salida de Bola">
-                <MetricLabel>🚀 Sal</MetricLabel>
+                <MetricLabel><RocketLaunch size={14} /> Sal</MetricLabel>
                 <MetricValue>{racket.radar_salida_bola?.toFixed(1)}</MetricValue>
               </MetricBadge>
               <MetricBadge title="Punto Dulce">
-                <MetricLabel>✨ Dul</MetricLabel>
+                <MetricLabel><Sparkle size={14} /> Dul</MetricLabel>
                 <MetricValue>{racket.radar_punto_dulce?.toFixed(1)}</MetricValue>
               </MetricBadge>
             </MetricsSummary>
@@ -367,8 +371,8 @@ const RacketCardComponent: React.FC<RacketCardProps> = memo(
           <ActionButtons $view={view}>
             <ViewDetailsButton onClick={() => onClick(racket)}>Ver detalles</ViewDetailsButton>
             {isAuthenticated && onAddToList && (
-              <ViewDetailsButton onClick={handleAddToList} style={{ background: '#15803d' }}>
-                <FiHeart size={14} />
+              <ViewDetailsButton onClick={handleAddToList} style={{ background: 'var(--primary-hover)' }}>
+                <Heart size={14} />
                 Mis listas
               </ViewDetailsButton>
             )}

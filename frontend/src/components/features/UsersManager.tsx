@@ -27,15 +27,15 @@ const SearchBar = styled.div`
 const SearchInput = styled.input`
   width: 100%;
   padding: 0.75rem 1rem 0.75rem 2.75rem;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--border);
   border-radius: 12px;
   font-size: 1rem;
   transition: all 0.3s ease;
 
   &:focus {
     outline: none;
-    border-color: #16a34a;
-    box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.1);
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.1);
   }
 `;
 
@@ -44,7 +44,7 @@ const SearchIcon = styled(FiSearch)`
   left: 1rem;
   top: 50%;
   transform: translateY(-50%);
-  color: #9ca3af;
+  color: var(--text-subtle);
   font-size: 1.25rem;
 `;
 
@@ -55,9 +55,9 @@ const FilterButtons = styled.div`
 
 const FilterButton = styled.button<{ active: boolean }>`
   padding: 0.75rem 1.25rem;
-  background: ${props => (props.active ? '#16a34a' : 'white')};
-  color: ${props => (props.active ? 'white' : '#666')};
-  border: 1px solid ${props => (props.active ? '#16a34a' : '#e5e7eb')};
+  background: ${props => (props.active ? 'var(--primary)' : 'var(--surface)')};
+  color: ${props => (props.active ? 'var(--brand-on-surface)' : 'var(--text-muted)')};
+  border: 1px solid ${props => (props.active ? 'var(--primary)' : 'var(--border)')};
   border-radius: 8px;
   font-size: 0.875rem;
   font-weight: 600;
@@ -65,14 +65,14 @@ const FilterButton = styled.button<{ active: boolean }>`
   transition: all 0.3s ease;
 
   &:hover {
-    background: ${props => (props.active ? '#15803d' : '#f9fafb')};
+    background: ${props => (props.active ? 'var(--primary-hover)' : 'var(--surface-2)')};
   }
 `;
 
 const Table = styled.div`
-  background: white;
+  background: var(--surface);
   border-radius: 12px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 2px 10px var(--shadow-color);
   overflow: hidden;
 `;
 
@@ -80,10 +80,10 @@ const TableHeader = styled.div`
   display: grid;
   grid-template-columns: 0.5fr 1.5fr 1.5fr 1fr 1fr 1fr;
   padding: 1rem 1.5rem;
-  background: #f9fafb;
-  border-bottom: 1px solid #e5e7eb;
+  background: var(--surface-2);
+  border-bottom: 1px solid var(--border);
   font-weight: 600;
-  color: #666;
+  color: var(--text-muted);
   font-size: 0.875rem;
 
   @media (max-width: 1024px) {
@@ -95,12 +95,12 @@ const TableRow = styled.div`
   display: grid;
   grid-template-columns: 0.5fr 1.5fr 1.5fr 1fr 1fr 1fr;
   padding: 1rem 1.5rem;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid var(--border);
   align-items: center;
   transition: background 0.2s ease;
 
   &:hover {
-    background: #f9fafb;
+    background: var(--surface-2);
   }
 
   &:last-child {
@@ -114,7 +114,7 @@ const TableRow = styled.div`
 `;
 
 const Cell = styled.div`
-  color: #333;
+  color: var(--text);
   font-size: 0.875rem;
 
   @media (max-width: 1024px) {
@@ -134,8 +134,8 @@ const Avatar = styled.div`
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
-  color: white;
+  background: linear-gradient(135deg, var(--brand-surface) 0%, var(--brand-surface-hover) 100%);
+  color: var(--brand-on-surface);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -151,12 +151,12 @@ const UserInfo = styled.div`
 
 const UserName = styled.div`
   font-weight: 600;
-  color: #333;
+  color: var(--text);
 `;
 
 const UserNickname = styled.div`
   font-size: 0.75rem;
-  color: #999;
+  color: var(--text-subtle);
 `;
 
 const RoleBadge = styled.span<{ role: 'admin' | 'player' }>`
@@ -167,8 +167,8 @@ const RoleBadge = styled.span<{ role: 'admin' | 'player' }>`
   display: inline-flex;
   align-items: center;
   gap: 0.25rem;
-  background: ${props => (props.role === 'admin' ? '#fee2e2' : '#dbeafe')};
-  color: ${props => (props.role === 'admin' ? '#dc2626' : '#2563eb')};
+  background: ${props => (props.role === 'admin' ? 'rgba(220, 38, 38, 0.10)' : 'rgba(37, 99, 235, 0.10)')};
+  color: ${props => (props.role === 'admin' ? 'var(--danger)' : 'var(--info)')};
 
   svg {
     font-size: 0.875rem;
@@ -183,8 +183,8 @@ const ActionsCell = styled(Cell)`
 
 const IconButton = styled.button<{ color?: string }>`
   padding: 0.5rem;
-  background: ${props => props.color || '#f3f4f6'};
-  color: ${props => (props.color ? 'white' : '#666')};
+  background: ${props => props.color || 'var(--surface-3)'};
+  color: ${props => (props.color ? 'var(--brand-on-surface)' : 'var(--text-muted)')};
   border: none;
   border-radius: 8px;
   cursor: pointer;
@@ -206,7 +206,7 @@ const IconButton = styled.button<{ color?: string }>`
 const EmptyState = styled.div`
   padding: 3rem;
   text-align: center;
-  color: #666;
+  color: var(--text-muted);
 `;
 
 const LoadingContainer = styled.div`
@@ -214,7 +214,7 @@ const LoadingContainer = styled.div`
   justify-content: center;
   align-items: center;
   padding: 3rem;
-  color: #666;
+  color: var(--text-muted);
 `;
 
 const StatsGrid = styled.div`
@@ -225,21 +225,21 @@ const StatsGrid = styled.div`
 `;
 
 const StatCard = styled.div`
-  background: white;
+  background: var(--surface);
   padding: 1.5rem;
   border-radius: 12px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 2px 10px var(--shadow-color);
 `;
 
 const StatValue = styled.div`
   font-size: 2rem;
   font-weight: 700;
-  color: #16a34a;
+  color: var(--primary);
   margin-bottom: 0.5rem;
 `;
 
 const StatLabel = styled.div`
-  color: #666;
+  color: var(--text-muted);
   font-size: 0.875rem;
 `;
 
@@ -430,14 +430,14 @@ const UsersManager: React.FC = () => {
               <Cell>{new Date(user.created_at).toLocaleDateString()}</Cell>
               <ActionsCell>
                 <IconButton
-                  color='#3b82f6'
+                  color='var(--info)'
                   onClick={() => handleToggleRole(user.id, user.role)}
                   title={`Cambiar a ${user.role === 'admin' ? 'Jugador' : 'Admin'}`}
                 >
                   {user.role === 'admin' ? <FiUser /> : <FiShield />}
                 </IconButton>
                 <IconButton
-                  color='#ef4444'
+                  color='var(--error)'
                   onClick={() => handleDeleteUser(user.id)}
                   title='Eliminar usuario'
                 >

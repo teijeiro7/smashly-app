@@ -113,13 +113,25 @@ export default defineConfig(({ mode }) => ({
     },
   },
   server: {
-    port: 5173,
+    // When launched by `vercel dev`, bind the port Vercel assigns (env PORT);
+    // otherwise default to 5173 for standalone `vite`.
+    port: process.env.PORT ? Number(process.env.PORT) : 5173,
     host: true,
     proxy: {
       '/api': {
         target: 'http://localhost:3000',
         changeOrigin: true,
       },
+    },
+    watch: {
+      ignored: [
+        '**/node_modules/**',
+        '**/backend/**',
+        '**/testing/**',
+        '**/.git/**',
+        '**/public/videos/**',
+        '**/public/images/readme-images/**',
+      ],
     },
   },
   build: {
@@ -145,24 +157,24 @@ export default defineConfig(({ mode }) => ({
     reportCompressedSize: true,
     rollupOptions: {
       output: {
-        // More granular chunk splitting for better caching
+        manualChunks: {
+          'vendor-react': ['react', 'react-dom', 'react-is', '@tanstack/react-router'],
+          'vendor-motion': ['framer-motion'],
+          'vendor-styled': ['styled-components'],
+          'vendor-charts': ['recharts'],
+          'vendor-icons': ['react-icons'],
+          'vendor-query': ['@tanstack/react-query', '@tanstack/react-virtual'],
+          'vendor-supabase': ['@supabase/supabase-js'],
+          'vendor-dnd': ['@dnd-kit/core', '@dnd-kit/sortable', '@dnd-kit/utilities'],
+        },
       },
     },
   },
   // Optimize dependencies
   optimizeDeps: {
-    include: [
-      'react',
-      'react-dom',
-      'react-router-dom',
-      '@tanstack/react-query',
-    ],
+    include: ['react', 'react-dom', '@tanstack/react-router', '@tanstack/react-query'],
     // Exclude heavy libs from optimization to load on demand
-    exclude: [
-      'jspdf',
-      'html2canvas',
-      '@dnd-kit/core',
-    ],
+    exclude: ['jspdf', 'html2canvas', '@dnd-kit/core'],
   },
   test: {
     globals: true,

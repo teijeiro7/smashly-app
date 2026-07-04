@@ -1,16 +1,16 @@
 import { motion } from "framer-motion";
 import React from "react";
 import { FiTarget, FiTrendingUp, FiZap, FiChevronRight } from "react-icons/fi";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from '@tanstack/react-router';
 import styled from "styled-components";
 
 const BannerContainer = styled(motion.div)`
-  background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+  background: linear-gradient(135deg, var(--brand-surface) 0%, var(--brand-surface-hover) 100%);
   border-radius: 24px;
   padding: 3rem 2rem;
   margin: 4rem auto;
   max-width: 1000px;
-  color: white;
+  color: var(--brand-on-surface);
   position: relative;
   overflow: hidden;
   will-change: transform, opacity;
@@ -91,7 +91,7 @@ const FeatureIcon = styled.div`
   align-items: center;
   justify-content: center;
   margin-bottom: 1rem;
-  color: white;
+  color: var(--brand-on-surface);
   font-size: 1.5rem;
 `;
 
@@ -117,7 +117,7 @@ const CTAButton = styled.button<{ variant?: "primary" | "secondary" }>`
       : "none"};
   background: ${(props) =>
     props.variant === "secondary" ? "rgba(255, 255, 255, 0.1)" : "rgba(255, 255, 255, 0.25)"};
-  color: white;
+  color: var(--brand-on-surface);
   font-weight: 600;
   font-size: 1rem;
   cursor: pointer;
@@ -198,7 +198,7 @@ const AiBanner: React.FC = () => {
         <CTASection>
           <CTAButton
             variant="primary"
-            onClick={() => navigate("/best-racket")}
+            onClick={() => navigate({ to: '/best-racket' })}
           >
             <FiZap />
             Encontrar Mi Pala Ideal
@@ -206,7 +206,7 @@ const AiBanner: React.FC = () => {
           </CTAButton>
           <CTAButton
             variant="secondary"
-            onClick={() => navigate("/compare-rackets")}
+            onClick={() => navigate({ to: '/compare-rackets' })}
           >
             <FiTrendingUp />
             Comparar Palas

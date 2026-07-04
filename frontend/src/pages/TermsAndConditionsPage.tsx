@@ -1,18 +1,21 @@
 import styled from 'styled-components';
-import { Link as RouterLink } from 'react-router-dom';
+import { Link as RouterLink } from '@tanstack/react-router';
 import { FiArrowLeft } from 'react-icons/fi';
+import SEO from '../components/seo/SEO';
+import { organizationSchema, webPageSchema } from '../utils/seoSchemas';
+import { buildUrl } from '../config/seo';
 
 const Container = styled.div`
   max-width: 900px;
   margin: 0 auto;
   padding: 3rem 2rem;
   font-family:
-    'Inter',
+    'Satoshi',
     -apple-system,
     BlinkMacSystemFont,
     'Segoe UI',
     sans-serif;
-  color: #1f2937;
+  color: var(--text);
   line-height: 1.6;
 `;
 
@@ -27,7 +30,7 @@ const BackLink = styled(RouterLink)`
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  color: #ccff00;
+  color: var(--accent);
   text-decoration: none;
   font-weight: 600;
   transition: opacity 0.2s;
@@ -40,32 +43,32 @@ const BackLink = styled(RouterLink)`
 const Title = styled.h1`
   font-size: 2rem;
   margin: 0;
-  color: #1f2937;
+  color: var(--text);
 `;
 
 const Section = styled.section`
   margin: 2rem 0;
   padding: 1.5rem;
-  background: #f9fafb;
+  background: var(--surface-2);
   border-radius: 12px;
-  border-left: 4px solid #ccff00;
+  border-left: 4px solid var(--accent);
 `;
 
 const SectionTitle = styled.h2`
   font-size: 1.25rem;
   margin: 0 0 1rem 0;
-  color: #1f2937;
+  color: var(--text);
 `;
 
 const Paragraph = styled.p`
   margin: 1rem 0;
-  color: #4b5563;
+  color: var(--text);
 `;
 
 const List = styled.ul`
   margin: 1rem 0;
   padding-left: 2rem;
-  color: #4b5563;
+  color: var(--text);
 `;
 
 const ListItem = styled.li`
@@ -73,7 +76,7 @@ const ListItem = styled.li`
 `;
 
 const InlineLink = styled.a`
-  color: #ccff00;
+  color: var(--accent);
   text-decoration: none;
   font-weight: 500;
   transition: opacity 0.2s;
@@ -87,14 +90,28 @@ const InlineLink = styled.a`
 const LastUpdated = styled.div`
   margin-top: 3rem;
   padding-top: 2rem;
-  border-top: 1px solid #e5e7eb;
+  border-top: 1px solid var(--border);
   font-size: 0.875rem;
-  color: #9ca3af;
+  color: var(--text-subtle);
 `;
 
 export default function TermsAndConditionsPage() {
   return (
     <Container>
+      <SEO
+        title='Términos y Condiciones | Smashly'
+        description='Términos y condiciones de uso de Smashly. Conoce las reglas, derechos y responsabilidades al usar nuestra plataforma de comparación de palas de pádel.'
+        canonical={buildUrl('/terms-and-conditions')}
+        type='website'
+        schema={[
+          organizationSchema(),
+          webPageSchema({
+            name: 'Términos y Condiciones — Smashly',
+            description: 'Términos legales de uso de Smashly.',
+            url: buildUrl('/terms-and-conditions'),
+          }),
+        ]}
+      />
       <Header>
         <BackLink to='/'>
           <FiArrowLeft size={20} />

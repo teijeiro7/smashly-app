@@ -33,7 +33,7 @@ const Overlay = styled(motion.div)`
 `;
 
 const ModalContainer = styled(motion.div)`
-  background: white;
+  background: var(--surface);
   width: 100%;
   max-width: 1000px;
   height: 85dvh;
@@ -42,7 +42,7 @@ const ModalContainer = styled(motion.div)`
   overflow: hidden;
   display: flex;
   position: relative;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 25px 50px -12px var(--shadow-color);
   will-change: transform, opacity;
 
   @media (max-width: 768px) {
@@ -62,7 +62,7 @@ const LeftPanel = styled.div<{ $bgImage: string }>`
   flex-direction: column;
   justify-content: space-between;
   padding: 40px;
-  color: white;
+  color: var(--brand-on-surface);
   transition: background-image 0.3s ease-in-out; // Smooth transition between images
   will-change: background-image;
 
@@ -105,7 +105,7 @@ const CloseButton = styled.button`
   }
 
   svg {
-    stroke: #666;
+    stroke: var(--text-muted);
   }
 `;
 
@@ -129,7 +129,7 @@ const HeroTitle = styled.h1`
   margin-bottom: 20px;
 
   span {
-    color: #ccff00;
+    color: var(--accent);
     display: block;
   }
 `;

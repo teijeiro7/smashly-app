@@ -1,13 +1,13 @@
 import React from 'react';
-import { FiBook, FiCompass, FiHome, FiLayers } from 'react-icons/fi';
-import { Link, useLocation } from 'react-router-dom';
+import { Book, Compass, House, Stack } from '@phosphor-icons/react';
+import { Link, useRouterState } from '@tanstack/react-router';
 import styled from 'styled-components';
 import { useAuth } from '../../contexts/AuthContext';
 
 const SubHeaderContainer = styled.div`
-  background: white;
-  border-bottom: 1px solid #e5e7eb;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  box-shadow: 0 1px 2px var(--shadow-color);
   position: sticky;
   top: calc(64px + env(safe-area-inset-top, 0));
   z-index: 320;
@@ -46,7 +46,7 @@ const NavItem = styled(Link)<{ $isActive: boolean }>`
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  color: ${props => (props.$isActive ? '#15803d' : '#6b7280')};
+  color: ${props => (props.$isActive ? 'var(--primary-hover)' : 'var(--text-muted)')};
   text-decoration: none;
   font-weight: ${props => (props.$isActive ? '600' : '500')};
   font-size: 0.875rem;
@@ -56,15 +56,15 @@ const NavItem = styled(Link)<{ $isActive: boolean }>`
   position: relative;
 
   &:hover {
-    color: #15803d;
-    background: #f0fdf4;
+    color: var(--primary-hover);
+    background: var(--primary-subtle);
     text-decoration: none;
   }
 
   ${props =>
     props.$isActive &&
     `
-    background: #f0fdf4;
+    background: var(--primary-subtle);
     
     &::after {
       content: '';
@@ -74,7 +74,7 @@ const NavItem = styled(Link)<{ $isActive: boolean }>`
       transform: translateX(-50%);
       width: 20px;
       height: 2px;
-      background: #15803d;
+      background: var(--primary-hover);
       border-radius: 1px;
     }
   `}
@@ -92,7 +92,7 @@ const NavText = styled.span`
 `;
 
 const SubHeader: React.FC = () => {
-  const location = useLocation();
+  const { location } = useRouterState();
   const { user, isAuthenticated } = useAuth();
 
   const isActive = (path: string) => location.pathname === path;
@@ -103,25 +103,25 @@ const SubHeader: React.FC = () => {
   const navigationItems = [
     {
       to: homePath,
-      icon: <FiHome />,
+      icon: <House />,
       text: 'Inicio',
       isActive: isActive(homePath) || (homePath === '/dashboard' && isActive('/')),
     },
     {
       to: '/catalog',
-      icon: <FiCompass />,
+      icon: <Compass />,
       text: 'Catálogo de Palas',
       isActive: isActive('/catalog'),
     },
     {
       to: '/compare',
-      icon: <FiLayers />,
+      icon: <Stack />,
       text: 'Comparar Palas',
       isActive: isActive('/compare'),
     },
     {
       to: '/faq',
-      icon: <FiBook />,
+      icon: <Book />,
       text: 'FAQ',
       isActive: isActive('/faq'),
     },

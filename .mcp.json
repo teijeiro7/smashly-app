@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "render": {
+      "command": "npx",
+      "args": ["-y", "@niyogi/render-mcp", "start"],
+      "env": {
+        "RENDER_API_KEY": "rnd_nAH3AE6M8ttfghw3Z3lyUOd59mGF"
+      }
+    }
+  }
+}

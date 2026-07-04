@@ -1,20 +1,10 @@
-/**
- * Hook para obtener estadísticas de reviews de una pala
- */
-
-import { useState, useEffect } from 'react';
-import { reviewService } from '../services/reviewService';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '../lib/supabase';
 
 export interface ReviewStats {
   averageRating: number;
   totalReviews: number;
-  ratingDistribution: {
-    1: number;
-    2: number;
-    3: number;
-    4: number;
-    5: number;
-  };
+  ratingDistribution: { 1: number; 2: number; 3: number; 4: number; 5: number };
 }
 
 interface UseReviewStatsResult {
@@ -23,75 +13,42 @@ interface UseReviewStatsResult {
   error: string | null;
 }
 
-/**
- * Hook para obtener las estadísticas de reviews de una pala específica
- * @param racketId - ID de la pala
- * @returns Objeto con stats, loading y error
- */
+async function fetchReviewStats(racketId: number): Promise<ReviewStats> {
+  const { data, error } = await supabase
+    .from('reviews')
+    .select('rating')
+    .eq('racket_id', racketId);
+
+  if (error) throw new Error(error.message);
+
+  const dist = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 } as Record<number, number>;
+  let sum = 0;
+
+  (data ?? []).forEach(({ rating }) => {
+    dist[rating] = (dist[rating] ?? 0) + 1;
+    sum += rating;
+  });
+
+  const n = data?.length ?? 0;
+
+  return {
+    totalReviews: n,
+    averageRating: n > 0 ? sum / n : 0,
+    ratingDistribution: dist as any,
+  };
+}
+
 export const useReviewStats = (racketId: number | undefined): UseReviewStatsResult => {
-  const [stats, setStats] = useState<ReviewStats | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
+  const { data: stats = null, isLoading, error } = useQuery<ReviewStats | null, Error>({
+    queryKey: ['review-stats', racketId],
+    queryFn: () => fetchReviewStats(racketId!),
+    enabled: !!racketId,
+    staleTime: 1000 * 60 * 5,
+  });
 
-  useEffect(() => {
-    // Si no hay racketId, no hacemos nada
-    if (!racketId) {
-      setLoading(false);
-      return;
-    }
-
-    let isMounted = true;
-
-    const fetchStats = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-
-        // Obtenemos solo la primera página con límite 1 para obtener las stats
-        // El endpoint siempre devuelve las stats completas independientemente de la paginación
-        const response = await reviewService.getReviewsByRacket(racketId, {
-          page: 1,
-          limit: 1,
-        });
-
-        if (isMounted) {
-          // Map snake_case keys from API to camelCase expected by frontend
-          const apiStats = response.stats as any;
-          if (apiStats) {
-            setStats({
-              averageRating: apiStats.averageRating ?? apiStats.average_rating ?? 0,
-              totalReviews: apiStats.totalReviews ?? apiStats.total_reviews ?? 0,
-              ratingDistribution: apiStats.ratingDistribution ??
-                apiStats.rating_distribution ?? { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 },
-            });
-          } else {
-            setStats(null);
-          }
-        }
-      } catch (err) {
-        if (isMounted) {
-          setError(err instanceof Error ? err.message : 'Error cargando estadísticas');
-          // Si hay error, establecemos stats por defecto
-          setStats({
-            averageRating: 0,
-            totalReviews: 0,
-            ratingDistribution: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 },
-          });
-        }
-      } finally {
-        if (isMounted) {
-          setLoading(false);
-        }
-      }
-    };
-
-    fetchStats();
-
-    // Cleanup function
-    return () => {
-      isMounted = false;
-    };
-  }, [racketId]);
-
-  return { stats, loading, error };
+  return {
+    stats,
+    loading: isLoading,
+    error: error ? error.message : null,
+  };
 };

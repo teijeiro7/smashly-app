@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { FiSearch, FiX, FiPlus, FiCpu, FiDownload, FiSave, FiCheck, FiHeart } from 'react-icons/fi';
 import { useRackets } from '../contexts/RacketsContext';
 import { useAuth } from '../contexts/AuthContext';
+import { useComparison } from '../contexts/ComparisonContext';
 import { useNotifications } from '../contexts/NotificationContext';
 import { ComparisonService } from '../services/comparisonService';
 import { ListService } from '../services/listService';
@@ -14,14 +15,22 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { sileo } from 'sileo';
 import Fuse from 'fuse.js';
+import { toTitleCase } from '../utils/textUtils';
 import RacketRadarChart from '../components/features/RacketRadarChart';
 import ComparisonTable from '../components/features/ComparisonTable';
+import SEO from '../components/seo/SEO';
+import {
+  organizationSchema,
+  webPageSchema,
+  breadcrumbSchema,
+} from '../utils/seoSchemas';
+import { buildUrl, allKeywords } from '../config/seo';
 
 const Container = styled.div`
   min-height: 100dvh;
   background:
-    radial-gradient(circle at top right, rgba(21, 128, 61, 0.08), transparent 45%),
-    linear-gradient(145deg, #f8faf8 0%, #edf7ef 55%, #e8f5e8 100%);
+    radial-gradient(circle at top right, rgba(var(--primary-rgb-dark), 0.08), transparent 45%),
+    linear-gradient(145deg, var(--surface-2) 0%, var(--primary-subtle) 55%, var(--primary-faint) 100%);
   padding: 1rem;
   padding-bottom: calc(6.5rem + env(safe-area-inset-bottom));
 
@@ -43,11 +52,11 @@ const Header = styled.div`
 const Title = styled.h1`
   font-size: 2.5rem;
   font-weight: 800;
-  color: #1f2937;
+  color: var(--text);
   margin-bottom: 1rem;
 
   .highlight {
-    color: #15803d;
+    color: var(--primary-hover);
   }
 
   @media (max-width: 768px) {
@@ -58,7 +67,7 @@ const Title = styled.h1`
 
 const Subtitle = styled.p`
   font-size: 1.125rem;
-  color: #6b7280;
+  color: var(--text-muted);
   max-width: 600px;
   margin: 0 auto;
 
@@ -70,10 +79,10 @@ const Subtitle = styled.p`
 const SelectionSection = styled.div`
   max-width: 1000px;
   margin: 0 auto 3rem;
-  background: white;
+  background: var(--surface);
   border-radius: 20px;
   padding: 2rem;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 4px 6px -1px var(--shadow-color), 0 2px 4px -1px var(--shadow-color);
 
   @media (max-width: 768px) {
     margin-bottom: 1.25rem;
@@ -91,18 +100,18 @@ const SearchInput = styled.input`
   width: 100%;
   padding: 1rem 1rem 1rem 3rem;
   min-height: 48px;
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--border-strong);
   border-radius: 8px;
   font-size: 1rem;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
-  color: #1f2937;
+  color: var(--text);
 
-  &::placeholder { color: #9ca3af; }
+  &::placeholder { color: var(--text-subtle); }
 
   &:focus {
     outline: none;
-    border-color: #16a34a;
-    box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.1);
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.1);
   }
 `;
 
@@ -111,7 +120,7 @@ const SearchIcon = styled(FiSearch)`
   left: 1rem;
   top: 50%;
   transform: translateY(-50%);
-  color: #9ca3af;
+  color: var(--text-subtle);
   font-size: 1.25rem;
 `;
 
@@ -120,14 +129,14 @@ const SearchResults = styled.ul`
   top: 100%;
   left: 0;
   right: 0;
-  background: white;
+  background: var(--surface);
   border-radius: 12px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 10px 25px var(--shadow-color);
   max-height: 300px;
   overflow-y: auto;
   z-index: 50;
   margin-top: 0.5rem;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--border);
   list-style: none;
   padding: 0;
 `;
@@ -142,7 +151,7 @@ const SearchResultItem = styled.li`
   transition: background 0.2s;
 
   &:hover {
-    background: #f0fdf4;
+    background: var(--primary-subtle);
   }
 
   img {
@@ -160,7 +169,7 @@ const SelectedRacketsContainer = styled.div`
 `;
 
 const SelectedRacketCard = styled(motion.div)`
-  background: white;
+  background: var(--surface);
   border: 1px solid rgba(0, 0, 0, 0.06);
   border-radius: 16px;
   padding: 1rem;
@@ -169,27 +178,27 @@ const SelectedRacketCard = styled(motion.div)`
   flex-direction: column;
   align-items: center;
   text-align: center;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 4px 6px -1px var(--shadow-color), 0 2px 4px -1px var(--shadow-color);
 `;
 
 const RemoveButton = styled.button`
   position: absolute;
   top: 0.5rem;
   right: 0.5rem;
-  background: white;
-  border: 1px solid #e5e7eb;
+  background: var(--surface);
+  border: 1px solid var(--border);
   border-radius: 50%;
   width: 30px;
   height: 30px;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #ef4444;
+  color: var(--error);
   cursor: pointer;
   transition: all 0.2s;
 
   &:hover {
-    background: #fee2e2;
+    background: var(--danger-subtle);
     transform: scale(1.1);
   }
 `;
@@ -199,43 +208,48 @@ const RacketImage = styled.img`
   height: 100px;
   object-fit: contain;
   margin-bottom: 1rem;
+  background: var(--racket-image-bg);
+  border: var(--racket-image-border);
+  border-radius: var(--racket-image-radius-card);
+  box-shadow: var(--racket-image-shadow);
+  padding: 0.5rem;
 `;
 
 const RacketName = styled.h3`
   font-size: 0.875rem;
   font-weight: 600;
-  color: #1f2937;
+  color: var(--text);
   margin-bottom: 0.25rem;
 `;
 
 const RacketBrand = styled.span`
   font-size: 0.75rem;
-  color: #6b7280;
+  color: var(--text-muted);
 `;
 
 const EmptySlot = styled.div`
-  border: 2px dashed #d1d5db;
+  border: 2px dashed var(--border-strong);
   border-radius: 16px;
   height: 200px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  color: #9ca3af;
+  color: var(--text-subtle);
   gap: 0.5rem;
   transition: border-color 0.2s ease, background-color 0.2s ease;
   background: rgba(0, 0, 0, 0.01);
 
   &:hover {
-    border-color: rgba(21, 128, 61, 0.4);
-    background: rgba(22, 163, 74, 0.02);
-    color: #6b7280;
+    border-color: rgba(var(--primary-rgb-dark), 0.4);
+    background: rgba(var(--primary-rgb), 0.02);
+    color: var(--text-muted);
   }
 `;
 
 const CompareButton = styled.button`
   width: 100%;
-  background: #15803d;
+  background: var(--primary-hover);
   color: white;
   border: none;
   padding: 1rem;
@@ -251,24 +265,24 @@ const CompareButton = styled.button`
   gap: 0.5rem;
 
   &:disabled {
-    background: #d1d5db;
+    background: var(--border-strong);
     cursor: not-allowed;
   }
 
   &:not(:disabled):hover {
-    background: #166534;
+    background: var(--primary-hover);
     transform: translateY(-1px);
-    box-shadow: 0 10px 15px -3px rgba(21, 128, 61, 0.3), 0 4px 6px -2px rgba(21, 128, 61, 0.15);
+    box-shadow: 0 10px 15px -3px rgba(var(--primary-rgb-dark), 0.3), 0 4px 6px -2px rgba(var(--primary-rgb-dark), 0.15);
   }
 `;
 
 const ResultSection = styled(motion.div)`
   max-width: 1000px;
   margin: 0 auto;
-  background: white;
+  background: var(--surface);
   border-radius: 20px;
   padding: 3rem;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 20px 25px -5px var(--shadow-color), 0 10px 10px -5px var(--shadow-color);
   position: relative;
   overflow-x: hidden;
 
@@ -290,7 +304,7 @@ const ResultHeader = styled.div`
   justify-content: space-between;
   align-items: center;
   margin-bottom: 2rem;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid var(--border);
   padding-bottom: 1rem;
   gap: 1rem;
   flex-wrap: wrap;
@@ -307,7 +321,7 @@ const ResultHeader = styled.div`
 const ResultTitle = styled.h2`
   font-size: 1.5rem;
   font-weight: 700;
-  color: #1f2937;
+  color: var(--text);
   display: flex;
   align-items: center;
   gap: 0.75rem;
@@ -355,34 +369,47 @@ const ActionButton = styled.button<{ variant?: 'secondary' }>`
   ${props =>
     props.variant === 'secondary'
       ? `
-    background: white;
-    border: 1px solid #e5e7eb;
-    color: #4b5563;
-    &:hover { background: #f9fafb; border-color: #d1d5db; }
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+    &:hover { background: var(--surface-2); border-color: var(--border-strong); }
   `
       : `
-    background: #f0fdf4;
-    border: 1px solid #15803d;
-    color: #15803d;
-    &:hover { background: #dcfce7; }
+    background: var(--primary-subtle);
+    border: 1px solid var(--primary-hover);
+    color: var(--primary-hover);
+    &:hover { background: var(--primary-faint); }
   `}
 `;
 
 const MarkdownContent = styled.div`
   line-height: 1.7;
-  color: #374151;
+  color: var(--text);
+  font-size: 0.875rem;
+
+  @media (max-width: 768px) {
+    font-size: 0.8125rem;
+  }
 
   h1,
   h2,
   h3 {
-    color: #1f2937;
+    color: var(--text);
     margin-top: 1.5rem;
     margin-bottom: 1rem;
   }
 
-  h3 {
+  h2 {
     font-size: 1.25rem;
-    color: #15803d;
+  }
+
+  h3 {
+    font-size: 1.125rem;
+    color: var(--primary-hover);
+  }
+
+  h4 {
+    font-size: 1rem;
   }
 
   ul,
@@ -396,7 +423,7 @@ const MarkdownContent = styled.div`
   }
 
   strong {
-    color: #111827;
+    color: var(--text);
     font-weight: 700;
   }
 
@@ -409,19 +436,19 @@ const MarkdownContent = styled.div`
 
   th,
   td {
-    border: 1px solid #e5e7eb;
+    border: 1px solid var(--border);
     padding: 0.75rem;
     text-align: left;
   }
 
   th {
-    background: #f9fafb;
+    background: var(--surface-2);
     font-weight: 600;
-    color: #374151;
+    color: var(--text);
   }
 
   tr:nth-child(even) {
-    background: #f9fafb;
+    background: var(--surface-2);
   }
 `;
 
@@ -440,13 +467,13 @@ const ModalOverlay = styled(motion.div)`
 `;
 
 const ModalContent = styled(motion.div)`
-  background: white;
+  background: var(--surface);
   border-radius: 24px;
   width: 100%;
   max-width: 900px;
   max-height: 85vh;
   overflow-y: auto;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 20px 50px var(--shadow-color);
   position: relative;
   display: flex;
   flex-direction: column;
@@ -473,7 +500,7 @@ const CloseButton = styled.button`
   position: absolute;
   top: 1.5rem;
   right: 1.5rem;
-  background: #f3f4f6;
+  background: var(--surface-3);
   border: none;
   width: 40px;
   height: 40px;
@@ -482,13 +509,13 @@ const CloseButton = styled.button`
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  color: #4b5563;
+  color: var(--text);
   transition: all 0.2s;
   z-index: 10;
 
   &:hover {
-    background: #e5e7eb;
-    color: #1f2937;
+    background: var(--border);
+    color: var(--text);
     transform: rotate(90deg);
   }
 `;
@@ -500,7 +527,7 @@ const FavoritesSection = styled.div`
 const FavoritesTitle = styled.h3`
   font-size: 0.6875rem;
   font-weight: 600;
-  color: #9ca3af;
+  color: var(--text-subtle);
   margin-bottom: 0.5rem;
   display: flex;
   align-items: center;
@@ -525,8 +552,8 @@ const FavoritesGrid = styled.div`
 `;
 
 const FavoriteRacketCard = styled(motion.div)<{ $isSelected?: boolean }>`
-  background: ${props => (props.$isSelected ? '#f3f4f6' : 'white')};
-  border: 1.5px solid ${props => (props.$isSelected ? '#d1d5db' : '#e5e7eb')};
+  background: ${props => (props.$isSelected ? 'var(--surface-3)' : 'var(--surface)')};
+  border: 1.5px solid ${props => (props.$isSelected ? 'var(--border-strong)' : 'var(--border)')};
   border-radius: 6px;
   padding: 0.375rem 0.5rem;
   display: flex;
@@ -544,10 +571,10 @@ const FavoriteRacketCard = styled(motion.div)<{ $isSelected?: boolean }>`
     ${props =>
       !props.$isSelected &&
       `
-      border-color: #15803d;
-      background: #f0fdf4;
+      border-color: var(--primary-hover);
+      background: var(--primary-subtle);
       transform: translateY(-1px);
-      box-shadow: 0 2px 6px rgba(21, 128, 61, 0.12);
+      box-shadow: 0 2px 6px rgba(var(--primary-rgb-dark), 0.12);
     `}
   }
 
@@ -569,7 +596,7 @@ const FavoriteRacketInfo = styled.div`
 const FavoriteRacketName = styled.div`
   font-size: 0.6875rem;
   font-weight: 600;
-  color: #1f2937;
+  color: var(--text);
   line-height: 1;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -578,26 +605,27 @@ const FavoriteRacketName = styled.div`
 
 const FavoriteRacketBrand = styled.div`
   font-size: 0.5625rem;
-  color: #6b7280;
+  color: var(--text-muted);
   line-height: 1;
 `;
 
 const EmptyFavorites = styled.div`
   padding: 0.75rem;
   text-align: center;
-  color: #9ca3af;
+  color: var(--text-subtle);
   font-size: 0.6875rem;
-  background: #f9fafb;
+  background: var(--surface-2);
   border-radius: 6px;
-  border: 1px dashed #e5e7eb;
+  border: 1px dashed var(--border);
 `;
 
 const CompareRacketsPage: React.FC = () => {
   const { rackets } = useRackets();
   const { user, isAuthenticated } = useAuth();
   const { addNotification } = useNotifications();
+  const { rackets: comparisonRackets } = useComparison();
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedRackets, setSelectedRackets] = useState<Racket[]>([]);
+  const [selectedRackets, setSelectedRackets] = useState<Racket[]>(() => comparisonRackets);
   const [comparisonResult, setComparisonResult] = useState<ComparisonResult | null>(null);
   const [comparisonMetrics, setComparisonMetrics] = useState<RacketComparisonData[] | null>(null);
   const [loading, setLoading] = useState(false);
@@ -697,7 +725,7 @@ const CompareRacketsPage: React.FC = () => {
         {/* Resumen Ejecutivo */}
         {comparisonResult.executiveSummary && (
           <div style={{ marginBottom: '2rem' }}>
-            <h3 style={{ color: '#15803d', marginBottom: '1rem' }}>Resumen Ejecutivo</h3>
+            <h3 style={{ color: 'var(--primary-hover)', marginBottom: '1rem' }}>Resumen Ejecutivo</h3>
             <ReactMarkdown remarkPlugins={[remarkGfm]}>
               {comparisonResult.executiveSummary}
             </ReactMarkdown>
@@ -709,6 +737,7 @@ const CompareRacketsPage: React.FC = () => {
           <ComparisonTable
             data={comparisonResult.comparisonTable}
             metrics={comparisonMetrics || []}
+            rackets={selectedRackets}
           />
         ) : (
           comparisonResult.comparisonTable && (
@@ -723,10 +752,10 @@ const CompareRacketsPage: React.FC = () => {
         {/* Análisis Técnico */}
         {comparisonResult.technicalAnalysis && comparisonResult.technicalAnalysis.length > 0 && (
           <div style={{ marginBottom: '2rem' }}>
-            <h3 style={{ color: '#15803d', marginBottom: '1rem' }}>Análisis Técnico</h3>
+            <h3 style={{ color: 'var(--primary-hover)', marginBottom: '1rem' }}>Análisis Técnico</h3>
             {comparisonResult.technicalAnalysis.map((section, index) => (
               <div key={index} style={{ marginBottom: '1.5rem' }}>
-                <h4 style={{ color: '#1f2937', marginBottom: '0.5rem' }}>{section.title}</h4>
+                <h4 style={{ color: 'var(--text)', marginBottom: '0.5rem' }}>{section.title}</h4>
                 <ReactMarkdown remarkPlugins={[remarkGfm]}>{section.content}</ReactMarkdown>
               </div>
             ))}
@@ -736,7 +765,7 @@ const CompareRacketsPage: React.FC = () => {
         {/* Perfiles Recomendados */}
         {comparisonResult.recommendedProfiles && (
           <div style={{ marginBottom: '2rem' }}>
-            <h3 style={{ color: '#15803d', marginBottom: '1rem' }}>Perfiles Recomendados</h3>
+            <h3 style={{ color: 'var(--primary-hover)', marginBottom: '1rem' }}>Perfiles Recomendados</h3>
             <ReactMarkdown remarkPlugins={[remarkGfm]}>
               {comparisonResult.recommendedProfiles}
             </ReactMarkdown>
@@ -746,7 +775,7 @@ const CompareRacketsPage: React.FC = () => {
         {/* Consideraciones Biomecánicas */}
         {comparisonResult.biomechanicalConsiderations && (
           <div style={{ marginBottom: '2rem' }}>
-            <h3 style={{ color: '#15803d', marginBottom: '1rem' }}>Consideraciones Biomecánicas</h3>
+            <h3 style={{ color: 'var(--primary-hover)', marginBottom: '1rem' }}>Consideraciones Biomecánicas</h3>
             <ReactMarkdown remarkPlugins={[remarkGfm]}>
               {comparisonResult.biomechanicalConsiderations}
             </ReactMarkdown>
@@ -756,7 +785,7 @@ const CompareRacketsPage: React.FC = () => {
         {/* Conclusión */}
         {comparisonResult.conclusion && (
           <div style={{ marginBottom: '2rem' }}>
-            <h3 style={{ color: '#15803d', marginBottom: '1rem' }}>Conclusión</h3>
+            <h3 style={{ color: 'var(--primary-hover)', marginBottom: '1rem' }}>Conclusión</h3>
             <ReactMarkdown remarkPlugins={[remarkGfm]}>{comparisonResult.conclusion}</ReactMarkdown>
           </div>
         )}
@@ -815,6 +844,12 @@ const CompareRacketsPage: React.FC = () => {
           playingStyle: undefined,
           experience: undefined,
           preferences: user.limitations?.join(', ') || undefined,
+          currentRacket: user.current_racket || undefined,
+          gender: user.gender || undefined,
+          physicalCondition: user.physical_condition || undefined,
+          position: user.position || undefined,
+          frequency: user.frequency || undefined,
+          touchPreference: user.touch_preference || undefined,
         };
       }
 
@@ -928,6 +963,27 @@ const CompareRacketsPage: React.FC = () => {
 
   return (
     <Container>
+      <SEO
+        title='Comparador de Palas con IA | Análisis Inteligente'
+        description='Compara hasta 3 palas de pádel con análisis de IA. Visualiza peso, balance, forma y material lado a lado y descubre cuál se adapta mejor a tu juego.'
+        canonical={buildUrl('/compare-rackets')}
+        keywords={allKeywords}
+        type='website'
+        schema={[
+          organizationSchema(),
+          webPageSchema({
+            name: 'Comparador de Palas con IA — Smashly',
+            description:
+              'Compara hasta 3 palas de pádel con análisis de Inteligencia Artificial.',
+            url: buildUrl('/compare-rackets'),
+          }),
+          breadcrumbSchema([
+            { name: 'Inicio', url: buildUrl('/') },
+            { name: 'Comparar', url: buildUrl('/compare') },
+            { name: 'Comparador IA', url: buildUrl('/compare-rackets') },
+          ]),
+        ]}
+      />
       <Header>
         <Title>
           Comparador de <span className='highlight'>Palas IA</span>
@@ -958,15 +1014,25 @@ const CompareRacketsPage: React.FC = () => {
                   <img
                     src={racket.imagenes?.[0] || '/placeholder-racket.png'}
                     alt={racket.nombre}
+                    style={{
+                      width: 40,
+                      height: 40,
+                      objectFit: 'contain',
+                      borderRadius: 8,
+                      background: 'var(--racket-image-bg)',
+                      border: 'var(--racket-image-border)',
+                      boxShadow: 'var(--racket-image-shadow)',
+                      padding: 4,
+                    }}
                   />
                   <div>
-                    <div style={{ fontWeight: 600 }}>{racket.nombre}</div>
-                    <div style={{ fontSize: '0.875rem', color: '#6b7280' }}>{racket.marca}</div>
+                    <div style={{ fontWeight: 600 }}>{toTitleCase(racket.nombre)}</div>
+                    <div style={{ fontSize: '0.875rem', color: 'var(--text-muted)' }}>{racket.marca}</div>
                   </div>
                 </SearchResultItem>
               ))}
               {filteredRackets.length === 0 && (
-                <div style={{ padding: '1rem', textAlign: 'center', color: '#6b7280' }}>
+                <div style={{ padding: '1rem', textAlign: 'center', color: 'var(--text-muted)' }}>
                   No se encontraron palas
                 </div>
               )}
@@ -994,9 +1060,19 @@ const CompareRacketsPage: React.FC = () => {
                     <img
                       src={racket.imagenes?.[0] || '/placeholder-racket.png'}
                       alt={racket.nombre}
+                      style={{
+                        width: 60,
+                        height: 60,
+                        objectFit: 'contain',
+                        borderRadius: 8,
+                        background: 'var(--racket-image-bg)',
+                        border: 'var(--racket-image-border)',
+                        boxShadow: 'var(--racket-image-shadow)',
+                        padding: 4,
+                      }}
                     />
                     <FavoriteRacketInfo>
-                      <FavoriteRacketName>{racket.nombre}</FavoriteRacketName>
+                      <FavoriteRacketName>{toTitleCase(racket.nombre)}</FavoriteRacketName>
                       <FavoriteRacketBrand>{racket.marca}</FavoriteRacketBrand>
                     </FavoriteRacketInfo>
                   </FavoriteRacketCard>
@@ -1033,7 +1109,7 @@ const CompareRacketsPage: React.FC = () => {
                 src={racket.imagenes?.[0] || '/placeholder-racket.png'}
                 alt={racket.nombre}
               />
-              <RacketName>{racket.nombre}</RacketName>
+              <RacketName>{toTitleCase(racket.nombre)}</RacketName>
               <RacketBrand>{racket.marca}</RacketBrand>
             </SelectedRacketCard>
           ))}
@@ -1091,7 +1167,7 @@ const CompareRacketsPage: React.FC = () => {
               >
                 <ResultHeader>
                   <ResultTitle>
-                    <FiCheck color='#15803d' /> Análisis Comparativo
+                    <FiCheck color='var(--primary-hover)' /> Análisis Comparativo
                   </ResultTitle>
                   <ActionButtons className='no-pdf'>
                     {isAuthenticated && (

@@ -31,7 +31,7 @@ const SkeletonHeader = styled.div`
 const SkeletonTitle = styled.div<{ $reduced: boolean }>`
   height: 2.5rem;
   width: 300px;
-  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background: linear-gradient(90deg, var(--surface-3) 25%, var(--border) 50%, var(--surface-3) 75%);
   background-size: 1000px 100%;
   ${shimmer(false)}
   animation: ${props => getShimmerAnimation(props.$reduced)};
@@ -42,7 +42,7 @@ const SkeletonTitle = styled.div<{ $reduced: boolean }>`
 const SkeletonSubtitle = styled.div<{ $reduced: boolean }>`
   height: 1rem;
   width: 500px;
-  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background: linear-gradient(90deg, var(--surface-3) 25%, var(--border) 50%, var(--surface-3) 75%);
   background-size: 1000px 100%;
   ${shimmer(false)}
   animation: ${props => getShimmerAnimation(props.$reduced)};
@@ -56,18 +56,18 @@ const SkeletonGrid = styled.div`
 `;
 
 const SkeletonCard = styled(motion.div)<{ $reduced: boolean }>`
-  background: white;
+  background: var(--surface);
   border-radius: 16px;
   padding: 1.5rem;
   height: 380px;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--border);
   opacity: ${props => props.$reduced ? 0.6 : 1};
 `;
 
 const SkeletonImage = styled.div<{ $reduced: boolean }>`
   width: 100%;
   height: 200px;
-  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background: linear-gradient(90deg, var(--surface-3) 25%, var(--border) 50%, var(--surface-3) 75%);
   background-size: 1000px 100%;
   ${shimmer(false)}
   animation: ${props => getShimmerAnimation(props.$reduced)};
@@ -78,7 +78,7 @@ const SkeletonImage = styled.div<{ $reduced: boolean }>`
 const SkeletonText = styled.div<{ width?: string; height?: string; $reduced: boolean }>`
   width: ${props => props.width || '100%'};
   height: ${props => props.height || '1rem'};
-  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background: linear-gradient(90deg, var(--surface-3) 25%, var(--border) 50%, var(--surface-3) 75%);
   background-size: 1000px 100%;
   ${shimmer(false)}
   animation: ${props => getShimmerAnimation(props.$reduced)};
@@ -89,7 +89,7 @@ const SkeletonText = styled.div<{ width?: string; height?: string; $reduced: boo
 const SkeletonButton = styled.div<{ $reduced: boolean }>`
   height: 2.5rem;
   width: 100%;
-  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background: linear-gradient(90deg, var(--surface-3) 25%, var(--border) 50%, var(--surface-3) 75%);
   background-size: 1000px 100%;
   ${shimmer(false)}
   animation: ${props => getShimmerAnimation(props.$reduced)};

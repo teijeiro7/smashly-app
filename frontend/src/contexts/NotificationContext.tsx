@@ -1,11 +1,5 @@
-import React, {
-  createContext,
-  ReactNode,
-  useCallback,
-  useContext,
-  useEffect,
-  useState,
-} from 'react';
+import React, { createContext, ReactNode, useCallback, useContext, useMemo } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Notification } from '../types/notification';
 import { NotificationService } from '../services/notificationService';
 import { useAuth } from './AuthContext';
@@ -28,146 +22,95 @@ const NotificationContext = createContext<NotificationContextType | undefined>(u
 
 export const useNotifications = (): NotificationContextType => {
   const context = useContext(NotificationContext);
-  if (!context) {
-    throw new Error('useNotifications debe usarse dentro de NotificationProvider');
-  }
+  if (!context) throw new Error('useNotifications debe usarse dentro de NotificationProvider');
   return context;
 };
 
-interface NotificationProviderProps {
-  children: ReactNode;
-}
+interface NotificationProviderProps { children: ReactNode }
+
+const QUERY_KEY = ['notifications'];
 
 export const NotificationProvider: React.FC<NotificationProviderProps> = ({ children }) => {
-  const { isAuthenticated, user } = useAuth();
-  const [notifications, setNotifications] = useState<Notification[]>([]);
-  const [unreadCount, setUnreadCount] = useState<number>(0);
-  const [loading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string | null>(null);
+  const { isAuthenticated } = useAuth();
+  const queryClient = useQueryClient();
 
-  const fetchNotifications = useCallback(
-    async (unreadOnly: boolean = false) => {
-      if (!isAuthenticated) {
-        setNotifications([]);
-        setUnreadCount(0);
-        return;
-      }
+  const { data: notifications = [], isLoading, error, refetch } = useQuery<Notification[], Error>({
+    queryKey: QUERY_KEY,
+    queryFn: () => NotificationService.fetchNotifications({ limit: 50 }),
+    enabled: isAuthenticated,
+    staleTime: 0,
+    refetchInterval: isAuthenticated ? 60_000 : false,
+    refetchIntervalInBackground: false,
+  });
 
-      setLoading(true);
-      setError(null);
-
-      try {
-        const fetchedNotifications = await NotificationService.fetchNotifications({
-          limit: 50,
-          unreadOnly,
-        });
-        setNotifications(fetchedNotifications);
-      } catch (err) {
-        console.error('Error fetching notifications:', err);
-        setError('Error al cargar las notificaciones');
-      } finally {
-        setLoading(false);
-      }
-    },
-    [isAuthenticated]
-  );
-
-  const fetchUnreadCount = useCallback(async () => {
-    if (!isAuthenticated) {
-      setUnreadCount(0);
-      return;
-    }
-
-    try {
-      const count = await NotificationService.getUnreadCount();
-      setUnreadCount(count);
-    } catch (err) {
-      console.error('Error fetching unread count:', err);
-    }
-  }, [isAuthenticated]);
-
-  const markAsRead = useCallback(async (notificationId: string) => {
-    try {
-      await NotificationService.markAsRead(notificationId);
-
-      setNotifications(prev =>
-        prev.map(n => (n.id === notificationId ? { ...n, is_read: true } : n))
-      );
-
-      setUnreadCount(prev => Math.max(0, prev - 1));
-    } catch (err) {
-      console.error('Error marking notification as read:', err);
-    }
-  }, []);
-
-  const markAllAsRead = useCallback(async () => {
-    try {
-      await NotificationService.markAllAsRead();
-
-      setNotifications(prev => prev.map(n => ({ ...n, is_read: true })));
-      setUnreadCount(0);
-    } catch (err) {
-      console.error('Error marking all notifications as read:', err);
-    }
-  }, []);
-
-  const deleteNotification = useCallback(
-    async (notificationId: string) => {
-      try {
-        await NotificationService.deleteNotification(notificationId);
-
-        const notificationToDelete = notifications.find(n => n.id === notificationId);
-
-        setNotifications(prev => prev.filter(n => n.id !== notificationId));
-
-        if (notificationToDelete && !notificationToDelete.is_read) {
-          setUnreadCount(prev => Math.max(0, prev - 1));
-        }
-      } catch (err) {
-        console.error('Error deleting notification:', err);
-      }
-    },
+  const unreadCount = useMemo(
+    () => notifications.filter(n => !n.is_read).length,
     [notifications]
   );
 
+  const fetchNotifications = useCallback(async () => { await refetch(); }, [refetch]);
+  const fetchUnreadCount = useCallback(async () => { await refetch(); }, [refetch]);
+
+  const markAsReadMutation = useMutation({
+    mutationFn: (id: string) => NotificationService.markAsRead(id),
+    onMutate: async (id) => {
+      await queryClient.cancelQueries({ queryKey: QUERY_KEY });
+      queryClient.setQueryData<Notification[]>(QUERY_KEY, old =>
+        (old ?? []).map(n => n.id === id ? { ...n, is_read: true } : n)
+      );
+    },
+    onSettled: () => queryClient.invalidateQueries({ queryKey: QUERY_KEY }),
+  });
+
+  const markAllAsReadMutation = useMutation({
+    mutationFn: () => NotificationService.markAllAsRead(),
+    onMutate: async () => {
+      await queryClient.cancelQueries({ queryKey: QUERY_KEY });
+      queryClient.setQueryData<Notification[]>(QUERY_KEY, old =>
+        (old ?? []).map(n => ({ ...n, is_read: true }))
+      );
+    },
+    onSettled: () => queryClient.invalidateQueries({ queryKey: QUERY_KEY }),
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: (id: string) => NotificationService.deleteNotification(id),
+    onMutate: async (id) => {
+      await queryClient.cancelQueries({ queryKey: QUERY_KEY });
+      queryClient.setQueryData<Notification[]>(QUERY_KEY, old =>
+        (old ?? []).filter(n => n.id !== id)
+      );
+    },
+    onSettled: () => queryClient.invalidateQueries({ queryKey: QUERY_KEY }),
+  });
+
+  const markAsRead = useCallback(async (id: string) => {
+    await markAsReadMutation.mutateAsync(id);
+  }, [markAsReadMutation]);
+
+  const markAllAsRead = useCallback(async () => {
+    await markAllAsReadMutation.mutateAsync();
+  }, [markAllAsReadMutation]);
+
+  const deleteNotification = useCallback(async (id: string) => {
+    await deleteMutation.mutateAsync(id);
+  }, [deleteMutation]);
+
   const incrementUnreadCount = useCallback(() => {
-    setUnreadCount(prev => prev + 1);
+    // No-op: unreadCount derived from notifications data
   }, []);
 
   const addNotification = useCallback((notification: Notification) => {
-    setNotifications(prev => [notification, ...prev]);
-    setUnreadCount(prev => prev + 1);
-  }, []);
+    queryClient.setQueryData<Notification[]>(QUERY_KEY, old =>
+      [notification, ...(old ?? [])]
+    );
+  }, [queryClient]);
 
-  useEffect(() => {
-    if (isAuthenticated) {
-      fetchNotifications();
-      fetchUnreadCount();
-    } else {
-      setNotifications([]);
-      setUnreadCount(0);
-      NotificationService.clearLocalStorage();
-    }
-  }, [isAuthenticated, fetchNotifications, fetchUnreadCount]);
-
-  useEffect(() => {
-    if (!isAuthenticated || !user) return;
-
-    const interval = setInterval(() => {
-      // Solo realizar la petición si la pestaña está visible
-      if (document.visibilityState === 'visible') {
-        fetchUnreadCount();
-      }
-    }, 60000);
-
-    return () => clearInterval(interval);
-  }, [isAuthenticated, user, fetchUnreadCount]);
-
-  const value: NotificationContextType = {
+  const value = useMemo<NotificationContextType>(() => ({
     notifications,
     unreadCount,
-    loading,
-    error,
+    loading: isLoading,
+    error: error ? error.message : null,
     fetchNotifications,
     fetchUnreadCount,
     markAsRead,
@@ -175,7 +118,12 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({ chil
     deleteNotification,
     incrementUnreadCount,
     addNotification,
-  };
+  }), [
+    notifications, unreadCount, isLoading, error,
+    fetchNotifications, fetchUnreadCount,
+    markAsRead, markAllAsRead, deleteNotification,
+    incrementUnreadCount, addNotification,
+  ]);
 
   return <NotificationContext.Provider value={value}>{children}</NotificationContext.Provider>;
 };

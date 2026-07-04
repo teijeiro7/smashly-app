@@ -15,6 +15,15 @@ export interface UserProfile {
   game_level?: string;
   limitations?: string[]; // Array de strings en Supabase
   role?: string; // 'player' o 'admin'
+  // Player preferences
+  gender?: string;
+  physical_condition?: string;
+  position?: string;
+  frequency?: string;
+  touch_preference?: string;
+  balance_preference?: string;
+  shape_preference?: string;
+  weight_preference?: string;
   created_at?: string;
   updated_at?: string;
 }

@@ -1,7 +1,6 @@
-import { AnimatePresence, motion } from 'framer-motion';
 import React, { useEffect, useState, useRef, useCallback, useMemo } from 'react';
 import { FiGrid, FiList, FiSearch, FiX, FiChevronDown, FiFilter, FiTag } from 'react-icons/fi';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearch } from '@tanstack/react-router';
 import styled from 'styled-components';
 import { useComparison } from '../contexts/ComparisonContext';
 import { useRackets } from '../contexts/RacketsContext';
@@ -11,20 +10,29 @@ import { Racket } from '../types/racket';
 import { AddToListModal } from '../components/features/AddToListModal';
 import RacketCard from '../components/features/RacketCard';
 import { getLowestPrice } from '../utils/priceUtils';
+import SEO from '../components/seo/SEO';
+import {
+  organizationSchema,
+  websiteSchema,
+  webPageSchema,
+  breadcrumbSchema,
+  catalogItemListSchema,
+} from '../utils/seoSchemas';
+import { buildUrl, allKeywords } from '../config/seo';
 
 // Styled Components
 const Container = styled.div`
   min-height: 100vh;
   background:
-    radial-gradient(circle at 5% 0%, rgba(22, 163, 74, 0.08) 0%, transparent 42%),
-    linear-gradient(135deg, #f8faf8 0%, #e8f5e8 100%);
+    radial-gradient(circle at 5% 0%, rgba(var(--primary-rgb), 0.08) 0%, transparent 42%),
+    linear-gradient(135deg, var(--surface-2) 0%, var(--primary-faint) 100%);
 `;
 
 const Header = styled.div`
-  background: white;
-  border-bottom: 1px solid #e5e7eb;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
   padding: clamp(1.5rem, 4vw, 2.5rem) 0;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 1px 3px var(--shadow-color);
 `;
 
 const HeaderContent = styled.div`
@@ -37,19 +45,19 @@ const HeaderContent = styled.div`
 const Title = styled.h1`
   font-size: clamp(2rem, 5vw, 3rem);
   font-weight: 800;
-  color: #1f2937;
+  color: var(--text);
   margin-bottom: 0.75rem;
   line-height: 1.1;
   letter-spacing: -0.02em;
 
   .highlight {
-    color: #15803d;
+    color: var(--primary-hover);
   }
 `;
 
 const Subtitle = styled.p`
   font-size: 1.25rem;
-  color: #6b7280;
+  color: var(--text-muted);
   margin-bottom: 1.4rem;
   line-height: 1.6;
 
@@ -77,12 +85,12 @@ const StatItem = styled.div`
 const StatNumber = styled.div`
   font-size: 1.5rem;
   font-weight: 700;
-  color: #15803d;
+  color: var(--primary-hover);
 `;
 
 const StatLabel = styled.div`
   font-size: 0.875rem;
-  color: #6b7280;
+  color: var(--text-muted);
 `;
 
 const MainContent = styled.div`
@@ -92,53 +100,45 @@ const MainContent = styled.div`
 `;
 
 const FiltersSection = styled.div`
-  background: white;
+  background: var(--surface);
   border-radius: 12px;
   padding: clamp(1rem, 2vw, 1.5rem);
   margin-bottom: 1.5rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
-  border: 1px solid #e5e7eb;
+  box-shadow: 0 1px 3px var(--shadow-color), 0 1px 2px var(--shadow-color);
+  border: 1px solid var(--border);
 `;
 
 const FiltersRow = styled.div`
   display: flex;
-  gap: 1rem;
+  gap: 0.75rem;
   align-items: center;
-  flex-wrap: wrap;
-
-  @media (max-width: 768px) {
-    flex-direction: column;
-    align-items: stretch;
-  }
 `;
 
 const SearchContainer = styled.div`
   flex: 1;
   position: relative;
-  min-width: min(320px, 100%);
-
-  @media (max-width: 768px) {
-    min-width: 100%;
-  }
+  min-width: 0;
 `;
 
 const SearchInput = styled.input`
   width: 100%;
   min-height: 46px;
   padding: 0.875rem 1rem 0.875rem 2.75rem;
-  border: 1.5px solid #e5e7eb;
+  border: 1.5px solid var(--border);
   border-radius: 8px;
+  background: var(--surface);
+  color: var(--text);
   font-size: 0.875rem;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 
   &:focus {
     outline: none;
-    border-color: #15803d;
-    box-shadow: 0 0 0 3px rgba(21, 128, 61, 0.1);
+    border-color: var(--primary-hover);
+    box-shadow: 0 0 0 3px rgba(var(--primary-rgb-dark), 0.1);
   }
 
   &::placeholder {
-    color: #9ca3af;
+    color: var(--text-subtle);
   }
 `;
 
@@ -147,28 +147,28 @@ const SearchIcon = styled(FiSearch)`
   left: 1rem;
   top: 50%;
   transform: translateY(-50%);
-  color: #6b7280;
+  color: var(--text-muted);
 `;
 
 const FilterButton = styled.button<{ $active?: boolean }>`
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  min-height: 40px;
+  min-height: 46px;
   padding: 0.5rem 1rem;
-  border: 1.5px solid ${props => (props.$active ? '#15803d' : '#e5e7eb')};
+  border: 1.5px solid ${props => (props.$active ? 'var(--primary-hover)' : 'var(--border)')};
   border-radius: 8px;
-  background: ${props => (props.$active ? '#f0fdf4' : 'white')};
-  color: ${props => (props.$active ? '#15803d' : '#6b7280')};
+  background: ${props => (props.$active ? 'var(--primary-subtle)' : 'var(--surface)')};
+  color: ${props => (props.$active ? 'var(--primary-hover)' : 'var(--text-muted)')};
   font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 
   &:hover {
-    border-color: #15803d;
-    color: #15803d;
-    background: ${props => (props.$active ? '#f0fdf4' : '#f9fafb')};
+    border-color: var(--primary-hover);
+    color: var(--primary-hover);
+    background: ${props => (props.$active ? 'var(--primary-subtle)' : 'var(--surface-2)')};
   }
 
   @media (max-width: 768px) {
@@ -178,12 +178,12 @@ const FilterButton = styled.button<{ $active?: boolean }>`
 `;
 
 const FilterSelect = styled.select`
-  min-height: 40px;
+  min-height: 46px;
   padding: 0.5rem 2.5rem 0.5rem 1rem;
-  border: 1.5px solid #e5e7eb;
+  border: 1.5px solid var(--border);
   border-radius: 8px;
-  background: white;
-  color: #374151;
+  background: var(--surface);
+  color: var(--text-muted);
   font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
@@ -197,14 +197,14 @@ const FilterSelect = styled.select`
   background-size: 16px;
 
   &:hover {
-    border-color: #15803d;
+    border-color: var(--primary-hover);
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2315803d' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
   }
 
   &:focus {
     outline: none;
-    border-color: #15803d;
-    box-shadow: 0 0 0 3px rgba(21, 128, 61, 0.1);
+    border-color: var(--primary-hover);
+    box-shadow: 0 0 0 3px rgba(var(--primary-rgb-dark), 0.1);
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2315803d' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
   }
 
@@ -219,21 +219,22 @@ const AdvancedFiltersToggle = styled.button<{ $active: boolean }>`
   justify-content: center;
   gap: 0.5rem;
   padding: 0.75rem 1rem;
+  min-height: 46px;
   margin-top: 1rem;
   width: 100%;
-  border: 1.5px dashed ${props => (props.$active ? '#15803d' : '#e5e7eb')};
+  border: 1.5px dashed ${props => (props.$active ? 'var(--primary-hover)' : 'var(--border)')};
   border-radius: 8px;
-  background: ${props => (props.$active ? '#f0fdf4' : 'white')};
-  color: ${props => (props.$active ? '#15803d' : '#6b7280')};
+  background: ${props => (props.$active ? 'var(--primary-subtle)' : 'var(--surface)')};
+  color: ${props => (props.$active ? 'var(--primary-hover)' : 'var(--text-muted)')};
   font-size: 0.875rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
   &:hover {
-    border-color: #15803d;
-    color: #15803d;
-    background: #f0fdf4;
+    border-color: var(--primary-hover);
+    color: var(--primary-hover);
+    background: var(--primary-subtle);
   }
 
   svg:last-child {
@@ -242,27 +243,39 @@ const AdvancedFiltersToggle = styled.button<{ $active: boolean }>`
   }
 `;
 
+const QuickFiltersRow = styled.div`
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+`;
+
 const AdvancedFiltersPanel = styled.div<{ $isOpen: boolean }>`
   overflow: hidden;
   margin-top: 1rem;
-  max-height: ${props => props.$isOpen ? '500px' : '0'};
+  max-height: ${props => props.$isOpen ? '1200px' : '0'};
   opacity: ${props => props.$isOpen ? 1 : 0};
-  transition: max-height 0.3s ease, opacity 0.3s ease;
-  
+  transition: max-height 0.4s ease, opacity 0.3s ease;
+
   @media (prefers-reduced-motion: reduce) {
-    max-height: ${props => props.$isOpen ? '500px' : '0'};
+    max-height: ${props => props.$isOpen ? '1200px' : '0'};
     transition: none;
   }
+`;
+
+const FilterGroupLabel = styled.div`
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-subtle);
+  margin-bottom: 0.5rem;
 `;
 
 const AdvancedFiltersGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 1rem;
-  padding: 1rem;
-  background: #f9fafb;
-  border-radius: 8px;
-  border: 1px solid #e5e7eb;
+  gap: 0.75rem;
 
   @media (max-width: 768px) {
     grid-template-columns: 1fr;
@@ -285,7 +298,7 @@ const ResultsHeader = styled.div`
 
 const ResultsCount = styled.div`
   font-size: 1rem;
-  color: #6b7280;
+  color: var(--text-muted);
 `;
 
 const ResultsToolbar = styled.div`
@@ -296,19 +309,28 @@ const ResultsToolbar = styled.div`
 
   @media (max-width: 768px) {
     width: 100%;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 0.65rem;
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 0.5rem;
+
+    & > button {
+      width: auto;
+      flex-shrink: 0;
+      white-space: nowrap;
+    }
   }
 `;
 
 const ViewToggle = styled.div`
   display: flex;
-  gap: 0.5rem;
-  border: 1px solid #e5e7eb;
+  gap: 0.25rem;
+  border: 1px solid var(--border);
   border-radius: 8px;
-  padding: 0.25rem;
-  background: white;
+  padding: 0.125rem;
+  background: var(--surface);
+  min-height: 46px;
+  align-items: center;
+  flex-shrink: 0;
 
   @media (max-width: 768px) {
     justify-content: center;
@@ -316,37 +338,39 @@ const ViewToggle = styled.div`
 `;
 
 const ViewButton = styled.button<{ $active: boolean }>`
-  min-width: 44px;
-  min-height: 40px;
-  padding: 0.5rem;
+  min-width: 36px;
+  height: 36px;
+  padding: 0.25rem;
   border: none;
   border-radius: 6px;
-  background: ${props => (props.$active ? '#15803d' : 'transparent')};
-  color: ${props => (props.$active ? 'white' : '#6b7280')};
+  background: ${props => (props.$active ? 'var(--primary-hover)' : 'transparent')};
+  color: ${props => (props.$active ? 'white' : 'var(--text-muted)')};
   cursor: pointer;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 
   &:hover {
-    color: ${props => (props.$active ? 'white' : '#15803d')};
+    color: ${props => (props.$active ? 'white' : 'var(--primary-hover)')};
   }
 `;
 
 const SortSelect = styled.select`
-  min-height: 40px;
+  min-height: 46px;
   padding: 0.5rem 1rem;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--border);
   border-radius: 8px;
-  background: white;
+  background: var(--surface);
+  color: var(--text-muted);
   font-size: 0.875rem;
   cursor: pointer;
 
   &:focus {
     outline: none;
-    border-color: #15803d;
+    border-color: var(--primary-hover);
   }
 
   @media (max-width: 768px) {
-    width: 100%;
+    flex: 1;
+    min-width: 0;
   }
 `;
 
@@ -367,10 +391,10 @@ const RacketsGrid = styled.ul<{ $view: 'grid' | 'list' }>`
 const EmptyState = styled.div`
   text-align: center;
   padding: 4rem 2rem;
-  background: white;
+  background: var(--surface);
   border-radius: 12px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  border: 1px solid #e5e7eb;
+  box-shadow: 0 1px 3px var(--shadow-color);
+  border: 1px solid var(--border);
 `;
 
 const EmptyIcon = styled.div`
@@ -382,19 +406,19 @@ const EmptyIcon = styled.div`
 const EmptyTitle = styled.h3`
   font-size: 1.25rem;
   font-weight: 700;
-  color: #1f2937;
+  color: var(--text);
   margin-bottom: 0.5rem;
 `;
 
 const EmptyDescription = styled.p`
   font-size: 1rem;
-  color: #6b7280;
+  color: var(--text-muted);
   margin-bottom: 1.5rem;
   line-height: 1.6;
 `;
 
 const ClearFiltersButton = styled.button`
-  background: #15803d;
+  background: var(--primary-hover);
   color: white;
   border: none;
   padding: 0.625rem 1.25rem;
@@ -403,12 +427,12 @@ const ClearFiltersButton = styled.button`
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 1px 3px var(--shadow-color);
 
   &:hover {
-    background: #166534;
+    background: var(--primary-hover);
     transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(21, 128, 61, 0.2);
+    box-shadow: 0 4px 12px rgba(var(--primary-rgb-dark), 0.2);
   }
 
   &:active {
@@ -417,19 +441,24 @@ const ClearFiltersButton = styled.button`
 `;
 
 // Floating comparison panel
-const FloatingPanel = styled(motion.div)`
+const FloatingPanel = styled.div<{ $visible: boolean }>`
   position: fixed;
   bottom: 2rem;
   right: 2rem;
-  background: white;
+  background: var(--surface);
   border-radius: 12px;
   padding: 1rem 1.5rem;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-  border: 1.5px solid #15803d;
+  box-shadow: 0 10px 30px var(--shadow-color);
+  border: 1.5px solid var(--primary-hover);
   z-index: 50;
+  transform: translateY(${props => (props.$visible ? '0' : '120px')});
+  opacity: ${props => (props.$visible ? 1 : 0)};
+  pointer-events: ${props => (props.$visible ? 'auto' : 'none')};
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
+  will-change: transform, opacity;
 
   @media (max-width: 768px) {
-    bottom: 1rem;
+    bottom: calc(78px + env(safe-area-inset-bottom, 0px) + 0.75rem);
     right: 1rem;
     left: 1rem;
   }
@@ -444,11 +473,11 @@ const PanelContent = styled.div`
 const PanelText = styled.div`
   font-size: 0.875rem;
   font-weight: 600;
-  color: #1f2937;
+  color: var(--text);
 `;
 
 const CompareButton = styled.button`
-  background: #15803d;
+  background: var(--primary-hover);
   color: white;
   border: none;
   padding: 0.5rem 1rem;
@@ -459,28 +488,24 @@ const CompareButton = styled.button`
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 
   &:hover {
-    background: #166534;
+    background: var(--primary-hover);
     transform: translateY(-1px);
   }
 `;
 
 const ClearFiltersIconButton = styled(FilterButton)`
-  width: 44px;
-  min-width: 44px;
-  padding: 0;
-  justify-content: center;
+  white-space: nowrap;
+  flex-shrink: 0;
 
   @media (max-width: 768px) {
-    width: 100%;
-    min-width: 0;
-    padding: 0.7rem 1rem;
+    width: auto;
   }
 `;
 
 // Component
 const CatalogPage: React.FC = () => {
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
+  const searchParams = useSearch({ strict: false }) as Record<string, string>;
   const { rackets, loading } = useRackets();
   const { count } = useComparison();
   const { isAuthenticated } = useAuth();
@@ -493,7 +518,7 @@ const CatalogPage: React.FC = () => {
   const [selectedBrand, setSelectedBrand] = useState('Todas');
   const [showMostViewed, setShowMostViewed] = useState(false);
   const [showOffers, setShowOffers] = useState(false);
-  const [sortBy, setSortBy] = useState('most-viewed');
+  const [sortBy, setSortBy] = useState('name');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [displayCount, setDisplayCount] = useState(9);
   const [loadingMore, setLoadingMore] = useState(false);
@@ -518,18 +543,18 @@ const CatalogPage: React.FC = () => {
 
   // Initialize state from URL params
   useEffect(() => {
-    const queryParam = searchParams.get('search') || '';
-    const brandParam = searchParams.get('brand') || 'Todas';
-    const shapeParam = searchParams.get('shape') || 'Todas';
-    const balanceParam = searchParams.get('balance') || 'Todos';
-    const coreParam = searchParams.get('core') || 'Todos';
-    const faceParam = searchParams.get('face') || 'Todas';
-    const levelParam = searchParams.get('level') || 'Todos';
-    const gameTypeParam = searchParams.get('gameType') || 'Todos';
-    const hardnessParam = searchParams.get('hardness') || 'Todas';
-    const offersParam = searchParams.get('offers');
-    const mostViewedParam = searchParams.get('mostViewed');
-    const sortParam = searchParams.get('sort') || 'most-viewed';
+    const queryParam = searchParams['search'] || '';
+    const brandParam = searchParams['brand'] || 'Todas';
+    const shapeParam = searchParams['shape'] || 'Todas';
+    const balanceParam = searchParams['balance'] || 'Todos';
+    const coreParam = searchParams['core'] || 'Todos';
+    const faceParam = searchParams['face'] || 'Todas';
+    const levelParam = searchParams['level'] || 'Todos';
+    const gameTypeParam = searchParams['gameType'] || 'Todos';
+    const hardnessParam = searchParams['hardness'] || 'Todas';
+    const offersParam = searchParams['offers'];
+    const mostViewedParam = searchParams['mostViewed'];
+    const sortParam = searchParams['sort'] || 'name';
 
     setSearchQuery(queryParam);
     setSelectedBrand(brandParam);
@@ -542,7 +567,7 @@ const CatalogPage: React.FC = () => {
     setSelectedHardness(hardnessParam);
     setShowOffers(offersParam === 'true');
     setShowMostViewed(mostViewedParam === 'true');
-    setShowAvailableOnly(searchParams.get('availableOnly') === 'true');
+    setShowAvailableOnly(searchParams['availableOnly'] === 'true');
     setSortBy(sortParam);
   }, [searchParams]);
 
@@ -562,10 +587,10 @@ const CatalogPage: React.FC = () => {
     if (showOffers) params.set('offers', 'true');
     if (showMostViewed) params.set('mostViewed', 'true');
     if (showAvailableOnly) params.set('availableOnly', 'true');
-    if (sortBy !== 'most-viewed') params.set('sort', sortBy);
+    if (sortBy !== 'name') params.set('sort', sortBy);
 
-    const newUrl = params.toString() ? `?${params.toString()}` : window.location.pathname;
-    navigate(newUrl, { replace: true });
+    const searchObj = Object.fromEntries(params.entries());
+    navigate({ to: '/catalog', search: searchObj, replace: true });
   }, [
     searchQuery,
     selectedBrand,
@@ -623,6 +648,9 @@ const CatalogPage: React.FC = () => {
               sorted.sort((a, b) => {
                 switch (sortBy) {
                   case 'price-low':
+                    const aComp = a.solo_comparacion ? 1 : 0;
+                    const bComp = b.solo_comparacion ? 1 : 0;
+                    if (aComp !== bComp) return aComp - bComp;
                     const priceA = getLowestPrice(a)?.price || a.precio_actual || 0;
                     const priceB = getLowestPrice(b)?.price || b.precio_actual || 0;
                     return priceA - priceB;
@@ -637,7 +665,7 @@ const CatalogPage: React.FC = () => {
                     if (!a.en_oferta && b.en_oferta) return 1;
                     return 0;
                   default:
-                    return (b.view_count || 0) - (a.view_count || 0);
+                    return (a.modelo || '').localeCompare(b.modelo || '');
                 }
               });
             } catch (error) {
@@ -735,6 +763,9 @@ const CatalogPage: React.FC = () => {
         filtered.sort((a, b) => {
           switch (sortBy) {
             case 'price-low':
+              const aIsComparison = a.solo_comparacion ? 1 : 0;
+              const bIsComparison = b.solo_comparacion ? 1 : 0;
+              if (aIsComparison !== bIsComparison) return aIsComparison - bIsComparison;
               const priceA = getLowestPrice(a)?.price || a.precio_actual || 0;
               const priceB = getLowestPrice(b)?.price || b.precio_actual || 0;
               return priceA - priceB;
@@ -746,10 +777,6 @@ const CatalogPage: React.FC = () => {
               const brandA = a.marca || '';
               const brandB = b.marca || '';
               return brandA.localeCompare(brandB);
-            case 'most-viewed':
-              const viewsA = a.view_count || 0;
-              const viewsB = b.view_count || 0;
-              return viewsB - viewsA;
             case 'offer':
               if (a.en_oferta && !b.en_oferta) return -1;
               if (!a.en_oferta && b.en_oferta) return 1;
@@ -904,7 +931,7 @@ rackets,
 
   // Handlers
   const handleRacketClick = (racket: Racket) => {
-    navigate(`/racket-detail?id=${racket.id}`);
+    navigate({ to: '/racket-detail', search: { id: racket.id } });
   };
 
   const handleLoadMore = useCallback(() => {
@@ -947,7 +974,7 @@ rackets,
     setSelectedBrand('Todas');
     setShowMostViewed(false);
     setShowOffers(false);
-    setSortBy('most-viewed');
+    setSortBy('name');
 
     // Clear advanced filters
     setSelectedShape('Todas');
@@ -960,7 +987,7 @@ rackets,
   };
 
   const goToComparison = () => {
-    navigate('/compare-rackets');
+    navigate({ to: '/compare-rackets' });
   };
 
   if (loading) {
@@ -976,14 +1003,14 @@ rackets,
             gap: '1rem',
           }}
         >
-            <motion.div
-            animate={{ rotate: 360 }}
-            transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
-            style={{ color: '#15803d' }}
-          >
+          <div style={{
+            color: 'var(--primary-hover)',
+            animation: 'spin 1s linear infinite',
+          }}>
+            <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
             <FiGrid size={48} />
-          </motion.div>
-          <div style={{ color: '#6b7280', fontSize: '1.125rem' }}>Cargando catálogo...</div>
+          </div>
+          <div style={{ color: 'var(--text-muted)', fontSize: '1.125rem' }}>Cargando catálogo...</div>
         </div>
       </Container>
     );
@@ -991,6 +1018,27 @@ rackets,
 
   return (
     <Container>
+      <SEO
+        title='Catálogo de Palas de Pádel | Compara +800 Modelos'
+        description={`Catálogo de palas de pádel con ${totalRackets} modelos de ${uniqueBrands.length - 1} marcas. Compara peso, balance, forma y precio en PadelNuestro, PadelMarket y PadelProShop.`}
+        canonical={buildUrl('/catalog')}
+        keywords={allKeywords}
+        type='website'
+        schema={[
+          organizationSchema(),
+          websiteSchema(),
+          webPageSchema({
+            name: 'Catálogo de Palas de Pádel — Smashly',
+            description: `Catálogo con ${totalRackets} palas de pádel de las mejores marcas. Compara especificaciones y precios.`,
+            url: buildUrl('/catalog'),
+          }),
+          breadcrumbSchema([
+            { name: 'Inicio', url: buildUrl('/') },
+            { name: 'Catálogo', url: buildUrl('/catalog') },
+          ]),
+          catalogItemListSchema(displayedRackets, buildUrl('/catalog')),
+        ]}
+      />
       {/* Header */}
       <Header>
         <HeaderContent>
@@ -1031,22 +1079,9 @@ rackets,
               />
             </SearchContainer>
 
-            <FilterButton $active={showOffers} onClick={() => setShowOffers(!showOffers)}>
-              <FiTag />
-              Ofertas
-            </FilterButton>
-
-            {/* Filtro de marca como desplegable con estilo de FilterButton */}
-            <FilterSelect value={selectedBrand} onChange={e => setSelectedBrand(e.target.value)}>
-              {uniqueBrands.map(brand => (
-                <option key={brand} value={brand}>
-                  {brand === 'Todas' ? 'Todas las marcas' : brand}
-                </option>
-              ))}
-            </FilterSelect>
-
             <ClearFiltersIconButton onClick={clearFilters}>
               <FiX />
+              Limpiar
             </ClearFiltersIconButton>
           </FiltersRow>
 
@@ -1062,6 +1097,28 @@ rackets,
 
           {/* Advanced Filters Panel */}
           <AdvancedFiltersPanel $isOpen={showAdvancedFilters}>
+                <FilterGroupLabel>Filtros generales</FilterGroupLabel>
+                <QuickFiltersRow>
+                  <FilterSelect value={selectedBrand} onChange={e => setSelectedBrand(e.target.value)}>
+                    {uniqueBrands.map(brand => (
+                      <option key={brand} value={brand}>
+                        {brand === 'Todas' ? 'Todas las marcas' : brand}
+                      </option>
+                    ))}
+                  </FilterSelect>
+
+                  <FilterButton $active={showOffers} onClick={() => setShowOffers(!showOffers)}>
+                    <FiTag />
+                    Ofertas
+                  </FilterButton>
+
+                  <FilterButton $active={showAvailableOnly} onClick={() => setShowAvailableOnly(!showAvailableOnly)}>
+                    <FiFilter size={16} />
+                    En Stock
+                  </FilterButton>
+                </QuickFiltersRow>
+
+                <FilterGroupLabel style={{ marginTop: '1rem' }}>Características técnicas</FilterGroupLabel>
                 <AdvancedFiltersGrid>
                   <FilterSelect
                     value={selectedShape}
@@ -1150,16 +1207,7 @@ rackets,
           </ResultsCount>
 
           <ResultsToolbar>
-            <FilterButton
-              $active={showAvailableOnly}
-              onClick={() => setShowAvailableOnly(!showAvailableOnly)}
-            >
-              <FiFilter size={18} />
-              En Stock
-            </FilterButton>
-
             <SortSelect value={sortBy} onChange={e => setSortBy(e.target.value)}>
-              <option value='most-viewed'>Más vistas primero</option>
               <option value='name'>Ordenar por nombre</option>
               <option value='brand'>Ordenar por marca</option>
               <option value='price-low'>Precio: menor a mayor</option>
@@ -1234,7 +1282,7 @@ rackets,
                 style={{
                   textAlign: 'center',
                   padding: '2rem',
-                  color: '#6b7280',
+                  color: 'var(--text-muted)',
                   fontSize: '0.875rem',
                   fontWeight: 500,
                 }}
@@ -1249,7 +1297,7 @@ rackets,
                 style={{
                   textAlign: 'center',
                   padding: '2rem',
-                  color: '#9ca3af',
+                  color: 'var(--text-subtle)',
                   fontSize: '0.875rem',
                 }}
               >
@@ -1259,23 +1307,15 @@ rackets,
           </>
         )}
       </MainContent>
-      <AnimatePresence>
-        {count > 0 && (
-          <FloatingPanel
-            initial={{ opacity: 0, y: 100 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 100 }}
-          >
-            <PanelContent>
-              <PanelText>
-                {count} pala{count > 1 ? 's' : ''} seleccionada
-                {count > 1 ? 's' : ''} para comparar
-              </PanelText>
-              <CompareButton onClick={goToComparison}>Comparar ahora</CompareButton>
-            </PanelContent>
-          </FloatingPanel>
-        )}
-      </AnimatePresence>
+      <FloatingPanel $visible={count > 0}>
+        <PanelContent>
+          <PanelText>
+            {count} pala{count > 1 ? 's' : ''} seleccionada
+            {count > 1 ? 's' : ''} para comparar
+          </PanelText>
+          <CompareButton onClick={goToComparison}>Comparar ahora</CompareButton>
+        </PanelContent>
+      </FloatingPanel>
       {/* Modal para añadir a listas */}
       {selectedRacket && (
         <AddToListModal

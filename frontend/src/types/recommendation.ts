@@ -30,6 +30,7 @@ export interface AdvancedFormData extends Omit<BasicFormData, 'budget'> {
   likes_current_racket?: string;
   dislikes_current_racket?: string;
   goals: string[];
+  only_in_stock?: boolean;
 
   // Strategic field (Ponderación de Características)
   characteristic_priorities?: Array<

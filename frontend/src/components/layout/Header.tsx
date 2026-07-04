@@ -1,17 +1,19 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { FiMenu, FiSearch, FiX, FiUser, FiLogOut, FiHome, FiGrid, FiBarChart2, FiHelpCircle, FiLogIn, FiUserPlus } from 'react-icons/fi';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { List, MagnifyingGlass, X, User, SignOut, House, GridFour, ChartBar, Question, SignIn, UserPlus } from '@phosphor-icons/react';
+import { Link, useRouterState, useNavigate } from '@tanstack/react-router';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
+import Button from '../common/Button';
 import { useAuth } from '../../contexts/AuthContext';
 import { useAuthModal } from '../../contexts/AuthModalContext';
 import GlobalSearch from '../features/GlobalSearch';
 import { NotificationBell, MobileNotificationBell } from '../notifications/NotificationBell';
+import ThemeToggle from '../common/ThemeToggle';
 
 const HeaderContainer = styled.header`
-  background: #15803d;
+  background: var(--header-bg);
   padding: 0;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 1px 3px var(--shadow-color), 0 1px 2px var(--shadow-color);
   position: sticky;
   top: 0;
   z-index: 350;
@@ -21,7 +23,7 @@ const HeaderContainer = styled.header`
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 
   @media (max-width: 768px) {
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 2px 8px var(--shadow-color);
   }
 `;
 
@@ -57,11 +59,11 @@ const Logo = styled(Link)`
     transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 
     @media (max-width: 768px) {
-      height: 40px;
+      height: 48px;
     }
 
     @media (max-width: 480px) {
-      height: 36px;
+      height: 44px;
     }
   }
 
@@ -102,8 +104,8 @@ const MobileElements = styled.div`
 const MobileSearchButton = styled.button`
   background: none;
   border: none;
-  color: white;
-  font-size: 1.1rem;
+  color: var(--brand-on-surface);
+  font-size: 1.25rem;
   cursor: pointer;
   min-width: 40px;
   min-height: 40px;
@@ -137,13 +139,14 @@ const MobileMenuDropdown = styled(motion.div)<{ $isOpen: boolean }>`
   top: 100%;
   left: 0;
   right: 0;
-  background: white;
+  background: var(--surface);
   border-radius: 0 0 20px 20px;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 20px 40px var(--shadow-color);
   z-index: 100;
   overflow: hidden;
   max-height: min(85dvh, 720px);
   overflow-y: auto;
+  height: auto;
   border: 1px solid rgba(0, 0, 0, 0.04);
   border-top: none;
   
@@ -180,14 +183,14 @@ const MobileNavSection = styled.div`
 const MobileNavTitle = styled.h4`
   font-size: 0.7rem;
   font-weight: 700;
-  color: #9ca3af;
+  color: var(--text-subtle);
   margin: 0 0 0.75rem 0.5rem;
   text-transform: uppercase;
   letter-spacing: 1.5px;
 `;
 
 const NavLink = styled(Link)<{ $isActive: boolean; $isMobile?: boolean }>`
-  color: ${props => (props.$isMobile ? '#374151' : 'white')};
+  color: ${props => (props.$isMobile ? 'var(--text)' : 'var(--brand-on-surface)')};
   text-decoration: none;
   font-weight: 500;
   padding: ${props => (props.$isMobile ? '12px 16px' : '8px 16px')};
@@ -205,25 +208,25 @@ const NavLink = styled(Link)<{ $isActive: boolean; $isMobile?: boolean }>`
   ${props =>
     props.$isMobile &&
     `
-    background: ${props.$isActive ? 'rgba(22, 163, 74, 0.06)' : 'transparent'};
-    color: ${props.$isActive ? '#15803d' : '#374151'};
+    background: ${props.$isActive ? 'rgba(var(--primary-rgb), 0.06)' : 'transparent'};
+    color: ${props.$isActive ? 'var(--primary-hover)' : 'var(--text)'};
     font-weight: ${props.$isActive ? '600' : '500'};
     
     svg {
-      color: ${props.$isActive ? '#15803d' : '#9ca3af'};
+      color: ${props.$isActive ? 'var(--primary-hover)' : 'var(--text-subtle)'};
       font-size: 1.1rem;
       transition: color 0.2s ease;
     }
   `}
 
   &:hover {
-    background: ${props => (props.$isMobile ? '#f9fafb' : 'rgba(255, 255, 255, 0.08)')};
-    color: ${props => (props.$isMobile ? '#15803d' : 'white')};
+    background: ${props => (props.$isMobile ? 'var(--surface-2)' : 'rgba(255, 255, 255, 0.08)')};
+    color: ${props => (props.$isMobile ? 'var(--primary-hover)' : 'var(--brand-on-surface)')};
     text-decoration: none;
     transform: ${props => (props.$isMobile ? 'translateX(3px)' : 'none')};
     
     svg {
-      color: #15803d;
+      color: var(--primary-hover);
     }
   }
 
@@ -236,8 +239,8 @@ const MobileMenuButton = styled.button`
   display: none;
   background: none;
   border: none;
-  color: white;
-  font-size: 1.3rem;
+  color: var(--brand-on-surface);
+  font-size: 1.25rem;
   cursor: pointer;
   min-width: 40px;
   min-height: 40px;
@@ -279,83 +282,7 @@ const AuthButtons = styled.div`
   }
 `;
 
-const AuthButton = styled.button<{
-  $variant?: 'primary' | 'secondary';
-  $isMobile?: boolean;
-}>`
-  padding: ${props => (props.$isMobile ? '12px 16px' : '7px 18px')};
-  border-radius: ${props => (props.$isMobile ? '12px' : '8px')};
-  font-weight: 600;
-  text-decoration: none;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  text-align: center;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  cursor: pointer;
-  border: none;
-  font-size: 0.875rem;
-  font-family: inherit;
-  width: ${props => (props.$isMobile ? '100%' : 'auto')};
-  letter-spacing: -0.01em;
 
-  ${props => {
-    if (props.$isMobile) {
-      return props.$variant === 'primary'
-        ? `
-        background: #15803d;
-        color: white;
-        box-shadow: 0 2px 8px rgba(21, 128, 61, 0.2);
-        
-        &:hover {
-          background: #166534;
-          transform: translateY(-1px);
-          box-shadow: 0 4px 12px rgba(21, 128, 61, 0.25);
-          color: white;
-        }
-      `
-        : `
-        background: white;
-        color: #374151;
-        border: 1.5px solid #e5e7eb;
-        
-        &:hover {
-          background: #f9fafb;
-          border-color: #15803d;
-          color: #15803d;
-        }
-      `;
-    } else {
-      return props.$variant === 'primary'
-        ? `
-        background: white;
-        color: #15803d;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-        
-        &:hover {
-          background: #f0fdf4;
-          transform: translateY(-1px);
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-        }
-      `
-        : `
-        background: transparent;
-        color: white;
-        border: 1.5px solid rgba(255, 255, 255, 0.25);
-        
-        &:hover {
-          background: rgba(255, 255, 255, 0.08);
-          border-color: rgba(255, 255, 255, 0.4);
-        }
-      `;
-    }
-  }}
-
-  &:active {
-    transform: scale(0.97) translateY(0);
-  }
-`;
 
 const LogoutButton = styled.button<{
   $variant?: 'primary' | 'secondary';
@@ -374,28 +301,28 @@ const LogoutButton = styled.button<{
   cursor: pointer;
   border: none;
   background: transparent;
-  color: white;
+  color: var(--brand-on-surface);
   font-size: 0.875rem;
   font-family: inherit;
 
   &:hover {
     background: rgba(255, 255, 255, 0.08);
-    color: white;
+    color: var(--brand-on-surface);
     text-decoration: none;
   }
 
   ${props =>
     props.$isMobile &&
     `
-    background: white;
-    color: #374151;
-    border: 1.5px solid #e5e7eb;
+    background: var(--surface);
+    color: var(--text);
+    border: 1.5px solid var(--border);
     width: 100%;
     
     &:hover {
-      background: #f9fafb;
-      border-color: #dc2626;
-      color: #dc2626;
+      background: var(--surface-2);
+      border-color: var(--danger);
+      color: var(--danger);
       text-decoration: none;
     }
   `}
@@ -417,7 +344,7 @@ const AvatarButton = styled.button`
   height: 36px;
   border-radius: 50%;
   border: 2px solid rgba(255, 255, 255, 0.3);
-  background: white;
+  background: var(--surface);
   cursor: pointer;
   overflow: hidden;
   display: flex;
@@ -429,7 +356,7 @@ const AvatarButton = styled.button`
   &:hover {
     transform: scale(1.05);
     border-color: rgba(255, 255, 255, 0.6);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 2px 8px var(--shadow-color);
   }
 
   &:active {
@@ -443,7 +370,7 @@ const AvatarButton = styled.button`
   }
 
   svg {
-    color: #15803d;
+    color: var(--primary-hover);
     font-size: 18px;
   }
 `;
@@ -452,9 +379,9 @@ const UserDropdown = styled.div<{ $isOpen: boolean }>`
   position: absolute;
   top: calc(100% + 10px);
   right: 0;
-  background: white;
+  background: var(--surface);
   border-radius: 12px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 10px 40px var(--shadow-color);
   min-width: 200px;
   opacity: ${props => (props.$isOpen ? '1' : '0')};
   visibility: ${props => (props.$isOpen ? 'visible' : 'hidden')};
@@ -471,7 +398,7 @@ const UserDropdown = styled.div<{ $isOpen: boolean }>`
     right: 14px;
     width: 12px;
     height: 12px;
-    background: white;
+    background: var(--surface);
     transform: rotate(45deg);
     border-left: 1px solid rgba(0, 0, 0, 0.04);
     border-top: 1px solid rgba(0, 0, 0, 0.04);
@@ -486,7 +413,7 @@ const DropdownItem = styled.button`
   text-align: left;
   font-size: 0.875rem;
   font-weight: 500;
-  color: #374151;
+  color: var(--text);
   cursor: pointer;
   transition: all 0.15s ease;
   display: flex;
@@ -496,8 +423,8 @@ const DropdownItem = styled.button`
   z-index: 1;
 
   &:hover {
-    background: #f9fafb;
-    color: #15803d;
+    background: var(--surface-2);
+    color: var(--primary-hover);
   }
 
   &:first-child {
@@ -506,30 +433,30 @@ const DropdownItem = styled.button`
 
   &:last-child {
     border-radius: 0 0 12px 12px;
-    color: #dc2626;
+    color: var(--danger);
     
     &:hover {
-      background: #fef2f2;
-      color: #b91c1c;
+      background: var(--surface-2);
+      color: var(--danger);
     }
   }
 
   svg {
     font-size: 18px;
-    color: #9ca3af;
+    color: var(--text-subtle);
     transition: color 0.15s ease;
   }
 
   &:hover svg {
-    color: #15803d;
+    color: var(--primary-hover);
   }
 
   &:last-child svg {
-    color: #ef4444;
+    color: var(--error);
   }
 
   &:last-child:hover svg {
-    color: #b91c1c;
+    color: var(--danger);
   }
 `;
 
@@ -543,7 +470,7 @@ const Header: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
-  const location = useLocation();
+  const { location } = useRouterState();
   const { userProfile, signOut } = useAuth();
   const { openLogin, openRegister } = useAuthModal();
   const navigate = useNavigate();
@@ -599,6 +526,7 @@ const Header: React.FC = () => {
         </CentralSearchContainer>
 
         <AuthButtons>
+          <ThemeToggle variant='onBrand' />
           {userProfile ? (
             <UserMenuContainer ref={userMenuRef}>
               <NotificationBell />
@@ -606,17 +534,17 @@ const Header: React.FC = () => {
                 {userProfile.avatar_url ? (
                   <img src={userProfile.avatar_url} alt='Avatar' />
                 ) : (
-                  <FiUser />
+                  <User />
                 )}
               </AvatarButton>
               <UserDropdown $isOpen={isUserMenuOpen}>
                 <DropdownItem
                   onClick={() => {
-                    navigate('/profile');
+                    navigate({ to: '/profile' });
                     setIsUserMenuOpen(false);
                   }}
                 >
-                  <FiUser />
+                  <User />
                   Mi cuenta
                 </DropdownItem>
                 <Divider />
@@ -624,33 +552,34 @@ const Header: React.FC = () => {
                   onClick={async () => {
                     await signOut();
                     setIsUserMenuOpen(false);
-                    navigate('/');
+                    navigate({ to: '/' });
                   }}
                 >
-                  <FiLogOut />
+                  <SignOut />
                   Cerrar sesión
                 </DropdownItem>
               </UserDropdown>
             </UserMenuContainer>
           ) : (
             <>
-              <AuthButton onClick={openLogin} $variant='secondary'>
+              <Button variant='ghost' $inverse onClick={openLogin}>
                 Iniciar sesión
-              </AuthButton>
-              <AuthButton onClick={openRegister} $variant='primary'>
+              </Button>
+              <Button variant='secondary' $inverse onClick={openRegister}>
                 Registrarse
-              </AuthButton>
+              </Button>
             </>
           )}
         </AuthButtons>
 
         <MobileElements>
           <MobileNotificationBell />
+          <ThemeToggle variant='onBrand' />
           <MobileSearchButton onClick={toggleMobileSearch} aria-label="Buscar">
-            <FiSearch />
+            <MagnifyingGlass />
           </MobileSearchButton>
           <MobileMenuButton onClick={toggleMenu} aria-label={isMenuOpen ? 'Cerrar menú' : 'Abrir menú'}>
-            {isMenuOpen ? <FiX /> : <FiMenu />}
+            {isMenuOpen ? <X /> : <List />}
           </MobileMenuButton>
         </MobileElements>
 
@@ -668,15 +597,13 @@ const Header: React.FC = () => {
 
           <div
             style={{
-              opacity: isMenuOpen ? 1 : 0,
-              transition: 'opacity 0.2s ease',
-              pointerEvents: isMenuOpen ? 'auto' : 'none',
+              display: isMenuOpen ? 'block' : 'none',
             }}
           >
             <MobileNavSection>
               <MobileNavTitle>Navegación</MobileNavTitle>
               <NavLink to='/' $isActive={isActive('/')} $isMobile onClick={closeAllMenus}>
-                <FiHome />
+                <House />
                 Inicio
               </NavLink>
               <NavLink
@@ -685,7 +612,7 @@ const Header: React.FC = () => {
                 $isMobile
                 onClick={closeAllMenus}
               >
-                <FiGrid />
+                <GridFour />
                 Catálogo de Palas
               </NavLink>
               <NavLink
@@ -694,7 +621,7 @@ const Header: React.FC = () => {
                 $isMobile
                 onClick={closeAllMenus}
               >
-                <FiBarChart2 />
+                <ChartBar />
                 Comparar palas
               </NavLink>
               <NavLink
@@ -703,7 +630,7 @@ const Header: React.FC = () => {
                 $isMobile
                 onClick={closeAllMenus}
               >
-                <FiHelpCircle />
+                <Question />
                 FAQ
               </NavLink>
             </MobileNavSection>
@@ -718,7 +645,7 @@ const Header: React.FC = () => {
                     $isMobile
                     onClick={closeAllMenus}
                   >
-                    <FiUser />
+                    <User />
                     Mi cuenta
                   </NavLink>
                   <LogoutButton
@@ -727,38 +654,38 @@ const Header: React.FC = () => {
                     onClick={async () => {
                       await signOut();
                       closeAllMenus();
-                      navigate('/');
+                      navigate({ to: '/' });
                     }}
                     style={{ cursor: 'pointer', marginTop: '0.5rem', width: '100%' }}
                   >
-                    <FiLogOut style={{ marginRight: '8px' }} />
+                    <SignOut style={{ marginRight: '8px' }} />
                     Cerrar sesión
                   </LogoutButton>
                 </>
               ) : (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                  <AuthButton
-                    $variant='secondary'
-                    $isMobile
+                  <Button
+                    variant='secondary'
                     onClick={() => {
                       closeAllMenus();
                       openLogin();
                     }}
+                    style={{ width: '100%' }}
                   >
-                    <FiLogIn />
+                    <SignIn />
                     Iniciar sesión
-                  </AuthButton>
-                  <AuthButton
-                    $variant='primary'
-                    $isMobile
+                  </Button>
+                  <Button
+                    variant='primary'
                     onClick={() => {
                       closeAllMenus();
                       openRegister();
                     }}
+                    style={{ width: '100%' }}
                   >
-                    <FiUserPlus />
+                    <UserPlus />
                     Registrarse
-                  </AuthButton>
+                  </Button>
                 </div>
               )}
             </MobileNavSection>

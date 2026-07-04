@@ -27,7 +27,7 @@ export const API_ENDPOINTS = {
   RACKETS_BULK_UPDATE: '/api/v1/rackets/bulk-update',
   RACKETS_BY_BRAND: (brand: string) => `/api/v1/rackets/brands/${brand}`,
   RACKETS_PRICE_HISTORY: (id: number) => `/api/v1/rackets/${id}/price-history`,
-  RECOMMENDATION_RAG: '/api/v1/recommendations/generate-rag',
+  RECOMMENDATION_RAG: '/api/recommendations/generate-rag',
 
   // Users
   USERS_PROFILE: '/api/v1/users/profile',
@@ -50,15 +50,15 @@ export const API_ENDPOINTS = {
 
   // Admin
   ADMIN: {
-    METRICS: '/api/v1/admin/metrics',
-    USERS: '/api/v1/admin/users',
+    METRICS: '/api/admin/metrics',
+    USERS: '/api/admin/users',
     RACKET_REQUESTS: '/api/v1/admin/racket-requests',
     STORE_REQUESTS: '/api/v1/admin/store-requests',
     RECENT_ACTIVITY: '/api/v1/admin/recent-activity',
     BRANDS: '/api/v1/admin/brands',
     CATEGORIES: '/api/v1/admin/categories',
-    VERIFY_STORE: (id: string) => `/api/v1/admin/stores/${id}/verify`,
-    REJECT_STORE: (id: string) => `/api/v1/admin/stores/${id}/reject`,
+    VERIFY_STORE: (id: string) => `/api/admin/stores/${id}`,
+    REJECT_STORE: (id: string) => `/api/admin/stores/${id}`,
     CONFLICTS: '/api/v1/admin/rackets/conflicts',
     RESOLVE_CONFLICT: (id: number) => `/api/v1/admin/rackets/${id}/resolve`,
     EMBEDDING_STATS: '/api/v1/admin/embeddings/stats',

@@ -1,10 +1,11 @@
 import React from "react";
-import { FiHeart, FiMail } from "react-icons/fi";
+import { Heart, Envelope } from "@phosphor-icons/react";
 import { FaInstagram, FaTiktok } from "react-icons/fa";
+import { Link } from "@tanstack/react-router";
 import styled from "styled-components";
 
 const FooterContainer = styled.footer`
-  background: #1f2937;
+  background: var(--footer-bg);
   color: white;
   padding: 3rem 0 1.5rem;
   margin-top: auto;
@@ -17,7 +18,7 @@ const FooterContent = styled.div`
 `;
 
 const FooterBottom = styled.div`
-  border-top: 1px solid #374151;
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
   padding-top: 1.5rem;
   display: flex;
   justify-content: space-between;
@@ -33,7 +34,7 @@ const FooterBottom = styled.div`
 `;
 
 const Copyright = styled.p`
-  color: #9ca3af;
+  color: rgba(255, 255, 255, 0.75);
   margin: 0;
   display: flex;
   align-items: center;
@@ -52,15 +53,15 @@ const SocialLinks = styled.div`
   gap: 1rem;
 
   a {
-    color: #9ca3af;
+    color: rgba(255, 255, 255, 0.75);
     font-size: 1.25rem;
     transition: all 0.2s ease;
     padding: 8px;
     border-radius: 8px;
 
     &:hover {
-      color: #16a34a;
-      background: rgba(255, 255, 255, 0.05);
+      color: var(--brand-on-surface);
+      background: rgba(255, 255, 255, 0.1);
     }
   }
 
@@ -74,15 +75,41 @@ const SocialLinks = styled.div`
   }
 `;
 
+const LegalLinks = styled.div`
+  display: flex;
+  gap: 1.5rem;
+
+  a {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.85rem;
+    transition: color 0.2s;
+    text-decoration: none;
+
+    &:hover {
+      color: var(--brand-on-surface);
+      text-decoration: underline;
+    }
+  }
+
+  @media (max-width: 768px) {
+    justify-content: center;
+  }
+`;
+
 const Footer: React.FC = () => {
   return (
     <FooterContainer>
       <FooterContent>
         <FooterBottom>
           <Copyright>
-            © 2025 Smashly. Hecho con <FiHeart color="#ef4444" /> para los
+            © 2025 Smashly. Hecho con <Heart color="var(--error)" /> para los
             amantes del pádel.
           </Copyright>
+
+          <LegalLinks>
+            <Link to='/privacy-policy'>Política de Privacidad</Link>
+            <Link to='/terms-and-conditions'>Términos y Condiciones</Link>
+          </LegalLinks>
 
           <SocialLinks>
             <a
@@ -102,7 +129,7 @@ const Footer: React.FC = () => {
               <FaTiktok />
             </a>
             <a href="mailto:hello@smashly.app" aria-label="Enviar correo">
-              <FiMail />
+              <Envelope />
             </a>
           </SocialLinks>
         </FooterBottom>

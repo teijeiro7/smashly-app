@@ -12,32 +12,47 @@ import {
 import { RacketComparisonData } from '../../types/racket';
 import { FiCheckCircle } from 'react-icons/fi';
 
+const toTitleCase = (str: string): string =>
+  str.replace(/\w\S*/g, word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase());
+
 interface RacketRadarChartProps {
   metrics: RacketComparisonData[];
 }
 
 const ChartContainer = styled.div`
-  background: white;
+  background: var(--surface);
   border-radius: 16px;
   padding: 2rem;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4px 20px var(--shadow-color);
   margin: 2rem 0;
   will-change: contents;
   transform: translateZ(0);
+
+  @media (max-width: 768px) {
+    padding: 1rem 0.75rem;
+  }
 `;
 
 const ChartSubtitle = styled.div`
   font-size: 0.875rem;
-  color: #6b7280;
+  color: var(--text-muted);
   text-align: center;
-  margin-bottom: 2rem;
+  margin-bottom: 0.75rem;
   display: flex;
   justify-content: center;
   gap: 1rem;
 `;
 
+const RadarWrapper = styled.div`
+  height: 400px;
+
+  @media (max-width: 768px) {
+    height: 260px;
+  }
+`;
+
 // Colores para hasta 3 palas
-const COLORS = ['#16a34a', '#3b82f6', '#f59e0b'];
+const COLORS = ['var(--primary)', 'var(--info)', 'var(--accent)'];
 
 // Tooltip personalizado
 const CustomTooltip = memo(({ active, payload, metrics }: any) => {
@@ -48,14 +63,16 @@ const CustomTooltip = memo(({ active, payload, metrics }: any) => {
   return (
     <div
       style={{
-        background: 'white',
+        background: 'var(--surface)',
         padding: '12px',
         borderRadius: '8px',
         boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-        border: '1px solid #e5e7eb',
+        border: '1px solid var(--border)',
       }}
     >
-      <p style={{ margin: 0, fontWeight: 600, marginBottom: '8px' }}>{payload[0].payload.metric}</p>
+      <p style={{ margin: 0, fontWeight: 600, marginBottom: '8px' }}>
+        {({'S. Bola': 'Salida de Bola', 'Manej.': 'Manejabilidad', 'P. Dulce': 'Punto Dulce'} as Record<string, string>)[payload[0].payload.metric] ?? payload[0].payload.metric}
+      </p>
       {payload.map((entry: any, index: number) => {
         const racket = metrics[index];
         return (
@@ -71,7 +88,7 @@ const CustomTooltip = memo(({ active, payload, metrics }: any) => {
             }}
           >
             {racket?.racketName}: <strong>{entry.value}/10</strong>
-            {racket?.isCertified && <FiCheckCircle color='#16a34a' size={12} />}
+            {racket?.isCertified && <FiCheckCircle color='var(--primary)' size={12} />}
           </p>
         );
       })}
@@ -89,7 +106,7 @@ const Legend = memo(({ metrics }: { metrics: RacketComparisonData[] }) => {
         display: 'flex',
         justifyContent: 'center',
         gap: '1.5rem',
-        marginTop: '1rem',
+        marginTop: '0.25rem',
         flexWrap: 'wrap',
       }}
     >
@@ -113,17 +130,17 @@ const Legend = memo(({ metrics }: { metrics: RacketComparisonData[] }) => {
           <span
             style={{
               fontSize: '0.875rem',
-              color: '#374151',
+              color: 'var(--text)',
               fontWeight: 500,
               display: 'flex',
               alignItems: 'center',
               gap: '4px',
             }}
           >
-            {racket.racketName}
+            {toTitleCase(racket.racketName)}
             {racket.isCertified && (
               <span title='Datos certificados por Testea Padel'>
-                <FiCheckCircle color='#16a34a' size={14} />
+                <FiCheckCircle color='var(--primary)' size={14} />
               </span>
             )}
           </span>
@@ -155,21 +172,21 @@ const RacketRadarChart: React.FC<RacketRadarChartProps> = ({ metrics }) => {
         }, {} as any),
       },
       {
-        metric: 'Salida de Bola',
+        metric: 'S. Bola',
         ...metrics.reduce((acc, racket, idx) => {
           acc[`pala${idx + 1}`] = Number(racket.radarData?.salidaDeBola) || 0;
           return acc;
         }, {} as any),
       },
       {
-        metric: 'Manejabilidad',
+        metric: 'Manej.',
         ...metrics.reduce((acc, racket, idx) => {
           acc[`pala${idx + 1}`] = Number(racket.radarData?.manejabilidad) || 0;
           return acc;
         }, {} as any),
       },
       {
-        metric: 'Punto Dulce',
+        metric: 'P. Dulce',
         ...metrics.reduce((acc, racket, idx) => {
           acc[`pala${idx + 1}`] = Number(racket.radarData?.puntoDulce) || 0;
           return acc;
@@ -191,7 +208,7 @@ const RacketRadarChart: React.FC<RacketRadarChartProps> = ({ metrics }) => {
             display: 'flex',
             alignItems: 'center',
             gap: '4px',
-            color: '#16a34a',
+            color: 'var(--primary)',
             fontWeight: 500,
           }}
         >
@@ -199,24 +216,25 @@ const RacketRadarChart: React.FC<RacketRadarChartProps> = ({ metrics }) => {
         </span>
       </ChartSubtitle>
 
-      <ResponsiveContainer width='100%' height={400}>
-        <RadarChart data={chartData}>
-          <PolarGrid strokeDasharray='3 3' stroke='#e5e7eb' />
+      <RadarWrapper>
+      <ResponsiveContainer width='100%' height='100%'>
+        <RadarChart data={chartData} outerRadius='75%' margin={{ top: 10, right: 40, bottom: 10, left: 40 }}>
+          <PolarGrid strokeDasharray='3 3' stroke='var(--border)' />
           <PolarAngleAxis
             dataKey='metric'
-            tick={{ fill: '#374151', fontSize: 13, fontWeight: 600 }}
+            tick={{ fill: 'var(--text)', fontSize: 12, fontWeight: 600 }}
           />
           <PolarRadiusAxis
             angle={90}
             domain={[0, 10]}
-            tick={{ fill: '#9ca3af', fontSize: 10 }}
+            tick={{ fill: 'var(--text-subtle)', fontSize: 10 }}
             tickCount={6}
           />
           <Tooltip content={<CustomTooltip metrics={metrics} />} />
           {metrics.map((racket, index) => (
             <Radar
               key={index}
-              name={racket.racketName}
+              name={toTitleCase(racket.racketName)}
               dataKey={`pala${index + 1}`}
               stroke={COLORS[index]}
               fill={COLORS[index]}
@@ -227,6 +245,8 @@ const RacketRadarChart: React.FC<RacketRadarChartProps> = ({ metrics }) => {
           ))}
         </RadarChart>
       </ResponsiveContainer>
+      </RadarWrapper>
+
       <Legend metrics={metrics} />
     </ChartContainer>
   );

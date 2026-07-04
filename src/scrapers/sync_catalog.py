@@ -50,6 +50,7 @@ from .padelproshop_scraper import PadelProShopScraper
 from .padelmarket_scraper import PadelMarketScraper
 from .racket_manager import RacketManager
 from .paddle_normalizer import normalize_paddle_name, slugify_paddle
+from .deduplicate_rackets import run as run_deduplication
 
 # ── Configuración ─────────────────────────────────────────────────────────────
 
@@ -537,6 +538,13 @@ async def run_full_sync(
     print(f"   Nuevas en price_hist:  {total_new}")
     print(f"   Actualizadas:          {total_updated}")
     print(f"{'='*60}\n")
+
+    # Deduplicar tras cada full sync para eliminar variantes de nombre (ej. "by player")
+    if supabase:
+        print(f"\n{'─'*50}")
+        print("🔁 Deduplicando catálogo...")
+        run_deduplication(dry_run=dry_run)
+        print(f"{'─'*50}\n")
 
 
 # ── Modo PRICES con Concurrencia ────────────────────────────────────────────────

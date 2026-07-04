@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { motion } from 'framer-motion';
 import { FiCamera, FiUpload, FiX } from 'react-icons/fi';
 import { sileo } from 'sileo';
+import Button from '../common/Button';
 
 const AvatarContainer = styled.div`
   position: relative;
@@ -15,8 +16,8 @@ const AvatarWrapper = styled(motion.div)<{ $size?: number }>`
   border-radius: 50%;
   overflow: hidden;
   position: relative;
-  background: linear-gradient(135deg, #16a34a20, #16a34a10);
-  border: 3px solid white;
+  background: linear-gradient(135deg, rgba(var(--primary-rgb), 0.20), rgba(var(--primary-rgb), 0.10));
+  border: 3px solid var(--surface);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
 `;
 
@@ -34,8 +35,8 @@ const AvatarFallback = styled.div<{ $size?: number }>`
   justify-content: center;
   font-size: ${props => (props.$size || 120) / 2.5}px;
   font-weight: 700;
-  color: white;
-  background: linear-gradient(135deg, #16a34a20, #16a34a08);
+  color: var(--brand-on-surface);
+  background: linear-gradient(135deg, rgba(var(--primary-rgb), 0.20), rgba(var(--primary-rgb), 0.08));
 `;
 
 const UploadButton = styled(motion.button)`
@@ -45,9 +46,9 @@ const UploadButton = styled(motion.button)`
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  background: #16a34a;
-  color: white;
-  border: 2px solid white;
+  background: var(--brand-surface);
+  color: var(--brand-on-surface);
+  border: 2px solid var(--surface);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -55,7 +56,7 @@ const UploadButton = styled(motion.button)`
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 
   &:hover {
-    background: #334155;
+    background: var(--brand-surface-hover);
   }
 `;
 
@@ -74,7 +75,7 @@ const Overlay = styled(motion.div)`
 `;
 
 const Modal = styled(motion.div)`
-  background: white;
+  background: var(--surface);
   border-radius: 16px;
   padding: 1.5rem;
   max-width: 400px;
@@ -84,7 +85,7 @@ const Modal = styled(motion.div)`
 const ModalTitle = styled.h3`
   font-size: 1.125rem;
   font-weight: 600;
-  color: #16a34a;
+  color: var(--primary);
   margin-bottom: 1rem;
 `;
 
@@ -99,7 +100,7 @@ const PreviewImage = styled.img`
   border-radius: 50%;
   object-fit: cover;
   margin-bottom: 1rem;
-  border: 3px solid #e2e8f0;
+  border: 3px solid var(--border);
 `;
 
 const ModalActions = styled.div`
@@ -108,28 +109,7 @@ const ModalActions = styled.div`
   justify-content: flex-end;
 `;
 
-const Button = styled.button<{ $variant?: 'primary' | 'secondary' }>`
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.625rem 1.25rem;
-  border-radius: 8px;
-  font-size: 0.875rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  border: none;
 
-  ${props => props.$variant === 'primary' ? `
-    background: #16a34a;
-    color: white;
-    &:hover { background: #15803d; }
-  ` : `
-    background: #f1f5f9;
-    color: #64748b;
-    &:hover { background: #e2e8f0; }
-  `}
-`;
 
 interface ProfileAvatarProps {
   currentAvatar?: string | null;
@@ -258,16 +238,16 @@ const ProfileAvatar: React.FC<ProfileAvatarProps> = ({
               {preview && (
                 <PreviewImage src={preview} alt="Preview" />
               )}
-              <p style={{ color: '#64748b', fontSize: '0.875rem' }}>
+              <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem' }}>
                 ¿Quieres usar esta foto como imagen de perfil?
               </p>
             </ModalContent>
             <ModalActions>
-              <Button onClick={handleCancel}>
+              <Button variant='ghost' size='sm' onClick={handleCancel}>
                 <FiX size={16} />
                 Cancelar
               </Button>
-              <Button $variant="primary" onClick={handleUpload} disabled={uploading}>
+              <Button variant='primary' size='sm' onClick={handleUpload} disabled={uploading}>
                 <FiUpload size={16} />
                 {uploading ? 'Subiendo...' : 'Confirmar'}
               </Button>

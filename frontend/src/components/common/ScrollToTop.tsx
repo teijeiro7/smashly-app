@@ -1,12 +1,9 @@
 import { useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useRouterState } from '@tanstack/react-router';
 
-/**
- * ScrollToTop component
- * Automatically scrolls to the top of the page when the route changes
- */
 export const ScrollToTop = () => {
-  const { pathname } = useLocation();
+  const { location } = useRouterState();
+  const { pathname } = location;
 
   useEffect(() => {
     // Scroll to top when pathname changes

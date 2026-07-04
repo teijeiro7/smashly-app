@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { FiCompass, FiHelpCircle, FiHome, FiLayers, FiUser, FiX, FiLogIn } from 'react-icons/fi';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Compass, Question, House, Stack, User, X, SignIn } from '@phosphor-icons/react';
+import { Link, useRouterState, useNavigate } from '@tanstack/react-router';
 import styled from 'styled-components';
 import { motion, AnimatePresence } from 'framer-motion';
+import Button from '../common/Button';
 import { useAuth } from '../../contexts/AuthContext';
 import { useAuthModal } from '../../contexts/AuthModalContext';
 
@@ -13,10 +14,10 @@ const NavShell = styled.nav`
   bottom: 0;
   z-index: 380;
   display: none;
-  background: rgba(255, 255, 255, 0.95);
+  background: var(--surface-overlay);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  border-top: 1px solid #d9e8dc;
+  border-top: 1px solid var(--primary-faint);
   box-shadow: 0 -12px 30px rgba(17, 24, 39, 0.08);
   will-change: transform;
   transform: translateZ(0);
@@ -24,7 +25,7 @@ const NavShell = styled.nav`
   @media (hover: none) and (pointer: coarse) {
     backdrop-filter: none;
     -webkit-backdrop-filter: none;
-    background: white;
+    background: var(--surface);
   }
   padding: 8px 10px calc(8px + env(safe-area-inset-bottom, 0));
 
@@ -75,14 +76,14 @@ const navItemStyles = `
 
 const NavItemLink = styled(Link)<{ $active: boolean }>`
   ${navItemStyles}
-  color: ${props => (props.$active ? '#0f6e38' : '#4b5563')};
-  background: ${props => (props.$active ? '#eaf8ee' : 'transparent')};
+  color: ${props => (props.$active ? 'var(--primary-hover)' : 'var(--text)')};
+  background: ${props => (props.$active ? 'var(--primary-subtle)' : 'transparent')};
 `;
 
 const NavItemButton = styled.button<{ $active: boolean }>`
   ${navItemStyles}
-  color: ${props => (props.$active ? '#0f6e38' : '#4b5563')};
-  background: ${props => (props.$active ? '#eaf8ee' : 'transparent')};
+  color: ${props => (props.$active ? 'var(--primary-hover)' : 'var(--text)')};
+  background: ${props => (props.$active ? 'var(--primary-subtle)' : 'transparent')};
 `;
 
 const PopupOverlay = styled(motion.div)`
@@ -101,7 +102,7 @@ const PopupOverlay = styled(motion.div)`
 `;
 
 const PopupCard = styled(motion.div)`
-  background: white;
+  background: var(--surface);
   border-radius: 20px;
   padding: 1.5rem;
   width: 100%;
@@ -112,7 +113,7 @@ const PopupCard = styled(motion.div)`
 const PopupTitle = styled.h3`
   font-size: 1.1rem;
   font-weight: 700;
-  color: #111827;
+  color: var(--text);
   margin-bottom: 0.5rem;
   display: flex;
   align-items: center;
@@ -121,7 +122,7 @@ const PopupTitle = styled.h3`
 
 const PopupText = styled.p`
   font-size: 0.9rem;
-  color: #6b7280;
+  color: var(--text-muted);
   line-height: 1.5;
   margin-bottom: 1.25rem;
 `;
@@ -132,41 +133,7 @@ const PopupButtons = styled.div`
   gap: 0.75rem;
 `;
 
-const PrimaryButton = styled.button`
-  background: #16a34a;
-  color: white;
-  border: none;
-  border-radius: 12px;
-  padding: 0.875rem 1rem;
-  font-size: 0.95rem;
-  font-weight: 600;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  transition: background 0.2s;
 
-  &:hover {
-    background: #15803d;
-  }
-`;
-
-const SecondaryButton = styled.button`
-  background: transparent;
-  color: #6b7280;
-  border: 1px solid #e5e7eb;
-  border-radius: 12px;
-  padding: 0.875rem 1rem;
-  font-size: 0.95rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background 0.2s;
-
-  &:hover {
-    background: #f9fafb;
-  }
-`;
 
 const CloseButton = styled.button`
   position: absolute;
@@ -174,18 +141,18 @@ const CloseButton = styled.button`
   right: 0.75rem;
   background: none;
   border: none;
-  color: #9ca3af;
+  color: var(--text-subtle);
   cursor: pointer;
   padding: 0.25rem;
   display: flex;
 
   &:hover {
-    color: #6b7280;
+    color: var(--text-muted);
   }
 `;
 
 const MobileBottomNav: React.FC = () => {
-  const location = useLocation();
+  const { location } = useRouterState();
   const navigate = useNavigate();
   const { user, isAuthenticated, userProfile } = useAuth();
   const { openLogin } = useAuthModal();
@@ -201,7 +168,7 @@ const MobileBottomNav: React.FC = () => {
     } else if (!hasCompleteProfile) {
       setShowPopup('onboarding');
     } else {
-      navigate('/profile');
+      navigate({ to: '/profile' });
     }
   };
 
@@ -216,15 +183,15 @@ const MobileBottomNav: React.FC = () => {
 
   const handleGoToOnboarding = () => {
     setShowPopup(null);
-    navigate('/onboarding');
+    navigate({ to: '/onboarding' as any });
   };
 
   const items = [
-    { to: homePath, label: 'Inicio', icon: <FiHome /> },
-    { to: '/catalog', label: 'Catalogo', icon: <FiCompass /> },
-    { to: '/compare', label: 'Comparar', icon: <FiLayers /> },
-    { to: '/faq', label: 'FAQ', icon: <FiHelpCircle /> },
-    { to: '/profile', label: 'Perfil', icon: <FiUser />, onClick: handleProfileClick },
+    { to: homePath, label: 'Inicio', icon: <House /> },
+    { to: '/catalog', label: 'Catalogo', icon: <Compass /> },
+    { to: '/compare', label: 'Comparar', icon: <Stack /> },
+    { to: '/faq', label: 'FAQ', icon: <Question /> },
+    { to: '/profile', label: 'Perfil', icon: <User />, onClick: handleProfileClick },
   ];
 
   return (
@@ -281,23 +248,23 @@ const MobileBottomNav: React.FC = () => {
               onClick={e => e.stopPropagation()}
             >
               <CloseButton onClick={handleClosePopup}>
-                <FiX size={20} />
+                <X size={20} />
               </CloseButton>
               <PopupTitle>
-                <FiUser size={22} />
+                <User size={22} />
                 Inicia sesión
               </PopupTitle>
               <PopupText>
                 Para acceder a tu perfil y personalizar tus recomendaciones, necesitas iniciar sesión.
               </PopupText>
               <PopupButtons>
-                <PrimaryButton onClick={handleLogin}>
-                  <FiLogIn size={18} />
+                <Button variant='primary' onClick={handleLogin}>
+                  <SignIn size={18} />
                   Iniciar sesión
-                </PrimaryButton>
-                <SecondaryButton onClick={handleClosePopup}>
+                </Button>
+                <Button variant='ghost' onClick={handleClosePopup}>
                   Ahora no
-                </SecondaryButton>
+                </Button>
               </PopupButtons>
             </PopupCard>
           </PopupOverlay>
@@ -318,23 +285,23 @@ const MobileBottomNav: React.FC = () => {
               onClick={e => e.stopPropagation()}
             >
               <CloseButton onClick={handleClosePopup}>
-                <FiX size={20} />
+                <X size={20} />
               </CloseButton>
               <PopupTitle>
-                <FiUser size={22} />
+                <User size={22} />
                 Completa tu perfil
               </PopupTitle>
               <PopupText>
                 Para ver tu perfil personalizado, primero complétalo con tu nivel de juego y preferencias.
               </PopupText>
               <PopupButtons>
-                <PrimaryButton onClick={handleGoToOnboarding}>
-                  <FiLogIn size={18} />
+                <Button variant='primary' onClick={handleGoToOnboarding}>
+                  <SignIn size={18} />
                   Completar perfil
-                </PrimaryButton>
-                <SecondaryButton onClick={handleClosePopup}>
+                </Button>
+                <Button variant='ghost' onClick={handleClosePopup}>
                   Ahora no
-                </SecondaryButton>
+                </Button>
               </PopupButtons>
             </PopupCard>
           </PopupOverlay>

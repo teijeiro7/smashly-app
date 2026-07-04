@@ -114,11 +114,16 @@ const ImageContainer = styled.div`
   align-items: center;
   justify-content: center;
   position: relative;
+  background: var(--racket-image-bg);
+  border: var(--racket-image-border);
+  border-radius: var(--racket-image-radius-detail);
+  box-shadow: var(--racket-image-shadow);
+  padding: 2rem;
 `;
 
 const LightboxImage = styled.img`
   max-width: 100%;
-  max-height: 90vh;
+  max-height: 80vh;
   object-fit: contain;
   animation: zoomIn 0.3s ease;
   user-select: none;
@@ -177,11 +182,18 @@ export const ImageLightbox: React.FC<ImageLightboxProps> = ({
     };
 
     document.addEventListener('keydown', handleKeyDown);
-    document.body.style.overflow = 'hidden';
+
+    const scrollY = window.scrollY;
+    document.body.style.position = 'fixed';
+    document.body.style.top = `-${scrollY}px`;
+    document.body.style.width = '100%';
 
     return () => {
       document.removeEventListener('keydown', handleKeyDown);
-      document.body.style.overflow = '';
+      document.body.style.position = '';
+      document.body.style.top = '';
+      document.body.style.width = '';
+      window.scrollTo(0, scrollY);
     };
   }, [currentIndex, images.length, onClose, onNavigate]);
 

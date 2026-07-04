@@ -20,7 +20,7 @@ const Overlay = styled(motion.div)`
 `;
 
 const ModalContainer = styled(motion.div)`
-  background: white;
+  background: var(--surface);
   padding: 2rem;
   border-radius: 16px;
   width: 100%;
@@ -39,23 +39,23 @@ const CloseButton = styled.button`
   border: none;
   font-size: 1.5rem;
   cursor: pointer;
-  color: #6b7280;
+  color: var(--text-muted);
   transition: color 0.2s;
 
   &:hover {
-    color: #1f2937;
+    color: var(--text);
   }
 `;
 
 const Title = styled.h2`
   font-size: 1.5rem;
   font-weight: 700;
-  color: #1f2937;
+  color: var(--text);
   margin-bottom: 0.5rem;
 `;
 
 const Subtitle = styled.p`
-  color: #6b7280;
+  color: var(--text-muted);
   font-size: 0.875rem;
   margin-bottom: 1.5rem;
 `;
@@ -74,27 +74,27 @@ const FormGroup = styled.div`
 
 const Label = styled.label`
   font-weight: 500;
-  color: #374151;
+  color: var(--text);
   font-size: 0.875rem;
 `;
 
 const Input = styled.input`
   padding: 0.75rem;
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--border-strong);
   border-radius: 8px;
   font-size: 1rem;
   transition: border-color 0.2s;
 
   &:focus {
     outline: none;
-    border-color: #16a34a;
-    box-shadow: 0 0 0 2px rgba(22, 163, 74, 0.1);
+    border-color: var(--primary);
+    box-shadow: 0 0 0 2px rgba(var(--primary-rgb), 0.1);
   }
 `;
 
 const Textarea = styled.textarea`
   padding: 0.75rem;
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--border-strong);
   border-radius: 8px;
   font-size: 1rem;
   min-height: 100px;
@@ -103,22 +103,22 @@ const Textarea = styled.textarea`
 
   &:focus {
     outline: none;
-    border-color: #16a34a;
-    box-shadow: 0 0 0 2px rgba(22, 163, 74, 0.1);
+    border-color: var(--primary);
+    box-shadow: 0 0 0 2px rgba(var(--primary-rgb), 0.1);
   }
 `;
 
 const Select = styled.select`
   padding: 0.75rem;
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--border-strong);
   border-radius: 8px;
   font-size: 1rem;
-  background-color: white;
+  background-color: var(--surface);
   cursor: pointer;
 
   &:focus {
     outline: none;
-    border-color: #16a34a;
+    border-color: var(--primary);
   }
 `;
 
@@ -144,15 +144,15 @@ const Button = styled.button<{ variant?: 'primary' | 'secondary' }>`
   ${props =>
     props.variant === 'primary'
       ? `
-    background: #16a34a;
-    color: white;
-    &:hover { background: #15803d; }
-    &:disabled { background: #86efac; cursor: not-allowed; }
+    background: var(--brand-surface);
+    color: var(--brand-on-surface);
+    &:hover { background: var(--primary-hover); }
+    &:disabled { background: var(--primary-light); cursor: not-allowed; }
   `
       : `
-    background: #f3f4f6;
-    color: #4b5563;
-    &:hover { background: #e5e7eb; }
+    background: var(--surface-3);
+    color: var(--text);
+    &:hover { background: var(--border); }
   `}
 `;
 
@@ -160,12 +160,12 @@ const ErrorMessage = styled.div`
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  color: #ef4444;
+  color: var(--error);
   font-size: 0.875rem;
-  background: #fef2f2;
+  background: var(--surface-2);
   padding: 0.75rem;
   border-radius: 8px;
-  border: 1px solid #fecaca;
+  border: 1px solid var(--danger-strong);
 `;
 
 interface EditRacketModalProps {
@@ -362,7 +362,7 @@ export const EditRacketModal: React.FC<EditRacketModalProps> = ({
 
             {category === 'prices' && (
               <>
-                <h4 style={{ margin: '0 0 0.5rem', color: '#16a34a' }}>Padel Nuestro</h4>
+                <h4 style={{ margin: '0 0 0.5rem', color: 'var(--primary)' }}>Padel Nuestro</h4>
                 <FormGroup>
                   <Label>Precio Actual</Label>
                   <Input
@@ -383,7 +383,7 @@ export const EditRacketModal: React.FC<EditRacketModalProps> = ({
                   />
                 </FormGroup>
 
-                <h4 style={{ margin: '1rem 0 0.5rem', color: '#16a34a' }}>Padel Market</h4>
+                <h4 style={{ margin: '1rem 0 0.5rem', color: 'var(--primary)' }}>Padel Market</h4>
                 <FormGroup>
                   <Label>Precio Actual</Label>
                   <Input

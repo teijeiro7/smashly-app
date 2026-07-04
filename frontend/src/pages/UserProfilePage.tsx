@@ -14,7 +14,7 @@ import {
   FiCalendar,
 } from 'react-icons/fi';
 import { GiTennisRacket } from 'react-icons/gi';
-import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { Link, useNavigate, useSearch } from '@tanstack/react-router';
 import { useAuth } from '../contexts/AuthContext';
 import { UserProfileService } from '../services/userProfileService';
 import { UploadService } from '../services/uploadService';
@@ -28,11 +28,11 @@ import RacketSearchInput, { RacketSearchResult } from '../components/recommendat
 
 const Container = styled.div`
   min-height: 100vh;
-  background: #f8fafc;
+  background: var(--surface-2);
 `;
 
 const Header = styled.div`
-  background: linear-gradient(140deg, #169b47 0%, #12793a 100%);
+  background: linear-gradient(140deg, var(--brand-surface) 0%, var(--brand-surface-hover) 100%);
   padding: 2rem;
   position: relative;
   overflow: hidden;
@@ -123,10 +123,10 @@ const MainContent = styled.div`
 const NavigationTabs = styled.div`
   display: flex;
   gap: 0.25rem;
-  background: white;
+  background: var(--surface);
   padding: 0.5rem;
   border-radius: 16px;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--border);
   margin-bottom: 2rem;
   overflow-x: auto;
 
@@ -150,19 +150,19 @@ const NavTab = styled.button<{ $active: boolean }>`
   cursor: pointer;
   transition: all 0.2s ease;
   white-space: nowrap;
-  background: ${props => (props.$active ? '#16a34a' : 'transparent')};
-  color: ${props => (props.$active ? 'white' : '#64748b')};
+  background: ${props => (props.$active ? 'var(--primary)' : 'transparent')};
+  color: ${props => (props.$active ? 'white' : 'var(--text-muted)')};
 
   &:hover {
-    background: ${props => (props.$active ? '#16a34a' : '#f1f5f9')};
-    color: ${props => (props.$active ? 'white' : '#16a34a')};
+    background: ${props => (props.$active ? 'var(--primary)' : 'var(--surface-3)')};
+    color: ${props => (props.$active ? 'white' : 'var(--primary)')};
   }
 `;
 
 const ContentCard = styled.div`
-  background: white;
+  background: var(--surface);
   border-radius: 20px;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--border);
   overflow: hidden;
 `;
 
@@ -185,7 +185,7 @@ const FormSection = styled.div`
 const SectionTitle = styled.h3`
   font-size: 1rem;
   font-weight: 600;
-  color: #16a34a;
+  color: var(--primary);
   margin: 0 0 1rem 0;
   display: flex;
   align-items: center;
@@ -211,7 +211,7 @@ const FormGroup = styled.div`
 const FormLabel = styled.label`
   font-size: 0.8125rem;
   font-weight: 600;
-  color: #475569;
+  color: var(--text);
   display: flex;
   align-items: center;
   gap: 0.375rem;
@@ -219,78 +219,78 @@ const FormLabel = styled.label`
 
 const FormInput = styled.input`
   padding: 0.75rem 1rem;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--border);
   border-radius: 10px;
   font-size: 0.9375rem;
   transition: all 0.2s ease;
-  background: white;
+  background: var(--surface);
 
   &:focus {
     outline: none;
-    border-color: #16a34a;
+    border-color: var(--primary);
     box-shadow: 0 0 0 3px rgba(15, 23, 42, 0.1);
   }
 
   &:disabled {
-    background: #f8fafc;
-    color: #64748b;
+    background: var(--surface-2);
+    color: var(--text-muted);
   }
 
   &::placeholder {
-    color: #94a3b8;
+    color: var(--text-subtle);
   }
 `;
 
 const FormSelect = styled.select`
   padding: 0.75rem 1rem;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--border);
   border-radius: 10px;
   font-size: 0.9375rem;
   transition: all 0.2s ease;
-  background: white;
+  background: var(--surface);
   cursor: pointer;
 
   &:focus {
     outline: none;
-    border-color: #16a34a;
+    border-color: var(--primary);
     box-shadow: 0 0 0 3px rgba(15, 23, 42, 0.1);
   }
 
   &:disabled {
-    background: #f8fafc;
-    color: #64748b;
+    background: var(--surface-2);
+    color: var(--text-muted);
   }
 `;
 
 const FormTextarea = styled.textarea`
   padding: 0.75rem 1rem;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--border);
   border-radius: 10px;
   font-size: 0.9375rem;
   transition: all 0.2s ease;
-  background: white;
+  background: var(--surface);
   resize: vertical;
   min-height: 100px;
 
   &:focus {
     outline: none;
-    border-color: #16a34a;
+    border-color: var(--primary);
     box-shadow: 0 0 0 3px rgba(15, 23, 42, 0.1);
   }
 
   &:disabled {
-    background: #f8fafc;
-    color: #64748b;
+    background: var(--surface-2);
+    color: var(--text-muted);
   }
 
   &::placeholder {
-    color: #94a3b8;
+    color: var(--text-subtle);
   }
 `;
 
 const HelperText = styled.p`
   font-size: 0.75rem;
-  color: #64748b;
+  color: var(--text-muted);
   margin: 0.25rem 0 0 0;
 `;
 
@@ -324,7 +324,7 @@ const FormActions = styled.div`
   justify-content: flex-end;
   margin-top: 1.5rem;
   padding-top: 1.5rem;
-  border-top: 1px solid #f1f5f9;
+  border-top: 1px solid var(--surface-3);
 
   @media (max-width: 640px) {
     flex-direction: column-reverse;
@@ -345,11 +345,11 @@ const Button = styled(motion.button)<{ $primary?: boolean }>`
   cursor: pointer;
   border: none;
   transition: all 0.2s ease;
-  background: ${props => (props.$primary ? '#16a34a' : '#f1f5f9')};
-  color: ${props => (props.$primary ? 'white' : '#64748b')};
+  background: ${props => (props.$primary ? 'var(--primary)' : 'var(--surface-3)')};
+  color: ${props => (props.$primary ? 'white' : 'var(--text-muted)')};
 
   &:hover {
-    background: ${props => (props.$primary ? '#15803d' : '#e2e8f0')};
+    background: ${props => (props.$primary ? 'var(--primary-hover)' : 'var(--border)')};
   }
 
   &:disabled {
@@ -396,7 +396,7 @@ const LoadingContainer = styled.div`
   justify-content: center;
   align-items: center;
   min-height: 400px;
-  color: #64748b;
+  color: var(--text-muted);
 `;
 
 type TabType = 'profile' | 'activity' | 'collections' | 'account';
@@ -409,12 +409,20 @@ interface UserProfileFormData {
   birthdate: string;
   game_level: string;
   limitations: string;
+  gender: string;
+  physical_condition: string;
+  position: string;
+  frequency: string;
+  touch_preference: string;
+  balance_preference: string;
+  shape_preference: string;
+  weight_preference: string;
 }
 
 const UserProfilePage: React.FC = () => {
   const { user, userProfile, refreshUserProfile, loading } = useAuth();
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
+  const searchParams = useSearch({ strict: false }) as Record<string, string>;
   const [activeTab, setActiveTab] = useState<TabType>('profile');
   const [saving, setSaving] = useState(false);
   const [activityData, setActivityData] = useState<any>(null);
@@ -427,10 +435,18 @@ const UserProfilePage: React.FC = () => {
     birthdate: '',
     game_level: '',
     limitations: '',
+    gender: '',
+    physical_condition: '',
+    position: '',
+    frequency: '',
+    touch_preference: '',
+    balance_preference: '',
+    shape_preference: '',
+    weight_preference: '',
   });
 
   useEffect(() => {
-    const tab = searchParams.get('tab');
+    const tab = searchParams['tab'];
     if (tab && ['profile', 'activity', 'collections', 'account'].includes(tab)) {
       setActiveTab(tab as TabType);
     }
@@ -446,6 +462,14 @@ const UserProfilePage: React.FC = () => {
         birthdate: userProfile.birthdate || '',
         game_level: userProfile.game_level || '',
         limitations: userProfile.limitations?.[0] || '',
+        gender: userProfile.gender || '',
+        physical_condition: userProfile.physical_condition || '',
+        position: userProfile.position || '',
+        frequency: userProfile.frequency || '',
+        touch_preference: userProfile.touch_preference || '',
+        balance_preference: userProfile.balance_preference || '',
+        shape_preference: userProfile.shape_preference || '',
+        weight_preference: userProfile.weight_preference || '',
       });
     }
   }, [userProfile]);
@@ -455,7 +479,7 @@ const UserProfilePage: React.FC = () => {
     if (loading) return;
 
     if (!user) {
-      navigate('/login');
+      navigate({ to: '/login' });
     }
   }, [user, navigate, loading]);
 
@@ -566,11 +590,20 @@ const UserProfilePage: React.FC = () => {
         birthdate: formData.birthdate || undefined,
         game_level: formData.game_level || undefined,
         limitations: formData.limitations ? [formData.limitations] : undefined,
+        gender: formData.gender || undefined,
+        physical_condition: formData.physical_condition || undefined,
+        position: formData.position || undefined,
+        frequency: formData.frequency || undefined,
+        touch_preference: formData.touch_preference || undefined,
+        balance_preference: formData.balance_preference || undefined,
+        shape_preference: formData.shape_preference || undefined,
+        weight_preference: formData.weight_preference || undefined,
       });
       await refreshUserProfile();
       sileo.success({ title: 'Éxito', description: 'Perfil actualizado correctamente' });
-    } catch (error) {
-      sileo.error({ title: 'Error', description: 'Error al actualizar el perfil' });
+    } catch (error: any) {
+      console.error('Update profile error:', error);
+      sileo.error({ title: 'Error', description: error?.message || 'Error al actualizar el perfil' });
     } finally {
       setSaving(false);
     }
@@ -785,13 +818,134 @@ const UserProfilePage: React.FC = () => {
                           onChange={handleInputChange}
                         >
                           <option value=''>Selecciona tu nivel</option>
-                          <option value='principiante'>Principiante (1.0 - 2.5)</option>
-                          <option value='intermedio'>Intermedio (3.0 - 4.5)</option>
-                          <option value='avanzado'>Avanzado (5.0 - 6.5)</option>
-                          <option value='profesional'>Profesional (7.0+)</option>
+                          <option value='Principiante'>Principiante (1.0 - 2.5)</option>
+                          <option value='Intermedio'>Intermedio (3.0 - 4.5)</option>
+                          <option value='Avanzado'>Avanzado (5.0 - 6.5)</option>
+                          <option value='Profesional'>Profesional (7.0+)</option>
                         </FormSelect>
                         <HelperText>Basado en el sistema de clasificación Playtomic</HelperText>
                       </FormGroup>
+                    </FormSection>
+
+                    <FormSection>
+                      <SectionTitle>
+                        <GiTennisRacket size={18} /> Preferencias de Juego
+                      </SectionTitle>
+                      <FormGrid>
+                        <FormGroup>
+                          <FormLabel htmlFor='gender'>Género</FormLabel>
+                          <FormSelect
+                            id='gender'
+                            name='gender'
+                            value={formData.gender}
+                            onChange={handleInputChange}
+                          >
+                            <option value=''>Selecciona género</option>
+                            <option value='masculino'>Masculino</option>
+                            <option value='femenino'>Femenino</option>
+                          </FormSelect>
+                        </FormGroup>
+                        <FormGroup>
+                          <FormLabel htmlFor='physical_condition'>Condición física</FormLabel>
+                          <FormSelect
+                            id='physical_condition'
+                            name='physical_condition'
+                            value={formData.physical_condition}
+                            onChange={handleInputChange}
+                          >
+                            <option value=''>Selecciona condición</option>
+                            <option value='asiduo'>Asiduo al deporte</option>
+                            <option value='ocasional'>Ocasional</option>
+                          </FormSelect>
+                        </FormGroup>
+                        <FormGroup>
+                          <FormLabel htmlFor='position'>Posición en pista</FormLabel>
+                          <FormSelect
+                            id='position'
+                            name='position'
+                            value={formData.position}
+                            onChange={handleInputChange}
+                          >
+                            <option value=''>Selecciona posición</option>
+                            <option value='reves'>Revés</option>
+                            <option value='drive'>Drive</option>
+                            <option value='ambos'>Indiferente</option>
+                          </FormSelect>
+                        </FormGroup>
+                        <FormGroup>
+                          <FormLabel htmlFor='frequency'>Frecuencia de juego</FormLabel>
+                          <FormSelect
+                            id='frequency'
+                            name='frequency'
+                            value={formData.frequency}
+                            onChange={handleInputChange}
+                          >
+                            <option value=''>Selecciona frecuencia</option>
+                            <option value='1'>1 vez/semana o menos</option>
+                            <option value='2-3'>2-3 veces/semana</option>
+                            <option value='4+'>4+ veces/semana</option>
+                          </FormSelect>
+                        </FormGroup>
+                        <FormGroup>
+                          <FormLabel htmlFor='touch_preference'>Tacto de pala</FormLabel>
+                          <FormSelect
+                            id='touch_preference'
+                            name='touch_preference'
+                            value={formData.touch_preference}
+                            onChange={handleInputChange}
+                          >
+                            <option value=''>Selecciona tacto</option>
+                            <option value='duro'>Duro</option>
+                            <option value='medio'>Medio</option>
+                            <option value='blando'>Blando</option>
+                          </FormSelect>
+                        </FormGroup>
+                        <FormGroup>
+                          <FormLabel htmlFor='weight_preference'>Peso de pala</FormLabel>
+                          <FormSelect
+                            id='weight_preference'
+                            name='weight_preference'
+                            value={formData.weight_preference}
+                            onChange={handleInputChange}
+                          >
+                            <option value=''>No sé</option>
+                            <option value='ligera'>Ligera (&lt;360g)</option>
+                            <option value='media'>Media (360-375g)</option>
+                            <option value='pesada'>Pesada (&gt;375g)</option>
+                          </FormSelect>
+                        </FormGroup>
+                        <FormGroup>
+                          <FormLabel htmlFor='balance_preference'>Balance de pala</FormLabel>
+                          <FormSelect
+                            id='balance_preference'
+                            name='balance_preference'
+                            value={formData.balance_preference}
+                            onChange={handleInputChange}
+                          >
+                            <option value=''>No sé</option>
+                            <option value='bajo'>Bajo (Manejable)</option>
+                            <option value='medio'>Medio (Equilibrado)</option>
+                            <option value='alto'>Alto (Potencia)</option>
+                          </FormSelect>
+                        </FormGroup>
+                        <FormGroup>
+                          <FormLabel htmlFor='shape_preference'>Forma de pala</FormLabel>
+                          <FormSelect
+                            id='shape_preference'
+                            name='shape_preference'
+                            value={formData.shape_preference}
+                            onChange={handleInputChange}
+                          >
+                            <option value=''>No sé</option>
+                            <option value='redonda'>Redonda</option>
+                            <option value='lagrima'>Lágrima</option>
+                            <option value='diamante'>Diamante</option>
+                          </FormSelect>
+                        </FormGroup>
+                      </FormGrid>
+                      <HelperText style={{ marginTop: '0.5rem' }}>
+                        Estas preferencias se usan para pre-rellenar los formularios de recomendación
+                      </HelperText>
                     </FormSection>
 
                     <FormSection>

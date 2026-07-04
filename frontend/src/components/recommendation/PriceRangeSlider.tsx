@@ -18,7 +18,7 @@ const SliderTrack = styled.div`
   left: 12px;
   right: 12px;
   height: 8px;
-  background: #e5e7eb;
+  background: var(--border);
   border-radius: 8px;
   box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
 `;
@@ -29,9 +29,9 @@ const SliderRange = styled.div<{ left: number; width: number }>`
   left: calc(12px + ${props => props.left}%);
   width: ${props => props.width}%;
   height: 8px;
-  background: linear-gradient(90deg, #16a34a 0%, #22c55e 100%);
+  background: linear-gradient(90deg, var(--brand-surface) 0%, var(--brand-surface-hover) 100%);
   border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(22, 163, 74, 0.3);
+  box-shadow: 0 2px 4px rgba(var(--primary-rgb), 0.3);
   transition: all 0.2s ease;
 `;
 
@@ -55,8 +55,8 @@ const SliderInput = styled.input`
     height: 24px;
     border-radius: 50%;
     /* Use a solid color gradient to ensure white fill */
-    background: linear-gradient(#ffffff, #ffffff);
-    border: 4px solid #16a34a;
+    background: linear-gradient(var(--surface), var(--surface));
+    border: 4px solid var(--primary);
     cursor: grab;
     pointer-events: auto;
     box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
@@ -65,14 +65,14 @@ const SliderInput = styled.input`
 
     &:hover {
       transform: scale(1.2);
-      box-shadow: 0 4px 12px rgba(22, 163, 74, 0.4);
+      box-shadow: 0 4px 12px rgba(var(--primary-rgb), 0.4);
     }
 
     &:active {
       cursor: grabbing;
       transform: scale(1.1);
-      background: linear-gradient(#f0fdf4, #f0fdf4);
-      box-shadow: 0 2px 6px rgba(22, 163, 74, 0.5);
+      background: linear-gradient(var(--primary-subtle), var(--primary-subtle));
+      box-shadow: 0 2px 6px rgba(var(--primary-rgb), 0.5);
     }
   }
 
@@ -80,8 +80,8 @@ const SliderInput = styled.input`
     width: 16px;
     height: 16px;
     border-radius: 50%;
-    background: #ffffff;
-    border: 4px solid #16a34a;
+    background: var(--surface);
+    border: 4px solid var(--primary);
     cursor: grab;
     pointer-events: auto;
     box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
@@ -90,14 +90,14 @@ const SliderInput = styled.input`
 
     &:hover {
       transform: scale(1.2);
-      box-shadow: 0 4px 12px rgba(22, 163, 74, 0.4);
+      box-shadow: 0 4px 12px rgba(var(--primary-rgb), 0.4);
     }
 
     &:active {
       cursor: grabbing;
       transform: scale(1.1);
-      background: #f0fdf4;
-      box-shadow: 0 2px 6px rgba(22, 163, 74, 0.5);
+      background: var(--primary-subtle);
+      box-shadow: 0 2px 6px rgba(var(--primary-rgb), 0.5);
     }
   }
 
@@ -107,13 +107,13 @@ const SliderInput = styled.input`
 
   &:focus::-webkit-slider-thumb {
     box-shadow:
-      0 0 0 6px rgba(22, 163, 74, 0.15),
+      0 0 0 6px rgba(var(--primary-rgb), 0.15),
       0 3px 8px rgba(0, 0, 0, 0.2);
   }
 
   &:focus::-moz-range-thumb {
     box-shadow:
-      0 0 0 6px rgba(22, 163, 74, 0.15),
+      0 0 0 6px rgba(var(--primary-rgb), 0.15),
       0 3px 8px rgba(0, 0, 0, 0.2);
   }
 `;
@@ -139,7 +139,7 @@ const ValueLabel = styled.div`
 
 const ValueTitle = styled.span`
   font-size: 0.7rem;
-  color: #9ca3af;
+  color: var(--text-subtle);
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.8px;
@@ -148,7 +148,7 @@ const ValueTitle = styled.span`
 const ValueDisplay = styled.span`
   font-size: 1.5rem;
   font-weight: 800;
-  color: #16a34a;
+  color: var(--primary);
   line-height: 1;
 `;
 

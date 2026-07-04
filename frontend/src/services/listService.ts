@@ -1,201 +1,85 @@
-import { API_URL } from "../config/api";
-import { getAuthToken } from "../utils/authUtils";
-import {
-  List,
-  ListWithRackets,
-  CreateListRequest,
-  UpdateListRequest,
-} from "../types/list";
+import { supabase } from '../lib/supabase';
+import { List, ListWithRackets, CreateListRequest, UpdateListRequest } from '../types/list';
 
-/**
- * Servicio para gestionar las listas de palas del usuario
- */
 export class ListService {
-  /**
-   * Obtiene todas las listas del usuario autenticado
-   */
   static async getUserLists(): Promise<List[]> {
-    const token = getAuthToken();
-    if (!token) {
-      throw new Error("No hay token de autenticación");
-    }
+    const { data, error } = await supabase
+      .from('lists')
+      .select('*, racket_count:list_rackets(count)')
+      .order('created_at', { ascending: false });
 
-    const response = await fetch(`${API_URL}/api/v1/lists`, {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-    });
+    if (error) throw new Error(error.message);
 
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.message || "Error al obtener las listas");
-    }
-
-    const data = await response.json();
-    return data.data || [];
+    return (data ?? []).map((list: any) => ({
+      ...list,
+      racket_count: list.racket_count?.[0]?.count ?? 0,
+    })) as List[];
   }
 
-  /**
-   * Obtiene una lista específica con sus palas
-   */
   static async getListById(listId: string): Promise<ListWithRackets> {
-    const token = getAuthToken();
-    if (!token) {
-      throw new Error("No hay token de autenticación");
-    }
+    const { data, error } = await supabase
+      .from('lists')
+      .select('*, rackets:list_rackets(racket:rackets(*))')
+      .eq('id', listId)
+      .single();
 
-    const response = await fetch(`${API_URL}/api/v1/lists/${listId}`, {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-    });
+    if (error) throw new Error(error.message);
 
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.message || "Error al obtener la lista");
-    }
-
-    const data = await response.json();
-    return data.data;
+    const rackets = (data.rackets ?? []).map((lr: any) => lr.racket).filter(Boolean);
+    return { ...data, rackets } as ListWithRackets;
   }
 
-  /**
-   * Crea una nueva lista
-   */
   static async createList(listData: CreateListRequest): Promise<List> {
-    const token = getAuthToken();
-    if (!token) {
-      throw new Error("No hay token de autenticación");
-    }
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) throw new Error('No hay sesión activa');
 
-    const response = await fetch(`${API_URL}/api/v1/lists`, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(listData),
-    });
+    const { data, error } = await supabase
+      .from('lists')
+      .insert({
+        user_id: session.user.id,
+        name: listData.name,
+        description: listData.description ?? null,
+        is_public: false,
+      })
+      .select()
+      .single();
 
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.message || "Error al crear la lista");
-    }
-
-    const data = await response.json();
-    return data.data;
+    if (error) throw new Error(error.message);
+    return data as List;
   }
 
-  /**
-   * Actualiza una lista
-   */
-  static async updateList(
-    listId: string,
-    updates: UpdateListRequest
-  ): Promise<List> {
-    const token = getAuthToken();
-    if (!token) {
-      throw new Error("No hay token de autenticación");
-    }
+  static async updateList(listId: string, updates: UpdateListRequest): Promise<List> {
+    const { data, error } = await supabase
+      .from('lists')
+      .update({ name: updates.name, description: updates.description ?? null })
+      .eq('id', listId)
+      .select()
+      .single();
 
-    const response = await fetch(`${API_URL}/api/v1/lists/${listId}`, {
-      method: "PUT",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(updates),
-    });
-
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.message || "Error al actualizar la lista");
-    }
-
-    const data = await response.json();
-    return data.data;
+    if (error) throw new Error(error.message);
+    return data as List;
   }
 
-  /**
-   * Elimina una lista
-   */
   static async deleteList(listId: string): Promise<void> {
-    const token = getAuthToken();
-    if (!token) {
-      throw new Error("No hay token de autenticación");
-    }
-
-    const response = await fetch(`${API_URL}/api/v1/lists/${listId}`, {
-      method: "DELETE",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-    });
-
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.message || "Error al eliminar la lista");
-    }
+    const { error } = await supabase.from('lists').delete().eq('id', listId);
+    if (error) throw new Error(error.message);
   }
 
-  /**
-   * Añade una pala a una lista
-   */
-  static async addRacketToList(
-    listId: string,
-    racketId: number
-  ): Promise<void> {
-    const token = getAuthToken();
-    if (!token) {
-      throw new Error("No hay token de autenticación");
-    }
+  static async addRacketToList(listId: string, racketId: number): Promise<void> {
+    const { error } = await supabase
+      .from('list_rackets')
+      .insert({ list_id: listId, racket_id: racketId });
 
-    const response = await fetch(`${API_URL}/api/v1/lists/${listId}/rackets`, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ racket_id: racketId }),
-    });
-
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.message || "Error al añadir pala a la lista");
-    }
+    if (error && error.code !== '23505') throw new Error(error.message); // ignore duplicate
   }
 
-  /**
-   * Elimina una pala de una lista
-   */
-  static async removeRacketFromList(
-    listId: string,
-    racketId: number
-  ): Promise<void> {
-    const token = getAuthToken();
-    if (!token) {
-      throw new Error("No hay token de autenticación");
-    }
+  static async removeRacketFromList(listId: string, racketId: number): Promise<void> {
+    const { error } = await supabase
+      .from('list_rackets')
+      .delete()
+      .eq('list_id', listId)
+      .eq('racket_id', racketId);
 
-    const response = await fetch(
-      `${API_URL}/api/v1/lists/${listId}/rackets/${racketId}`,
-      {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      }
-    );
-
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.message || "Error al eliminar pala de la lista");
-    }
+    if (error) throw new Error(error.message);
   }
 }

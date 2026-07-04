@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import styled from "styled-components";
 import { FiX, FiSave, FiUser, FiCalendar, FiActivity, FiCamera, FiTrash2 } from "react-icons/fi";
+import { GiTennisRacket } from "react-icons/gi";
 import { motion, AnimatePresence } from "framer-motion";
 import { UserProfile } from "../../services/userProfileService";
 import { UploadService } from "../../services/uploadService";
@@ -29,7 +30,7 @@ const Overlay = styled(motion.div)`
 `;
 
 const Modal = styled(motion.div)`
-  background: white;
+  background: var(--surface);
   border-radius: 20px;
   padding: 2rem;
   max-width: 600px;
@@ -45,16 +46,16 @@ const Modal = styled(motion.div)`
   }
 
   &::-webkit-scrollbar-track {
-    background: #f3f4f6;
+    background: var(--surface-3);
     border-radius: 4px;
   }
 
   &::-webkit-scrollbar-thumb {
-    background: #d1d5db;
+    background: var(--border-strong);
     border-radius: 4px;
 
     &:hover {
-      background: #9ca3af;
+      background: var(--text-subtle);
     }
   }
 `;
@@ -65,13 +66,13 @@ const Header = styled.div`
   align-items: center;
   margin-bottom: 2rem;
   padding-bottom: 1rem;
-  border-bottom: 2px solid #f3f4f6;
+  border-bottom: 2px solid var(--surface-3);
 `;
 
 const Title = styled.h2`
   font-size: 1.75rem;
   font-weight: 700;
-  color: #1f2937;
+  color: var(--text);
   margin: 0;
   display: flex;
   align-items: center;
@@ -82,7 +83,7 @@ const CloseButton = styled.button`
   background: none;
   border: none;
   cursor: pointer;
-  color: #6b7280;
+  color: var(--text-muted);
   padding: 0.5rem;
   display: flex;
   align-items: center;
@@ -91,8 +92,8 @@ const CloseButton = styled.button`
   border-radius: 8px;
 
   &:hover {
-    background: #f3f4f6;
-    color: #1f2937;
+    background: var(--surface-3);
+    color: var(--text);
   }
 `;
 
@@ -111,7 +112,7 @@ const FormSection = styled.div`
 const SectionTitle = styled.h3`
   font-size: 1.125rem;
   font-weight: 600;
-  color: #16a34a;
+  color: var(--primary);
   margin: 0;
   display: flex;
   align-items: center;
@@ -127,7 +128,7 @@ const FormGroup = styled.div`
 const Label = styled.label`
   font-size: 0.875rem;
   font-weight: 600;
-  color: #374151;
+  color: var(--text);
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -135,26 +136,26 @@ const Label = styled.label`
 
 const Input = styled.input`
   padding: 0.75rem;
-  border: 2px solid #e5e7eb;
+  border: 2px solid var(--border);
   border-radius: 12px;
   font-size: 1rem;
   transition: all 0.2s ease;
 
   &:focus {
     outline: none;
-    border-color: #16a34a;
-    box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.1);
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.1);
   }
 
   &:disabled {
-    background: #f3f4f6;
+    background: var(--surface-3);
     cursor: not-allowed;
   }
 `;
 
 const TextArea = styled.textarea`
   padding: 0.75rem;
-  border: 2px solid #e5e7eb;
+  border: 2px solid var(--border);
   border-radius: 12px;
   font-size: 1rem;
   min-height: 100px;
@@ -164,24 +165,24 @@ const TextArea = styled.textarea`
 
   &:focus {
     outline: none;
-    border-color: #16a34a;
-    box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.1);
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.1);
   }
 `;
 
 const Select = styled.select`
   padding: 0.75rem;
-  border: 2px solid #e5e7eb;
+  border: 2px solid var(--border);
   border-radius: 12px;
   font-size: 1rem;
   transition: all 0.2s ease;
-  background: white;
+  background: var(--surface);
   cursor: pointer;
 
   &:focus {
     outline: none;
-    border-color: #16a34a;
-    box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.1);
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.1);
   }
 `;
 
@@ -222,30 +223,30 @@ const Button = styled.button<{ variant?: "primary" | "secondary" }>`
   ${(props) =>
     props.variant === "primary"
       ? `
-    background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
-    color: white;
+    background: linear-gradient(135deg, var(--brand-surface) 0%, var(--brand-surface-hover) 100%);
+    color: var(--brand-on-surface);
     &:hover {
       transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(22, 163, 74, 0.3);
+      box-shadow: 0 4px 12px rgba(var(--primary-rgb), 0.3);
     }
     &:disabled {
-      background: #9ca3af;
+      background: var(--text-subtle);
       cursor: not-allowed;
       transform: none;
     }
   `
       : `
-    background: #f3f4f6;
-    color: #374151;
+    background: var(--surface-3);
+    color: var(--text);
     &:hover {
-      background: #e5e7eb;
+      background: var(--border);
     }
   `}
 `;
 
 const HelperText = styled.span`
   font-size: 0.75rem;
-  color: #6b7280;
+  color: var(--text-muted);
   margin-top: -0.25rem;
 `;
 
@@ -255,7 +256,7 @@ const AvatarSection = styled.div`
   align-items: center;
   gap: 1rem;
   padding: 1.5rem;
-  background: #f9fafb;
+  background: var(--surface-2);
   border-radius: 12px;
   margin-bottom: 1rem;
 `;
@@ -265,8 +266,8 @@ const AvatarPreview = styled.div`
   height: 120px;
   border-radius: 50%;
   overflow: hidden;
-  border: 4px solid #16a34a;
-  background: #e5e7eb;
+  border: 4px solid var(--primary);
+  background: var(--border);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -279,7 +280,7 @@ const AvatarPreview = styled.div`
   }
 
   svg {
-    color: #9ca3af;
+    color: var(--text-subtle);
   }
 `;
 
@@ -305,17 +306,17 @@ const AvatarButton = styled.button<{ variant?: "primary" | "danger" }>`
   ${(props) =>
     props.variant === "danger"
       ? `
-    background: #fee;
-    color: #dc2626;
+    background: var(--danger-subtle);
+    color: var(--danger);
     &:hover {
-      background: #fecaca;
+      background: var(--danger-strong);
     }
   `
       : `
-    background: #16a34a;
-    color: white;
+    background: var(--brand-surface);
+    color: var(--brand-on-surface);
     &:hover {
-      background: #15803d;
+      background: var(--primary-hover);
     }
   `}
 
@@ -331,7 +332,7 @@ const HiddenInput = styled.input`
 
 const ErrorText = styled.span`
   font-size: 0.75rem;
-  color: #dc2626;
+  color: var(--danger);
   text-align: center;
 `;
 
@@ -351,6 +352,14 @@ export const EditProfileModal: React.FC<EditProfileModalProps> = ({
     birthdate: "",
     game_level: "",
     limitations: "",
+    gender: "",
+    physical_condition: "",
+    position: "",
+    frequency: "",
+    touch_preference: "",
+    balance_preference: "",
+    shape_preference: "",
+    weight_preference: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
@@ -370,6 +379,14 @@ export const EditProfileModal: React.FC<EditProfileModalProps> = ({
         birthdate: userProfile.birthdate || "",
         game_level: userProfile.game_level || "",
         limitations: userProfile.limitations?.[0] || "", // Tomar el primer elemento del array
+        gender: userProfile.gender || "",
+        physical_condition: userProfile.physical_condition || "",
+        position: userProfile.position || "",
+        frequency: userProfile.frequency || "",
+        touch_preference: userProfile.touch_preference || "",
+        balance_preference: userProfile.balance_preference || "",
+        shape_preference: userProfile.shape_preference || "",
+        weight_preference: userProfile.weight_preference || "",
       });
       setAvatarPreview(userProfile.avatar_url || null);
       setAvatarFile(null);
@@ -480,6 +497,14 @@ export const EditProfileModal: React.FC<EditProfileModalProps> = ({
         full_name: formData.full_name.trim() || undefined,
         current_racket: formData.current_racket || undefined,
         game_level: formData.game_level || undefined,
+        gender: formData.gender || undefined,
+        physical_condition: formData.physical_condition || undefined,
+        position: formData.position || undefined,
+        frequency: formData.frequency || undefined,
+        touch_preference: formData.touch_preference || undefined,
+        balance_preference: formData.balance_preference || undefined,
+        shape_preference: formData.shape_preference || undefined,
+        weight_preference: formData.weight_preference || undefined,
       };
 
       // Incluir avatar_url si cambió
@@ -718,10 +743,10 @@ export const EditProfileModal: React.FC<EditProfileModalProps> = ({
                     disabled={isSubmitting}
                   >
                     <option value="">Selecciona tu nivel</option>
-                    <option value="principiante">Principiante</option>
-                    <option value="intermedio">Intermedio</option>
-                    <option value="avanzado">Avanzado</option>
-                    <option value="profesional">Profesional</option>
+                    <option value="Principiante">Principiante</option>
+                    <option value="Intermedio">Intermedio</option>
+                    <option value="Avanzado">Avanzado</option>
+                    <option value="Profesional">Profesional</option>
                   </Select>
                 </FormGroup>
 
@@ -741,6 +766,150 @@ export const EditProfileModal: React.FC<EditProfileModalProps> = ({
                     adecuadas
                   </HelperText>
                 </FormGroup>
+              </FormSection>
+
+              <FormSection>
+                <SectionTitle>
+                  <GiTennisRacket size={18} /> Preferencias de juego
+                </SectionTitle>
+
+                <InputGroup>
+                  <FormGroup>
+                    <Label htmlFor="gender">Género</Label>
+                    <Select
+                      id="gender"
+                      name="gender"
+                      value={formData.gender}
+                      onChange={handleChange}
+                      disabled={isSubmitting}
+                    >
+                      <option value="">Selecciona género</option>
+                      <option value="masculino">Masculino</option>
+                      <option value="femenino">Femenino</option>
+                    </Select>
+                  </FormGroup>
+
+                  <FormGroup>
+                    <Label htmlFor="physical_condition">Condición física</Label>
+                    <Select
+                      id="physical_condition"
+                      name="physical_condition"
+                      value={formData.physical_condition}
+                      onChange={handleChange}
+                      disabled={isSubmitting}
+                    >
+                      <option value="">Selecciona condición</option>
+                      <option value="asiduo">Asiduo al deporte</option>
+                      <option value="ocasional">Ocasional</option>
+                    </Select>
+                  </FormGroup>
+                </InputGroup>
+
+                <InputGroup>
+                  <FormGroup>
+                    <Label htmlFor="position">Posición en pista</Label>
+                    <Select
+                      id="position"
+                      name="position"
+                      value={formData.position}
+                      onChange={handleChange}
+                      disabled={isSubmitting}
+                    >
+                      <option value="">Selecciona posición</option>
+                      <option value="reves">Revés</option>
+                      <option value="drive">Drive</option>
+                      <option value="ambos">Indiferente</option>
+                    </Select>
+                  </FormGroup>
+
+                  <FormGroup>
+                    <Label htmlFor="frequency">Frecuencia de juego</Label>
+                    <Select
+                      id="frequency"
+                      name="frequency"
+                      value={formData.frequency}
+                      onChange={handleChange}
+                      disabled={isSubmitting}
+                    >
+                      <option value="">Selecciona frecuencia</option>
+                      <option value="1">1 vez/semana o menos</option>
+                      <option value="2-3">2-3 veces/semana</option>
+                      <option value="4+">4+ veces/semana</option>
+                    </Select>
+                  </FormGroup>
+                </InputGroup>
+
+                <InputGroup>
+                  <FormGroup>
+                    <Label htmlFor="touch_preference">Tacto de pala</Label>
+                    <Select
+                      id="touch_preference"
+                      name="touch_preference"
+                      value={formData.touch_preference}
+                      onChange={handleChange}
+                      disabled={isSubmitting}
+                    >
+                      <option value="">Selecciona tacto</option>
+                      <option value="duro">Duro</option>
+                      <option value="medio">Medio</option>
+                      <option value="blando">Blando</option>
+                    </Select>
+                  </FormGroup>
+
+                  <FormGroup>
+                    <Label htmlFor="weight_preference">Peso de pala</Label>
+                    <Select
+                      id="weight_preference"
+                      name="weight_preference"
+                      value={formData.weight_preference}
+                      onChange={handleChange}
+                      disabled={isSubmitting}
+                    >
+                      <option value="">No sé</option>
+                      <option value="ligera">Ligera (&lt;360g)</option>
+                      <option value="media">Media (360-375g)</option>
+                      <option value="pesada">Pesada (&gt;375g)</option>
+                    </Select>
+                  </FormGroup>
+                </InputGroup>
+
+                <InputGroup>
+                  <FormGroup>
+                    <Label htmlFor="balance_preference">Balance de pala</Label>
+                    <Select
+                      id="balance_preference"
+                      name="balance_preference"
+                      value={formData.balance_preference}
+                      onChange={handleChange}
+                      disabled={isSubmitting}
+                    >
+                      <option value="">No sé</option>
+                      <option value="bajo">Bajo (Manejable)</option>
+                      <option value="medio">Medio (Equilibrado)</option>
+                      <option value="alto">Alto (Potencia)</option>
+                    </Select>
+                  </FormGroup>
+
+                  <FormGroup>
+                    <Label htmlFor="shape_preference">Forma de pala</Label>
+                    <Select
+                      id="shape_preference"
+                      name="shape_preference"
+                      value={formData.shape_preference}
+                      onChange={handleChange}
+                      disabled={isSubmitting}
+                    >
+                      <option value="">No sé</option>
+                      <option value="redonda">Redonda</option>
+                      <option value="lagrima">Lágrima</option>
+                      <option value="diamante">Diamante</option>
+                    </Select>
+                  </FormGroup>
+                </InputGroup>
+
+                <HelperText>
+                  Estas preferencias se usarán para pre-rellenar los formularios de recomendación
+                </HelperText>
               </FormSection>
 
               <ButtonGroup>

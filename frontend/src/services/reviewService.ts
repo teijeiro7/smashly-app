@@ -1,172 +1,223 @@
-/**
- * Review Service
- * Servicio para gestionar reviews de palas
- */
-
-import { API_URL } from "../config/api";
+import { supabase } from '../lib/supabase';
 import type {
   Review,
   ReviewWithDetails,
+  ReviewWithUser,
   CreateReviewDTO,
   UpdateReviewDTO,
   CreateCommentDTO,
   ReviewsResponse,
   ReviewComment,
-} from "../types/review";
+  ReviewFilters,
+} from '../types/review';
 
-// Helper para obtener el token de autenticación
-const getAuthToken = (): string | null => {
-  return localStorage.getItem("auth_token");
-};
-
-// Helper para hacer peticiones con autenticación
-const fetchWithAuth = async (url: string, options: RequestInit = {}) => {
-  const token = getAuthToken();
-  const headers: Record<string, string> = {
-    "Content-Type": "application/json",
-  };
-
-  if (token) {
-    headers["Authorization"] = `Bearer ${token}`;
-  }
-
-  const response = await fetch(`${API_URL}${url}`, {
-    ...options,
-    headers: {
-      ...headers,
-      ...(options.headers as Record<string, string>),
-    },
-  });
-
-  if (!response.ok) {
-    const error = await response
-      .json()
-      .catch(() => ({ message: "Error desconocido" }));
-    throw new Error(error.message || `HTTP error ${response.status}`);
-  }
-
-  return response.json();
-};
+function mapRow(row: any): ReviewWithUser {
+  const { user_profiles, ...review } = row;
+  return { ...review, user: user_profiles ?? null };
+}
 
 export const reviewService = {
-  /**
-   * Obtener reviews de una pala específica
-   */
   async getReviewsByRacket(
     racketId: number,
-    params?: {
-      rating?: number;
-      sort?: "recent" | "rating_high" | "rating_low" | "most_liked";
-      page?: number;
-      limit?: number;
-    }
+    params?: ReviewFilters
   ): Promise<ReviewsResponse> {
-    const queryParams = new URLSearchParams();
-    if (params?.rating) queryParams.append("rating", params.rating.toString());
-    if (params?.sort) queryParams.append("sort", params.sort);
-    if (params?.page) queryParams.append("page", params.page.toString());
-    if (params?.limit) queryParams.append("limit", params.limit.toString());
+    const page = params?.page ?? 1;
+    const limit = params?.limit ?? 10;
+    const offset = (page - 1) * limit;
 
-    const queryString = queryParams.toString();
-    const url = `/api/v1/reviews/rackets/${racketId}${
-      queryString ? `?${queryString}` : ""
-    }`;
+    let query = supabase
+      .from('reviews')
+      .select('*, user_profiles!inner(id, nickname, avatar_url)', { count: 'exact' })
+      .eq('racket_id', racketId);
 
-    return fetchWithAuth(url);
+    if (params?.rating) query = query.eq('rating', params.rating);
+
+    const sortMap: Record<string, { column: string; asc: boolean }> = {
+      recent: { column: 'created_at', asc: false },
+      rating_high: { column: 'rating', asc: false },
+      rating_low: { column: 'rating', asc: true },
+      most_liked: { column: 'likes_count', asc: false },
+    };
+    const sort = sortMap[params?.sort ?? 'recent'] ?? sortMap.recent;
+    query = query.order(sort.column, { ascending: sort.asc });
+
+    const { data, count, error } = await query.range(offset, offset + limit - 1);
+    if (error) throw new Error(error.message);
+
+    const reviews = (data ?? []).map(mapRow);
+    const totalReviews = count ?? 0;
+    const totalPages = Math.ceil(totalReviews / limit);
+
+    // Compute stats from all ratings for this racket (lightweight)
+    const { data: allRatings } = await supabase
+      .from('reviews')
+      .select('rating')
+      .eq('racket_id', racketId);
+
+    const dist = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 } as Record<number, number>;
+    let ratingSum = 0;
+    (allRatings ?? []).forEach(({ rating }) => {
+      dist[rating] = (dist[rating] ?? 0) + 1;
+      ratingSum += rating;
+    });
+    const n = allRatings?.length ?? 0;
+
+    // Check if current user has liked the fetched reviews
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session) {
+      const reviewIds = reviews.map(r => r.id);
+      const { data: likes } = await supabase
+        .from('review_likes')
+        .select('review_id')
+        .eq('user_id', session.user.id)
+        .in('review_id', reviewIds);
+
+      const likedSet = new Set((likes ?? []).map((l: any) => l.review_id));
+      reviews.forEach(r => { (r as any).user_has_liked = likedSet.has(r.id); });
+    }
+
+    return {
+      reviews,
+      pagination: { total: totalReviews, page, limit, totalPages },
+      stats: {
+        averageRating: n > 0 ? ratingSum / n : 0,
+        totalReviews,
+        ratingDistribution: dist as any,
+      },
+    };
   },
 
-  /**
-   * Obtener reviews de un usuario
-   */
   async getReviewsByUser(
     userId: string,
     params?: { page?: number; limit?: number }
   ): Promise<ReviewsResponse> {
-    const queryParams = new URLSearchParams();
-    if (params?.page) queryParams.append("page", params.page.toString());
-    if (params?.limit) queryParams.append("limit", params.limit.toString());
+    const page = params?.page ?? 1;
+    const limit = params?.limit ?? 10;
+    const offset = (page - 1) * limit;
 
-    const queryString = queryParams.toString();
-    const url = `/api/v1/reviews/users/${userId}${
-      queryString ? `?${queryString}` : ""
-    }`;
+    const { data, count, error } = await supabase
+      .from('reviews')
+      .select('*, user_profiles!inner(id, nickname, avatar_url)', { count: 'exact' })
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false })
+      .range(offset, offset + limit - 1);
 
-    return fetchWithAuth(url);
+    if (error) throw new Error(error.message);
+
+    const reviews = (data ?? []).map(mapRow);
+    const total = count ?? 0;
+
+    return {
+      reviews,
+      pagination: { total, page, limit, totalPages: Math.ceil(total / limit) },
+      stats: { averageRating: 0, totalReviews: total, ratingDistribution: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 } },
+    };
   },
 
-  /**
-   * Obtener una review específica
-   */
   async getReviewById(reviewId: string): Promise<ReviewWithDetails> {
-    return fetchWithAuth(`/api/v1/reviews/${reviewId}`);
+    const { data, error } = await supabase
+      .from('reviews')
+      .select('*, user_profiles!inner(id, nickname, avatar_url), rackets(id, nombre, marca, modelo, imagenes)')
+      .eq('id', reviewId)
+      .single();
+
+    if (error) throw new Error(error.message);
+    const { user_profiles, rackets, ...review } = data as any;
+    return { ...review, user: user_profiles, racket: rackets } as ReviewWithDetails;
   },
 
-  /**
-   * Crear una nueva review
-   */
-  async createReview(data: CreateReviewDTO): Promise<Review> {
-    return fetchWithAuth("/api/v1/reviews", {
-      method: "POST",
-      body: JSON.stringify(data),
-    });
+  async createReview(dto: CreateReviewDTO): Promise<Review> {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) throw new Error('No autenticado');
+
+    const { data, error } = await supabase
+      .from('reviews')
+      .insert({ ...dto, user_id: session.user.id, likes_count: 0, comments_count: 0 })
+      .select()
+      .single();
+
+    if (error) throw new Error(error.message);
+    return data as Review;
   },
 
-  /**
-   * Actualizar una review existente
-   */
-  async updateReview(reviewId: string, data: UpdateReviewDTO): Promise<Review> {
-    return fetchWithAuth(`/api/v1/reviews/${reviewId}`, {
-      method: "PUT",
-      body: JSON.stringify(data),
-    });
+  async updateReview(reviewId: string, dto: UpdateReviewDTO): Promise<Review> {
+    const { data, error } = await supabase
+      .from('reviews')
+      .update(dto)
+      .eq('id', reviewId)
+      .select()
+      .single();
+
+    if (error) throw new Error(error.message);
+    return data as Review;
   },
 
-  /**
-   * Eliminar una review
-   */
   async deleteReview(reviewId: string): Promise<void> {
-    await fetchWithAuth(`/api/v1/reviews/${reviewId}`, {
-      method: "DELETE",
-    });
+    const { error } = await supabase.from('reviews').delete().eq('id', reviewId);
+    if (error) throw new Error(error.message);
   },
 
-  /**
-   * Dar/quitar like a una review (toggle)
-   */
-  async toggleLike(
-    reviewId: string
-  ): Promise<{ liked: boolean; likes_count: number }> {
-    return fetchWithAuth(`/api/v1/reviews/${reviewId}/like`, {
-      method: "POST",
-    });
+  async toggleLike(reviewId: string): Promise<{ liked: boolean; likes_count: number }> {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) throw new Error('No autenticado');
+
+    const { data: existing } = await supabase
+      .from('review_likes')
+      .select('id')
+      .eq('review_id', reviewId)
+      .eq('user_id', session.user.id)
+      .maybeSingle();
+
+    if (existing) {
+      await supabase.from('review_likes').delete().eq('id', existing.id);
+      // Decrement likes_count
+      await supabase.rpc('decrement_review_likes', { review_id: reviewId });
+    } else {
+      await supabase.from('review_likes').insert({ review_id: reviewId, user_id: session.user.id });
+    }
+
+    const { data: updated } = await supabase
+      .from('reviews')
+      .select('likes_count')
+      .eq('id', reviewId)
+      .single();
+
+    return { liked: !existing, likes_count: updated?.likes_count ?? 0 };
   },
 
-  /**
-   * Obtener comentarios de una review
-   */
   async getComments(reviewId: string): Promise<ReviewComment[]> {
-    return fetchWithAuth(`/api/v1/reviews/${reviewId}/comments`);
+    const { data, error } = await supabase
+      .from('review_comments')
+      .select('*, user_profiles!inner(id, nickname, avatar_url)')
+      .eq('review_id', reviewId)
+      .order('created_at', { ascending: true });
+
+    if (error) throw new Error(error.message);
+
+    return (data ?? []).map((row: any) => {
+      const { user_profiles, ...comment } = row;
+      return { ...comment, user: user_profiles };
+    }) as ReviewComment[];
   },
 
-  /**
-   * Agregar un comentario a una review
-   */
-  async addComment(
-    reviewId: string,
-    data: CreateCommentDTO
-  ): Promise<ReviewComment> {
-    return fetchWithAuth(`/api/v1/reviews/${reviewId}/comments`, {
-      method: "POST",
-      body: JSON.stringify(data),
-    });
+  async addComment(reviewId: string, dto: CreateCommentDTO): Promise<ReviewComment> {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) throw new Error('No autenticado');
+
+    const { data, error } = await supabase
+      .from('review_comments')
+      .insert({ review_id: reviewId, user_id: session.user.id, content: dto.content })
+      .select('*, user_profiles!inner(id, nickname, avatar_url)')
+      .single();
+
+    if (error) throw new Error(error.message);
+
+    const { user_profiles, ...comment } = data as any;
+    return { ...comment, user: user_profiles } as ReviewComment;
   },
 
-  /**
-   * Eliminar un comentario
-   */
   async deleteComment(commentId: string): Promise<void> {
-    await fetchWithAuth(`/api/v1/reviews/comments/${commentId}`, {
-      method: "DELETE",
-    });
+    const { error } = await supabase.from('review_comments').delete().eq('id', commentId);
+    if (error) throw new Error(error.message);
   },
 };

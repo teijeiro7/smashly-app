@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { useComparison } from '../../contexts/ComparisonContext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useRouterState } from '@tanstack/react-router';
 import { FaBalanceScale } from 'react-icons/fa';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -12,10 +12,10 @@ const FloatingButton = styled(motion.button)`
   width: 64px;
   height: 64px;
   border-radius: 50%;
-  background: #16a34a;
-  color: white;
+  background: var(--brand-surface);
+  color: var(--brand-on-surface);
   border: none;
-  box-shadow: 0 8px 24px rgba(22, 163, 74, 0.3);
+  box-shadow: 0 8px 24px rgba(var(--primary-rgb), 0.3);
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -25,8 +25,8 @@ const FloatingButton = styled(motion.button)`
   transition: all 0.3s ease;
 
   &:hover {
-    background: #15803d;
-    box-shadow: 0 12px 32px rgba(22, 163, 74, 0.4);
+    background: var(--primary-hover);
+    box-shadow: 0 12px 32px rgba(var(--primary-rgb), 0.4);
     transform: scale(1.1);
   }
 
@@ -35,7 +35,7 @@ const FloatingButton = styled(motion.button)`
   }
 
   @media (max-width: 768px) {
-    bottom: 1rem;
+    bottom: calc(78px + env(safe-area-inset-bottom, 0px) + 0.75rem);
     right: 1rem;
     width: 56px;
     height: 56px;
@@ -51,26 +51,25 @@ const Badge = styled(motion.div)`
   width: 24px;
   height: 24px;
   border-radius: 50%;
-  background: #dc2626;
-  color: white;
+  background: var(--danger);
+  color: var(--brand-on-surface);
   font-size: 0.75rem;
   font-weight: 700;
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 2px solid white;
+  border: 2px solid var(--surface);
 `;
 
 export const FloatingCompareButton: React.FC = () => {
-  const { count, rackets } = useComparison();
+  const { count } = useComparison();
   const navigate = useNavigate();
+  const { location } = useRouterState();
 
-  if (count === 0) {
-    return null; // Don't show button if no rackets in comparison
-  }
+  if (count === 0 || location.pathname === '/catalog') return null;
 
   const handleClick = () => {
-    navigate('/compare', { state: { rackets } });
+    navigate({ to: '/compare-rackets' });
   };
 
   return (
