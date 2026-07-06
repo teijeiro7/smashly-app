@@ -6,7 +6,8 @@ export type NotificationType =
   | 'review_reply'
   | 'admin_update'
   | 'new_user'
-  | 'new_store';
+  | 'new_store'
+  | 'store_status';
 
 export interface Notification {
   id: string;
