@@ -42,6 +42,18 @@
       "destination": "/api/admin/stores/[id]"
     },
     {
+      "source": "/api/v1/analytics/store",
+      "destination": "/api/v1/analytics/store"
+    },
+    {
+      "source": "/api/v1/messaging/conversations",
+      "destination": "/api/v1/messaging/conversations"
+    },
+    {
+      "source": "/api/v1/messaging/messages",
+      "destination": "/api/v1/messaging/messages"
+    },
+    {
       "source": "/api/v1/stores/my-store",
       "destination": "/api/v1/stores/my-store"
     },

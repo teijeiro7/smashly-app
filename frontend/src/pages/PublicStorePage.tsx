@@ -6,6 +6,7 @@ import { motion } from 'framer-motion';
 import { API_URL, API_ENDPOINTS } from '../config/api';
 import { Store } from '../services/storeService';
 import { StorePrice } from '../services/catalogService';
+import { trackEvent } from '../services/analyticsService';
 
 const Page = styled.div`
   min-height: 100dvh;
@@ -298,6 +299,7 @@ const PublicStorePage: React.FC = () => {
         if (!res.ok) { setNotFound(true); return; }
         const data = await res.json();
         setStore(data);
+        trackEvent(data.id, 'view');
 
         // Fetch catalog
         try {
@@ -392,7 +394,7 @@ const PublicStorePage: React.FC = () => {
                     <RacketName>{item.racket?.name || `Pala #${item.racket_id}`}</RacketName>
                     {item.price && <RacketPrice>{item.price}€</RacketPrice>}
                     {item.link && (
-                      <RacketLink href={item.link} target="_blank" rel="noopener">
+                      <RacketLink href={item.link} target="_blank" rel="noopener" onClick={() => trackEvent(store!.id, 'click')}>
                         <FiShoppingCart /> Ver en tienda
                       </RacketLink>
                     )}

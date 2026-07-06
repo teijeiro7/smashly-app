@@ -303,6 +303,36 @@ const SubmitButton = styled.button`
   }
 `;
 
+const AnalyticsGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+
+  @media (max-width: 600px) {
+    grid-template-columns: 1fr;
+  }
+`;
+
+const AnalyticCard = styled.div`
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 1.25rem;
+  text-align: center;
+`;
+
+const AnalyticValue = styled.div`
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin-bottom: 0.25rem;
+`;
+
+const AnalyticLabel = styled.div`
+  font-size: 0.85rem;
+  color: var(--text-muted);
+`;
+
 const ToggleCreateButton = styled.button`
   background: none;
   border: none;
@@ -499,7 +529,7 @@ export const StoreDashboard: React.FC = () => {
       icon: FaChartLine,
       title: 'Analíticas',
       description: 'Visitas, clics y valoraciones',
-      onClick: () => sileo.info({ title: 'Próximamente', description: 'Las analíticas estarán disponibles pronto.' }),
+      onClick: () => document.getElementById('analytics-section')?.scrollIntoView({ behavior: 'smooth' }),
     },
   ];
 
@@ -533,6 +563,24 @@ export const StoreDashboard: React.FC = () => {
               </motion.div>
             ))}
           </QuickActionsGrid>
+        </Section>
+
+        <Section id="analytics-section">
+          <SectionTitle><FaChartLine /> Analíticas</SectionTitle>
+          <AnalyticsGrid>
+            <AnalyticCard>
+              <AnalyticValue>{store.views_count ?? 0}</AnalyticValue>
+              <AnalyticLabel>Visitas</AnalyticLabel>
+            </AnalyticCard>
+            <AnalyticCard>
+              <AnalyticValue>{store.clicks_count ?? 0}</AnalyticValue>
+              <AnalyticLabel>Clics en productos</AnalyticLabel>
+            </AnalyticCard>
+            <AnalyticCard>
+              <AnalyticValue>{store.rating_avg > 0 ? store.rating_avg.toFixed(1) : '—'}</AnalyticValue>
+              <AnalyticLabel>Valoración</AnalyticLabel>
+            </AnalyticCard>
+          </AnalyticsGrid>
         </Section>
 
         <Section>
