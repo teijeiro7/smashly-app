@@ -42,6 +42,14 @@
       "destination": "/api/admin/stores/[id]"
     },
     {
+      "source": "/api/v1/stores/my-store",
+      "destination": "/api/v1/stores/my-store"
+    },
+    {
+      "source": "/api/v1/stores/:id",
+      "destination": "/api/v1/stores/[id]"
+    },
+    {
       "source": "/((?!api/).*)",
       "destination": "/index.html"
     }

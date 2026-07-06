@@ -2,8 +2,7 @@ import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { FiSearch, FiCheck, FiX, FiMapPin, FiMail, FiPhone, FiGlobe } from 'react-icons/fi';
 import { sileo } from 'sileo';
-import { AdminService } from '../../services/adminService';
-import { Store } from '../../services/storeService';
+import { AdminService, StoreRequest } from '../../services/adminService';
 
 const Container = styled.div`
   display: flex;
@@ -219,8 +218,8 @@ const LoadingContainer = styled.div`
 type ViewMode = 'all' | 'pending';
 
 const StoreRequestsManager: React.FC = () => {
-  const [requests, setRequests] = useState<Store[]>([]);
-  const [filteredRequests, setFilteredRequests] = useState<Store[]>([]);
+  const [requests, setRequests] = useState<StoreRequest[]>([]);
+  const [filteredRequests, setFilteredRequests] = useState<StoreRequest[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [viewMode, setViewMode] = useState<ViewMode>('pending');
   const [loading, setLoading] = useState(true);
@@ -258,7 +257,7 @@ const StoreRequestsManager: React.FC = () => {
 
     // Filtrar por modo de vista
     if (viewMode === 'pending') {
-      filtered = filtered.filter(r => !r.verified);
+      filtered = filtered.filter(r => r.status === 'pending');
       console.log('🔍 After pending filter:', filtered.length);
     }
 
@@ -289,8 +288,9 @@ const StoreRequestsManager: React.FC = () => {
   };
 
   const handleReject = async (requestId: string) => {
+    const reason = window.prompt('Motivo del rechazo:');
     try {
-      await AdminService.rejectStore(requestId);
+      await AdminService.rejectStore(requestId, reason || undefined);
       // Remover de la lista
       setRequests(requests.filter(r => r.id !== requestId));
       sileo.success({ title: 'Éxito', description: 'Solicitud de tienda rechazada' });
@@ -337,8 +337,8 @@ const StoreRequestsManager: React.FC = () => {
             <RequestCard key={request.id}>
               <CardHeader>
                 <StoreName>{request.store_name}</StoreName>
-                <StatusBadge status={request.verified ? 'approved' : 'pending'}>
-                  {request.verified ? 'Verificada' : 'Pendiente'}
+                <StatusBadge status={request.status === 'verified' ? 'approved' : request.status}>
+                  {request.status === 'verified' ? 'Verificada' : request.status === 'rejected' ? 'Rechazada' : 'Pendiente'}
                 </StatusBadge>
               </CardHeader>
 
@@ -387,7 +387,13 @@ const StoreRequestsManager: React.FC = () => {
                 <strong>Razón Social:</strong> {request.legal_name} ({request.cif_nif})
               </InfoItem>
 
-              {!request.verified && (
+              {request.status === 'rejected' && request.rejection_reason && (
+                <InfoItem style={{ display: 'block', color: 'var(--danger)' }}>
+                  <strong>Motivo:</strong> {request.rejection_reason}
+                </InfoItem>
+              )}
+
+              {request.status === 'pending' && (
                 <ActionsContainer>
                   <ActionButton variant='approve' onClick={() => handleApprove(request.id)}>
                     <FiCheck />

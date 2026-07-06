@@ -47,6 +47,7 @@ const PrivacyPolicyPage = lazy(() => import('./pages/PrivacyPolicyPage'));
 const UserProfilePage = lazy(() => import('./pages/UserProfilePage'));
 const ListPage = lazy(() => import('./pages/ListPage'));
 const AdminPanelPage = lazy(() => import('./pages/AdminPanelPage'));
+const StoreDashboard = lazy(() => import('./pages/StoreDashboard').then(m => ({ default: m.StoreDashboard })));
 const AdminRacketReviewPage = lazy(() => import('./pages/AdminRacketReviewPage'));
 const AdminRacketsPage = lazy(() => import('./pages/AdminRacketsPage'));
 const AdminUsersPage = lazy(() => import('./pages/AdminUsersPage'));
@@ -118,6 +119,30 @@ async function requireAdmin() {
     .single();
   if (data?.role?.toLowerCase() !== 'admin') {
     throw redirect({ to: '/error' as any });
+  }
+}
+
+async function requireStoreOwner() {
+  const session = await requireAuth();
+  const { data } = await supabase
+    .from('user_profiles')
+    .select('role')
+    .eq('id', session.user.id)
+    .single();
+  if (data?.role !== 'store_owner') {
+    throw redirect({ to: '/dashboard' });
+  }
+}
+
+async function redirectStoreOwnerToDashboard() {
+  const session = await requireAuth();
+  const { data } = await supabase
+    .from('user_profiles')
+    .select('role')
+    .eq('id', session.user.id)
+    .single();
+  if (data?.role === 'store_owner') {
+    throw redirect({ to: '/store/dashboard' });
   }
 }
 
@@ -299,8 +324,15 @@ const registerRoute = createRoute({
 const dashboardRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/dashboard',
-  beforeLoad: requireAuth,
+  beforeLoad: redirectStoreOwnerToDashboard,
   component: () => <LazyRoute><PlayerDashboard /></LazyRoute>,
+});
+
+const storeDashboardRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/store/dashboard',
+  beforeLoad: requireStoreOwner,
+  component: () => <LazyRoute><StoreDashboard /></LazyRoute>,
 });
 
 const myComparisonsRoute = createRoute({
@@ -405,6 +437,7 @@ const routeTree = rootRoute.addChildren([
   registerRoute,
   // Protected
   dashboardRoute,
+  storeDashboardRoute,
   myComparisonsRoute,
   profileRoute,
   listRoute,
