@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { useParams, useNavigate } from '@tanstack/react-router';
-import { FiMapPin, FiMail, FiPhone, FiGlobe, FiArrowLeft, FiStar, FiEye, FiShoppingCart } from 'react-icons/fi';
+import { FiMapPin, FiMail, FiPhone, FiGlobe, FiArrowLeft, FiStar, FiEye, FiShoppingCart, FiMessageSquare } from 'react-icons/fi';
 import { motion } from 'framer-motion';
 import { API_URL, API_ENDPOINTS } from '../config/api';
 import { Store } from '../services/storeService';
@@ -405,7 +405,14 @@ const PublicStorePage: React.FC = () => {
 
         <SideCol>
           <InfoCard>
-            <SectionTitle>Información de contacto</SectionTitle>
+            <SectionTitle>Contacto</SectionTitle>
+            <InfoItem>
+              <FiMessageSquare />
+              <InfoLink as="button" onClick={() => navigate({ to: '/messages' })} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--primary)', fontSize: '0.9rem', fontWeight: 600, padding: 0 }}>
+                Enviar mensaje
+              </InfoLink>
+            </InfoItem>
+            <SectionTitle style={{ marginTop: '1rem' }}>Información</SectionTitle>
             <InfoItem><FiMapPin /> {store.location}</InfoItem>
             <InfoItem><FiMail /> <InfoLink href={`mailto:${store.contact_email}`}>{store.contact_email}</InfoLink></InfoItem>
             <InfoItem><FiPhone /> {store.phone_number}</InfoItem>

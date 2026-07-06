@@ -56,6 +56,7 @@ const AdminSettingsPage = lazy(() => import('./pages/AdminSettingsPage'));
 const ForgotPasswordPage = lazy(() => import('./pages/ForgotPasswordPage'));
 const UpdatePasswordPage = lazy(() => import('./pages/UpdatePasswordPage'));
 const PublicStorePage = lazy(() => import('./pages/PublicStorePage'));
+const MessagingPage = lazy(() => import('./pages/MessagingPage'));
 const NotFoundPage = lazy(() => import('./pages/NotFoundPage'));
 const ErrorPage = lazy(() => import('./pages/ErrorPage'));
 
@@ -342,6 +343,13 @@ const storeDashboardRoute = createRoute({
   component: () => <LazyRoute><StoreDashboard /></LazyRoute>,
 });
 
+const messagingRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/messages',
+  beforeLoad: requireAuth,
+  component: () => <LazyRoute><MessagingPage /></LazyRoute>,
+});
+
 const myComparisonsRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/comparisons',
@@ -446,6 +454,7 @@ const routeTree = rootRoute.addChildren([
   dashboardRoute,
   storeDashboardRoute,
   publicStoreRoute,
+  messagingRoute,
   myComparisonsRoute,
   profileRoute,
   listRoute,
