@@ -7,15 +7,21 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
 
   if (handleOptions(req, res)) return;
 
-  const storeId = (req.url || '').split('/').filter(Boolean).pop() || '';
+  const rawId = (req.url || '').split('/').filter(Boolean).pop() || '';
 
   if (req.method === 'GET') {
-    await handleList(storeId, req, res);
+    await handleList(rawId, req, res);
     return;
   }
 
   if (req.method === 'POST') {
-    await handleAdd(storeId, req, res);
+    const resolvedId = await resolveStoreId(rawId);
+    if (!resolvedId) {
+      res.writeHead(404, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Tienda no encontrada' }));
+      return;
+    }
+    await handleAdd(resolvedId, req, res);
     return;
   }
 
@@ -23,14 +29,44 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
   res.end(JSON.stringify({ error: 'Method not allowed' }));
 }
 
-async function handleList(storeId: string, req: IncomingMessage, res: ServerResponse): Promise<void> {
+async function resolveStoreId(idOrSlug: string): Promise<string | null> {
+  const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(idOrSlug);
+  if (isUuid) return idOrSlug;
+
+  const { data } = await supabaseAdmin
+    .from('stores')
+    .select('id')
+    .eq('slug', idOrSlug)
+    .maybeSingle();
+  return data?.id || null;
+}
+
+async function handleList(rawId: string, req: IncomingMessage, res: ServerResponse): Promise<void> {
+  const storeId = await resolveStoreId(rawId);
+  if (!storeId) {
+    res.writeHead(404, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ error: 'Tienda no encontrada' }));
+    return;
+  }
+
   const user = await getAuthUser(req);
-  if (!user) return unauthorized(res);
-
   const ownerId = await getStoreOwnerId(storeId);
-  const admin = await isAdmin(user.id);
+  const admin = user ? await isAdmin(user.id) : false;
+  const isOwner = user && ownerId === user.id;
 
-  if (ownerId !== user.id && !admin) return forbidden(res);
+  if (!isOwner && !admin) {
+    const { data: store } = await supabaseAdmin
+      .from('stores')
+      .select('status')
+      .eq('id', storeId)
+      .maybeSingle();
+
+    if (!store || store.status !== 'verified') {
+      res.writeHead(404, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Tienda no encontrada' }));
+      return;
+    }
+  }
 
   const url = new URL(req.url || '', `http://${req.headers.host}`);
   const page = parseInt(url.searchParams.get('page') || '1', 10);

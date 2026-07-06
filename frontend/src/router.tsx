@@ -55,6 +55,7 @@ const AdminStoresPage = lazy(() => import('./pages/AdminStoresPage'));
 const AdminSettingsPage = lazy(() => import('./pages/AdminSettingsPage'));
 const ForgotPasswordPage = lazy(() => import('./pages/ForgotPasswordPage'));
 const UpdatePasswordPage = lazy(() => import('./pages/UpdatePasswordPage'));
+const PublicStorePage = lazy(() => import('./pages/PublicStorePage'));
 const NotFoundPage = lazy(() => import('./pages/NotFoundPage'));
 const ErrorPage = lazy(() => import('./pages/ErrorPage'));
 
@@ -312,6 +313,12 @@ const loginRoute = createRoute({
   component: LoginRedirect,
 });
 
+const publicStoreRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/store/$slug',
+  component: () => <LazyRoute><PublicStorePage /></LazyRoute>,
+});
+
 const registerRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/register',
@@ -438,6 +445,7 @@ const routeTree = rootRoute.addChildren([
   // Protected
   dashboardRoute,
   storeDashboardRoute,
+  publicStoreRoute,
   myComparisonsRoute,
   profileRoute,
   listRoute,
