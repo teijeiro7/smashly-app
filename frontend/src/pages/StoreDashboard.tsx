@@ -2,12 +2,14 @@ import React, { useState, useEffect, useCallback } from 'react';
 import styled from 'styled-components';
 import { useNavigate } from '@tanstack/react-router';
 import { FaStore, FaEdit, FaGlobe, FaBox, FaChartLine, FaPlus } from 'react-icons/fa';
+import { FiPackage } from 'react-icons/fi';
 import { motion } from 'framer-motion';
 import { supabase } from '../lib/supabase';
 import storeService, { Store, CreateStoreRequest } from '../services/storeService';
 import { QuickActionCard } from '../components/dashboard/QuickActionCard';
 import StoreStatusCard from '../components/features/StoreStatusCard';
 import StoreProfileForm from '../components/features/StoreProfileForm';
+import StoreCatalogManager from '../components/features/StoreCatalogManager';
 import { sileo } from 'sileo';
 
 const Container = styled.div`
@@ -597,6 +599,11 @@ export const StoreDashboard: React.FC = () => {
               </>
             )}
           </InfoCard>
+        </Section>
+
+        <Section>
+          <SectionTitle><FiPackage /> Catálogo</SectionTitle>
+          <StoreCatalogManager storeId={store.id} />
         </Section>
       </MaxWidth>
 

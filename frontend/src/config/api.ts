@@ -47,6 +47,9 @@ export const API_ENDPOINTS = {
   STORES: '/api/v1/stores',
   STORES_BY_ID: (id: string) => `/api/v1/stores/${id}`,
   STORES_MY_STORE: '/api/v1/stores/my-store',
+  STORES_CATALOG: (storeId: string) => `/api/v1/stores/catalog/${storeId}`,
+  STORES_CATALOG_SEARCH: (storeId: string) => `/api/v1/stores/catalog/${storeId}/search`,
+  STORES_CATALOG_ITEM: (storeId: string, priceId: string) => `/api/v1/stores/catalog/${storeId}/${priceId}`,
 
   // Admin
   ADMIN: {
