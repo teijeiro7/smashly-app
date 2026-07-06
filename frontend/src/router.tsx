@@ -22,6 +22,7 @@ import { PWAInstallPrompt } from './components/pwa/PWAInstallPrompt';
 import { BackgroundTaskPopup } from './components/common/BackgroundTaskPopup';
 import LoadingSpinner from './components/common/LoadingSpinner';
 import { logger } from './utils/logger';
+import { sileo } from 'sileo';
 
 // ──────────────────────────────────────────────────────────────────────────────
 // Lazy page components
@@ -157,6 +158,20 @@ const RegisterRedirect: React.FC = () => {
 };
 
 // ──────────────────────────────────────────────────────────────────────────────
+// Google block error handler (store_owner cannot use Google login)
+// ──────────────────────────────────────────────────────────────────────────────
+const GoogleBlockHandler: React.FC = () => {
+  const { googleBlockError, clearGoogleBlockError } = useAuth();
+  React.useEffect(() => {
+    if (googleBlockError) {
+      sileo.error({ title: 'Error', description: googleBlockError });
+      clearGoogleBlockError();
+    }
+  }, [googleBlockError, clearGoogleBlockError]);
+  return null;
+};
+
+// ──────────────────────────────────────────────────────────────────────────────
 // Root route — provides the main layout shell
 // ──────────────────────────────────────────────────────────────────────────────
 const rootRoute = createRootRoute({
@@ -165,6 +180,7 @@ const rootRoute = createRootRoute({
       <ScrollToTop />
       <AuthModal />
       <GoogleOnboardingHandler />
+      <GoogleBlockHandler />
       <PWAInstallPrompt />
       <Layout>
         <FloatingCompareButton />

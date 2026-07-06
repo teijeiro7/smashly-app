@@ -8,6 +8,7 @@ interface AuthContextType {
   userProfile: UserProfile | null;
   loading: boolean;
   pendingGoogleOnboarding: { suggestedNickname: string } | null;
+  googleBlockError: string | null;
   signUp: (
     email: string,
     password: string,
@@ -23,6 +24,7 @@ interface AuthContextType {
   signOut: () => Promise<{ error: string | null }>;
   refreshUserProfile: () => Promise<void>;
   clearGoogleOnboarding: () => void;
+  clearGoogleBlockError: () => void;
   isAuthenticated: boolean;
 }
 
@@ -68,6 +70,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [pendingGoogleOnboarding, setPendingGoogleOnboarding] = useState<{
     suggestedNickname: string;
   } | null>(null);
+  const [googleBlockError, setGoogleBlockError] = useState<string | null>(null);
 
   const loadAndSetProfile = useCallback(async (userId: string): Promise<UserProfile | null> => {
     const profile = await fetchProfile(userId);
@@ -83,6 +86,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const clearGoogleOnboarding = useCallback(() => {
     setPendingGoogleOnboarding(null);
+  }, []);
+
+  const clearGoogleBlockError = useCallback(() => {
+    setGoogleBlockError(null);
   }, []);
 
   useEffect(() => {
@@ -118,6 +125,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           setPendingGoogleOnboarding({
             suggestedNickname: deriveSuggestedNickname(session),
           });
+        }
+
+        // Block Google login for store_owner accounts
+        if (provider === 'google' && profile?.role === 'store_owner') {
+          supabase.auth.signOut();
+          clearAuth();
+          setGoogleBlockError('Las cuentas de tienda no pueden usar Google para iniciar sesión.');
         }
       }
     });
@@ -199,7 +213,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       email: data.user.email,
       nickname,
       full_name: fullName ?? null,
-      role: 'player',
+      role: _role ?? 'player',
     });
 
     if (!data.session) {
@@ -252,24 +266,28 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     userProfile,
     loading,
     pendingGoogleOnboarding,
+    googleBlockError,
     signUp,
     signIn,
     signInWithGoogle,
     signOut,
     refreshUserProfile,
     clearGoogleOnboarding,
+    clearGoogleBlockError,
     isAuthenticated: !!user,
   }), [
     user,
     userProfile,
     loading,
     pendingGoogleOnboarding,
+    googleBlockError,
     signUp,
     signIn,
     signInWithGoogle,
     signOut,
     refreshUserProfile,
     clearGoogleOnboarding,
+    clearGoogleBlockError,
   ]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
