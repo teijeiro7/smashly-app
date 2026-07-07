@@ -131,7 +131,7 @@ async function requireStoreOwner() {
     .select('role')
     .eq('id', session.user.id)
     .single();
-  if (data?.role !== 'store_owner') {
+  if (data?.role !== 'Store') {
     throw redirect({ to: '/dashboard' });
   }
 }
@@ -143,7 +143,7 @@ async function redirectStoreOwnerToDashboard() {
     .select('role')
     .eq('id', session.user.id)
     .single();
-  if (data?.role === 'store_owner') {
+  if (data?.role === 'Store') {
     throw redirect({ to: '/store/dashboard' });
   }
 }

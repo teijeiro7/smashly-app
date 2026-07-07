@@ -30,14 +30,14 @@ export async function getAuthUser(req: IncomingMessage): Promise<AuthUser | null
   return { id: user.id, email: user.email };
 }
 
-/** Verify user is admin by checking user_profiles.role = 'admin' */
+/** Verify user is admin by checking user_profiles.role = 'Admin' */
 export async function isAdmin(userId: string): Promise<boolean> {
   const { data } = await supabaseAdmin
     .from('user_profiles')
     .select('role')
     .eq('id', userId)
     .single();
-  return data?.role === 'admin';
+  return data?.role === 'Admin';
 }
 
 /** Set CORS headers for store endpoints */

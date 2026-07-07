@@ -37,7 +37,7 @@ async function handleList(req: IncomingMessage, res: ServerResponse): Promise<vo
     .select('*')
     .order('last_message_at', { ascending: false });
 
-  if (profile?.role === 'store_owner') {
+  if (profile?.role === 'Store') {
     const { data: storeIds } = await supabaseAdmin
       .from('stores')
       .select('id')

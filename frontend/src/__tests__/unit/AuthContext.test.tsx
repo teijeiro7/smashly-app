@@ -23,7 +23,7 @@ const mockProfile = {
   id: 'u1',
   email: 'user@test.com',
   nickname: 'user',
-  role: 'player',
+  role: 'Player',
 };
 
 // Reset fetch between tests

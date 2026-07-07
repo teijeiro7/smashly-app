@@ -44,7 +44,7 @@ export interface AdminUser {
   email: string;
   nickname: string;
   full_name?: string;
-  role: 'admin' | 'player';
+  role: 'Admin' | 'Player' | 'Store';
   created_at: string;
 }
 
@@ -120,7 +120,7 @@ export class AdminService {
   /**
    * Actualiza el rol de un usuario
    */
-  static async updateUserRole(userId: string, role: 'admin' | 'player'): Promise<AdminUser> {
+  static async updateUserRole(userId: string, role: 'Admin' | 'Player'): Promise<AdminUser> {
     const headers = await getAuthHeaders();
     const response = await fetch(`${API_ENDPOINTS.ADMIN.USERS}/${userId}`, {
       method: 'PATCH',

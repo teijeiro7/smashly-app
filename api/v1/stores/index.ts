@@ -107,7 +107,7 @@ async function handleCreate(req: IncomingMessage, res: ServerResponse): Promise<
   const { data: admins } = await supabaseAdmin
     .from('user_profiles')
     .select('id')
-    .eq('role', 'admin');
+    .eq('role', 'Admin');
 
   if (admins?.length) {
     const notifications = admins.map(a => ({
@@ -120,8 +120,8 @@ async function handleCreate(req: IncomingMessage, res: ServerResponse): Promise<
     await supabaseAdmin.from('notifications').insert(notifications);
   }
 
-  // Update user role to store_owner
-  await supabaseAdmin.from('user_profiles').update({ role: 'store_owner' }).eq('id', user.id);
+  // Update user role to Store
+  await supabaseAdmin.from('user_profiles').update({ role: 'Store' }).eq('id', user.id);
 
   res.writeHead(201, { 'Content-Type': 'application/json' });
   res.end(JSON.stringify(store));

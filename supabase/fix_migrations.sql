@@ -18,7 +18,7 @@ AS $$
     SELECT 1
     FROM user_profiles
     WHERE id = auth.uid()
-      AND role::text = 'admin'
+      AND role::text = 'Admin'
   );
 $$;
 

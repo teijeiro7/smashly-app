@@ -164,7 +164,7 @@ async function handleDelete(req: IncomingMessage, res: ServerResponse, storeId: 
     return;
   }
 
-  // Keep user role as store_owner (confirmed by user)
+  // Keep user role as Store (confirmed by user)
   res.writeHead(204);
   res.end();
 }

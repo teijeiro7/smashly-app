@@ -14,7 +14,7 @@ interface AuthContextType {
     password: string,
     nickname: string,
     fullName?: string,
-    _role?: 'player' | 'store_owner'
+    _role?: 'Player' | 'Store'
   ) => Promise<{ data: UserProfile | null; error: string | null; token?: string }>;
   signIn: (
     email: string,
@@ -128,7 +128,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         }
 
         // Block Google login for store_owner accounts
-        if (provider === 'google' && profile?.role === 'store_owner') {
+        if (provider === 'google' && profile?.role === 'Store') {
           supabase.auth.signOut();
           clearAuth();
           setGoogleBlockError('Las cuentas de tienda no pueden usar Google para iniciar sesión.');
@@ -189,7 +189,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     password: string,
     nickname: string,
     fullName?: string,
-    _role?: 'player' | 'store_owner'
+    _role?: 'Player' | 'Store'
   ): Promise<{ data: UserProfile | null; error: string | null; token?: string }> => {
     console.log('[signUp] 1: calling supabase.auth.signUp...', { email, nickname, _role });
     const { data, error } = await supabase.auth.signUp({
@@ -217,9 +217,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       email: data.user.email,
       nickname,
       full_name: fullName ?? null,
-      role: _role ?? 'player',
+      role: _role ?? 'Player',
     });
     console.log('[signUp] 5: upsert done', { upsertError });
+
+    if (upsertError) {
+      console.log('[signUp] 5b: upsert error path');
+      return { data: null, error: `No se pudo actualizar el perfil: ${upsertError.message}` };
+    }
 
     if (!data.session) {
       console.log('[signUp] 6: no session (email confirmation required)');
