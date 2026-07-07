@@ -21,7 +21,7 @@ AS $$
     SELECT 1
     FROM user_profiles
     WHERE id = auth.uid()
-      AND lower(role) = 'admin'
+      AND role::text = 'admin'
   );
 $$;
 
