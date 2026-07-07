@@ -47,7 +47,9 @@ const storeService = {
     storeData: CreateStoreRequest,
     token: string
   ): Promise<Store> {
-    const response = await fetch(`${API_URL}${API_ENDPOINTS.STORES}`, {
+    const url = `${API_URL}${API_ENDPOINTS.STORES}`;
+    console.log('[createStoreRequest] POST', url, { storeData, hasToken: !!token });
+    const response = await fetch(url, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -55,14 +57,17 @@ const storeService = {
       },
       body: JSON.stringify(storeData),
     });
+    console.log('[createStoreRequest] response status:', response.status);
 
     if (!response.ok) {
       const error = await response.json();
+      console.log('[createStoreRequest] error body:', error);
       throw new Error(error.error || "Error al crear la tienda");
     }
 
     const data = await response.json();
-    return data.store;
+    console.log('[createStoreRequest] success:', data);
+    return data.store ?? data;
   },
 
   /**

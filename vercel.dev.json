@@ -54,6 +54,10 @@
       "destination": "/api/v1/messaging/messages"
     },
     {
+      "source": "/api/v1/stores",
+      "destination": "/api/v1/stores/index"
+    },
+    {
       "source": "/api/v1/stores/my-store",
       "destination": "/api/v1/stores/my-store"
     },
