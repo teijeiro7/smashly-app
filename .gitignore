@@ -381,3 +381,4 @@ docs/TFG_Cristian_Teijeiro
 .env*.local
 .superpowers/
 testing/
+.env*
