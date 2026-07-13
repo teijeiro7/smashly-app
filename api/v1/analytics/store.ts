@@ -1,6 +1,6 @@
 import type { IncomingMessage, ServerResponse } from 'http';
 import { supabaseAdmin } from '../../_lib/supabase';
-import { readBody, setCorsHeaders, handleOptions, badRequest } from '../../_lib/auth';
+import { getAuthUser, readBody, setCorsHeaders, handleOptions, badRequest } from '../../_lib/auth';
 
 export default async function handler(req: IncomingMessage, res: ServerResponse): Promise<void> {
   setCorsHeaders(req, res);
@@ -17,6 +17,13 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
 }
 
 async function handleTrack(req: IncomingMessage, res: ServerResponse): Promise<void> {
+  const user = await getAuthUser(req);
+  if (!user) {
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ success: true }));
+    return;
+  }
+
   let body: any;
   try { body = await readBody(req); } catch {
     return badRequest(res, 'Invalid JSON body');
@@ -34,18 +41,10 @@ async function handleTrack(req: IncomingMessage, res: ServerResponse): Promise<v
 
   const column = event === 'view' ? 'views_count' : 'clicks_count';
 
-  const { data: store } = await supabaseAdmin
-    .from('stores')
-    .select(column)
-    .eq('id', store_id)
-    .single();
-
-  const currentValue = store?.[column as keyof typeof store] ?? 0;
-
-  const { error } = await supabaseAdmin
-    .from('stores')
-    .update({ [column]: Number(currentValue) + 1 })
-    .eq('id', store_id);
+  const { error } = await supabaseAdmin.rpc('increment_store_counter', {
+    store_id,
+    col: column,
+  });
 
   if (error) {
     res.writeHead(500, { 'Content-Type': 'application/json' });
