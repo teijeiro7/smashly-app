@@ -3,7 +3,7 @@ import { supabaseAdmin } from '../../../_lib/supabase';
 import { getAuthUser, isAdmin, readBody, setCorsHeaders, handleOptions, unauthorized, forbidden, badRequest, getStoreOwnerId } from '../../../_lib/auth';
 
 export default async function handler(req: IncomingMessage, res: ServerResponse): Promise<void> {
-  setCorsHeaders(res);
+  setCorsHeaders(req, res);
 
   if (handleOptions(req, res)) return;
 
@@ -75,7 +75,7 @@ async function handleList(rawId: string, req: IncomingMessage, res: ServerRespon
 
   const { data: prices, error, count } = await supabaseAdmin
     .from('store_prices')
-    .select('*, racket:rackets(*)', { count: 'exact' })
+    .select('*, racket:rackets(id, name, brand, model, images, specs)', { count: 'exact' })
     .eq('store_id', storeId)
     .order('created_at', { ascending: false })
     .range(offset, offset + limit - 1);
