@@ -278,7 +278,7 @@ const UsersManager: React.FC = () => {
 
     // Filtrar por rol
     if (filter !== 'all') {
-      filtered = filtered.filter(u => u.role === filter);
+      filtered = filtered.filter(u => u.role.toLowerCase() === filter);
     }
 
     // Filtrar por búsqueda
