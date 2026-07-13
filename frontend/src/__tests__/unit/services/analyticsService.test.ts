@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 global.fetch = vi.fn();
 
-import { trackEvent } from '../../../services/analyticsService';
+import analyticsService from '../../../services/analyticsService';
 
 describe('analyticsService', () => {
   beforeEach(() => {
@@ -16,7 +16,7 @@ describe('analyticsService', () => {
         json: async () => ({}),
       });
 
-      await trackEvent('store-1', 'view');
+      await analyticsService.trackEvent('store-1', 'view');
 
       expect(global.fetch).toHaveBeenCalledWith(
         expect.stringContaining('/api/v1/analytics/store'),
@@ -34,7 +34,7 @@ describe('analyticsService', () => {
         json: async () => ({}),
       });
 
-      await trackEvent('store-1', 'click');
+      await analyticsService.trackEvent('store-1', 'click');
 
       expect(global.fetch).toHaveBeenCalledWith(
         expect.anything(),
@@ -47,7 +47,7 @@ describe('analyticsService', () => {
     it('should silently fail on network error', async () => {
       (global.fetch as any).mockRejectedValueOnce(new Error('Network error'));
 
-      await expect(trackEvent('store-1', 'view')).resolves.not.toThrow();
+      await expect(analyticsService.trackEvent('store-1', 'view')).resolves.not.toThrow();
     });
 
     it('should silently fail on server error', async () => {
@@ -56,7 +56,7 @@ describe('analyticsService', () => {
         status: 500,
       });
 
-      await expect(trackEvent('store-1', 'view')).resolves.not.toThrow();
+      await expect(analyticsService.trackEvent('store-1', 'view')).resolves.not.toThrow();
     });
   });
 });

@@ -1,23 +1,19 @@
 import type { IncomingMessage, ServerResponse } from 'http';
 import { supabaseAdmin } from '../../_lib/supabase';
-import { getAuthUser, isAdmin, readBody, unauthorized, forbidden, badRequest } from '../../_lib/auth';
+import { getAuthUser, isAdmin, readBody, setCorsHeaders, handleOptions, unauthorized, forbidden, badRequest } from '../../_lib/auth';
 
-export default async function handler(req: IncomingMessage & { query?: any }, res: ServerResponse): Promise<void> {
-  res.setHeader('Access-Control-Allow-Origin', process.env.FRONTEND_URL || '*');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, PATCH, OPTIONS');
+export default async function handler(req: IncomingMessage, res: ServerResponse): Promise<void> {
+  setCorsHeaders(req, res);
 
-  if (req.method === 'OPTIONS') {
-    res.writeHead(204);
-    res.end();
-    return;
-  }
+  if (handleOptions(req, res)) return;
 
   const user = await getAuthUser(req);
   if (!user) return unauthorized(res);
   if (!(await isAdmin(user.id))) return forbidden(res);
 
-  const storeId = req.query?.id;
+  const url = new URL(req.url || '', `http://${req.headers.host || 'localhost'}`);
+  const segments = url.pathname.split('/').filter(Boolean);
+  const storeId = segments[segments.length - 1];
   if (!storeId) {
     return badRequest(res, 'Store ID required');
   }

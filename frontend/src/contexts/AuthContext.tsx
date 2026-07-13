@@ -191,7 +191,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     fullName?: string,
     _role?: 'Player' | 'Store'
   ): Promise<{ data: UserProfile | null; error: string | null; token?: string }> => {
-    console.log('[signUp] 1: calling supabase.auth.signUp...', { email, nickname, _role });
     const { data, error } = await supabase.auth.signUp({
       email: email.trim().toLowerCase(),
       password,
@@ -199,19 +198,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         data: { nickname, full_name: fullName },
       },
     });
-    console.log('[signUp] 2: signUp returned', { hasUser: !!data?.user, hasSession: !!data?.session, error });
 
     if (error) {
-      console.log('[signUp] 3: error path');
       return { data: null, error: error.message };
     }
 
     if (!data.user) {
-      console.log('[signUp] 3: no user path');
       return { data: null, error: 'No se pudo crear el usuario' };
     }
 
-    console.log('[signUp] 4: upserting user_profiles...');
     const { error: upsertError } = await supabase.from('user_profiles').upsert({
       id: data.user.id,
       email: data.user.email,
@@ -219,21 +214,16 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       full_name: fullName ?? null,
       role: _role ?? 'Player',
     });
-    console.log('[signUp] 5: upsert done', { upsertError });
 
     if (upsertError) {
-      console.log('[signUp] 5b: upsert error path');
       return { data: null, error: `No se pudo actualizar el perfil: ${upsertError.message}` };
     }
 
     if (!data.session) {
-      console.log('[signUp] 6: no session (email confirmation required)');
       return { data: null, error: null };
     }
 
-    console.log('[signUp] 7: loading profile...');
     const profile = await loadAndSetProfile(data.user.id);
-    console.log('[signUp] 8: done', { hasProfile: !!profile });
     return {
       data: profile,
       error: null,

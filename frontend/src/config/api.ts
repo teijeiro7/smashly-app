@@ -80,6 +80,7 @@ export const API_ENDPOINTS = {
   HEALTH: '/api/v1/health',
 
   // Analytics
+  ANALYTICS_TRACK: '/api/v1/analytics/store',
   ANALYTICS_TIMELINE: (storeId: string) => `/api/v1/analytics/store/${storeId}/timeline`,
 
   // Price Watch

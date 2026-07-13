@@ -14,7 +14,8 @@ import StoreStatusCard from '../components/features/StoreStatusCard';
 import StoreProfileForm from '../components/features/StoreProfileForm';
 import StoreCatalogManager from '../components/features/StoreCatalogManager';
 import { sileo } from 'sileo';
-import { fetchAnalyticsTimeline, TimelineResponse } from '../services/analyticsService';
+import analyticsService from '../services/analyticsService';
+import type { TimelineResponse } from '../services/analyticsService';
 
 const Container = styled.div`
   min-height: 100dvh;
@@ -524,7 +525,7 @@ export const StoreDashboard: React.FC = () => {
     setTimelineLoading(true);
     try {
       const token = await getToken();
-      const data = await fetchAnalyticsTimeline(storeId, token, period);
+      const data = await analyticsService.fetchTimeline(storeId, token, period);
       setTimeline(data);
     } catch (err) {
       console.error('Error loading timeline:', err);

@@ -1,9 +1,11 @@
 import type { IncomingMessage, ServerResponse } from 'http';
 import { supabaseAdmin } from '../_lib/supabase';
-import { setCorsHeaders } from '../_lib/auth';
+import { setCorsHeaders, handleOptions } from '../_lib/auth';
 
 export default async function handler(req: IncomingMessage, res: ServerResponse): Promise<void> {
-  setCorsHeaders(res);
+  setCorsHeaders(req, res);
+
+  if (handleOptions(req, res)) return;
 
   if (req.method !== 'GET') {
     res.writeHead(405, { 'Content-Type': 'application/json' });

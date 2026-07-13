@@ -17,8 +17,8 @@ interface TimelineResponse {
   previous: TimelinePoint[];
 }
 
-export default async function handler(req: IncomingMessage & { query?: any }, res: ServerResponse): Promise<void> {
-  setCorsHeaders(res);
+export default async function handler(req: IncomingMessage, res: ServerResponse): Promise<void> {
+  setCorsHeaders(req, res);
 
   if (handleOptions(req, res)) return;
 
@@ -28,7 +28,9 @@ export default async function handler(req: IncomingMessage & { query?: any }, re
     return;
   }
 
-  const storeId = req.query?.id;
+  const url = new URL(req.url || '', `http://${req.headers.host || 'localhost'}`);
+  const segments = url.pathname.split('/').filter(Boolean);
+  const storeId = segments[segments.length - 2];
   if (!storeId) {
     return badRequest(res, 'Store ID requerido');
   }
@@ -47,7 +49,7 @@ export default async function handler(req: IncomingMessage & { query?: any }, re
     return forbidden(res);
   }
 
-  const period = (req.query?.period as string) || '30d';
+  const period = url.searchParams.get('period') || '30d';
   const days = parsePeriod(period);
 
   const current = await getTimeline(storeId, days);

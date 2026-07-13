@@ -41,15 +41,23 @@ async function handleTrack(req: IncomingMessage, res: ServerResponse): Promise<v
 
   const column = event === 'view' ? 'views_count' : 'clicks_count';
 
-  const { error } = await supabaseAdmin.rpc('increment_store_counter', {
+  const { error: rpcError } = await supabaseAdmin.rpc('increment_store_counter', {
     store_id,
     col: column,
   });
 
-  if (error) {
+  if (rpcError) {
     res.writeHead(500, { 'Content-Type': 'application/json' });
-    res.end(JSON.stringify({ error: error.message }));
+    res.end(JSON.stringify({ error: rpcError.message }));
     return;
+  }
+
+  const { error: insertError } = await supabaseAdmin
+    .from('store_analytics_events')
+    .insert({ store_id, event_type: event });
+
+  if (insertError) {
+    console.error('Failed to insert analytics event:', insertError.message);
   }
 
   res.writeHead(200, { 'Content-Type': 'application/json' });
