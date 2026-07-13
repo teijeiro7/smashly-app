@@ -4,6 +4,9 @@ import { useNavigate } from '@tanstack/react-router';
 import { FaStore, FaEdit, FaGlobe, FaBox, FaChartLine, FaPlus } from 'react-icons/fa';
 import { FiPackage } from 'react-icons/fi';
 import { motion } from 'framer-motion';
+import {
+  Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis,
+} from 'recharts';
 import { supabase } from '../lib/supabase';
 import storeService, { Store, CreateStoreRequest } from '../services/storeService';
 import { QuickActionCard } from '../components/dashboard/QuickActionCard';
@@ -11,6 +14,7 @@ import StoreStatusCard from '../components/features/StoreStatusCard';
 import StoreProfileForm from '../components/features/StoreProfileForm';
 import StoreCatalogManager from '../components/features/StoreCatalogManager';
 import { sileo } from 'sileo';
+import { fetchAnalyticsTimeline, TimelineResponse } from '../services/analyticsService';
 
 const Container = styled.div`
   min-height: 100dvh;
@@ -333,6 +337,62 @@ const AnalyticLabel = styled.div`
   color: var(--text-muted);
 `;
 
+const ChangeBadge = styled.span<{ positive: boolean }>`
+  font-size: 0.75rem;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.125rem;
+  color: ${({ positive }) => (positive ? 'var(--success, #22c55e)' : 'var(--danger, #ef4444)')};
+`;
+
+const ChartCard = styled.div`
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 1.25rem;
+  margin-top: 1rem;
+`;
+
+const ChartTitle = styled.h4`
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0 0 0.75rem;
+`;
+
+const PeriodControls = styled.div`
+  display: flex;
+  gap: 0.375rem;
+  margin-bottom: 0.75rem;
+`;
+
+const PeriodButton = styled.button<{ active: boolean }>`
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 4px 12px;
+  border-radius: 99px;
+  border: 1.5px solid ${({ active }) => (active ? 'var(--primary)' : 'var(--border)')};
+  background: ${({ active }) => (active ? 'var(--primary-subtle)' : 'var(--surface)')};
+  color: ${({ active }) => (active ? 'var(--primary)' : 'var(--text-muted)')};
+  cursor: pointer;
+  transition: all 0.15s;
+  &:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+  }
+`;
+
+const ChartGrid = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+`;
+
 const ToggleCreateButton = styled.button`
   background: none;
   border: none;
@@ -348,6 +408,78 @@ const ToggleCreateButton = styled.button`
     color: var(--primary-hover);
   }
 `;
+
+function computeChange(timeline: TimelineResponse, field: 'views' | 'clicks'): number {
+  const currTotal = timeline.current.reduce((s, p) => s + p[field], 0);
+  const prevTotal = timeline.previous.reduce((s, p) => s + p[field], 0);
+  if (prevTotal === 0) return currTotal > 0 ? 100 : 0;
+  return Math.round(((currTotal - prevTotal) / prevTotal) * 100);
+}
+
+function formatChange(value: number): string {
+  const sign = value >= 0 ? '+' : '';
+  return `${sign}${value}% vs periodo anterior`;
+}
+
+function renderTimelineChart(timeline: TimelineResponse | null, loading: boolean, field: 'views' | 'clicks'): React.ReactNode {
+  if (loading) {
+    return <div style={{ height: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)', fontSize: '0.875rem' }}>Cargando...</div>;
+  }
+  if (!timeline || timeline.current.length === 0) {
+    return <div style={{ height: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)', fontSize: '0.875rem' }}>Sin datos aún</div>;
+  }
+  return (
+    <div style={{ width: '100%', height: 200 }}>
+      <ResponsiveContainer>
+        <AreaChart data={timeline.current} margin={{ top: 4, right: 4, bottom: 0, left: 0 }}>
+          <defs>
+            <linearGradient id={`grad-${field}`} x1="0" y1="0" x2="0" y2="1">
+              <stop offset="5%" stopColor="var(--primary)" stopOpacity={0.15} />
+              <stop offset="95%" stopColor="var(--primary)" stopOpacity={0} />
+            </linearGradient>
+          </defs>
+          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--surface-3)" />
+          <XAxis
+            dataKey="date"
+            axisLine={false}
+            tickLine={false}
+            tick={{ fontSize: 10, fill: 'var(--text-subtle)' }}
+            tickFormatter={(val: string) => {
+              const d = new Date(val + 'T00:00:00');
+              return d.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' });
+            }}
+            minTickGap={40}
+          />
+          <YAxis hide domain={['dataMin - 1', 'dataMax + 1']} />
+          <Tooltip
+            contentStyle={{
+              borderRadius: '12px',
+              border: 'none',
+              boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
+              fontSize: '0.8rem',
+            }}
+            labelFormatter={(label: any) => {
+              const d = new Date(String(label) + 'T00:00:00');
+              return d.toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' });
+            }}
+            formatter={(value: any) => [Number(value), field === 'views' ? 'Visitas' : 'Clics']}
+          />
+          <Area
+            type="monotone"
+            dataKey={field}
+            stroke="var(--primary)"
+            strokeWidth={2}
+            fill={`url(#grad-${field})`}
+            fillOpacity={1}
+            dot={false}
+            activeDot={{ r: 4, strokeWidth: 2 }}
+            animationDuration={800}
+          />
+        </AreaChart>
+      </ResponsiveContainer>
+    </div>
+  );
+}
 
 export const StoreDashboard: React.FC = () => {
   const navigate = useNavigate();
@@ -367,6 +499,9 @@ export const StoreDashboard: React.FC = () => {
     short_description: '',
   });
   const [creating, setCreating] = useState(false);
+  const [timeline, setTimeline] = useState<TimelineResponse | null>(null);
+  const [timelineLoading, setTimelineLoading] = useState(false);
+  const [period, setPeriod] = useState<'7d' | '30d' | '90d'>('30d');
 
   const getToken = useCallback(async () => {
     const { data: { session } } = await supabase.auth.getSession();
@@ -385,9 +520,26 @@ export const StoreDashboard: React.FC = () => {
     }
   }, [getToken]);
 
+  const loadTimeline = useCallback(async (storeId: string) => {
+    setTimelineLoading(true);
+    try {
+      const token = await getToken();
+      const data = await fetchAnalyticsTimeline(storeId, token, period);
+      setTimeline(data);
+    } catch (err) {
+      console.error('Error loading timeline:', err);
+    } finally {
+      setTimelineLoading(false);
+    }
+  }, [getToken, period]);
+
   useEffect(() => {
     loadStore();
   }, [loadStore]);
+
+  useEffect(() => {
+    if (store) loadTimeline(store.id);
+  }, [store, loadTimeline]);
 
   const handleSaveProfile = async (updates: Partial<Store>) => {
     if (!store) return;
@@ -571,16 +723,45 @@ export const StoreDashboard: React.FC = () => {
             <AnalyticCard>
               <AnalyticValue>{store.views_count ?? 0}</AnalyticValue>
               <AnalyticLabel>Visitas</AnalyticLabel>
+              {timeline && (
+                <ChangeBadge positive={computeChange(timeline, 'views') >= 0}>
+                  {formatChange(computeChange(timeline, 'views'))}
+                </ChangeBadge>
+              )}
             </AnalyticCard>
             <AnalyticCard>
               <AnalyticValue>{store.clicks_count ?? 0}</AnalyticValue>
               <AnalyticLabel>Clics en productos</AnalyticLabel>
+              {timeline && (
+                <ChangeBadge positive={computeChange(timeline, 'clicks') >= 0}>
+                  {formatChange(computeChange(timeline, 'clicks'))}
+                </ChangeBadge>
+              )}
             </AnalyticCard>
             <AnalyticCard>
               <AnalyticValue>{store.rating_avg > 0 ? store.rating_avg.toFixed(1) : '—'}</AnalyticValue>
               <AnalyticLabel>Valoración</AnalyticLabel>
             </AnalyticCard>
           </AnalyticsGrid>
+
+          <PeriodControls>
+            {(['7d', '30d', '90d'] as const).map(p => (
+              <PeriodButton key={p} active={period === p} onClick={() => setPeriod(p)}>
+                {p}
+              </PeriodButton>
+            ))}
+          </PeriodControls>
+
+          <ChartGrid>
+            <ChartCard>
+              <ChartTitle>Visitas</ChartTitle>
+              {renderTimelineChart(timeline, timelineLoading, 'views')}
+            </ChartCard>
+            <ChartCard>
+              <ChartTitle>Clics en productos</ChartTitle>
+              {renderTimelineChart(timeline, timelineLoading, 'clicks')}
+            </ChartCard>
+          </ChartGrid>
         </Section>
 
         <Section>

@@ -46,6 +46,10 @@
       "destination": "/api/v1/analytics/store"
     },
     {
+      "source": "/api/v1/analytics/store/:id/timeline",
+      "destination": "/api/v1/analytics/store/[id]/timeline"
+    },
+    {
       "source": "/api/v1/messaging/conversations",
       "destination": "/api/v1/messaging/conversations"
     },
@@ -70,6 +74,18 @@
       "destination": "/api/v1/stores/catalog/[storeId]"
     },
     {
+      "source": "/api/v1/price-watch",
+      "destination": "/api/v1/price-watch"
+    },
+    {
+      "source": "/api/v1/price-watch/:id",
+      "destination": "/api/v1/price-watch/[id]"
+    },
+    {
+      "source": "/api/cron/check-price-drops",
+      "destination": "/api/cron/check-price-drops"
+    },
+    {
       "source": "/api/v1/rackets/:id/price-history",
       "destination": "/api/v1/rackets/[id]/price-history"
     },
@@ -80,6 +96,12 @@
     {
       "source": "/((?!api/).*)",
       "destination": "/index.html"
+    }
+  ],
+  "crons": [
+    {
+      "path": "/api/cron/check-price-drops",
+      "schedule": "0 8 * * *"
     }
   ],
   "headers": [

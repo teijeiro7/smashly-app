@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { FiClock, FiLayers, FiAlertCircle } from 'react-icons/fi';
 import { useParams, Link } from '@tanstack/react-router';
-import { ComparisonService, SavedComparison } from '../services/comparisonService';
-import { RacketService } from '../services/racketService';
+import comparisonService, { SavedComparison } from '../services/comparisonService';
+import racketService from '../services/racketService';
 import { Racket } from '../types/racket';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -301,14 +301,14 @@ const SharedComparisonPage: React.FC = () => {
   const loadSharedComparison = async () => {
     try {
       setLoading(true);
-      const data = await ComparisonService.getSharedComparison(token!);
+      const data = await comparisonService.getSharedComparison(token!);
       setComparison(data);
 
       // Load racket names
       const rackets = await Promise.all(
         data.racket_ids.map(async id => {
           try {
-            const racket = await RacketService.getRacketById(id);
+            const racket = await racketService.getRacketById(id);
             return { id, racket };
           } catch {
             return null;

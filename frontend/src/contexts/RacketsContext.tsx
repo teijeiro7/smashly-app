@@ -1,6 +1,6 @@
 import React, { createContext, ReactNode, useContext, useCallback, useMemo } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { RacketService } from '../services/racketService';
+import racketService from '../services/racketService';
 import { Racket } from '../types/racket';
 
 interface RacketsContextType {
@@ -31,7 +31,7 @@ export const RacketsProvider: React.FC<RacketsProviderProps> = ({ children }) =>
 
   const { data: rackets = [], isLoading, error, refetch } = useQuery({
     queryKey: ['rackets', 'all'],
-    queryFn: () => RacketService.getAllRackets(),
+    queryFn: () => racketService.getAllRackets(),
     staleTime: 1000 * 60 * 30, // 30 min — replaces ETag/localStorage weekly expiry
     gcTime: 1000 * 60 * 60,    // 1 hour in cache
   });

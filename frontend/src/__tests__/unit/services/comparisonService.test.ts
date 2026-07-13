@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { ComparisonService, SavedComparison } from '@/services/comparisonService';
+import comparisonService, { SavedComparison } from '@/services/comparisonService';
 import { RacketComparisonData } from '@/types/racket';
 
 const { mockConfig, supabase } = vi.hoisted(() => {
@@ -107,7 +107,7 @@ describe('ComparisonService', () => {
         }),
       });
 
-      const result = await ComparisonService.compareRackets([1, 2]);
+      const result = await comparisonService.compareRackets([1, 2]);
 
       expect(result.comparison).toEqual(mockComparisonResult);
       expect(global.fetch).toHaveBeenCalledWith(
@@ -130,7 +130,7 @@ describe('ComparisonService', () => {
         json: async () => ({ comparison: mockComparisonResult }),
       });
 
-      await ComparisonService.compareRackets([1, 2], userProfile);
+      await comparisonService.compareRackets([1, 2], userProfile);
 
       const callArgs = (global.fetch as any).mock.calls[0];
       const body = JSON.parse(callArgs[1].body);
@@ -145,7 +145,7 @@ describe('ComparisonService', () => {
         json: async () => ({ error: 'Comparison failed' }),
       });
 
-      await expect(ComparisonService.compareRackets([1, 2])).rejects.toThrow('Comparison failed');
+      await expect(comparisonService.compareRackets([1, 2])).rejects.toThrow('Comparison failed');
     });
 
     it('should throw error when error parsing fails', async () => {
@@ -157,7 +157,7 @@ describe('ComparisonService', () => {
         },
       });
 
-      await expect(ComparisonService.compareRackets([1, 2])).rejects.toThrow(
+      await expect(comparisonService.compareRackets([1, 2])).rejects.toThrow(
         'Error al comparar palas'
       );
     });
@@ -165,13 +165,13 @@ describe('ComparisonService', () => {
     it('should handle network errors', async () => {
       (global.fetch as any).mockRejectedValueOnce(new Error('Network error'));
 
-      await expect(ComparisonService.compareRackets([1, 2])).rejects.toThrow('Network error');
+      await expect(comparisonService.compareRackets([1, 2])).rejects.toThrow('Network error');
     });
   });
 
   describe('saveComparison', () => {
     it('should save comparison successfully', async () => {
-      const result = await ComparisonService.saveComparison([1, 2], mockComparisonResult);
+      const result = await comparisonService.saveComparison([1, 2], mockComparisonResult);
 
       expect(result).toEqual(mockSavedComparison);
     });
@@ -179,7 +179,7 @@ describe('ComparisonService', () => {
     it('should throw error when save fails', async () => {
       mockConfig.error = new Error('Save failed');
 
-      await expect(ComparisonService.saveComparison([1, 2], mockComparisonResult)).rejects.toThrow(
+      await expect(comparisonService.saveComparison([1, 2], mockComparisonResult)).rejects.toThrow(
         'Save failed'
       );
     });
@@ -189,7 +189,7 @@ describe('ComparisonService', () => {
     it('should get user comparisons successfully', async () => {
       mockConfig.data = [mockSavedComparison];
 
-      const result = await ComparisonService.getUserComparisons();
+      const result = await comparisonService.getUserComparisons();
 
       expect(result).toEqual([mockSavedComparison]);
     });
@@ -197,7 +197,7 @@ describe('ComparisonService', () => {
     it('should return empty array when no comparisons exist', async () => {
       mockConfig.data = [];
 
-      const result = await ComparisonService.getUserComparisons();
+      const result = await comparisonService.getUserComparisons();
 
       expect(result).toEqual([]);
     });
@@ -205,7 +205,7 @@ describe('ComparisonService', () => {
     it('should throw error when fetch fails', async () => {
       mockConfig.error = new Error('Fetch failed');
 
-      await expect(ComparisonService.getUserComparisons()).rejects.toThrow('Fetch failed');
+      await expect(comparisonService.getUserComparisons()).rejects.toThrow('Fetch failed');
     });
   });
 
@@ -213,7 +213,7 @@ describe('ComparisonService', () => {
     it('should get comparison by id successfully', async () => {
       mockConfig.data = mockSavedComparison;
 
-      const result = await ComparisonService.getComparisonById('comp-123');
+      const result = await comparisonService.getComparisonById('comp-123');
 
       expect(result).toEqual(mockSavedComparison);
     });
@@ -221,19 +221,19 @@ describe('ComparisonService', () => {
     it('should throw error when comparison not found', async () => {
       mockConfig.error = new Error('Not found');
 
-      await expect(ComparisonService.getComparisonById('nonexistent')).rejects.toThrow('Not found');
+      await expect(comparisonService.getComparisonById('nonexistent')).rejects.toThrow('Not found');
     });
   });
 
   describe('deleteComparison', () => {
     it('should delete comparison successfully', async () => {
-      await expect(ComparisonService.deleteComparison('comp-123')).resolves.not.toThrow();
+      await expect(comparisonService.deleteComparison('comp-123')).resolves.not.toThrow();
     });
 
     it('should throw error when delete fails', async () => {
       mockConfig.error = new Error('Delete failed');
 
-      await expect(ComparisonService.deleteComparison('comp-123')).rejects.toThrow('Delete failed');
+      await expect(comparisonService.deleteComparison('comp-123')).rejects.toThrow('Delete failed');
     });
   });
 
@@ -241,7 +241,7 @@ describe('ComparisonService', () => {
     it('should get comparison count successfully', async () => {
       mockConfig.count = 5;
 
-      const result = await ComparisonService.getComparisonCount();
+      const result = await comparisonService.getComparisonCount();
 
       expect(result).toBe(5);
     });
@@ -249,7 +249,7 @@ describe('ComparisonService', () => {
     it('should return 0 on error', async () => {
       mockConfig.error = new Error('Database error');
 
-      await expect(ComparisonService.getComparisonCount()).resolves.toBe(0);
+      await expect(comparisonService.getComparisonCount()).resolves.toBe(0);
     });
   });
 
@@ -257,7 +257,7 @@ describe('ComparisonService', () => {
     it('should share comparison and return token', async () => {
       mockConfig.data = { share_token: 'share-token-abc' };
 
-      const result = await ComparisonService.shareComparison('comp-123');
+      const result = await comparisonService.shareComparison('comp-123');
 
       expect(result).toBe('share-token-abc');
     });
@@ -265,19 +265,19 @@ describe('ComparisonService', () => {
     it('should throw error when share fails', async () => {
       mockConfig.error = new Error('Share failed');
 
-      await expect(ComparisonService.shareComparison('comp-123')).rejects.toThrow('Share failed');
+      await expect(comparisonService.shareComparison('comp-123')).rejects.toThrow('Share failed');
     });
   });
 
   describe('unshareComparison', () => {
     it('should unshare comparison successfully', async () => {
-      await expect(ComparisonService.unshareComparison('comp-123')).resolves.not.toThrow();
+      await expect(comparisonService.unshareComparison('comp-123')).resolves.not.toThrow();
     });
 
     it('should throw error when unshare fails', async () => {
       mockConfig.error = new Error('Unshare failed');
 
-      await expect(ComparisonService.unshareComparison('comp-123')).rejects.toThrow('Unshare failed');
+      await expect(comparisonService.unshareComparison('comp-123')).rejects.toThrow('Unshare failed');
     });
   });
 
@@ -285,7 +285,7 @@ describe('ComparisonService', () => {
     it('should get shared comparison by token', async () => {
       mockConfig.data = mockSavedComparison;
 
-      const result = await ComparisonService.getSharedComparison('share-token-abc');
+      const result = await comparisonService.getSharedComparison('share-token-abc');
 
       expect(result).toEqual(mockSavedComparison);
     });
@@ -293,7 +293,7 @@ describe('ComparisonService', () => {
     it('should throw error when shared comparison not found', async () => {
       mockConfig.error = new Error('Not found');
 
-      await expect(ComparisonService.getSharedComparison('invalid-token')).rejects.toThrow(
+      await expect(comparisonService.getSharedComparison('invalid-token')).rejects.toThrow(
         'Comparación compartida no encontrada'
       );
     });

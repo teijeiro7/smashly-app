@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { RacketService } from '@/services/racketService';
+import racketService from '@/services/racketService';
 
 const { mockConfig, supabase } = vi.hoisted(() => {
   const mockConfig: any = { data: null, error: null, count: null };
@@ -103,7 +103,7 @@ describe('RacketService', () => {
 
   describe('getAllRackets', () => {
     it('should fetch all rackets successfully', async () => {
-      const result = await RacketService.getAllRackets();
+      const result = await racketService.getAllRackets();
 
       expect(result).toHaveLength(2);
       expect(result[0].nombre).toBe('Adidas Metalbone 3.1');
@@ -114,20 +114,20 @@ describe('RacketService', () => {
     it('should throw error when supabase query fails', async () => {
       mockConfig.error = new Error('Server error');
 
-      await expect(RacketService.getAllRackets()).rejects.toThrow('Server error');
+      await expect(racketService.getAllRackets()).rejects.toThrow('Server error');
     });
   });
 
   describe('getRacketsWithPagination', () => {
     it('should fetch paginated rackets with default params', async () => {
-      const result = await RacketService.getRacketsWithPagination();
+      const result = await racketService.getRacketsWithPagination();
 
       expect(result).toHaveLength(2);
       expect(result[0].nombre).toBe('Adidas Metalbone 3.1');
     });
 
     it('should fetch paginated rackets with custom params', async () => {
-      const result = await RacketService.getRacketsWithPagination(0, 10);
+      const result = await racketService.getRacketsWithPagination(0, 10);
 
       expect(result).toHaveLength(2);
       expect(result[1].nombre).toBe('Bullpadel Vertex 04');
@@ -136,7 +136,7 @@ describe('RacketService', () => {
     it('should handle empty data', async () => {
       mockConfig.data = [];
 
-      const result = await RacketService.getRacketsWithPagination();
+      const result = await racketService.getRacketsWithPagination();
 
       expect(result).toEqual([]);
     });
@@ -144,7 +144,7 @@ describe('RacketService', () => {
 
   describe('getRacketById', () => {
     it('should fetch racket by id successfully', async () => {
-      const result = await RacketService.getRacketById(1);
+      const result = await racketService.getRacketById(1);
 
       expect(result).not.toBeNull();
       expect(result!.nombre).toBe('Adidas Metalbone 3.1');
@@ -154,7 +154,7 @@ describe('RacketService', () => {
     it('should return null when racket is not found', async () => {
       mockConfig.data = [];
 
-      const result = await RacketService.getRacketById(999);
+      const result = await racketService.getRacketById(999);
 
       expect(result).toBeNull();
     });
@@ -162,13 +162,13 @@ describe('RacketService', () => {
     it('should throw error for other errors', async () => {
       mockConfig.error = new Error('Database error');
 
-      await expect(RacketService.getRacketById(1)).rejects.toThrow('Database error');
+      await expect(racketService.getRacketById(1)).rejects.toThrow('Database error');
     });
   });
 
   describe('getRacketByName', () => {
     it('should find racket by exact name match', async () => {
-      const result = await RacketService.getRacketByName('Adidas Metalbone 3.1');
+      const result = await racketService.getRacketByName('Adidas Metalbone 3.1');
 
       expect(result).not.toBeNull();
       expect(result!.nombre).toBe('Adidas Metalbone 3.1');
@@ -177,7 +177,7 @@ describe('RacketService', () => {
     it('should return null when no match found', async () => {
       mockConfig.data = [];
 
-      const result = await RacketService.getRacketByName('Non-existent Racket');
+      const result = await racketService.getRacketByName('Non-existent Racket');
 
       expect(result).toBeNull();
     });
@@ -185,13 +185,13 @@ describe('RacketService', () => {
     it('should throw on supabase error', async () => {
       mockConfig.error = new Error('Network error');
 
-      await expect(RacketService.getRacketByName('Test Racket')).rejects.toThrow('Network error');
+      await expect(racketService.getRacketByName('Test Racket')).rejects.toThrow('Network error');
     });
   });
 
   describe('searchRackets', () => {
     it('should search rackets by query', async () => {
-      const result = await RacketService.searchRackets('Adidas');
+      const result = await racketService.searchRackets('Adidas');
 
       expect(result.data).toHaveLength(2);
       expect(result.data[0].nombre).toBe('Adidas Metalbone 3.1');
@@ -201,13 +201,13 @@ describe('RacketService', () => {
     it('should throw error on search failure', async () => {
       mockConfig.error = new Error('Search failed');
 
-      await expect(RacketService.searchRackets('test')).rejects.toThrow('Search failed');
+      await expect(racketService.searchRackets('test')).rejects.toThrow('Search failed');
     });
   });
 
   describe('getRacketsByBrand', () => {
     it('should fetch rackets by brand', async () => {
-      const result = await RacketService.getRacketsByBrand('Adidas');
+      const result = await racketService.getRacketsByBrand('Adidas');
 
       expect(result).toHaveLength(2);
       expect(result[0].marca).toBe('Adidas');
@@ -216,7 +216,7 @@ describe('RacketService', () => {
 
   describe('getBestsellerRackets', () => {
     it('should fetch bestseller rackets', async () => {
-      const result = await RacketService.getBestsellerRackets();
+      const result = await racketService.getBestsellerRackets();
 
       expect(result).toHaveLength(2);
       expect(result[0].nombre).toBe('Adidas Metalbone 3.1');
@@ -225,7 +225,7 @@ describe('RacketService', () => {
 
   describe('getRacketsOnSale', () => {
     it('should fetch rackets on sale', async () => {
-      const result = await RacketService.getRacketsOnSale();
+      const result = await racketService.getRacketsOnSale();
 
       expect(result).toHaveLength(2);
       expect(result[0].en_oferta).toBe(true);
@@ -234,7 +234,7 @@ describe('RacketService', () => {
 
   describe('getUniqueBrands', () => {
     it('should fetch unique brands', async () => {
-      const result = await RacketService.getUniqueBrands();
+      const result = await racketService.getUniqueBrands();
 
       expect(result).toEqual(['Adidas', 'Bullpadel']);
     });
@@ -244,7 +244,7 @@ describe('RacketService', () => {
     it('should fetch racket statistics', async () => {
       mockConfig.count = 1000;
 
-      const result = await RacketService.getStats();
+      const result = await racketService.getStats();
 
       expect(result.total).toBe(1000);
       expect(result.bestsellers).toBe(0);

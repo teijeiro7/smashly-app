@@ -150,8 +150,8 @@ function mapDbToFrontend(raw: any): Racket {
 }
 
 // ── Service ───────────────────────────────────────────────────────────────────
-export class RacketService {
-  static async getAllRackets(): Promise<Racket[]> {
+const racketService = {
+  async getAllRackets(): Promise<Racket[]> {
     const { data, error } = await supabase
       .from('rackets')
       .select('*')
@@ -159,14 +159,14 @@ export class RacketService {
 
     if (error) throw new Error(error.message);
     return (data ?? []).map(mapDbToFrontend);
-  }
+  },
 
   // Alias used by RacketsContext — TanStack Query caches this
-  static async getAllRacketsCached(): Promise<Racket[]> {
-    return RacketService.getAllRackets();
-  }
+  async getAllRacketsCached(): Promise<Racket[]> {
+    return racketService.getAllRackets();
+  },
 
-  static async getRacketsWithPagination(page = 0, limit = 50): Promise<Racket[]> {
+  async getRacketsWithPagination(page = 0, limit = 50): Promise<Racket[]> {
     const from = page * limit;
     const { data, error } = await supabase
       .from('rackets')
@@ -176,9 +176,9 @@ export class RacketService {
 
     if (error) throw new Error(error.message);
     return (data ?? []).map(mapDbToFrontend);
-  }
+  },
 
-  static async getRacketById(id: number): Promise<Racket | null> {
+  async getRacketById(id: number): Promise<Racket | null> {
     const { data, error } = await supabase
       .from('rackets')
       .select('*')
@@ -187,9 +187,9 @@ export class RacketService {
 
     if (error) throw new Error(error.message);
     return data ? mapDbToFrontend(data) : null;
-  }
+  },
 
-  static async getRacketsByIds(ids: number[]): Promise<Racket[]> {
+  async getRacketsByIds(ids: number[]): Promise<Racket[]> {
     const { data, error } = await supabase
       .from('rackets')
       .select('*')
@@ -197,9 +197,9 @@ export class RacketService {
 
     if (error) throw new Error(error.message);
     return (data ?? []).map(mapDbToFrontend);
-  }
+  },
 
-  static async getRacketByName(nombre: string): Promise<Racket | null> {
+  async getRacketByName(nombre: string): Promise<Racket | null> {
     const { data, error } = await supabase
       .from('rackets')
       .select('*')
@@ -208,9 +208,9 @@ export class RacketService {
 
     if (error) throw new Error(error.message);
     return data ? mapDbToFrontend(data) : null;
-  }
+  },
 
-  static async searchRackets(
+  async searchRackets(
     query: string,
     filters?: Record<string, string>,
     pagination?: { page?: number; limit?: number }
@@ -250,9 +250,9 @@ export class RacketService {
       data: (data ?? []).map(mapDbToFrontend),
       pagination: { page, limit, total: count ?? 0, totalPages: Math.ceil((count ?? 0) / limit) },
     };
-  }
+  },
 
-  static async getRacketsByBrand(marca: string): Promise<Racket[]> {
+  async getRacketsByBrand(marca: string): Promise<Racket[]> {
     const { data, error } = await supabase
       .from('rackets')
       .select('*')
@@ -261,9 +261,9 @@ export class RacketService {
 
     if (error) throw new Error(error.message);
     return (data ?? []).map(mapDbToFrontend);
-  }
+  },
 
-  static async getBestsellerRackets(): Promise<Racket[]> {
+  async getBestsellerRackets(): Promise<Racket[]> {
     // es_bestseller does not exist in DB — return top rackets by name
     const { data, error } = await supabase
       .from('rackets')
@@ -273,9 +273,9 @@ export class RacketService {
 
     if (error) throw new Error(error.message);
     return (data ?? []).map(mapDbToFrontend);
-  }
+  },
 
-  static async getRacketsOnSale(): Promise<Racket[]> {
+  async getRacketsOnSale(): Promise<Racket[]> {
     const { data, error } = await supabase
       .from('rackets')
       .select('*')
@@ -284,9 +284,9 @@ export class RacketService {
 
     if (error) throw new Error(error.message);
     return (data ?? []).map(mapDbToFrontend);
-  }
+  },
 
-  static async getUniqueBrands(): Promise<string[]> {
+  async getUniqueBrands(): Promise<string[]> {
     const { data, error } = await supabase
       .from('rackets')
       .select('brand')
@@ -295,9 +295,9 @@ export class RacketService {
     if (error) throw new Error(error.message);
     const brands = [...new Set((data ?? []).map((r: any) => r.brand).filter(Boolean))];
     return brands as string[];
-  }
+  },
 
-  static async getStats(): Promise<{ total: number; bestsellers: number; onSale: number; brands: number }> {
+  async getStats(): Promise<{ total: number; bestsellers: number; onSale: number; brands: number }> {
     const [totalRes, onSaleRes, brandsRes] = await Promise.all([
       supabase.from('rackets').select('*', { count: 'exact', head: true }),
       supabase.from('rackets').select('*', { count: 'exact', head: true }).eq('on_offer', true),
@@ -312,10 +312,10 @@ export class RacketService {
       onSale: onSaleRes.count ?? 0,
       brands: uniqueBrands.size,
     };
-  }
+  },
 
   // ── Admin mutations ───────────────────────────────────────────────────────
-  static async updateRacket(id: number, updates: Partial<Racket>): Promise<Racket> {
+  async updateRacket(id: number, updates: Partial<Racket>): Promise<Racket> {
     const { data, error } = await supabase
       .from('rackets')
       .update(updates)
@@ -325,14 +325,14 @@ export class RacketService {
 
     if (error) throw new Error(error.message);
     return mapDbToFrontend(data);
-  }
+  },
 
-  static async deleteRacket(id: number): Promise<void> {
+  async deleteRacket(id: number): Promise<void> {
     const { error } = await supabase.from('rackets').delete().eq('id', id);
     if (error) throw new Error(error.message);
-  }
+  },
 
-  static async bulkUpdateRackets(
+  async bulkUpdateRackets(
     field: string,
     oldValue: any,
     newValue: any
@@ -345,10 +345,10 @@ export class RacketService {
 
     if (error) throw new Error(error.message);
     return { updatedCount: data?.length ?? 0 };
-  }
+  },
 
   // ── Price history ──────────────────────────────────────────────────────────
-  static async getPriceHistory(
+  async getPriceHistory(
     racketId: number,
     days = 90,
     store?: string
@@ -415,9 +415,8 @@ export class RacketService {
     } catch {
       return null;
     }
-  }
-
-}
+  },
+};
 
 /** Normalize store name to lowercase key for chart color/label mapping */
 function normalizeStoreName(name: string): string {
@@ -429,3 +428,5 @@ function normalizeStoreName(name: string): string {
   const lower = name.toLowerCase().trim();
   return map[lower] || lower.replace(/\s+/g, '_');
 }
+
+export default racketService;

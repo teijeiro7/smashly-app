@@ -14,8 +14,8 @@ import {
   FiCheck,
 } from 'react-icons/fi';
 import { Link, useNavigate } from '@tanstack/react-router';
-import { ComparisonService, SavedComparison } from '../services/comparisonService';
-import { RacketService } from '../services/racketService';
+import comparisonService, { SavedComparison } from '../services/comparisonService';
+import racketService from '../services/racketService';
 import { Racket } from '../types/racket';
 import { useAuth } from '../contexts/AuthContext';
 import { sileo } from 'sileo';
@@ -521,7 +521,7 @@ const MyComparisonsPage: React.FC = () => {
     try {
       setLoading(true);
 
-      const data = await ComparisonService.getUserComparisons();
+      const data = await comparisonService.getUserComparisons();
       setAllComparisons(data);
 
       // Mostrar las primeras 9
@@ -535,7 +535,7 @@ const MyComparisonsPage: React.FC = () => {
       const rackets = await Promise.all(
         allRacketIds.map(async id => {
           try {
-            const racket = await RacketService.getRacketById(id);
+            const racket = await racketService.getRacketById(id);
             return { id, racket };
           } catch {
             return null;
@@ -609,7 +609,7 @@ const MyComparisonsPage: React.FC = () => {
 
     try {
       setDeletingId(id);
-      await ComparisonService.deleteComparison(id);
+      await comparisonService.deleteComparison(id);
       setAllComparisons(prev => prev.filter(c => c.id !== id));
       setDisplayedComparisons(prev => prev.filter(c => c.id !== id));
       sileo.success({ title: 'Éxito', description: 'Comparación eliminada correctamente' });
@@ -639,7 +639,7 @@ const MyComparisonsPage: React.FC = () => {
   const handleShare = async (id: string) => {
     try {
       setSharingId(id);
-      const shareToken = await ComparisonService.shareComparison(id);
+      const shareToken = await comparisonService.shareComparison(id);
       const shareUrl = `${window.location.origin}/shared/${shareToken}`;
 
       // Update local state

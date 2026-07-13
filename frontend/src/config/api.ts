@@ -79,6 +79,13 @@ export const API_ENDPOINTS = {
   // Health
   HEALTH: '/api/v1/health',
 
+  // Analytics
+  ANALYTICS_TIMELINE: (storeId: string) => `/api/v1/analytics/store/${storeId}/timeline`,
+
+  // Price Watch
+  PRICE_WATCH: '/api/v1/price-watch',
+  PRICE_WATCH_BY_ID: (id: string) => `/api/v1/price-watch/${id}`,
+
   // Notifications
   NOTIFICATIONS: '/api/v1/notifications',
   NOTIFICATIONS_UNREAD_COUNT: '/api/v1/notifications/unread-count',
