@@ -63,30 +63,58 @@ async function handleList(req: IncomingMessage, res: ServerResponse): Promise<vo
   }
 
   // Enrich with store info, buyer info, last message, unread count
-  const enriched = await Promise.all((conversations || []).map(async (conv) => {
-    const [storeResult, buyerResult, lastMsgResult, unreadResult] = await Promise.all([
-      supabaseAdmin.from('stores').select('store_name, slug, logo_url').eq('id', conv.store_id).maybeSingle(),
-      supabaseAdmin.from('user_profiles').select('nickname, avatar_url').eq('id', conv.buyer_id).maybeSingle(),
-      supabaseAdmin.from('messages').select('content, created_at, sender_id')
-        .eq('conversation_id', conv.id)
-        .order('created_at', { ascending: false })
-        .limit(1)
-        .maybeSingle(),
-      supabaseAdmin.from('messages')
-        .eq('conversation_id', conv.id)
-        .eq('read', false)
-        .neq('sender_id', user.id)
-        .select('*', { count: 'exact', head: true }),
+  const storeIds = [...new Set(conversations.map(c => c.store_id))];
+  const buyerIds = [...new Set(conversations.map(c => c.buyer_id))];
+  const convIds = conversations.map(c => c.id);
+
+  let enriched: any[] = [];
+
+  if (convIds.length > 0) {
+    const [storeResult, buyerResult] = await Promise.all([
+      storeIds.length
+        ? supabaseAdmin.from('stores').select('id, store_name, slug, logo_url').in('id', storeIds)
+        : { data: [] },
+      buyerIds.length
+        ? supabaseAdmin.from('user_profiles').select('id, nickname, avatar_url').in('id', buyerIds)
+        : { data: [] },
     ]);
 
-    return {
+    const storeMap = Object.fromEntries((storeResult.data || []).map(s => [s.id, s]));
+    const buyerMap = Object.fromEntries((buyerResult.data || []).map(b => [b.id, b]));
+
+    const { data: allMessages } = await supabaseAdmin
+      .from('messages')
+      .select('id, conversation_id, content, created_at, sender_id')
+      .in('conversation_id', convIds)
+      .order('created_at', { ascending: false });
+
+    const lastMessageMap = new Map();
+    for (const msg of allMessages || []) {
+      if (!lastMessageMap.has(msg.conversation_id)) {
+        lastMessageMap.set(msg.conversation_id, msg);
+      }
+    }
+
+    const { data: unreadMessages } = await supabaseAdmin
+      .from('messages')
+      .select('conversation_id, id')
+      .in('conversation_id', convIds)
+      .eq('read', false)
+      .neq('sender_id', user.id);
+
+    const unreadMap = new Map<string, number>();
+    for (const msg of unreadMessages || []) {
+      unreadMap.set(msg.conversation_id, (unreadMap.get(msg.conversation_id) || 0) + 1);
+    }
+
+    enriched = conversations.map(conv => ({
       ...conv,
-      store: storeResult.data,
-      buyer: buyerResult.data,
-      last_message: lastMsgResult.data,
-      unread_count: unreadResult.count || 0,
-    };
-  }));
+      store: storeMap[conv.store_id] || null,
+      buyer: buyerMap[conv.buyer_id] || null,
+      last_message: lastMessageMap.get(conv.id) || null,
+      unread_count: unreadMap.get(conv.id) || 0,
+    }));
+  }
 
   res.writeHead(200, { 'Content-Type': 'application/json' });
   res.end(JSON.stringify({ data: enriched }));
