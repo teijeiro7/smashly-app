@@ -1,59 +1,100 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { RacketService } from '@/services/racketService';
-import { API_ENDPOINTS, buildApiUrl, getCommonHeaders } from '@/config/api';
 
-// Mock fetch
-global.fetch = vi.fn();
+const { mockConfig, supabase } = vi.hoisted(() => {
+  const mockConfig: any = { data: null, error: null, count: null };
 
-// Mock config
-vi.mock('@/config/api', async () => {
-  const actual = await vi.importActual('@/config/api');
+  function mockSelectReturn(resp: any) {
+    const chain: any = { data: resp.data, error: resp.error, count: resp.count };
+    chain.order = vi.fn(() => chain);
+    chain.range = vi.fn(() => chain);
+    chain.limit = vi.fn(() => chain);
+    chain.eq = vi.fn(() => chain);
+    chain.in = vi.fn(() => chain);
+    chain.or = vi.fn(() => chain);
+    chain.ilike = vi.fn(() => chain);
+    chain.neq = vi.fn(() => chain);
+    chain.gte = vi.fn(() => chain);
+    chain.single = vi.fn(async () => ({
+      data: Array.isArray(resp.data) ? (resp.data.length > 0 ? resp.data[0] : null) : resp.data,
+      error: resp.error,
+    }));
+    chain.maybeSingle = vi.fn(async () => ({
+      data: Array.isArray(resp.data) ? (resp.data.length > 0 ? resp.data[0] : null) : resp.data,
+      error: resp.error,
+    }));
+    chain.select = vi.fn(() => chain);
+    chain.insert = vi.fn(() => ({ ...chain, select: vi.fn(() => ({ ...chain, single: vi.fn(async () => resp) })) }));
+    chain.update = vi.fn(() => ({ ...chain, select: vi.fn(() => ({ ...chain, single: vi.fn(async () => resp) })) }));
+    chain.delete = vi.fn(() => chain);
+    chain.upsert = vi.fn(() => ({ ...chain, select: vi.fn(() => ({ ...chain, single: vi.fn(async () => resp) })) }));
+    chain.then = async (resolve: any) => resolve(resp);
+    return chain;
+  }
+
   return {
-    ...actual,
-    buildApiUrl: vi.fn((endpoint: string, params?: Record<string, any>) => {
-      const queryString = params ? '?' + new URLSearchParams(params).toString() : '';
-      return `http://localhost:3000${endpoint}${queryString}`;
-    }),
-    getCommonHeaders: vi.fn(() => ({
-      'Content-Type': 'application/json',
-    })),
+    mockConfig,
+    supabase: {
+      from: vi.fn(() => mockSelectReturn(mockConfig)),
+      auth: {
+        getSession: vi.fn(async () => ({
+          data: { session: { access_token: 'test-token', user: { id: 'test-user', email: 'test@test.com' } } },
+          error: null,
+        })),
+        signOut: vi.fn(async () => ({ error: null })),
+        signInWithPassword: vi.fn(),
+        signUp: vi.fn(),
+        onAuthStateChange: vi.fn(() => ({ data: { subscription: { unsubscribe: vi.fn() } } })),
+      },
+      rpc: vi.fn(),
+      storage: { from: vi.fn() },
+    },
   };
 });
 
-const mockRackets = [
+vi.mock('@/lib/supabase', () => ({ supabase }));
+
+const mockDbRackets = [
   {
     id: 1,
-    nombre: 'Adidas Metalbone 3.1',
-    marca: 'Adidas',
-    modelo: 'Metalbone 3.1',
-    imagenes: ['metalbone.jpg'],
-    descripcion: 'Pala de potencia',
-    precio_actual: 250,
-    precio_original: 280,
-    descuento_porcentaje: 11,
-    en_oferta: true,
-    enlace: 'https://padelmarket.com/pala1',
-    fuente: 'padelmarket',
+    name: 'Adidas Metalbone 3.1',
+    brand: 'Adidas',
+    model: 'Metalbone 3.1',
+    images: ['metalbone.jpg'],
+    description: 'Pala de potencia',
+    on_offer: true,
+    created_at: '2025-01-15T00:00:00.000Z',
+    updated_at: '2025-01-15T00:00:00.000Z',
+    view_count: 0,
+    padelnuestro_actual_price: 250,
+    padelnuestro_original_price: 280,
+    padelnuestro_discount_percentage: 11,
+    padelnuestro_link: 'https://padelmarket.com/pala1',
   },
   {
     id: 2,
-    nombre: 'Bullpadel Vertex 04',
-    marca: 'Bullpadel',
-    modelo: 'Vertex 04',
-    imagenes: ['vertex.jpg'],
-    descripcion: 'Pala de control',
-    precio_actual: 180,
-    precio_original: 200,
-    descuento_porcentaje: 10,
-    en_oferta: true,
-    enlace: 'https://padelnuestro.com/pala2',
-    fuente: 'padelnuestro',
+    name: 'Bullpadel Vertex 04',
+    brand: 'Bullpadel',
+    model: 'Vertex 04',
+    images: ['vertex.jpg'],
+    description: 'Pala de control',
+    on_offer: true,
+    created_at: '2025-01-15T00:00:00.000Z',
+    updated_at: '2025-01-15T00:00:00.000Z',
+    view_count: 0,
+    padelnuestro_actual_price: 180,
+    padelnuestro_original_price: 200,
+    padelnuestro_discount_percentage: 10,
+    padelnuestro_link: 'https://padelnuestro.com/pala2',
   },
 ];
 
 describe('RacketService', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockConfig.data = mockDbRackets;
+    mockConfig.error = null;
+    mockConfig.count = null;
   });
 
   afterEach(() => {
@@ -62,226 +103,103 @@ describe('RacketService', () => {
 
   describe('getAllRackets', () => {
     it('should fetch all rackets successfully', async () => {
-      (global.fetch as any).mockResolvedValue({
-        ok: true,
-        json: async () => ({
-          success: true,
-          data: mockRackets,
-        }),
-      });
-
       const result = await RacketService.getAllRackets();
 
-      expect(result).toEqual(mockRackets);
-      expect(global.fetch).toHaveBeenCalledWith(
-        expect.stringContaining('/api/v1/rackets'),
-        expect.objectContaining({
-          method: 'GET',
-        })
-      );
+      expect(result).toHaveLength(2);
+      expect(result[0].nombre).toBe('Adidas Metalbone 3.1');
+      expect(result[0].marca).toBe('Adidas');
+      expect(result[0].precio_actual).toBe(250);
     });
 
-    it('should throw error when response is not ok', async () => {
-      (global.fetch as any).mockResolvedValue({
-        ok: false,
-        status: 500,
-        statusText: 'Internal Server Error',
-        json: async () => ({ message: 'Server error' }),
-      });
+    it('should throw error when supabase query fails', async () => {
+      mockConfig.error = new Error('Server error');
 
       await expect(RacketService.getAllRackets()).rejects.toThrow('Server error');
-    });
-
-    it('should throw error when success is false', async () => {
-      (global.fetch as any).mockResolvedValue({
-        ok: true,
-        json: async () => ({
-          success: false,
-          message: 'Invalid request',
-        }),
-      });
-
-      await expect(RacketService.getAllRackets()).rejects.toThrow('Invalid request');
-    });
-
-    it('should handle network errors', async () => {
-      (global.fetch as any).mockRejectedValue(new Error('Network error'));
-
-      await expect(RacketService.getAllRackets()).rejects.toThrow('Network error');
     });
   });
 
   describe('getRacketsWithPagination', () => {
     it('should fetch paginated rackets with default params', async () => {
-      const mockResponse = {
-        items: [mockRackets[0]],
-        pagination: { total: 1, page: 0, limit: 50 },
-      };
-
-      (global.fetch as any).mockResolvedValue({
-        ok: true,
-        json: async () => ({
-          success: true,
-          data: mockResponse,
-        }),
-      });
-
       const result = await RacketService.getRacketsWithPagination();
 
-      expect(result).toEqual([mockRackets[0]]);
+      expect(result).toHaveLength(2);
+      expect(result[0].nombre).toBe('Adidas Metalbone 3.1');
     });
 
     it('should fetch paginated rackets with custom params', async () => {
-      const mockResponse = {
-        items: mockRackets,
-        pagination: { total: 2, page: 0, limit: 10 },
-      };
-
-      (global.fetch as any).mockResolvedValue({
-        ok: true,
-        json: async () => ({
-          success: true,
-          data: mockResponse,
-        }),
-      });
-
       const result = await RacketService.getRacketsWithPagination(0, 10);
 
-      expect(result).toEqual(mockRackets);
-      expect(global.fetch).toHaveBeenCalledWith(
-        expect.stringContaining('page=0&limit=10&paginated=true'),
-        expect.any(Object)
-      );
+      expect(result).toHaveLength(2);
+      expect(result[1].nombre).toBe('Bullpadel Vertex 04');
     });
 
-    it('should handle response without items property', async () => {
-      (global.fetch as any).mockResolvedValue({
-        ok: true,
-        json: async () => ({
-          success: true,
-          data: mockRackets,
-        }),
-      });
+    it('should handle empty data', async () => {
+      mockConfig.data = [];
 
       const result = await RacketService.getRacketsWithPagination();
 
-      expect(result).toEqual(mockRackets);
+      expect(result).toEqual([]);
     });
   });
 
   describe('getRacketById', () => {
     it('should fetch racket by id successfully', async () => {
-      (global.fetch as any).mockResolvedValue({
-        ok: true,
-        json: async () => ({
-          success: true,
-          data: mockRackets[0],
-        }),
-      });
-
       const result = await RacketService.getRacketById(1);
 
-      expect(result).toEqual(mockRackets[0]);
+      expect(result).not.toBeNull();
+      expect(result!.nombre).toBe('Adidas Metalbone 3.1');
+      expect(result!.marca).toBe('Adidas');
     });
 
-    it('should return null when racket is not found (404)', async () => {
-      (global.fetch as any).mockResolvedValue({
-        status: 404,
-        ok: false,
-      });
+    it('should return null when racket is not found', async () => {
+      mockConfig.data = [];
 
       const result = await RacketService.getRacketById(999);
 
       expect(result).toBeNull();
     });
 
-    it('should return null when error message contains 404', async () => {
-      (global.fetch as any).mockResolvedValue({
-        ok: false,
-        status: 500,
-        json: async () => ({ message: 'Error 404 - Not Found' }),
-      });
+    it('should throw error for other errors', async () => {
+      mockConfig.error = new Error('Database error');
 
-      const result = await RacketService.getRacketById(999);
-
-      expect(result).toBeNull();
-    });
-
-    it('should throw error for non-404 errors', async () => {
-      (global.fetch as any).mockResolvedValue({
-        ok: false,
-        status: 500,
-        json: async () => ({ message: 'Server error' }),
-      });
-
-      await expect(RacketService.getRacketById(1)).rejects.toThrow('Server error');
+      await expect(RacketService.getRacketById(1)).rejects.toThrow('Database error');
     });
   });
 
   describe('getRacketByName', () => {
     it('should find racket by exact name match', async () => {
-      (global.fetch as any).mockResolvedValue({
-        ok: true,
-        json: async () => ({
-          success: true,
-          data: mockRackets[0],
-        }),
-      });
-
       const result = await RacketService.getRacketByName('Adidas Metalbone 3.1');
 
-      expect(result).toEqual(mockRackets[0]);
+      expect(result).not.toBeNull();
+      expect(result!.nombre).toBe('Adidas Metalbone 3.1');
     });
 
     it('should return null when no match found', async () => {
-      (global.fetch as any).mockResolvedValue({
-        ok: false,
-        status: 404,
-        json: async () => ({
-          success: false,
-          error: 'Pala no encontrada',
-        }),
-      });
+      mockConfig.data = [];
 
       const result = await RacketService.getRacketByName('Non-existent Racket');
 
       expect(result).toBeNull();
     });
 
-    it('should return null on error', async () => {
-      (global.fetch as any).mockRejectedValue(new Error('Network error'));
+    it('should throw on supabase error', async () => {
+      mockConfig.error = new Error('Network error');
 
-      const result = await RacketService.getRacketByName('Test Racket');
-
-      expect(result).toBeNull();
+      await expect(RacketService.getRacketByName('Test Racket')).rejects.toThrow('Network error');
     });
   });
 
   describe('searchRackets', () => {
     it('should search rackets by query', async () => {
-      (global.fetch as any).mockResolvedValue({
-        ok: true,
-        json: async () => ({
-          success: true,
-          data: [mockRackets[0]],
-        }),
-      });
-
       const result = await RacketService.searchRackets('Adidas');
 
-      expect(result).toEqual([mockRackets[0]]);
-      expect(global.fetch).toHaveBeenCalledWith(
-        expect.stringContaining('q=Adidas'),
-        expect.any(Object)
-      );
+      expect(result.data).toHaveLength(2);
+      expect(result.data[0].nombre).toBe('Adidas Metalbone 3.1');
+      expect(result.pagination).toBeDefined();
     });
 
     it('should throw error on search failure', async () => {
-      (global.fetch as any).mockResolvedValue({
-        ok: false,
-        status: 500,
-        json: async () => ({ message: 'Search failed' }),
-      });
+      mockConfig.error = new Error('Search failed');
 
       await expect(RacketService.searchRackets('test')).rejects.toThrow('Search failed');
     });
@@ -289,110 +207,49 @@ describe('RacketService', () => {
 
   describe('getRacketsByBrand', () => {
     it('should fetch rackets by brand', async () => {
-      (global.fetch as any).mockResolvedValue({
-        ok: true,
-        json: async () => ({
-          success: true,
-          data: [mockRackets[0]],
-        }),
-      });
-
       const result = await RacketService.getRacketsByBrand('Adidas');
 
-      expect(result).toEqual([mockRackets[0]]);
-      expect(global.fetch).toHaveBeenCalledWith(
-        expect.stringContaining('/brands/Adidas'),
-        expect.any(Object)
-      );
+      expect(result).toHaveLength(2);
+      expect(result[0].marca).toBe('Adidas');
     });
   });
 
   describe('getBestsellerRackets', () => {
     it('should fetch bestseller rackets', async () => {
-      (global.fetch as any).mockResolvedValue({
-        ok: true,
-        json: async () => ({
-          success: true,
-          data: [mockRackets[0]],
-        }),
-      });
-
       const result = await RacketService.getBestsellerRackets();
 
-      expect(result).toEqual([mockRackets[0]]);
-      expect(global.fetch).toHaveBeenCalledWith(
-        expect.stringContaining('/bestsellers'),
-        expect.any(Object)
-      );
+      expect(result).toHaveLength(2);
+      expect(result[0].nombre).toBe('Adidas Metalbone 3.1');
     });
   });
 
   describe('getRacketsOnSale', () => {
     it('should fetch rackets on sale', async () => {
-      (global.fetch as any).mockResolvedValue({
-        ok: true,
-        json: async () => ({
-          success: true,
-          data: mockRackets,
-        }),
-      });
-
       const result = await RacketService.getRacketsOnSale();
 
-      expect(result).toEqual(mockRackets);
-      expect(global.fetch).toHaveBeenCalledWith(
-        expect.stringContaining('/offers'),
-        expect.any(Object)
-      );
+      expect(result).toHaveLength(2);
+      expect(result[0].en_oferta).toBe(true);
     });
   });
 
   describe('getUniqueBrands', () => {
     it('should fetch unique brands', async () => {
-      const brands = ['Adidas', 'Bullpadel', 'Nox'];
-
-      (global.fetch as any).mockResolvedValue({
-        ok: true,
-        json: async () => ({
-          success: true,
-          data: brands,
-        }),
-      });
-
       const result = await RacketService.getUniqueBrands();
 
-      expect(result).toEqual(brands);
-      expect(global.fetch).toHaveBeenCalledWith(
-        expect.stringContaining('/brands'),
-        expect.any(Object)
-      );
+      expect(result).toEqual(['Adidas', 'Bullpadel']);
     });
   });
 
   describe('getStats', () => {
     it('should fetch racket statistics', async () => {
-      const stats = {
-        total: 1000,
-        bestsellers: 50,
-        onSale: 200,
-        brands: 15,
-      };
-
-      (global.fetch as any).mockResolvedValue({
-        ok: true,
-        json: async () => ({
-          success: true,
-          data: stats,
-        }),
-      });
+      mockConfig.count = 1000;
 
       const result = await RacketService.getStats();
 
-      expect(result).toEqual(stats);
-      expect(global.fetch).toHaveBeenCalledWith(
-        expect.stringContaining('/stats'),
-        expect.any(Object)
-      );
+      expect(result.total).toBe(1000);
+      expect(result.bestsellers).toBe(0);
+      expect(result.onSale).toBe(1000);
+      expect(result.brands).toBe(2);
     });
   });
 });
