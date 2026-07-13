@@ -70,6 +70,10 @@
       "destination": "/api/v1/stores/catalog/[storeId]"
     },
     {
+      "source": "/api/v1/rackets/:id/price-history",
+      "destination": "/api/v1/rackets/[id]/price-history"
+    },
+    {
       "source": "/api/v1/stores/:id",
       "destination": "/api/v1/stores/[id]"
     },

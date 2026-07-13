@@ -1,6 +1,6 @@
 import { supabase } from '../lib/supabase';
 import { Racket } from '../types/racket';
-import { API_ENDPOINTS, buildApiUrl, getCommonHeaders, ApiResponse } from '../config/api';
+import { API_ENDPOINTS, buildApiUrl, getCommonHeaders } from '../config/api';
 
 // ── Price history types ───────────────────────────────────────────────────────
 export interface PricePoint {
@@ -22,16 +22,6 @@ export interface PriceHistoryResult {
   days: number;
   stores: StorePriceHistory[];
   combined: PricePoint[];
-}
-
-async function handleApiResponse<T>(response: Response): Promise<T> {
-  if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}));
-    throw new Error(errorData.message || `Error: ${response.status} ${response.statusText}`);
-  }
-  const data: ApiResponse<T> = await response.json();
-  if (!data.success) throw new Error(data.message || data.error || 'Error desconocido');
-  return data.data as T;
 }
 
 // ── DB → Frontend mapper ──────────────────────────────────────────────────────
@@ -357,7 +347,7 @@ export class RacketService {
     return { updatedCount: data?.length ?? 0 };
   }
 
-  // ── Price history (Express legacy — remove after full decommission) ────────
+  // ── Price history ──────────────────────────────────────────────────────────
   static async getPriceHistory(
     racketId: number,
     days = 90,
@@ -369,9 +359,73 @@ export class RacketService {
 
       const url = buildApiUrl(API_ENDPOINTS.RACKETS_PRICE_HISTORY(racketId), params);
       const response = await fetch(url, { method: 'GET', headers: getCommonHeaders() });
-      return await handleApiResponse<PriceHistoryResult>(response);
+      if (!response.ok) return null;
+
+      const rawData: any[] = await response.json();
+      if (!Array.isArray(rawData) || rawData.length === 0) return null;
+
+      const storeMap = new Map<string, { prices: { date: string; price: number }[] }>();
+
+      for (const row of rawData) {
+        const storeName = row.store?.store_name || 'Unknown Store';
+        const storeKey = normalizeStoreName(storeName);
+
+        if (!storeMap.has(storeKey)) {
+          storeMap.set(storeKey, { prices: [] });
+        }
+        storeMap.get(storeKey)!.prices.push({
+          date: row.created_at,
+          price: row.price,
+        });
+      }
+
+      const stores: StorePriceHistory[] = [];
+      const combined: PricePoint[] = [];
+
+      for (const [key, value] of storeMap) {
+        const sortedPrices = value.prices.sort(
+          (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
+        );
+        const prices = sortedPrices.map(p => p.price);
+        const currentPrice = prices[prices.length - 1] ?? null;
+        const minPrice = prices.length > 0 ? Math.min(...prices) : null;
+        const maxPrice = prices.length > 0 ? Math.max(...prices) : null;
+
+        stores.push({
+          store: key,
+          history: sortedPrices.map(p => ({ date: p.date, price: p.price, store: key })),
+          currentPrice,
+          minPrice,
+          maxPrice,
+        });
+
+        sortedPrices.forEach(p => {
+          combined.push({ date: p.date, price: p.price, store: key });
+        });
+      }
+
+      return {
+        racketId,
+        days,
+        stores,
+        combined: combined.sort(
+          (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
+        ),
+      };
     } catch {
       return null;
     }
   }
+
+}
+
+/** Normalize store name to lowercase key for chart color/label mapping */
+function normalizeStoreName(name: string): string {
+  const map: Record<string, string> = {
+    'padel nuestro': 'padelnuestro',
+    'padel market': 'padelmarket',
+    'padel pro shop': 'padelproshop',
+  };
+  const lower = name.toLowerCase().trim();
+  return map[lower] || lower.replace(/\s+/g, '_');
 }
