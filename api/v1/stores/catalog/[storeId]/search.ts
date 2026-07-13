@@ -4,7 +4,7 @@ import { getAuthUser, readBody, setCorsHeaders, handleOptions, unauthorized, bad
 import { normalizeName, normalizeForComparison } from '../../../../_lib/normalizer';
 
 export default async function handler(req: IncomingMessage, res: ServerResponse): Promise<void> {
-  setCorsHeaders(res);
+  setCorsHeaders(req, res);
 
   if (handleOptions(req, res)) return;
 

@@ -40,17 +40,48 @@ export async function isAdmin(userId: string): Promise<boolean> {
   return data?.role === 'Admin';
 }
 
-/** Set CORS headers for store endpoints */
-export function setCorsHeaders(res: ServerResponse): void {
-  res.setHeader('Access-Control-Allow-Origin', process.env.FRONTEND_URL || '*');
+/**
+ * Allowed CORS origins. Read from FRONTEND_URL (comma-separated).
+ * Default: local dev ports.
+ */
+function getAllowedOrigins(): string[] {
+  const raw = process.env.FRONTEND_URL;
+  if (!raw) {
+    return ['http://localhost:4000', 'http://localhost:5173', 'http://localhost:3000'];
+  }
+  return raw
+    .split(',')
+    .map((o) => o.trim())
+    .filter(Boolean);
+}
+
+/**
+ * Emit CORS headers. If the request Origin matches an allowed origin, that
+ * origin is echoed back (required when the request uses Authorization /
+ * credentials). Otherwise `*` is sent (sufficient for same-origin / public reads).
+ *
+ * NOTE: `Access-Control-Allow-Origin` MUST be a single origin string or `*`.
+ * A comma-separated list is invalid and browsers will reject the preflight,
+ * which is what the previous implementation was doing.
+ */
+export function setCorsHeaders(req: IncomingMessage, res: ServerResponse): void {
+  const allowed = getAllowedOrigins();
+  const origin = (req.headers.origin as string | undefined) ?? '';
+  const allowOrigin = origin && allowed.includes(origin) ? origin : '*';
+
+  res.setHeader('Access-Control-Allow-Origin', allowOrigin);
+  res.setHeader('Vary', 'Origin');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
+  if (allowOrigin !== '*') {
+    res.setHeader('Access-Control-Allow-Credentials', 'true');
+  }
 }
 
 /** Handle OPTIONS preflight, returns true if request was OPTIONS */
 export function handleOptions(req: IncomingMessage, res: ServerResponse): boolean {
   if (req.method === 'OPTIONS') {
-    setCorsHeaders(res);
+    setCorsHeaders(req, res);
     res.writeHead(204);
     res.end();
     return true;

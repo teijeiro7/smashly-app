@@ -7,7 +7,7 @@ import {
 import { generateStoreSlug } from '../../_lib/slug';
 
 export default async function handler(req: IncomingMessage & { query?: any }, res: ServerResponse): Promise<void> {
-  setCorsHeaders(res);
+  setCorsHeaders(req, res);
 
   if (handleOptions(req, res)) return;
 

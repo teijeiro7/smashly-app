@@ -13,6 +13,9 @@ async function getAuthHeaders(): Promise<HeadersInit> {
  */
 async function handleApiResponse<T>(response: Response): Promise<T> {
   if (!response.ok) {
+    const ct = response.headers.get('content-type');
+    const bodyPreview = await response.clone().text().then(t => t.slice(0, 300));
+    console.log('[handleApiResponse] status:', response.status, 'content-type:', ct, 'body:', bodyPreview);
     const errorData = await response.json().catch(() => ({}));
     throw new Error(errorData.message || `Error: ${response.status} ${response.statusText}`);
   }
@@ -310,7 +313,7 @@ export class AdminService {
     const response = await fetch(buildApiUrl(API_ENDPOINTS.ADMIN.RECENT_ACTIVITY, { limit }), {
       method: 'GET',
       credentials: 'include',
-      headers: getCommonHeaders(),
+      headers: await getAuthHeaders(),
     });
 
     return handleApiResponse<Activity[]>(response);
@@ -323,7 +326,7 @@ export class AdminService {
     const response = await fetch(buildApiUrl(API_ENDPOINTS.ADMIN.CONFLICTS), {
       method: 'GET',
       credentials: 'include',
-      headers: getCommonHeaders(),
+      headers: await getAuthHeaders(),
     });
 
     return handleApiResponse<any[]>(response);
