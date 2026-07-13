@@ -1,10 +1,10 @@
 import type { IncomingMessage, ServerResponse } from 'http';
 import { supabaseAdmin } from '../../_lib/supabase';
-import { getAuthUser, isAdmin, readBody, setCorsHeaders, handleOptions, unauthorized, badRequest } from '../../_lib/auth';
+import { getAuthUser, isAdmin, readBody, setCorsHeaders, handleOptions, unauthorized, forbidden, badRequest } from '../../_lib/auth';
 import { generateStoreSlug } from '../../_lib/slug';
 
 export default async function handler(req: IncomingMessage, res: ServerResponse): Promise<void> {
-  setCorsHeaders(res);
+  setCorsHeaders(req, res);
 
   if (handleOptions(req, res)) return;
 
@@ -25,9 +25,12 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
 async function handleGetAll(req: IncomingMessage, res: ServerResponse): Promise<void> {
   const url = new URL(req.url || '', `http://${req.headers.host}`);
   const verified = url.searchParams.get('verified');
-  const token = req.headers.authorization?.startsWith('Bearer ')
-    ? req.headers.authorization.slice(7)
-    : null;
+
+  if (verified !== 'true') {
+    const user = await getAuthUser(req);
+    if (!user) return unauthorized(res);
+    if (!(await isAdmin(user.id))) return forbidden(res);
+  }
 
   const query = supabaseAdmin.from('stores').select('*');
 
