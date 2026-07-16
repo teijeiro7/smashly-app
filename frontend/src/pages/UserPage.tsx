@@ -344,6 +344,7 @@ const UserPage: React.FC = () => {
                   <img
                     src={userProfile.avatar_url}
                     alt={userProfile.nickname || 'Usuario'}
+                    loading='lazy'
                     style={{
                       width: '100%',
                       height: '100%',

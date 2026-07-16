@@ -518,7 +518,7 @@ const Header: React.FC = () => {
     <HeaderContainer>
       <HeaderContent>
         <Logo to='/' onClick={closeAllMenus}>
-          <img src='/images/icons/smashly-large-icon.ico' alt='Smashly' />
+          <img src='/images/icons/smashly-banner.svg' alt='Smashly' />
         </Logo>
 
         <CentralSearchContainer>
@@ -532,7 +532,7 @@ const Header: React.FC = () => {
               <NotificationBell />
               <AvatarButton onClick={() => setIsUserMenuOpen(!isUserMenuOpen)} aria-label="Menú de usuario">
                 {userProfile.avatar_url ? (
-                  <img src={userProfile.avatar_url} alt='Avatar' />
+                  <img src={userProfile.avatar_url} alt='Avatar' loading='lazy' />
                 ) : (
                   <User />
                 )}

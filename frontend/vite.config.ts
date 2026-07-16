@@ -1,6 +1,7 @@
 import { defineConfig } from 'vitest/config';
 import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
+import { ViteImageOptimizer } from 'vite-plugin-image-optimizer';
 import path from 'path';
 
 export default defineConfig(({ mode }) => ({
@@ -17,6 +18,27 @@ export default defineConfig(({ mode }) => ({
         parserOpts: {
           plugins: ['styled-components'],
         },
+      },
+    }),
+    ViteImageOptimizer({
+      includePublic: true,
+      logStats: true,
+      ansiColors: true,
+      png: {
+        quality: 75,
+        palette: true,
+      },
+      jpeg: {
+        quality: 75,
+      },
+      jpg: {
+        quality: 75,
+      },
+      webp: {
+        quality: 75,
+      },
+      avif: {
+        quality: 60,
       },
     }),
     VitePWA({

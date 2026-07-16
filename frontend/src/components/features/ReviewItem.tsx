@@ -188,7 +188,7 @@ export const ReviewItem: React.FC<ReviewItemProps> = ({
         <UserInfo>
           <Avatar>
             {review.user?.avatar_url ? (
-              <img src={review.user.avatar_url} alt={review.user?.nickname || 'User'} />
+              <img src={review.user.avatar_url} alt={review.user?.nickname || 'User'} loading='lazy' />
             ) : (
               <DefaultAvatar>
                 {review.user?.nickname ? review.user.nickname[0].toUpperCase() : 'U'}
@@ -254,7 +254,7 @@ export const ReviewItem: React.FC<ReviewItemProps> = ({
               <CommentItem key={comment.id}>
                 <CommentAvatar>
                   {comment.user.avatar_url ? (
-                    <img src={comment.user.avatar_url} alt={comment.user.nickname} />
+                    <img src={comment.user.avatar_url} alt={comment.user.nickname} loading='lazy' />
                   ) : (
                     <SmallDefaultAvatar>
                       {comment.user.nickname[0].toUpperCase()}
