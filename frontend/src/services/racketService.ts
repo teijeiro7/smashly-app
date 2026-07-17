@@ -250,7 +250,7 @@ export class RacketService {
         game_type: 'caracteristicas_tipo_de_juego',
         level: 'caracteristicas_nivel_de_juego',
         nivel: 'caracteristicas_nivel_de_juego',
-        on_sale: 'en_oferta',
+        on_sale: 'on_offer',
       };
       for (const [key, value] of Object.entries(filters)) {
         if (!value) continue;

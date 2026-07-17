@@ -88,6 +88,7 @@ export function createMockSupabase() {
     mockFrom,
     mockData,
     setMockData: (data: any[]) => {
+      mockData.splice(0, mockData.length, ...data)
       mockFrom.mockClear()
       return mockFrom
     },

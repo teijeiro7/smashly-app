@@ -78,14 +78,6 @@
         "leadingUnderscore": "allow"
       },
       {
-        "selector": "typeProperty",
-        "format": ["camelCase", "PascalCase", "snake_case", "UPPER_CASE"],
-        "filter": {
-          "regex": "^__",
-          "match": false
-        }
-      },
-      {
         "selector": "objectLiteralProperty",
         "format": ["camelCase", "PascalCase", "snake_case", "UPPER_CASE"],
         "leadingUnderscore": "allow",

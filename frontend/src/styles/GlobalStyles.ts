@@ -607,8 +607,8 @@ export const GlobalStyles = createGlobalStyle`
   /* Print styles */
   @media print {
     html, body, body * {
-      color: black;
-      background: white;
+      color: black !important;
+      background: white !important;
     }
   }
   /* Sileo Toast Viewport Z-Index Override */

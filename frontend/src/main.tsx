@@ -8,6 +8,15 @@ import { Toaster } from 'sileo';
 import { HelmetProvider } from 'react-helmet-async';
 import { registerSW } from 'virtual:pwa-register';
 import * as Sentry from '@sentry/react';
+import ErrorBoundary from './components/ErrorBoundary';
+import { AuthProvider } from './contexts/AuthContext';
+import { AuthModalProvider } from './contexts/AuthModalContext';
+import { BackgroundTasksProvider } from './contexts/BackgroundTasksContext';
+import { ComparisonProvider } from './contexts/ComparisonContext';
+import { ListsProvider } from './contexts/ListsContext';
+import { NotificationProvider } from './contexts/NotificationContext';
+import { RacketsProvider } from './contexts/RacketsContext';
+import { ThemeProvider } from './contexts/ThemeContext';
 
 import { router } from './router';
 
@@ -18,15 +27,6 @@ Sentry.init({
   integrations: [Sentry.browserTracingIntegration()],
   tracesSampleRate: 0.1,
 });
-import { AuthProvider } from './contexts/AuthContext';
-import { AuthModalProvider } from './contexts/AuthModalContext';
-import { NotificationProvider } from './contexts/NotificationContext';
-import { RacketsProvider } from './contexts/RacketsContext';
-import { ComparisonProvider } from './contexts/ComparisonContext';
-import { ListsProvider } from './contexts/ListsContext';
-import { BackgroundTasksProvider } from './contexts/BackgroundTasksContext';
-import { ThemeProvider } from './contexts/ThemeContext';
-import ErrorBoundary from './components/ErrorBoundary';
 
 const queryClient = new QueryClient({
   defaultOptions: {
