@@ -239,9 +239,19 @@ export class RacketService {
       const filterMap: Record<string, string> = {
         brand: 'brand',
         marca: 'brand',
-        forma: 'characteristics_shape',
-        balance: 'characteristics_balance',
-        nivel: 'characteristics_game_level',
+        shape: 'caracteristicas_forma',
+        forma: 'caracteristicas_forma',
+        balance: 'caracteristicas_balance',
+        core: 'caracteristicas_nucleo',
+        nucleo: 'caracteristicas_nucleo',
+        face: 'caracteristicas_cara',
+        cara: 'caracteristicas_cara',
+        hardness: 'caracteristicas_dureza',
+        dureza: 'caracteristicas_dureza',
+        game_type: 'caracteristicas_tipo_de_juego',
+        level: 'caracteristicas_nivel_de_juego',
+        nivel: 'caracteristicas_nivel_de_juego',
+        on_sale: 'en_oferta',
       };
       for (const [key, value] of Object.entries(filters)) {
         if (!value) continue;

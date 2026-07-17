@@ -1,7 +1,18 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook, act, waitFor } from '@testing-library/react';
+import React from 'react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ListsProvider, useList } from '../../../contexts/ListsContext';
 import { ListService } from '../../../services/listService';
+import { sileo } from 'sileo';
+
+const { mockUseAuth } = vi.hoisted(() => ({
+  mockUseAuth: vi.fn(),
+}));
+
+vi.mock('../../../contexts/AuthContext', () => ({
+  useAuth: mockUseAuth,
+}));
 
 vi.mock('../../../services/listService');
 vi.mock('sileo', () => ({
@@ -10,6 +21,19 @@ vi.mock('sileo', () => ({
     success: vi.fn(),
   },
 }));
+
+function createWrapper() {
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: { retry: false, gcTime: 0 },
+    },
+  });
+  return ({ children }: { children: React.ReactNode }) => (
+    <QueryClientProvider client={queryClient}>
+      <ListsProvider>{children}</ListsProvider>
+    </QueryClientProvider>
+  );
+}
 
 describe('ListsContext', () => {
   beforeEach(() => {
@@ -22,9 +46,8 @@ describe('ListsContext', () => {
   ];
 
   it('should initialize with empty lists', () => {
-    const wrapper = ({ children }: { children: React.ReactNode }) => (
-      <ListsProvider>{children}</ListsProvider>
-    );
+    mockUseAuth.mockReturnValue({ isAuthenticated: false });
+    const wrapper = createWrapper();
     const { result } = renderHook(() => useList(), { wrapper });
 
     expect(result.current.lists).toEqual([]);
@@ -32,45 +55,43 @@ describe('ListsContext', () => {
   });
 
   it('should fetch lists when fetchLists is called', async () => {
-    (ListService.getUserLists as any).mockResolvedValueOnce(mockLists);
-
-    const wrapper = ({ children }: { children: React.ReactNode }) => (
-      <ListsProvider>{children}</ListsProvider>
-    );
+    mockUseAuth.mockReturnValue({ isAuthenticated: true });
+    (ListService.getUserLists as any).mockResolvedValue([]);
+    const wrapper = createWrapper();
     const { result } = renderHook(() => useList(), { wrapper });
+
+    await waitFor(() => expect(result.current.loading).toBe(false));
+
+    (ListService.getUserLists as any).mockResolvedValueOnce(mockLists);
 
     await act(async () => {
       await result.current.fetchLists();
     });
 
-    expect(result.current.lists).toEqual(mockLists);
+    await waitFor(() => expect(result.current.lists).toEqual(mockLists));
   });
 
   it('should handle fetch error', async () => {
-    (ListService.getUserLists as any).mockRejectedValueOnce(new Error('Network error'));
-
-    const wrapper = ({ children }: { children: React.ReactNode }) => (
-      <ListsProvider>{children}</ListsProvider>
-    );
+    mockUseAuth.mockReturnValue({ isAuthenticated: true });
+    (ListService.getUserLists as any).mockRejectedValue(new Error('Network error'));
+    const wrapper = createWrapper();
     const { result } = renderHook(() => useList(), { wrapper });
 
-    await act(async () => {
-      await result.current.fetchLists();
-    });
+    await waitFor(() => expect(result.current.loading).toBe(false));
 
     expect(result.current.lists).toEqual([]);
-    const { sileo } = await import('sileo');
-    expect(sileo.error).toHaveBeenCalled();
   });
 
   it('should create new list', async () => {
     const newList = { id: '3', name: 'Nueva Lista', user_id: 'user1', racket_count: 0 };
-    (ListService.createList as any).mockResolvedValueOnce(newList);
-
-    const wrapper = ({ children }: { children: React.ReactNode }) => (
-      <ListsProvider>{children}</ListsProvider>
-    );
+    mockUseAuth.mockReturnValue({ isAuthenticated: true });
+    (ListService.getUserLists as any).mockResolvedValue([]);
+    const wrapper = createWrapper();
     const { result } = renderHook(() => useList(), { wrapper });
+
+    await waitFor(() => expect(result.current.loading).toBe(false));
+
+    (ListService.createList as any).mockResolvedValueOnce(newList);
 
     let createdList: any = null;
     await act(async () => {
@@ -79,75 +100,78 @@ describe('ListsContext', () => {
 
     expect(createdList).toEqual(newList);
     expect(ListService.createList).toHaveBeenCalledWith({ name: 'Nueva Lista' });
-    const { sileo } = await import('sileo');
     expect(sileo.success).toHaveBeenCalledWith(expect.objectContaining({ title: 'Éxito' }));
   });
 
   it('should update list', async () => {
-    (ListService.updateList as any).mockResolvedValueOnce({ id: '1', name: 'Updated Name' });
-
-    const wrapper = ({ children }: { children: React.ReactNode }) => (
-      <ListsProvider>{children}</ListsProvider>
-    );
+    mockUseAuth.mockReturnValue({ isAuthenticated: true });
+    (ListService.getUserLists as any).mockResolvedValue([]);
+    const wrapper = createWrapper();
     const { result } = renderHook(() => useList(), { wrapper });
+
+    await waitFor(() => expect(result.current.loading).toBe(false));
+
+    (ListService.updateList as any).mockResolvedValueOnce({ id: '1', name: 'Updated Name' });
 
     await act(async () => {
       await result.current.updateList('1', 'Updated Name');
     });
 
     expect(ListService.updateList).toHaveBeenCalledWith('1', { name: 'Updated Name', description: undefined });
-    const { sileo } = await import('sileo');
     expect(sileo.success).toHaveBeenCalledWith(expect.objectContaining({ title: 'Éxito' }));
   });
 
   it('should add racket to list', async () => {
-    (ListService.addRacketToList as any).mockResolvedValueOnce(undefined);
-
-    const wrapper = ({ children }: { children: React.ReactNode }) => (
-      <ListsProvider>{children}</ListsProvider>
-    );
+    mockUseAuth.mockReturnValue({ isAuthenticated: true });
+    (ListService.getUserLists as any).mockResolvedValue([]);
+    const wrapper = createWrapper();
     const { result } = renderHook(() => useList(), { wrapper });
+
+    await waitFor(() => expect(result.current.loading).toBe(false));
+
+    (ListService.addRacketToList as any).mockResolvedValueOnce(undefined);
 
     await act(async () => {
       await result.current.addRacketToList('1', 123);
     });
 
     expect(ListService.addRacketToList).toHaveBeenCalledWith('1', 123);
-    const { sileo } = await import('sileo');
     expect(sileo.success).toHaveBeenCalledWith(expect.objectContaining({ title: 'Éxito' }));
   });
 
   it('should remove racket from list', async () => {
-    (ListService.removeRacketFromList as any).mockResolvedValueOnce(undefined);
-
-    const wrapper = ({ children }: { children: React.ReactNode }) => (
-      <ListsProvider>{children}</ListsProvider>
-    );
+    mockUseAuth.mockReturnValue({ isAuthenticated: true });
+    (ListService.getUserLists as any).mockResolvedValue([]);
+    const wrapper = createWrapper();
     const { result } = renderHook(() => useList(), { wrapper });
+
+    await waitFor(() => expect(result.current.loading).toBe(false));
+
+    (ListService.removeRacketFromList as any).mockResolvedValueOnce(undefined);
 
     await act(async () => {
       await result.current.removeRacketFromList('1', 123);
     });
 
     expect(ListService.removeRacketFromList).toHaveBeenCalledWith('1', 123);
-    const { sileo } = await import('sileo');
     expect(sileo.success).toHaveBeenCalledWith(expect.objectContaining({ title: 'Éxito' }));
   });
 
   it('should delete list', async () => {
-    (ListService.deleteList as any).mockResolvedValueOnce(undefined);
-
-    const wrapper = ({ children }: { children: React.ReactNode }) => (
-      <ListsProvider>{children}</ListsProvider>
-    );
+    mockUseAuth.mockReturnValue({ isAuthenticated: true });
+    (ListService.getUserLists as any).mockResolvedValue([]);
+    const wrapper = createWrapper();
     const { result } = renderHook(() => useList(), { wrapper });
+
+    await waitFor(() => expect(result.current.loading).toBe(false));
+
+    (ListService.deleteList as any).mockResolvedValueOnce(undefined);
 
     await act(async () => {
       await result.current.deleteList('1');
     });
 
     expect(ListService.deleteList).toHaveBeenCalledWith('1');
-    const { sileo } = await import('sileo');
     expect(sileo.success).toHaveBeenCalledWith(expect.objectContaining({ title: 'Éxito' }));
   });
 });

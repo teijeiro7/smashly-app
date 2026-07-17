@@ -1,7 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { BrowserRouter } from 'react-router-dom';
 import ErrorBoundary from '../../../components/ErrorBoundary';
+
+vi.mock('@sentry/react', () => ({ captureException: vi.fn() }));
 
 const ThrowError = ({ shouldThrow }: { shouldThrow: boolean }) => {
   if (shouldThrow) {
@@ -18,11 +19,9 @@ describe('ErrorBoundary', () => {
 
   it('should render children when no error', () => {
     render(
-      <BrowserRouter>
-        <ErrorBoundary>
-          <ThrowError shouldThrow={false} />
-        </ErrorBoundary>
-      </BrowserRouter>
+      <ErrorBoundary>
+        <ThrowError shouldThrow={false} />
+      </ErrorBoundary>
     );
 
     expect(screen.getByText('Working Component')).toBeInTheDocument();
@@ -30,11 +29,9 @@ describe('ErrorBoundary', () => {
 
   it('should catch error and display fallback', () => {
     render(
-      <BrowserRouter>
-        <ErrorBoundary>
-          <ThrowError shouldThrow={true} />
-        </ErrorBoundary>
-      </BrowserRouter>
+      <ErrorBoundary>
+        <ThrowError shouldThrow={true} />
+      </ErrorBoundary>
     );
 
     expect(screen.queryByText('Working Component')).not.toBeInTheDocument();
@@ -45,11 +42,9 @@ describe('ErrorBoundary', () => {
     const customFallback = <div>Custom Error Message</div>;
 
     render(
-      <BrowserRouter>
-        <ErrorBoundary fallback={customFallback}>
-          <ThrowError shouldThrow={true} />
-        </ErrorBoundary>
-      </BrowserRouter>
+      <ErrorBoundary fallback={customFallback}>
+        <ThrowError shouldThrow={true} />
+      </ErrorBoundary>
     );
 
     expect(screen.getByText('Custom Error Message')).toBeInTheDocument();
@@ -57,21 +52,17 @@ describe('ErrorBoundary', () => {
 
   it.skip('should allow retry', async () => {
     const { rerender } = render(
-      <BrowserRouter>
-        <ErrorBoundary>
-          <ThrowError shouldThrow={true} />
-        </ErrorBoundary>
-      </BrowserRouter>
+      <ErrorBoundary>
+        <ThrowError shouldThrow={true} />
+      </ErrorBoundary>
     );
 
     expect(screen.getByText(/algo salió mal/i)).toBeInTheDocument();
 
     rerender(
-      <BrowserRouter>
-        <ErrorBoundary>
-          <ThrowError shouldThrow={false} />
-        </ErrorBoundary>
-      </BrowserRouter>
+      <ErrorBoundary>
+        <ThrowError shouldThrow={false} />
+      </ErrorBoundary>
     );
 
     await waitFor(() => {
