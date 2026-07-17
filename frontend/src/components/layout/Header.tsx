@@ -111,7 +111,7 @@ const MobileSearchButton = styled.button`
   min-height: 40px;
   padding: 8px;
   border-radius: 8px;
-  transition: all 0.2s ease;
+  transition: background-color 0.2s ease, opacity 0.2s ease, transform 0.2s ease;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -162,7 +162,7 @@ const MobileMenuDropdown = styled(motion.div)<{ $isOpen: boolean }>`
 const MobileSearchContainer = styled.div<{ $isOpen: boolean }>`
   padding: 1rem;
   border-bottom: 1px solid rgba(229, 231, 235, 0.5);
-  transition: all 0.3s ease;
+  transition: opacity 0.3s ease;
   overflow: visible;
   position: relative;
   z-index: 101;
@@ -466,7 +466,7 @@ const Divider = styled.div`
   margin: 0 12px;
 `;
 
-const Header: React.FC = () => {
+const Header = React.memo(() => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
@@ -694,6 +694,6 @@ const Header: React.FC = () => {
       </HeaderContent>
     </HeaderContainer>
   );
-};
+});
 
 export default Header;

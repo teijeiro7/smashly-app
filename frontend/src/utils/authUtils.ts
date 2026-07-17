@@ -43,8 +43,6 @@ export const getAuthToken = (): string | null => {
  */
 export const forceCleanAuthStorage = (): void => {
   try {
-    // console.log("Starting force clean of auth storage...");
-
     // Limpiar localStorage
     const localKeysToRemove: string[] = [];
     for (let i = 0; i < localStorage.length; i++) {
@@ -56,7 +54,6 @@ export const forceCleanAuthStorage = (): void => {
 
     localKeysToRemove.forEach(key => {
       localStorage.removeItem(key);
-      // console.log(`🗑️ Removed localStorage key: ${key}`);
     });
 
     // Limpiar sessionStorage
@@ -70,7 +67,6 @@ export const forceCleanAuthStorage = (): void => {
 
     sessionKeysToRemove.forEach(key => {
       sessionStorage.removeItem(key);
-      // console.log(`🗑️ Removed sessionStorage key: ${key}`);
     });
 
     // Limpiar cookies relacionadas con auth (si las hay)
@@ -80,17 +76,11 @@ export const forceCleanAuthStorage = (): void => {
         const name = eqPos > -1 ? cookie.substr(0, eqPos).trim() : cookie.trim();
         if (isAuthRelatedKey(name)) {
           document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/`;
-          // console.log(`🗑️ Removed cookie: ${name}`);
         }
       });
     } catch (cookieError) {
       logger.warn('Error cleaning cookies:', cookieError);
     }
-
-    // const totalKeysRemoved = localKeysToRemove.length + sessionKeysToRemove.length;
-    // console.log(
-    //   `✅ Force clean completed. Removed ${totalKeysRemoved} auth-related keys.`
-    // );
 
     return;
   } catch (error) {

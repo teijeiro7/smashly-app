@@ -1,4 +1,5 @@
 import React from 'react';
+import { logger } from './logger';
 
 /**
  * Performance Monitoring Utility
@@ -18,20 +19,13 @@ export interface PerformanceMetrics {
 class PerformanceMonitor {
   private metrics: PerformanceMetrics = {};
   private observers: PerformanceObserver[] = [];
-  private navigationStart: number = 0;
-
-  constructor() {
-    if (typeof window !== 'undefined' && window.performance) {
-      this.navigationStart = performance.timing.navigationStart;
-    }
-  }
 
   /**
    * Start monitoring performance metrics
    */
   startMonitoring() {
     if (typeof window === 'undefined' || !window.PerformanceObserver) {
-      console.warn('PerformanceObserver not supported');
+      logger.warn('PerformanceObserver not supported');
       return;
     }
 
@@ -51,7 +45,7 @@ class PerformanceMonitor {
       // Measure Time to First Byte (TTFB)
       this.measureTTFB();
     } catch (error) {
-      console.error('Error starting performance monitoring:', error);
+      logger.error('Error starting performance monitoring:', error);
     }
   }
 
@@ -70,7 +64,7 @@ class PerformanceMonitor {
       this.observers.push(observer);
     } catch (e) {
       // LCP might not be supported
-      console.warn('LCP observation failed:', e);
+      logger.warn('LCP observation failed:', e);
     }
   }
 
@@ -89,7 +83,7 @@ class PerformanceMonitor {
       this.observers.push(observer);
     } catch (e) {
       // FID might not be supported
-      console.warn('FID observation failed:', e);
+      logger.warn('FID observation failed:', e);
     }
   }
 
@@ -111,7 +105,7 @@ class PerformanceMonitor {
       observer.observe({ entryTypes: ['layout-shift'] });
       this.observers.push(observer);
     } catch (e) {
-      console.warn('CLS observation failed:', e);
+      logger.warn('CLS observation failed:', e);
     }
   }
 
@@ -119,12 +113,13 @@ class PerformanceMonitor {
    * Measure page load time
    */
   private measurePageLoad() {
-    if (typeof window !== 'undefined' && window.performance && (window.performance as any).timing) {
+    if (typeof window !== 'undefined' && window.performance) {
       window.addEventListener('load', () => {
         setTimeout(() => {
-          const timing = (window.performance as any).timing;
-          this.metrics.loadTime = timing.loadEventEnd - this.navigationStart;
-          this.metrics.fcp = timing.domContentLoadedEventEnd - this.navigationStart;
+          const navEntry = performance.getEntriesByType('navigation')[0] as any;
+          if (navEntry) {
+            this.metrics.loadTime = navEntry.loadEventEnd;
+          }
         }, 0);
       });
     }
@@ -134,9 +129,11 @@ class PerformanceMonitor {
    * Measure Time to First Byte
    */
   private measureTTFB() {
-    if (typeof window !== 'undefined' && window.performance && (window.performance as any).timing) {
-      const timing = (window.performance as any).timing;
-      this.metrics.ttfb = timing.responseStart - this.navigationStart;
+    if (typeof window !== 'undefined' && window.performance) {
+      const navEntry = performance.getEntriesByType('navigation')[0] as any;
+      if (navEntry) {
+        this.metrics.ttfb = navEntry.responseStart;
+      }
     }
   }
 
@@ -175,7 +172,7 @@ class PerformanceMonitor {
           this.measureCustom(name, measure.duration);
         }
       } catch (e) {
-        console.warn(`Failed to measure ${name}:`, e);
+        logger.warn(`Failed to measure ${name}:`, e);
       }
     }
   }
@@ -231,7 +228,7 @@ class PerformanceMonitor {
         body: JSON.stringify(this.metrics),
       });
     } catch (error) {
-      console.error('Failed to send metrics to analytics:', error);
+      logger.warn('Failed to send metrics to analytics:', error);
     }
   }
 

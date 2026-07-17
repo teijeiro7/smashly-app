@@ -95,7 +95,6 @@ function mapDbToFrontend(raw: any): Racket {
     marca: raw.brand ?? '',
     modelo: raw.model ?? '',
     imagenes: images,
-    es_bestseller: false, // column does not exist in DB
     en_oferta: raw.on_offer ?? false,
     scrapeado_en: raw.created_at,
     descripcion: raw.description ?? null,
@@ -284,7 +283,7 @@ export class RacketService {
   }
 
   static async getBestsellerRackets(): Promise<Racket[]> {
-    // es_bestseller does not exist in DB — return top rackets by name
+    // Return top rackets by name
     const { data, error } = await supabase
       .from('rackets')
       .select('*')
@@ -328,7 +327,7 @@ export class RacketService {
 
     return {
       total: totalRes.count ?? 0,
-      bestsellers: 0, // es_bestseller column does not exist in DB
+      bestsellers: 0, // bestseller logic TBD — returning 0 for now
       onSale: onSaleRes.count ?? 0,
       brands: uniqueBrands.size,
     };

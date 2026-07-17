@@ -39,12 +39,7 @@ const Overlay = styled.div`
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.7) 0%,
-    rgba(255, 255, 255, 0.95) 50%,
-    rgba(255, 255, 255, 0.7) 100%
-  );
+  background: var(--surface-overlay);
   backdrop-filter: blur(2px);
   -webkit-backdrop-filter: blur(2px);
 

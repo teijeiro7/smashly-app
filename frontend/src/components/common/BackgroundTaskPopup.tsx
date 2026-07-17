@@ -357,6 +357,15 @@ export const BackgroundTaskPopup: React.FC = () => {
   const { location } = useRouterState();
   const [minimized, setMinimized] = useState(true);
   const [showPopup, setShowPopup] = useState(false);
+  const [reducedMotion, setReducedMotion] = useState(false);
+
+  useEffect(() => {
+    const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+    setReducedMotion(mq.matches);
+    const handler = (e: MediaQueryListEvent) => setReducedMotion(e.matches);
+    mq.addEventListener('change', handler);
+    return () => mq.removeEventListener('change', handler);
+  }, []);
 
   // Mostrar popup cuando hay una tarea activa o completada recientemente
   useEffect(() => {
@@ -471,28 +480,34 @@ export const BackgroundTaskPopup: React.FC = () => {
                 <defs>
                   <linearGradient id='animatedGradient' x1='0%' y1='0%' x2='100%' y2='100%'>
                     <stop offset='0%' stopColor='var(--primary)'>
-                      <animate
-                        attributeName='stop-color'
-                        values='var(--primary); var(--primary-light); var(--primary-light); var(--primary-light); var(--primary)'
-                        dur='3s'
-                        repeatCount='indefinite'
-                      />
+                      {!reducedMotion && (
+                        <animate
+                          attributeName='stop-color'
+                          values='var(--primary); var(--primary-light); var(--primary-light); var(--primary-light); var(--primary)'
+                          dur='3s'
+                          repeatCount='indefinite'
+                        />
+                      )}
                     </stop>
                     <stop offset='50%' stopColor='var(--primary-light)'>
-                      <animate
-                        attributeName='stop-color'
-                        values='var(--primary-light); var(--primary-light); var(--primary); var(--primary-light); var(--primary-light)'
-                        dur='3s'
-                        repeatCount='indefinite'
-                      />
+                      {!reducedMotion && (
+                        <animate
+                          attributeName='stop-color'
+                          values='var(--primary-light); var(--primary-light); var(--primary); var(--primary-light); var(--primary-light)'
+                          dur='3s'
+                          repeatCount='indefinite'
+                        />
+                      )}
                     </stop>
                     <stop offset='100%' stopColor='var(--primary-light)'>
-                      <animate
-                        attributeName='stop-color'
-                        values='var(--primary-light); var(--primary); var(--primary-light); var(--primary); var(--primary-light)'
-                        dur='3s'
-                        repeatCount='indefinite'
-                      />
+                      {!reducedMotion && (
+                        <animate
+                          attributeName='stop-color'
+                          values='var(--primary-light); var(--primary); var(--primary-light); var(--primary); var(--primary-light)'
+                          dur='3s'
+                          repeatCount='indefinite'
+                        />
+                      )}
                     </stop>
                   </linearGradient>
                 </defs>
