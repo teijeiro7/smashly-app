@@ -518,7 +518,7 @@ const Header = React.memo(() => {
     <HeaderContainer>
       <HeaderContent>
         <Logo to='/' onClick={closeAllMenus}>
-          <img src='/images/icons/smashly-banner.svg' alt='Smashly' />
+          <img src='/images/icons/smashly-large-icon.png' alt='Smashly' />
         </Logo>
 
         <CentralSearchContainer>
