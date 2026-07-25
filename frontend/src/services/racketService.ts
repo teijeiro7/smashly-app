@@ -1,6 +1,5 @@
 import { supabase } from '../lib/supabase';
 import { Racket } from '../types/racket';
-import { API_ENDPOINTS, buildApiUrl, getCommonHeaders, ApiResponse } from '../config/api';
 
 // ── Price history types ───────────────────────────────────────────────────────
 export interface PricePoint {
@@ -22,16 +21,6 @@ export interface PriceHistoryResult {
   days: number;
   stores: StorePriceHistory[];
   combined: PricePoint[];
-}
-
-async function handleApiResponse<T>(response: Response): Promise<T> {
-  if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}));
-    throw new Error(errorData.message || `Error: ${response.status} ${response.statusText}`);
-  }
-  const data: ApiResponse<T> = await response.json();
-  if (!data.success) throw new Error(data.message || data.error || 'Error desconocido');
-  return data.data as T;
 }
 
 // ── DB → Frontend mapper ──────────────────────────────────────────────────────
@@ -357,19 +346,56 @@ export class RacketService {
     return { updatedCount: data?.length ?? 0 };
   }
 
-  // ── Price history (Express legacy — remove after full decommission) ────────
+  // ── Price history ────────────────────────────────────────────────────────
+  // price_history has public RLS SELECT (service-role-only writes, from the
+  // scraper's record_price_history()), so this reads straight from Supabase
+  // instead of the dead /api/v1/rackets/:id/price-history REST route.
   static async getPriceHistory(
     racketId: number,
     days = 90,
     store?: string
   ): Promise<PriceHistoryResult | null> {
     try {
-      const params: Record<string, any> = { days };
-      if (store) params.store = store;
+      const since = new Date();
+      since.setDate(since.getDate() - days);
 
-      const url = buildApiUrl(API_ENDPOINTS.RACKETS_PRICE_HISTORY(racketId), params);
-      const response = await fetch(url, { method: 'GET', headers: getCommonHeaders() });
-      return await handleApiResponse<PriceHistoryResult>(response);
+      let query = supabase
+        .from('price_history')
+        .select('store, price, recorded_at')
+        .eq('racket_id', racketId)
+        .gte('recorded_at', since.toISOString())
+        .order('recorded_at', { ascending: true });
+
+      if (store) query = query.eq('store', store);
+
+      const { data, error } = await query;
+      if (error || !data) return null;
+
+      const points: PricePoint[] = data.map((row: any) => ({
+        date: row.recorded_at,
+        price: row.price,
+        store: row.store,
+      }));
+
+      const byStore = new Map<string, PricePoint[]>();
+      for (const point of points) {
+        const list = byStore.get(point.store) ?? [];
+        list.push(point);
+        byStore.set(point.store, list);
+      }
+
+      const stores: StorePriceHistory[] = Array.from(byStore.entries()).map(([storeName, history]) => {
+        const prices = history.map(h => h.price);
+        return {
+          store: storeName,
+          history,
+          currentPrice: prices.length ? prices[prices.length - 1] : null,
+          minPrice: prices.length ? Math.min(...prices) : null,
+          maxPrice: prices.length ? Math.max(...prices) : null,
+        };
+      });
+
+      return { racketId, days, stores, combined: points };
     } catch {
       return null;
     }
