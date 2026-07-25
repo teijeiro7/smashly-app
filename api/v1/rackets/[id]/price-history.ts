@@ -3,7 +3,7 @@ import { supabaseAdmin } from '../../../_lib/supabase';
 import { setCorsHeaders, handleOptions } from '../../../_lib/auth';
 
 export default async function handler(req: IncomingMessage, res: ServerResponse): Promise<void> {
-  setCorsHeaders(res);
+  setCorsHeaders(req, res);
 
   if (handleOptions(req, res)) return;
 
