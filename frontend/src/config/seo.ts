@@ -14,7 +14,6 @@ export const SITE = {
   shortDescription:
     'Comparador de palas de pádel con IA. +800 modelos, precios en tiempo real.',
   locale: 'es_ES',
-  alternateLocale: 'en_ES',
   language: 'es',
   // Brand colors used in OG image and theme
   themeColor: '#16a34a',

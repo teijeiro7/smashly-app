@@ -45,8 +45,8 @@
     <!-- Preconnect to speed up first paint of critical resources -->
     <link rel="preconnect" href="https://smashly-app.es" crossorigin />
     <link rel="dns-prefetch" href="https://smashly-app.es" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preconnect" href="https://api.fontshare.com" />
+    <link rel="preconnect" href="https://cdn.fontshare.com" crossorigin />
     <link rel="dns-prefetch" href="https://www.linkedin.com" />
 
     <!-- ============================================================
@@ -58,8 +58,6 @@
     <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />
     <meta name="googlebot" content="index, follow" />
     <meta name="rating" content="general" />
-    <meta name="distribution" content="global" />
-    <meta name="revisit-after" content="1 day" />
 
     <!-- Primary Meta Tags -->
     <title>Smashly — Comparador de Palas de Pádel con IA | +800 Modelos</title>
@@ -77,7 +75,6 @@
     <!-- Open Graph / Facebook -->
     <meta property="og:site_name" content="Smashly" />
     <meta property="og:locale" content="es_ES" />
-    <meta property="og:locale:alternate" content="en_ES" />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://smashly-app.es/" />
     <meta property="og:title" content="Smashly — Comparador de Palas de Pádel con IA | +800 Modelos" />
@@ -188,16 +185,21 @@
     }
     </script>
 
-    <!-- Google Fonts: Satoshi — non-blocking load to avoid render-blocking -->
+    <!-- Fontshare: Satoshi — non-blocking load to avoid render-blocking.
+         Satoshi is an Indian Type Foundry font distributed via Fontshare,
+         not Google Fonts; it was previously requested from
+         fonts.googleapis.com, which 404s for this family and silently
+         fell back to the system font. Satoshi ships 400/500/700/900,
+         no 600. -->
     <link
       rel="preload"
-      href="https://fonts.googleapis.com/css2?family=Satoshi:wght@400;500;600;700&display=swap"
+      href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700,900&display=swap"
       as="style"
       onload="this.onload=null;this.rel='stylesheet'"
     />
     <noscript>
       <link
-        href="https://fonts.googleapis.com/css2?family=Satoshi:wght@400;500;600;700&display=swap"
+        href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700,900&display=swap"
         rel="stylesheet"
       />
     </noscript>

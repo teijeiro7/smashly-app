@@ -92,7 +92,6 @@ const SEO: React.FC<SEOProps> = ({
       {/* OpenGraph */}
       <meta property='og:site_name' content={SITE.name} />
       <meta property='og:locale' content={SITE.locale} />
-      <meta property='og:locale:alternate' content={SITE.alternateLocale} />
       <meta property='og:type' content={type} />
       <meta property='og:title' content={fullTitle} />
       <meta property='og:description' content={description} />
