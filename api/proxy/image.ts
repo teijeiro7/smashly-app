@@ -34,6 +34,8 @@ const ALLOWED_IMAGE_DOMAINS: string[] = [
   'lrdgyfmkkboyhoycrnov.supabase.co',
 ];
 
+const MAX_IMAGE_BYTES = 10 * 1024 * 1024; // 10 MB
+
 export default async function handler(req: IncomingMessage, res: ServerResponse): Promise<void> {
   // CORS preflight
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -106,8 +108,48 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
       return;
     }
 
-    const contentType = response.headers.get('content-type') || 'image/jpeg';
-    const buffer = await response.arrayBuffer();
+    // Only ever relay actual images: an allow-listed domain can still host
+    // user-uploaded files (Shopify CDN, Supabase storage, googleusercontent),
+    // and blindly forwarding their content-type would let this endpoint serve
+    // text/html — i.e. stored XSS on our own origin — from those hosts.
+    const contentType = response.headers.get('content-type') || '';
+    if (!contentType.toLowerCase().startsWith('image/')) {
+      res.writeHead(502, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Upstream did not return an image' }));
+      return;
+    }
+
+    const declaredLength = Number(response.headers.get('content-length') || 0);
+    if (declaredLength > MAX_IMAGE_BYTES) {
+      res.writeHead(413, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Image too large' }));
+      return;
+    }
+
+    if (!response.body) {
+      res.writeHead(502, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Empty response from image source' }));
+      return;
+    }
+
+    // Enforce the cap on the actual bytes read too — a spoofed/absent
+    // content-length header must not bypass the limit.
+    const reader = response.body.getReader();
+    const chunks: Uint8Array[] = [];
+    let total = 0;
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      total += value.byteLength;
+      if (total > MAX_IMAGE_BYTES) {
+        reader.cancel().catch(() => {});
+        res.writeHead(413, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'Image too large' }));
+        return;
+      }
+      chunks.push(value);
+    }
+    const buffer = Buffer.concat(chunks.map((chunk) => Buffer.from(chunk)));
 
     res.writeHead(200, {
       'Content-Type': contentType,
@@ -115,7 +157,7 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
       'Cross-Origin-Resource-Policy': 'cross-origin',
       'Cache-Control': 'public, max-age=604800, stale-while-revalidate=86400',
     });
-    res.end(Buffer.from(buffer));
+    res.end(buffer);
   } catch (err: any) {
     res.writeHead(500, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify({ error: 'Internal server error while fetching image' }));
