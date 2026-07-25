@@ -20,8 +20,8 @@ interface ContentLockProps {
 export const ContentLock: React.FC<ContentLockProps> = ({
   isLocked,
   children,
-  title = "Premium Feature",
-  description = "Sign in to access this feature",
+  title = "Funcionalidad Premium",
+  description = "Inicia sesión para acceder a esta funcionalidad",
 }) => {
   if (!isLocked) {
     return <>{children}</>;
@@ -47,16 +47,16 @@ export const ContentLock: React.FC<ContentLockProps> = ({
           <ButtonGroup>
             <LoginButton to="/login">
               <FiLogIn size={20} />
-              Log In
+              Iniciar Sesión
             </LoginButton>
             <SignUpButton to="/register">
               <FiUserPlus size={20} />
-              Sign Up
+              Crear Cuenta
             </SignUpButton>
           </ButtonGroup>
 
           <SubText>
-            Get access to price tracking, reviews, and more
+            Accede a seguimiento de precios, reviews y más
           </SubText>
         </LockCard>
       </LockOverlay>

@@ -1,6 +1,5 @@
 import React from 'react';
 import { describe, expect, it, beforeEach, vi } from 'vitest';
-import { MemoryRouter } from 'react-router-dom';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import { PlayerDashboard } from '../../../pages/PlayerDashboard';
 
@@ -59,14 +58,13 @@ vi.mock('../../../services/recommendationService', () => ({
   },
 }));
 
-vi.mock('react-router-dom', async () => {
-  const actual = await vi.importActual<typeof import('react-router-dom')>('react-router-dom');
-
-  return {
-    ...actual,
-    useNavigate: () => mocks.mockNavigate,
-  };
-});
+vi.mock('@tanstack/react-router', () => ({
+  useNavigate: () => mocks.mockNavigate,
+  useRouterState: () => ({ location: { hash: '' } }),
+  Link: ({ to, children, className, ...props }: any) => (
+    <a href={to} className={className} {...props}>{children}</a>
+  ),
+}));
 
 const recommendation = {
   id: 'rec-1',
@@ -117,11 +115,7 @@ describe('PlayerDashboard recommendation cards', () => {
   });
 
   const renderDashboard = async () => {
-    render(
-      <MemoryRouter>
-        <PlayerDashboard />
-      </MemoryRouter>
-    );
+    render(<PlayerDashboard />);
 
     await waitFor(() => {
       expect(screen.getByRole('heading', { name: /Tus próximas palas/i })).toBeInTheDocument();

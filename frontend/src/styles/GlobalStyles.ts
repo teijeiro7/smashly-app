@@ -17,7 +17,7 @@ export const GlobalStyles = createGlobalStyle`
     line-height: 1.15;
     -webkit-text-size-adjust: 100%;
     scroll-behavior: smooth;
-    background: #f3f7f1;
+    background: var(--bg);
     width: 100%;
     max-width: 100%;
     overflow-x: hidden;
@@ -118,14 +118,14 @@ export const GlobalStyles = createGlobalStyle`
 
   /* Links */
   a {
-    color: #16a34a;
+    color: var(--primary);
     text-decoration: none;
     transition: color 0.2s ease;
     -webkit-tap-highlight-color: transparent;
   }
 
   a:hover {
-    color: #15803d;
+    color: var(--primary-hover);
     text-decoration: underline;
   }
 
@@ -152,22 +152,22 @@ export const GlobalStyles = createGlobalStyle`
     font-family: inherit;
     font-size: inherit;
     line-height: inherit;
-    border: 1px solid #d1d5db;
+    border: 1px solid var(--border-strong);
     border-radius: 8px;
     padding: 12px 16px;
-    background-color: #fff;
+    background-color: var(--surface);
     transition: border-color 0.2s ease, box-shadow 0.2s ease;
     min-height: 44px;
   }
 
   input:focus, textarea:focus, select:focus {
     outline: none;
-    border-color: #16a34a;
+    border-color: var(--primary);
     box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.1);
   }
 
   input::placeholder, textarea::placeholder {
-    color: #9ca3af;
+    color: var(--text-subtle);
   }
 
   /* Lists */
@@ -188,16 +188,16 @@ export const GlobalStyles = createGlobalStyle`
   }
 
   ::-webkit-scrollbar-track {
-    background: #f1f5f9;
+    background: var(--surface-3);
   }
 
   ::-webkit-scrollbar-thumb {
-    background: #cbd5e1;
+    background: var(--border-strong);
     border-radius: 4px;
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    background: #94a3b8;
+    background: var(--border);
   }
 
   /* Utility classes */
@@ -357,7 +357,8 @@ export const GlobalStyles = createGlobalStyle`
   }
 
   /* Dark mode — selectors use BOTH attribute and class for maximum
-     compatibility across browsers and any caching layers. */
+     compatibility across browsers and any caching layers.
+     Keep in sync with the @media (prefers-color-scheme: dark) block below. */
   html[data-theme='dark'],
   html.theme-dark {
     /* Forest-tinted dark palette: backgrounds are green-graphite (not pure black) */
@@ -436,7 +437,8 @@ export const GlobalStyles = createGlobalStyle`
 
   /* Auto mode: follow OS, but only when user has NOT made an explicit choice
      (the anti-FOUC script sets data-theme='light'/'dark' when there is a stored
-     preference, and leaves the attribute unset in auto mode). */
+     preference, and leaves the attribute unset in auto mode).
+     Keep in sync with the html[data-theme='dark'] block above. */
   @media (prefers-color-scheme: dark) {
     html:not([data-theme='light']):not([data-theme='dark']):not(.theme-light):not(.theme-dark) {
       --color-primary: #22c55e;
@@ -604,7 +606,7 @@ export const GlobalStyles = createGlobalStyle`
 
   /* Print styles */
   @media print {
-    * {
+    html, body, body * {
       color: black !important;
       background: white !important;
     }

@@ -1,210 +1,334 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { reviewService } from '../../../services/reviewService';
 
-const { mockConfig, supabase } = vi.hoisted(() => {
-  const mockConfig: any = { data: null, error: null, count: null };
+const { mockData, mockFrom, mockGetSession } = vi.hoisted(() => {
+  const queue: any[] = [];
 
-  function mockSelectReturn(resp: any) {
-    const chain: any = { data: resp.data, error: resp.error, count: resp.count };
-    chain.order = vi.fn(() => chain);
-    chain.range = vi.fn(() => chain);
-    chain.limit = vi.fn(() => chain);
-    chain.eq = vi.fn(() => chain);
-    chain.in = vi.fn(() => chain);
-    chain.or = vi.fn(() => chain);
-    chain.ilike = vi.fn(() => chain);
-    chain.neq = vi.fn(() => chain);
-    chain.gte = vi.fn(() => chain);
-    chain.single = vi.fn(async () => ({
-      data: Array.isArray(resp.data) ? (resp.data.length > 0 ? resp.data[0] : null) : resp.data,
-      error: resp.error,
-    }));
-    chain.maybeSingle = vi.fn(async () => ({
-      data: Array.isArray(resp.data) ? (resp.data.length > 0 ? resp.data[0] : null) : resp.data,
-      error: resp.error,
-    }));
-    chain.select = vi.fn(() => chain);
-    chain.insert = vi.fn(() => ({ ...chain, select: vi.fn(() => ({ ...chain, single: vi.fn(async () => resp) })) }));
-    chain.update = vi.fn(() => ({ ...chain, select: vi.fn(() => ({ ...chain, single: vi.fn(async () => resp) })) }));
-    chain.delete = vi.fn(() => chain);
-    chain.upsert = vi.fn(() => ({ ...chain, select: vi.fn(() => ({ ...chain, single: vi.fn(async () => resp) })) }));
-    chain.then = async (resolve: any) => resolve(resp);
-    return chain;
+  function qb(d: any) {
+    const c: any = new Proxy({ _d: d, _e: null }, {
+      get(t, p) {
+        if (p === 'then') {
+          return (r: (v: any) => void) => {
+            if (t._d && typeof t._d === 'object' && '_count' in t._d) {
+              return r({ data: null, error: null, count: t._d._count })
+            }
+            return r({ data: t._d, error: t._e, count: Array.isArray(t._d) ? t._d.length : null })
+          }
+        }
+        if (p === 'catch' || p === 'finally') return undefined
+        return () => c
+      },
+    })
+    return c
   }
 
-  return {
-    mockConfig,
-    supabase: {
-      from: vi.fn(() => mockSelectReturn(mockConfig)),
-      auth: {
-        getSession: vi.fn(async () => ({
-          data: { session: { access_token: 'test-token', user: { id: 'test-user', email: 'test@test.com' } } },
-          error: null,
-        })),
-        signOut: vi.fn(async () => ({ error: null })),
-        signInWithPassword: vi.fn(),
-        signUp: vi.fn(),
-        onAuthStateChange: vi.fn(() => ({ data: { subscription: { unsubscribe: vi.fn() } } })),
-      },
-      rpc: vi.fn(),
-      storage: { from: vi.fn() },
-    },
-  };
-});
+  const mf = vi.fn(() => qb(queue.shift()))
+  const mgs = vi.fn(() => Promise.resolve({ data: { session: { access_token: 't', user: { id: 'u1' } } } }))
 
-vi.mock('../../../lib/supabase', () => ({ supabase }));
+  return { mockData: queue, mockFrom: mf, mockGetSession: mgs }
+})
 
-const mockReviewRow = {
-  id: '1',
-  rating: 5,
-  comment: 'Great racket',
+vi.mock('../../../lib/supabase', () => ({
+  supabase: {
+    from: mockFrom,
+    auth: { getSession: mockGetSession },
+    rpc: vi.fn(() => Promise.resolve({ data: null, error: null })),
+  },
+}))
+
+const makeReview = (overrides = {}): any => ({
+  id: 'r1',
+  user_id: 'u1',
   racket_id: 1,
-  user_id: 'user-1',
+  title: 'Great racket',
+  content: 'Really enjoyed playing with this',
+  rating: 5,
+  created_at: '2025-01-15T00:00:00.000Z',
+  updated_at: '2025-01-15T00:00:00.000Z',
   likes_count: 3,
   comments_count: 1,
-  created_at: '2025-01-15T00:00:00.000Z',
-  user_profiles: { id: 'user-1', nickname: 'Player1', avatar_url: 'avatar.jpg' },
-};
+  user_profiles: { id: 'u1', nickname: 'Player1', avatar_url: 'avatar.jpg' },
+  ...overrides,
+})
 
-const mockReviewRow2 = {
-  id: '2',
-  rating: 4,
-  comment: 'Good',
-  racket_id: 1,
-  user_id: 'user-2',
-  likes_count: 1,
-  comments_count: 0,
-  created_at: '2025-01-16T00:00:00.000Z',
-  user_profiles: { id: 'user-2', nickname: 'Player2', avatar_url: null },
-};
+const makeComment = (overrides = {}): any => ({
+  id: 'c1',
+  review_id: 'r1',
+  user_id: 'u1',
+  content: 'Nice review!',
+  created_at: '2025-01-15T00:00:00.000Z',
+  updated_at: '2025-01-15T00:00:00.000Z',
+  user_profiles: { id: 'u1', nickname: 'Player1', avatar_url: 'avatar.jpg' },
+  ...overrides,
+})
 
 describe('reviewService', () => {
   beforeEach(() => {
-    vi.clearAllMocks();
-    mockConfig.data = [mockReviewRow, mockReviewRow2];
-    mockConfig.error = null;
-    mockConfig.count = 2;
-  });
+    vi.clearAllMocks()
+    mockData.length = 0
+  })
 
   describe('getReviewsByRacket', () => {
     it('should fetch reviews for a racket', async () => {
-      const result = await reviewService.getReviewsByRacket(1);
+      const reviews = [makeReview({ id: 'r1' }), makeReview({ id: 'r2', rating: 4 })]
+      const ratings = [{ rating: 5 }, { rating: 4 }]
 
-      expect(result.reviews).toHaveLength(2);
-      expect(result.reviews[0].rating).toBe(5);
-      expect(result.reviews[0].user).toEqual(mockReviewRow.user_profiles);
-      expect(result.pagination.total).toBe(2);
-    });
+      mockData.push(reviews, ratings)
 
-    it('should handle errors', async () => {
-      mockConfig.error = new Error('Not found');
+      const result = await reviewService.getReviewsByRacket(1)
 
-      await expect(reviewService.getReviewsByRacket(999)).rejects.toThrow('Not found');
-    });
-  });
+      expect(result.reviews).toHaveLength(2)
+      expect(result.pagination.total).toBe(2)
+      expect(result.stats.averageRating).toBe(4.5)
+      expect(mockFrom).toHaveBeenCalledWith('reviews')
+    })
+
+    it('should handle empty reviews', async () => {
+      mockData.push([], [])
+
+      const result = await reviewService.getReviewsByRacket(1)
+
+      expect(result.reviews).toEqual([])
+      expect(result.pagination.total).toBe(0)
+      expect(result.stats.averageRating).toBe(0)
+    })
+
+    it('should handle error from supabase', async () => {
+      const c: any = new Proxy({ _d: null, _e: new Error('DB error') }, {
+        get(t, p) {
+          if (p === 'then') return (r: (v: any) => void) => r({ data: t._d, error: t._e, count: null })
+          if (p === 'catch' || p === 'finally') return undefined
+          return () => c
+        },
+      })
+      mockFrom.mockImplementationOnce(() => c)
+
+      await expect(reviewService.getReviewsByRacket(1)).rejects.toThrow('DB error')
+    })
+
+    it('should apply sort parameter', async () => {
+      const reviews = [makeReview({ id: 'r1', rating: 5 }), makeReview({ id: 'r2', rating: 3 })]
+      mockData.push(reviews, reviews)
+
+      const result = await reviewService.getReviewsByRacket(1, { sort: 'rating_high' })
+
+      expect(result.reviews).toHaveLength(2)
+      expect(mockFrom).toHaveBeenCalledWith('reviews')
+    })
+
+    it('should apply rating filter', async () => {
+      const reviews = [makeReview({ id: 'r1', rating: 5 })]
+      mockData.push(reviews, reviews)
+
+      const result = await reviewService.getReviewsByRacket(1, { rating: 5 })
+
+      expect(result.reviews).toHaveLength(1)
+    })
+
+    it('should check user likes when authenticated', async () => {
+      const reviews = [makeReview({ id: 'r1' }), makeReview({ id: 'r2' })]
+      const ratings = [{ rating: 5 }, { rating: 4 }]
+      const likes = [{ review_id: 'r1' }]
+
+      mockData.push(reviews, ratings, likes)
+
+      const result = await reviewService.getReviewsByRacket(1)
+
+      expect(result.reviews[0].user_has_liked).toBe(true)
+      expect(result.reviews[1].user_has_liked).toBe(false)
+    })
+
+    it('should skip likes check when not authenticated', async () => {
+      mockGetSession.mockResolvedValueOnce({ data: { session: null } })
+
+      const reviews = [makeReview({ id: 'r1' })]
+      const ratings = [{ rating: 5 }]
+
+      mockData.push(reviews, ratings)
+
+      const result = await reviewService.getReviewsByRacket(1)
+
+      expect(result.reviews[0].user_has_liked).toBeUndefined()
+    })
+  })
+
+  describe('getReviewsByUser', () => {
+    it('should fetch reviews by user', async () => {
+      const reviews = [makeReview({ id: 'r1' })]
+      mockData.push(reviews)
+
+      const result = await reviewService.getReviewsByUser('u1')
+
+      expect(result.reviews).toHaveLength(1)
+      expect(mockFrom).toHaveBeenCalledWith('reviews')
+    })
+
+    it('should return empty when user has no reviews', async () => {
+      mockData.push([])
+
+      const result = await reviewService.getReviewsByUser('u1')
+
+      expect(result.reviews).toEqual([])
+      expect(result.pagination.total).toBe(0)
+    })
+  })
+
+  describe('getReviewById', () => {
+    it('should fetch a single review with details', async () => {
+      const review = makeReview({
+        rackets: { id: 1, nombre: 'Pro Drive', marca: 'Babolat', modelo: '2025', imagenes: ['img.jpg'] },
+      })
+      mockData.push(review)
+
+      const result = await reviewService.getReviewById('r1')
+
+      expect(result.id).toBe('r1')
+      expect(result.racket?.nombre).toBe('Pro Drive')
+      expect(mockFrom).toHaveBeenCalledWith('reviews')
+    })
+
+    it('should throw when review not found', async () => {
+      const c: any = new Proxy({ _d: null, _e: new Error('Not found') }, {
+        get(t, p) {
+          if (p === 'then') return (r: (v: any) => void) => r({ data: t._d, error: t._e, count: null })
+          if (p === 'catch' || p === 'finally') return undefined
+          return () => c
+        },
+      })
+      mockFrom.mockImplementationOnce(() => c)
+
+      await expect(reviewService.getReviewById('bad-id')).rejects.toThrow('Not found')
+    })
+  })
 
   describe('createReview', () => {
     it('should create a new review', async () => {
-      const newReview = {
-        racket_id: 1,
-        rating: 5,
-        comment: 'Excellent!',
-        power: 9,
-        control: 8,
-      };
+      const dto = { racket_id: 1, title: 'Great', content: 'Amazing', rating: 5 }
+      const created = makeReview()
+      mockData.push(created)
 
-      const createdReview = {
-        id: '1',
-        ...newReview,
-        user_id: 'test-user',
-        likes_count: 0,
-        comments_count: 0,
-      };
-      mockConfig.data = createdReview;
+      const result = await reviewService.createReview(dto)
 
-      const result = await reviewService.createReview(newReview as any);
+      expect(result.id).toBe('r1')
+      expect(mockGetSession).toHaveBeenCalled()
+      expect(mockFrom).toHaveBeenCalledWith('reviews')
+    })
 
-      expect(result).toEqual(createdReview);
-    });
-  });
+    it('should throw when not authenticated', async () => {
+      mockGetSession.mockResolvedValueOnce({ data: { session: null } })
+
+      await expect(reviewService.createReview({ racket_id: 1, title: 'T', content: 'C', rating: 5 })).rejects.toThrow('No autenticado')
+    })
+  })
 
   describe('updateReview', () => {
     it('should update a review', async () => {
-      const updates = { rating: 4, comment: 'Updated comment' };
-      const updatedReview = { id: '1', ...updates };
-      mockConfig.data = updatedReview;
+      const dto = { rating: 4, content: 'Updated' }
+      const updated = makeReview({ rating: 4, content: 'Updated' })
+      mockData.push(updated)
 
-      const result = await reviewService.updateReview('1', updates);
+      const result = await reviewService.updateReview('r1', dto)
 
-      expect(result).toEqual(updatedReview);
-    });
-  });
+      expect(result.rating).toBe(4)
+      expect(result.content).toBe('Updated')
+    })
+  })
 
   describe('deleteReview', () => {
     it('should delete a review', async () => {
-      await reviewService.deleteReview('1');
+      mockData.push(null)
 
-      expect(mockConfig.error).toBeNull();
-    });
-  });
+      await expect(reviewService.deleteReview('r1')).resolves.not.toThrow()
+      expect(mockFrom).toHaveBeenCalledWith('reviews')
+    })
+
+    it('should throw on error', async () => {
+      const c: any = new Proxy({ _d: null, _e: new Error('Delete failed') }, {
+        get(t, p) {
+          if (p === 'then') return (r: (v: any) => void) => r({ data: t._d, error: t._e, count: null })
+          if (p === 'catch' || p === 'finally') return undefined
+          return () => c
+        },
+      })
+      mockFrom.mockImplementationOnce(() => c)
+
+      await expect(reviewService.deleteReview('r1')).rejects.toThrow('Delete failed')
+    })
+  })
 
   describe('toggleLike', () => {
-    it('should toggle like on a review when already liked', async () => {
-      mockConfig.data = [{ id: 'like-1', review_id: '1', likes_count: 5 }];
+    it('should like a review when not previously liked', async () => {
+      mockData.push(null, null, { likes_count: 4 })
 
-      const result = await reviewService.toggleLike('1');
+      const result = await reviewService.toggleLike('r1')
 
-      expect(result.liked).toBe(false);
-      expect(result.likes_count).toBe(5);
-    });
+      expect(result.liked).toBe(true)
+      expect(result.likes_count).toBe(4)
+      expect(mockGetSession).toHaveBeenCalled()
+    })
 
-    it('should toggle like on a review when not liked yet', async () => {
-      mockConfig.data = [];
+    it('should unlike a review when already liked', async () => {
+      mockData.push({ id: 'like-1' }, null, { likes_count: 2 })
 
-      const result = await reviewService.toggleLike('1');
+      const result = await reviewService.toggleLike('r1')
 
-      expect(result.liked).toBe(true);
-      expect(result.likes_count).toBe(0);
-    });
-  });
+      expect(result.liked).toBe(false)
+      expect(result.likes_count).toBe(2)
+    })
+
+    it('should throw when not authenticated', async () => {
+      mockGetSession.mockResolvedValueOnce({ data: { session: null } })
+
+      await expect(reviewService.toggleLike('r1')).rejects.toThrow('No autenticado')
+    })
+  })
 
   describe('getComments', () => {
     it('should fetch comments for a review', async () => {
-      const mockCommentRow = {
-        id: '1',
-        content: 'Great review!',
-        review_id: '1',
-        user_id: 'user-1',
-        created_at: '2025-01-15T00:00:00.000Z',
-        user_profiles: { id: 'user-1', nickname: 'Player1', avatar_url: 'avatar.jpg' },
-      };
-      mockConfig.data = [mockCommentRow];
+      const comments = [makeComment(), makeComment({ id: 'c2', content: 'Thanks!' })]
+      mockData.push(comments)
 
-      const result = await reviewService.getComments('1');
+      const result = await reviewService.getComments('r1')
 
-      expect(result).toHaveLength(1);
-      expect(result[0].content).toBe('Great review!');
-      expect(result[0].user).toEqual(mockCommentRow.user_profiles);
-    });
-  });
+      expect(result).toHaveLength(2)
+      expect(mockFrom).toHaveBeenCalledWith('review_comments')
+    })
+
+    it('should return empty array when no comments', async () => {
+      mockData.push([])
+
+      const result = await reviewService.getComments('r1')
+
+      expect(result).toEqual([])
+    })
+  })
 
   describe('addComment', () => {
     it('should add a comment to a review', async () => {
-      const comment = { content: 'Nice review!' };
-      const createdComment = {
-        id: '1',
-        content: 'Nice review!',
-        review_id: '1',
-        user_id: 'test-user',
-        created_at: '2025-01-15T00:00:00.000Z',
-        user_profiles: { id: 'test-user', nickname: 'TestUser', avatar_url: null },
-      };
-      mockConfig.data = createdComment;
+      const dto = { content: 'Nice review!' }
+      const created = makeComment()
+      mockData.push(created)
 
-      const result = await reviewService.addComment('1', comment);
+      const result = await reviewService.addComment('r1', dto)
 
-      expect(result.content).toBe('Nice review!');
-      expect(result.user).toEqual(createdComment.user_profiles);
-    });
-  });
-});
+      expect(result.content).toBe('Nice review!')
+      expect(mockGetSession).toHaveBeenCalled()
+      expect(mockFrom).toHaveBeenCalledWith('review_comments')
+    })
+
+    it('should throw when not authenticated', async () => {
+      mockGetSession.mockResolvedValueOnce({ data: { session: null } })
+
+      await expect(reviewService.addComment('r1', { content: 'Nice!' })).rejects.toThrow('No autenticado')
+    })
+  })
+
+  describe('deleteComment', () => {
+    it('should delete a comment', async () => {
+      mockData.push(null)
+
+      await expect(reviewService.deleteComment('c1')).resolves.not.toThrow()
+      expect(mockFrom).toHaveBeenCalledWith('review_comments')
+    })
+  })
+})

@@ -7,31 +7,26 @@ import 'sileo/styles.css';
 import { Toaster } from 'sileo';
 import { HelmetProvider } from 'react-helmet-async';
 import { registerSW } from 'virtual:pwa-register';
-
-import { router } from './router';
+import * as Sentry from '@sentry/react';
+import ErrorBoundary from './components/ErrorBoundary';
 import { AuthProvider } from './contexts/AuthContext';
 import { AuthModalProvider } from './contexts/AuthModalContext';
-import { NotificationProvider } from './contexts/NotificationContext';
-import { RacketsProvider } from './contexts/RacketsContext';
+import { BackgroundTasksProvider } from './contexts/BackgroundTasksContext';
 import { ComparisonProvider } from './contexts/ComparisonContext';
 import { ListsProvider } from './contexts/ListsContext';
-import { BackgroundTasksProvider } from './contexts/BackgroundTasksContext';
+import { NotificationProvider } from './contexts/NotificationContext';
+import { RacketsProvider } from './contexts/RacketsContext';
 import { ThemeProvider } from './contexts/ThemeContext';
-import ErrorBoundary from './components/ErrorBoundary';
 
-// Suppress all browser console output. Errors shown via sileo toasts.
-// To debug, set VITE_DEBUG_CONSOLE=true in .env.local
-if (import.meta.env.VITE_DEBUG_CONSOLE !== 'true') {
-  const noop = () => {};
-  window.console.log     = noop;
-  window.console.info    = noop;
-  window.console.debug   = noop;
-  window.console.warn    = noop;
-  window.console.error   = noop;
-  window.console.group   = noop;
-  window.console.groupEnd = noop;
-  window.console.table   = noop;
-}
+import { router } from './router';
+
+Sentry.init({
+  dsn: import.meta.env.VITE_SENTRY_DSN,
+  environment: import.meta.env.MODE,
+  enabled: import.meta.env.PROD && !!import.meta.env.VITE_SENTRY_DSN,
+  integrations: [Sentry.browserTracingIntegration()],
+  tracesSampleRate: 0.1,
+});
 
 const queryClient = new QueryClient({
   defaultOptions: {

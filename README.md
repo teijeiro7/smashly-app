@@ -68,32 +68,32 @@ Conoce Smashly en acción:
 
 #### Página Principal
 
-![Página Principal](public/images/readme-images/MAIN-PAGE.png)
+![Página Principal](docs/readme-images/MAIN-PAGE.png)
 
 #### Catálogo de Palas
 
-![Catálogo](public/images/readme-images/CATALOG-PAGE.png)
+![Catálogo](docs/readme-images/CATALOG-PAGE.png)
 
 #### Detalle de Pala
 
-![Detalle de Pala](public/images/readme-images/RACKET-DETAIL-PAGE.png)
+![Detalle de Pala](docs/readme-images/RACKET-DETAIL-PAGE.png)
 
 #### Comparador
 
-![Comparador](public/images/readme-images/COMPARE-PAGE.png)
+![Comparador](docs/readme-images/COMPARE-PAGE.png)
 
 #### Formulario de Recomendación
 
-![Formulario](public/images/readme-images/FORM-PAGE.png)
+![Formulario](docs/readme-images/FORM-PAGE.png)
 
 #### Registro y Login
 
-![Registro](public/images/readme-images/REGISTER-PAGE.png)
-![Login](public/images/readme-images/LOGIN-PAGE.png)
+![Registro](docs/readme-images/REGISTER-PAGE.png)
+![Login](docs/readme-images/LOGIN-PAGE.png)
 
 #### Sección FAQ
 
-![FAQ](public/images/readme-images/FAQ-PAGE.png)
+![FAQ](docs/readme-images/FAQ-PAGE.png)
 
 </details>
 

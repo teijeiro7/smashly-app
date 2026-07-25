@@ -122,7 +122,7 @@ describe('AdminService', () => {
       await AdminService.updateUserRole('user-1', 'Admin');
 
       expect(global.fetch).toHaveBeenCalledWith(
-        expect.stringContaining('/api/v1/admin/users/user-1/role'),
+        expect.stringContaining('/api/admin/users/'),
         expect.objectContaining({
           method: 'PATCH',
           body: JSON.stringify({ role: 'Admin' }),
@@ -141,7 +141,7 @@ describe('AdminService', () => {
       await AdminService.deleteUser('user-1');
 
       expect(global.fetch).toHaveBeenCalledWith(
-        expect.stringContaining('/api/v1/admin/users/user-1'),
+        expect.stringContaining('/api/admin/users/'),
         expect.objectContaining({
           method: 'DELETE',
         })

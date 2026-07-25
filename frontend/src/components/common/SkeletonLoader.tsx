@@ -12,9 +12,9 @@ const shimmer = keyframes`
 const SkeletonBase = styled.div`
   background: linear-gradient(
     90deg,
-    var(--color-gray-100) 0%,
-    var(--color-gray-50) 50%,
-    var(--color-gray-100) 100%
+    var(--surface-3) 0%,
+    var(--surface-2) 50%,
+    var(--surface-3) 100%
   );
   background-size: 1000px 100%;
   animation: ${shimmer} 2s infinite linear;
@@ -23,7 +23,7 @@ const SkeletonBase = styled.div`
 
 const SkeletonContainer = styled.div`
   min-height: 100vh;
-  background: var(--color-gray-50);
+  background: var(--surface-2);
   padding-bottom: 4rem;
 `;
 
@@ -105,7 +105,7 @@ const SkeletonPriceCard = styled.div`
   background: var(--surface);
   border-radius: 20px;
   padding: 1.5rem;
-  border: 1px solid var(--color-gray-200);
+  border: 1px solid var(--border);
   box-shadow: 0 4px 20px var(--shadow-color);
   display: flex;
   flex-direction: column;
@@ -144,7 +144,7 @@ const SkeletonSpecCard = styled.div`
   background: var(--surface);
   padding: 1rem;
   border-radius: 12px;
-  border: 1px solid var(--color-gray-100);
+  border: 1px solid var(--surface-3);
   display: flex;
   flex-direction: column;
   gap: 0.5rem;

@@ -16,13 +16,17 @@ Usage:
   python3 dedup_rackets.py --execute   # apply changes
 """
 
+import os
 import sys
 import re
 import json
 import urllib.request
 
-SUPABASE_URL = "https://lrdgyfmkkboyhoycrnov.supabase.co"
-SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxyZGd5Zm1ra2JveWhveWNybm92Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1MTQ3MTg0NSwiZXhwIjoyMDY3MDQ3ODQ1fQ.etjT9fa5Ev8OX56IP1mRRwh-Ow7lZl93MfLvxfTM8mc"
+SUPABASE_URL = os.getenv("SUPABASE_URL", "https://lrdgyfmkkboyhoycrnov.supabase.co")
+SUPABASE_KEY = os.getenv("SUPABASE_SERVICE_ROLE_KEY")
+if not SUPABASE_KEY:
+    print("FATAL: SUPABASE_SERVICE_ROLE_KEY env var not set", file=sys.stderr)
+    sys.exit(1)
 
 STORE_COLS = [
     "padelnuestro_actual_price", "padelnuestro_original_price",

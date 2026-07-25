@@ -2,6 +2,7 @@ import React, { createContext, ReactNode, useCallback, useContext, useEffect, us
 import { supabase } from '../lib/supabase';
 import { UserProfile } from '../services/userProfileService';
 import { logger } from '../utils/logger';
+import { setAuthToken, removeAuthToken } from '../utils/authUtils';
 
 interface AuthContextType {
   user: UserProfile | null;
@@ -82,6 +83,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const clearAuth = useCallback(() => {
     setUser(null);
     setUserProfile(null);
+    removeAuthToken();
   }, []);
 
   const clearGoogleOnboarding = useCallback(() => {
@@ -98,6 +100,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (!mounted) return;
       if (session?.user) {
+        setAuthToken(session.access_token);
         loadAndSetProfile(session.user.id).finally(() => {
           if (mounted) setLoading(false);
         });
@@ -180,6 +183,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       return { data: null, error: 'No se recibió sesión', errorCode: 'NO_SESSION' };
     }
 
+    setAuthToken(data.session.access_token);
     const profile = await loadAndSetProfile(data.session.user.id);
     return { data: profile, error: null };
   }, [loadAndSetProfile]);
