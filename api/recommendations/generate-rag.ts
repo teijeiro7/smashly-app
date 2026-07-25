@@ -1,6 +1,6 @@
 import type { IncomingMessage, ServerResponse } from 'http';
 import { generateContent, embed } from '../_lib/ai';
-import { getAllRackets } from '../_lib/racket-service';
+import { getAllRackets, getCatalogVersion } from '../_lib/racket-service';
 import { filterRackets } from '../_lib/racket-filter';
 import { getTesteaMetrics } from '../_lib/testea-metrics';
 import { searchSimilarRackets, searchRelevantReviews, searchKnowledge } from '../_lib/vector-store';
@@ -263,7 +263,8 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
   }
 
   try {
-    const cacheHash = generateProfileHash(data);
+    const catalogVersion = await getCatalogVersion();
+    const cacheHash = generateProfileHash(data, catalogVersion);
     const cached = cacheGet(cacheHash);
     if (cached) {
       res.writeHead(200, { 'Content-Type': 'application/json' });

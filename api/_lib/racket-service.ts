@@ -22,6 +22,23 @@ export async function getAllRackets(): Promise<any[]> {
   return all;
 }
 
+/**
+ * Cheap signal for "has the catalog changed" — the most recent
+ * rackets.updated_at, which the weekly price sync bumps on every write.
+ * Used to key the recommendation cache so a sync invalidates it instead of
+ * serving last week's prices/ranking for the rest of the 7-day TTL.
+ */
+export async function getCatalogVersion(): Promise<string> {
+  const { data, error } = await supabaseAdmin
+    .from('rackets')
+    .select('updated_at')
+    .order('updated_at', { ascending: false })
+    .limit(1);
+
+  if (error || !data?.length) return 'unknown';
+  return String(data[0].updated_at);
+}
+
 export async function getRacketsByIds(ids: number[]): Promise<any[]> {
   const { data, error } = await supabaseAdmin
     .from('rackets')

@@ -1,6 +1,6 @@
 import type { IncomingMessage, ServerResponse } from 'http';
 import { generateContent } from '../_lib/ai';
-import { getAllRackets } from '../_lib/racket-service';
+import { getAllRackets, getCatalogVersion } from '../_lib/racket-service';
 import { filterRacketsWithScores, assessBiomechanicalSafety } from '../_lib/racket-filter';
 import { getTesteaMetrics } from '../_lib/testea-metrics';
 import { buildCompactSelectionPrompt } from '../_lib/prompt-compression';
@@ -170,7 +170,8 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
 
   try {
     const profile = normalizeFormData(data);
-    const cacheHash = generateProfileHash(profile);
+    const catalogVersion = await getCatalogVersion();
+    const cacheHash = generateProfileHash(profile, catalogVersion);
     const cached = cacheGet(cacheHash);
     if (cached) {
       res.writeHead(200, { 'Content-Type': 'application/json' });
