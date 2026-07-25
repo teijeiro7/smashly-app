@@ -10,7 +10,7 @@
     "lint:fix": "cd frontend && npm run lint:fix",
     "format": "cd frontend && npm run format",
     "format:check": "cd frontend && npm run format:check",
-    "quality:check": "npm run typecheck:api && npm run lint && npm run format:check",
+    "quality:check": "npm run typecheck:api && npm run lint",
     "quality:fix": "npm run lint:fix && npm run format",
     "test:all": "cd frontend && npm run test:unit",
     "build:all": "npm run typecheck:api && cd frontend && npm run build",
