@@ -1,5 +1,33 @@
 import { supabaseAdmin } from './supabase';
 
+// Columns actually read by the recommendation pipeline (racket-filter.ts,
+// testea-metrics.ts, prompt-compression.ts, and the enrich* functions in
+// generate.ts/generate-rag.ts). getAllRackets() is only used for that
+// pipeline — comparison.ts fetches its own (≤3 row) set via
+// getRacketsByIds() and needs the full row, which is untouched here.
+const RECOMMENDATION_COLUMNS = [
+  'id',
+  'nombre',
+  'marca',
+  'precio_actual',
+  'imagenes',
+  'peso',
+  'caracteristicas_forma',
+  'caracteristicas_balance',
+  'caracteristicas_dureza',
+  'caracteristicas_nivel_de_juego',
+  'testea_certificado',
+  'testea_potencia',
+  'testea_control',
+  'testea_manejabilidad',
+  'testea_confort',
+  'testea_iniciacion',
+  'tiene_antivibracion',
+  'valoracion_usuarios',
+  'es_bestseller',
+  'relacion_calidad_precio',
+].join(', ');
+
 export async function getAllRackets(): Promise<any[]> {
   // Supabase caps a single select at 1000 rows by default. The catalog is
   // larger, so page through with .range() until exhausted to feed the funnel
@@ -10,7 +38,7 @@ export async function getAllRackets(): Promise<any[]> {
   for (let from = 0; ; from += PAGE) {
     const { data, error } = await supabaseAdmin
       .from('rackets')
-      .select('*')
+      .select(RECOMMENDATION_COLUMNS)
       .order('id', { ascending: true })
       .range(from, from + PAGE - 1);
 
