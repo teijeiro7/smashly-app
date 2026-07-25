@@ -1,31 +1,28 @@
 import { supabaseAdmin } from './supabase';
+import { mapRacketRow } from './racket-mapper';
 
-// Columns actually read by the recommendation pipeline (racket-filter.ts,
-// testea-metrics.ts, prompt-compression.ts, and the enrich* functions in
+// Raw (English) DB columns actually read by mapRacketRow() for the fields
+// the recommendation pipeline needs (racket-filter.ts, testea-metrics.ts,
+// prompt-compression.ts, and the enrich* functions in
 // generate.ts/generate-rag.ts). getAllRackets() is only used for that
 // pipeline — comparison.ts fetches its own (≤3 row) set via
 // getRacketsByIds() and needs the full row, which is untouched here.
 const RECOMMENDATION_COLUMNS = [
   'id',
-  'nombre',
-  'marca',
-  'precio_actual',
-  'imagenes',
-  'peso',
-  'caracteristicas_forma',
-  'caracteristicas_balance',
-  'caracteristicas_dureza',
-  'caracteristicas_nivel_de_juego',
-  'testea_certificado',
-  'testea_potencia',
-  'testea_control',
-  'testea_manejabilidad',
-  'testea_confort',
-  'testea_iniciacion',
-  'tiene_antivibracion',
-  'valoracion_usuarios',
-  'es_bestseller',
-  'relacion_calidad_precio',
+  'name',
+  'brand',
+  'images',
+  'specs',
+  'characteristics_shape',
+  'characteristics_balance',
+  'characteristics_hardness',
+  'characteristics_game_level',
+  'radar_potencia',
+  'radar_control',
+  'radar_manejabilidad',
+  'padelnuestro_actual_price',
+  'padelmarket_actual_price',
+  'padelproshop_actual_price',
 ].join(', ');
 
 export async function getAllRackets(): Promise<any[]> {
@@ -47,7 +44,7 @@ export async function getAllRackets(): Promise<any[]> {
     all.push(...data);
     if (data.length < PAGE) break;
   }
-  return all;
+  return all.map(mapRacketRow);
 }
 
 /**
@@ -74,5 +71,5 @@ export async function getRacketsByIds(ids: number[]): Promise<any[]> {
     .in('id', ids);
 
   if (error) throw new Error(`Error fetching rackets by ids: ${error.message}`);
-  return data ?? [];
+  return (data ?? []).map(mapRacketRow);
 }
