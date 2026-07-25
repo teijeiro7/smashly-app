@@ -62,7 +62,9 @@ vi.mock('@tanstack/react-router', () => ({
   useNavigate: () => mocks.mockNavigate,
   useRouterState: () => ({ location: { hash: '' } }),
   Link: ({ to, children, className, ...props }: any) => (
-    <a href={to} className={className} {...props}>{children}</a>
+    <a href={to} className={className} {...props}>
+      {children}
+    </a>
   ),
 }));
 
@@ -132,7 +134,9 @@ describe('PlayerDashboard recommendation cards', () => {
     ).toBeInTheDocument();
 
     expect(screen.queryByRole('heading', { name: /Nox x-zero red 2026/i })).not.toBeInTheDocument();
-    expect(screen.queryByRole('heading', { name: /Wilson optix v2 power blue 2026/i })).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('heading', { name: /Wilson optix v2 power blue 2026/i })
+    ).not.toBeInTheDocument();
   });
 
   it('keeps the detail CTA anchored as the last element inside each card and links to detail pages', async () => {
@@ -147,7 +151,9 @@ describe('PlayerDashboard recommendation cards', () => {
 
     detailLinks.forEach(link => {
       expect(link.parentElement?.lastElementChild).toBe(link);
-      expect(within(link.parentElement as HTMLElement).getByRole('link', { name: /ver detalle/i })).toBe(link);
+      expect(
+        within(link.parentElement as HTMLElement).getByRole('link', { name: /ver detalle/i })
+      ).toBe(link);
     });
   });
 });

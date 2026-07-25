@@ -51,10 +51,12 @@ jobs:
         run: pip install -r src/scrapers/requirements.txt
 
       - name: Run Prices Sync
+        env:
+          SYNC_LIMIT: ${{ github.event.inputs.limit }}
         run: |
           LIMIT_ARG=""
-          if [ "${{ github.event.inputs.limit }}" != "" ]; then
-            LIMIT_ARG="--limit ${{ github.event.inputs.limit }}"
+          if [ -n "$SYNC_LIMIT" ]; then
+            LIMIT_ARG="--limit $SYNC_LIMIT"
           fi
           echo "Running prices sync..."
           set +e
@@ -127,7 +129,6 @@ jobs:
         with:
           sparse-checkout: |
             src/
-            backend/
           sparse-checkout-cone-mode: false
 
       - name: Set up Python
@@ -141,23 +142,14 @@ jobs:
         if: steps.first_sunday.outputs.run == 'true' || github.event_name == 'workflow_dispatch'
         run: pip install -r src/scrapers/requirements.txt
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 9
-
-      - name: Install Node dependencies
-        if: steps.first_sunday.outputs.run == 'true' || github.event_name == 'workflow_dispatch'
-        run: |
-          cd backend/api
-          pnpm install --frozen-lockfile
-
       - name: Run Full Sync
         if: steps.first_sunday.outputs.run == 'true' || github.event_name == 'workflow_dispatch'
+        env:
+          SYNC_LIMIT: ${{ github.event.inputs.limit }}
         run: |
           LIMIT_ARG=""
-          if [ "${{ github.event.inputs.limit }}" != "" ]; then
-            LIMIT_ARG="--limit ${{ github.event.inputs.limit }}"
+          if [ -n "$SYNC_LIMIT" ]; then
+            LIMIT_ARG="--limit $SYNC_LIMIT"
           fi
           echo "Running full sync (new + discontinued + prices)..."
           set +e
@@ -196,19 +188,16 @@ jobs:
             echo "metrics_failed=true" >> $GITHUB_ENV
           fi
 
-      - name: Sync Radar Metrics (Fallback Algorithm)
-        if: steps.first_sunday.outputs.run == 'true' || github.event_name == 'workflow_dispatch'
-        run: |
-          echo "Running fallback algorithm for remaining rackets..."
-          cd backend/api
-          set +e
-          npx ts-node src/scripts/populate-radar-metrics.ts >> fallback-metrics.log 2>&1
-          EXIT_CODE=$?
-          set -e
-          cat fallback-metrics.log
-          if [ $EXIT_CODE -ne 0 ]; then
-            echo "fallback_failed=true" >> $GITHUB_ENV
-          fi
+      # NOTE: this job used to run a deterministic fallback pass here
+      # (backend/api/src/scripts/populate-radar-metrics.ts) for rackets that
+      # PadelZoom/TuMejorPala scraping above couldn't cover. That script
+      # lived in backend/api, which no longer exists, so the step was
+      # removed rather than left silently failing every month. A fallback
+      # formula does exist in api/_lib/testea-metrics.ts
+      # (calculateFallbackMetrics), but it computes metrics on the fly for
+      # API responses — it isn't wired up to persist radar_* columns back
+      # to the DB, so porting it here needs a deliberate decision, not a
+      # quick copy-paste.
 
       - name: Commit and push changes
         if: steps.first_sunday.outputs.run == 'true' || github.event_name == 'workflow_dispatch'
@@ -220,7 +209,7 @@ jobs:
           git push || echo "Push failed"
 
       - name: Send failure notification
-        if: (steps.first_sunday.outputs.run == 'true' || github.event_name == 'workflow_dispatch') && (env.sync_failed == 'true' || env.dedupe_failed == 'true' || env.metrics_failed == 'true' || env.fallback_failed == 'true')
+        if: (steps.first_sunday.outputs.run == 'true' || github.event_name == 'workflow_dispatch') && (env.sync_failed == 'true' || env.dedupe_failed == 'true' || env.metrics_failed == 'true')
         run: |
           echo "📧 Enviando notificación de fallo a ${{ env.EMAIL_TO }}"
           curl -s -X POST https://api.resend.com/emails \

@@ -19,18 +19,19 @@ import { toTitleCase } from '../utils/textUtils';
 import RacketRadarChart from '../components/features/RacketRadarChart';
 import ComparisonTable from '../components/features/ComparisonTable';
 import SEO from '../components/seo/SEO';
-import {
-  organizationSchema,
-  webPageSchema,
-  breadcrumbSchema,
-} from '../utils/seoSchemas';
+import { organizationSchema, webPageSchema, breadcrumbSchema } from '../utils/seoSchemas';
 import { buildUrl, allKeywords } from '../config/seo';
 
 const Container = styled.div`
   min-height: 100dvh;
   background:
     radial-gradient(circle at top right, rgba(var(--primary-rgb-dark), 0.08), transparent 45%),
-    linear-gradient(145deg, var(--surface-2) 0%, var(--primary-subtle) 55%, var(--primary-faint) 100%);
+    linear-gradient(
+      145deg,
+      var(--surface-2) 0%,
+      var(--primary-subtle) 55%,
+      var(--primary-faint) 100%
+    );
   padding: 1rem;
   padding-bottom: calc(6.5rem + env(safe-area-inset-bottom));
 
@@ -82,7 +83,9 @@ const SelectionSection = styled.div`
   background: var(--surface);
   border-radius: 20px;
   padding: 2rem;
-  box-shadow: 0 4px 6px -1px var(--shadow-color), 0 2px 4px -1px var(--shadow-color);
+  box-shadow:
+    0 4px 6px -1px var(--shadow-color),
+    0 2px 4px -1px var(--shadow-color);
 
   @media (max-width: 768px) {
     margin-bottom: 1.25rem;
@@ -103,10 +106,14 @@ const SearchInput = styled.input`
   border: 1px solid var(--border-strong);
   border-radius: 8px;
   font-size: 1rem;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
   color: var(--text);
 
-  &::placeholder { color: var(--text-subtle); }
+  &::placeholder {
+    color: var(--text-subtle);
+  }
 
   &:focus {
     outline: none;
@@ -178,7 +185,9 @@ const SelectedRacketCard = styled(motion.div)`
   flex-direction: column;
   align-items: center;
   text-align: center;
-  box-shadow: 0 4px 6px -1px var(--shadow-color), 0 2px 4px -1px var(--shadow-color);
+  box-shadow:
+    0 4px 6px -1px var(--shadow-color),
+    0 2px 4px -1px var(--shadow-color);
 `;
 
 const RemoveButton = styled.button`
@@ -237,7 +246,9 @@ const EmptySlot = styled.div`
   justify-content: center;
   color: var(--text-subtle);
   gap: 0.5rem;
-  transition: border-color 0.2s ease, background-color 0.2s ease;
+  transition:
+    border-color 0.2s ease,
+    background-color 0.2s ease;
   background: rgba(0, 0, 0, 0.01);
 
   &:hover {
@@ -272,7 +283,9 @@ const CompareButton = styled.button`
   &:not(:disabled):hover {
     background: var(--primary-hover);
     transform: translateY(-1px);
-    box-shadow: 0 10px 15px -3px rgba(var(--primary-rgb-dark), 0.3), 0 4px 6px -2px rgba(var(--primary-rgb-dark), 0.15);
+    box-shadow:
+      0 10px 15px -3px rgba(var(--primary-rgb-dark), 0.3),
+      0 4px 6px -2px rgba(var(--primary-rgb-dark), 0.15);
   }
 `;
 
@@ -282,7 +295,9 @@ const ResultSection = styled(motion.div)`
   background: var(--surface);
   border-radius: 20px;
   padding: 3rem;
-  box-shadow: 0 20px 25px -5px var(--shadow-color), 0 10px 10px -5px var(--shadow-color);
+  box-shadow:
+    0 20px 25px -5px var(--shadow-color),
+    0 10px 10px -5px var(--shadow-color);
   position: relative;
   overflow-x: hidden;
 
@@ -725,7 +740,9 @@ const CompareRacketsPage: React.FC = () => {
         {/* Resumen Ejecutivo */}
         {comparisonResult.executiveSummary && (
           <div style={{ marginBottom: '2rem' }}>
-            <h3 style={{ color: 'var(--primary-hover)', marginBottom: '1rem' }}>Resumen Ejecutivo</h3>
+            <h3 style={{ color: 'var(--primary-hover)', marginBottom: '1rem' }}>
+              Resumen Ejecutivo
+            </h3>
             <ReactMarkdown remarkPlugins={[remarkGfm]}>
               {comparisonResult.executiveSummary}
             </ReactMarkdown>
@@ -752,7 +769,9 @@ const CompareRacketsPage: React.FC = () => {
         {/* Análisis Técnico */}
         {comparisonResult.technicalAnalysis && comparisonResult.technicalAnalysis.length > 0 && (
           <div style={{ marginBottom: '2rem' }}>
-            <h3 style={{ color: 'var(--primary-hover)', marginBottom: '1rem' }}>Análisis Técnico</h3>
+            <h3 style={{ color: 'var(--primary-hover)', marginBottom: '1rem' }}>
+              Análisis Técnico
+            </h3>
             {comparisonResult.technicalAnalysis.map((section, index) => (
               <div key={index} style={{ marginBottom: '1.5rem' }}>
                 <h4 style={{ color: 'var(--text)', marginBottom: '0.5rem' }}>{section.title}</h4>
@@ -765,7 +784,9 @@ const CompareRacketsPage: React.FC = () => {
         {/* Perfiles Recomendados */}
         {comparisonResult.recommendedProfiles && (
           <div style={{ marginBottom: '2rem' }}>
-            <h3 style={{ color: 'var(--primary-hover)', marginBottom: '1rem' }}>Perfiles Recomendados</h3>
+            <h3 style={{ color: 'var(--primary-hover)', marginBottom: '1rem' }}>
+              Perfiles Recomendados
+            </h3>
             <ReactMarkdown remarkPlugins={[remarkGfm]}>
               {comparisonResult.recommendedProfiles}
             </ReactMarkdown>
@@ -775,7 +796,9 @@ const CompareRacketsPage: React.FC = () => {
         {/* Consideraciones Biomecánicas */}
         {comparisonResult.biomechanicalConsiderations && (
           <div style={{ marginBottom: '2rem' }}>
-            <h3 style={{ color: 'var(--primary-hover)', marginBottom: '1rem' }}>Consideraciones Biomecánicas</h3>
+            <h3 style={{ color: 'var(--primary-hover)', marginBottom: '1rem' }}>
+              Consideraciones Biomecánicas
+            </h3>
             <ReactMarkdown remarkPlugins={[remarkGfm]}>
               {comparisonResult.biomechanicalConsiderations}
             </ReactMarkdown>
@@ -973,8 +996,7 @@ const CompareRacketsPage: React.FC = () => {
           organizationSchema(),
           webPageSchema({
             name: 'Comparador de Palas con IA — Smashly',
-            description:
-              'Compara hasta 3 palas de pádel con análisis de Inteligencia Artificial.',
+            description: 'Compara hasta 3 palas de pádel con análisis de Inteligencia Artificial.',
             url: buildUrl('/compare-rackets'),
           }),
           breadcrumbSchema([
@@ -1028,7 +1050,9 @@ const CompareRacketsPage: React.FC = () => {
                   />
                   <div>
                     <div style={{ fontWeight: 600 }}>{toTitleCase(racket.nombre)}</div>
-                    <div style={{ fontSize: '0.875rem', color: 'var(--text-muted)' }}>{racket.marca}</div>
+                    <div style={{ fontSize: '0.875rem', color: 'var(--text-muted)' }}>
+                      {racket.marca}
+                    </div>
                   </div>
                 </SearchResultItem>
               ))}

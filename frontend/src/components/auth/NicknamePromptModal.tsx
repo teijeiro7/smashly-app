@@ -137,8 +137,6 @@ const ButtonGroup = styled.div`
   gap: 0.75rem;
 `;
 
-
-
 interface NicknamePromptModalProps {
   isOpen: boolean;
   suggestedNickname: string;

@@ -75,9 +75,9 @@ export interface RacketRecommendation {
   price?: number | null;
 
   // Rich per-racket explanations (new)
-  what_it_gives_you?: string | null;   // Concrete in-game benefits
-  what_it_sacrifices?: string | null;  // Honest trade-offs vs other options
-  ideal_for_moment?: string | null;    // When/where it shines on court
+  what_it_gives_you?: string | null; // Concrete in-game benefits
+  what_it_sacrifices?: string | null; // Honest trade-offs vs other options
+  ideal_for_moment?: string | null; // When/where it shines on court
 
   // Strategic additions
   testea_metrics?: TesteaMetrics;

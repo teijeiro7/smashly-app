@@ -259,12 +259,16 @@ const MessagingPage: React.FC = () => {
     try {
       const data = await messagingService.listConversations();
       setConversations(data);
-    } catch { /* ignore */ } finally {
+    } catch {
+      /* ignore */
+    } finally {
       setLoading(false);
     }
   }, []);
 
-  useEffect(() => { loadConversations(); }, [loadConversations]);
+  useEffect(() => {
+    loadConversations();
+  }, [loadConversations]);
 
   const loadMessages = useCallback(async (convId: string) => {
     setMessagesLoading(true);
@@ -274,10 +278,10 @@ const MessagingPage: React.FC = () => {
       // Mark as read on server
       await messagingService.markRead(convId);
       // Update unread count locally
-      setConversations(prev => prev.map(c =>
-        c.id === convId ? { ...c, unread_count: 0 } : c
-      ));
-    } catch { /* ignore */ } finally {
+      setConversations(prev => prev.map(c => (c.id === convId ? { ...c, unread_count: 0 } : c)));
+    } catch {
+      /* ignore */
+    } finally {
       setMessagesLoading(false);
     }
   }, []);
@@ -304,11 +308,21 @@ const MessagingPage: React.FC = () => {
       setMessages(prev => [...prev, msg]);
       setInputValue('');
       // Update last_message
-      setConversations(prev => prev.map(c =>
-        c.id === activeConvId
-          ? { ...c, last_message_at: msg.created_at, last_message: { content: msg.content, created_at: msg.created_at, sender_id: msg.sender_id } }
-          : c
-      ));
+      setConversations(prev =>
+        prev.map(c =>
+          c.id === activeConvId
+            ? {
+                ...c,
+                last_message_at: msg.created_at,
+                last_message: {
+                  content: msg.content,
+                  created_at: msg.created_at,
+                  sender_id: msg.sender_id,
+                },
+              }
+            : c
+        )
+      );
     } catch (error: any) {
       sileo.error({ title: 'Error', description: error.message });
     } finally {
@@ -352,7 +366,9 @@ const MessagingPage: React.FC = () => {
             <LoadingContainer>Cargando...</LoadingContainer>
           ) : conversations.length === 0 ? (
             <EmptyChat>
-              <EmptyChatIcon><FiMessageSquare /></EmptyChatIcon>
+              <EmptyChatIcon>
+                <FiMessageSquare />
+              </EmptyChatIcon>
               <EmptyChatText>No tienes conversaciones</EmptyChatText>
             </EmptyChat>
           ) : (
@@ -395,14 +411,18 @@ const MessagingPage: React.FC = () => {
                 <LoadingContainer>Cargando mensajes...</LoadingContainer>
               ) : messages.length === 0 ? (
                 <EmptyChat>
-                  <EmptyChatIcon><FiMail /></EmptyChatIcon>
+                  <EmptyChatIcon>
+                    <FiMail />
+                  </EmptyChatIcon>
                   <EmptyChatText>No hay mensajes aún. Envía el primero.</EmptyChatText>
                 </EmptyChat>
               ) : (
                 messages.map(msg => (
                   <MessageBubble key={msg.id} $mine={msg.sender_id === currentUserId}>
                     {msg.content}
-                    <MessageTime $mine={msg.sender_id === currentUserId}>{formatTime(msg.created_at)}</MessageTime>
+                    <MessageTime $mine={msg.sender_id === currentUserId}>
+                      {formatTime(msg.created_at)}
+                    </MessageTime>
                   </MessageBubble>
                 ))
               )}
@@ -414,7 +434,7 @@ const MessagingPage: React.FC = () => {
                 value={inputValue}
                 onChange={e => setInputValue(e.target.value)}
                 onKeyDown={handleKeyDown}
-                placeholder="Escribe un mensaje..."
+                placeholder='Escribe un mensaje...'
               />
               <SendButton onClick={handleSend} disabled={!inputValue.trim() || sending}>
                 <FiSend size={18} />
@@ -423,7 +443,9 @@ const MessagingPage: React.FC = () => {
           </>
         ) : (
           <EmptyChat>
-            <EmptyChatIcon><FiMessageSquare /></EmptyChatIcon>
+            <EmptyChatIcon>
+              <FiMessageSquare />
+            </EmptyChatIcon>
             <EmptyChatText>Selecciona una conversación para empezar</EmptyChatText>
           </EmptyChat>
         )}

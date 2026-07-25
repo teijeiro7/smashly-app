@@ -38,19 +38,22 @@ export const ComparisonProvider: React.FC<ComparisonProviderProps> = ({ children
   }, [rackets]);
 
   // Add racket to comparison
-  const addRacket = useCallback((racket: Racket): boolean => {
-    if (rackets.some(r => r.nombre === racket.nombre)) {
-      sileo.error({ title: 'Error', description: 'Esta pala ya está en la comparación' });
-      return false;
-    }
-    if (rackets.length >= 3) {
-      sileo.error({ title: 'Error', description: 'Solo puedes comparar hasta 3 palas a la vez' });
-      return false;
-    }
-    setRackets(prev => [...prev, racket]);
-    sileo.success({ title: 'Éxito', description: `${racket.nombre} añadida a la comparación` });
-    return true;
-  }, [rackets]);
+  const addRacket = useCallback(
+    (racket: Racket): boolean => {
+      if (rackets.some(r => r.nombre === racket.nombre)) {
+        sileo.error({ title: 'Error', description: 'Esta pala ya está en la comparación' });
+        return false;
+      }
+      if (rackets.length >= 3) {
+        sileo.error({ title: 'Error', description: 'Solo puedes comparar hasta 3 palas a la vez' });
+        return false;
+      }
+      setRackets(prev => [...prev, racket]);
+      sileo.success({ title: 'Éxito', description: `${racket.nombre} añadida a la comparación` });
+      return true;
+    },
+    [rackets]
+  );
 
   // Remove racket from comparison
   const removeRacket = useCallback((racketName: string) => {
@@ -69,18 +72,24 @@ export const ComparisonProvider: React.FC<ComparisonProviderProps> = ({ children
   }, []);
 
   // Check if racket is in comparison
-  const isRacketInComparison = useCallback((racketName: string): boolean => {
-    return rackets.some(r => r.nombre === racketName);
-  }, [rackets]);
+  const isRacketInComparison = useCallback(
+    (racketName: string): boolean => {
+      return rackets.some(r => r.nombre === racketName);
+    },
+    [rackets]
+  );
 
-  const value = useMemo<ComparisonContextType>(() => ({
-    rackets,
-    count: rackets.length,
-    addRacket,
-    removeRacket,
-    clearComparison,
-    isRacketInComparison,
-  }), [rackets, addRacket, removeRacket, clearComparison, isRacketInComparison]);
+  const value = useMemo<ComparisonContextType>(
+    () => ({
+      rackets,
+      count: rackets.length,
+      addRacket,
+      removeRacket,
+      clearComparison,
+      isRacketInComparison,
+    }),
+    [rackets, addRacket, removeRacket, clearComparison, isRacketInComparison]
+  );
 
   return <ComparisonContext.Provider value={value}>{children}</ComparisonContext.Provider>;
 };

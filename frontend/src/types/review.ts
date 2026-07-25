@@ -69,7 +69,7 @@ export interface CreateCommentDTO {
 
 export interface ReviewFilters {
   rating?: number;
-  sort?: "recent" | "rating_high" | "rating_low" | "most_liked";
+  sort?: 'recent' | 'rating_high' | 'rating_low' | 'most_liked';
   page?: number;
   limit?: number;
 }

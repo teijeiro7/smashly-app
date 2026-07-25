@@ -17,18 +17,35 @@ const { chain, mockConfig, supabase } = vi.hoisted(() => {
   chain.neq = vi.fn(() => chain);
   chain.gte = vi.fn(() => chain);
   chain.single = vi.fn(async () => ({
-    data: Array.isArray(mockConfig.data) ? (mockConfig.data.length > 0 ? mockConfig.data[0] : null) : mockConfig.data,
+    data: Array.isArray(mockConfig.data)
+      ? mockConfig.data.length > 0
+        ? mockConfig.data[0]
+        : null
+      : mockConfig.data,
     error: mockConfig.error,
   }));
   chain.maybeSingle = vi.fn(async () => ({
-    data: Array.isArray(mockConfig.data) ? (mockConfig.data.length > 0 ? mockConfig.data[0] : null) : mockConfig.data,
+    data: Array.isArray(mockConfig.data)
+      ? mockConfig.data.length > 0
+        ? mockConfig.data[0]
+        : null
+      : mockConfig.data,
     error: mockConfig.error,
   }));
   chain.select = vi.fn(() => chain);
-  chain.insert = vi.fn(() => ({ ...chain, select: vi.fn(() => ({ ...chain, single: vi.fn(async () => mockConfig) })) }));
-  chain.update = vi.fn(() => ({ ...chain, select: vi.fn(() => ({ ...chain, single: vi.fn(async () => mockConfig) })) }));
+  chain.insert = vi.fn(() => ({
+    ...chain,
+    select: vi.fn(() => ({ ...chain, single: vi.fn(async () => mockConfig) })),
+  }));
+  chain.update = vi.fn(() => ({
+    ...chain,
+    select: vi.fn(() => ({ ...chain, single: vi.fn(async () => mockConfig) })),
+  }));
   chain.delete = vi.fn(() => chain);
-  chain.upsert = vi.fn(() => ({ ...chain, select: vi.fn(() => ({ ...chain, single: vi.fn(async () => mockConfig) })) }));
+  chain.upsert = vi.fn(() => ({
+    ...chain,
+    select: vi.fn(() => ({ ...chain, single: vi.fn(async () => mockConfig) })),
+  }));
   chain.then = async (resolve: any) => resolve(mockConfig);
 
   return {
@@ -38,7 +55,12 @@ const { chain, mockConfig, supabase } = vi.hoisted(() => {
       from: vi.fn(() => chain),
       auth: {
         getSession: vi.fn(async () => ({
-          data: { session: { access_token: 'test-token', user: { id: 'test-user', email: 'test@test.com' } } },
+          data: {
+            session: {
+              access_token: 'test-token',
+              user: { id: 'test-user', email: 'test@test.com' },
+            },
+          },
           error: null,
         })),
         signOut: vi.fn(async () => ({ error: null })),
@@ -258,7 +280,9 @@ describe('NotificationService', () => {
       chain.error = new Error('Delete failed');
       mockConfig.error = new Error('Delete failed');
 
-      await expect(NotificationService.deleteNotification('notif-1')).rejects.toThrow('Delete failed');
+      await expect(NotificationService.deleteNotification('notif-1')).rejects.toThrow(
+        'Delete failed'
+      );
     });
   });
 });

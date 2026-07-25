@@ -1,9 +1,9 @@
-import React from "react";
-import styled from "styled-components";
-import { useAuth } from "../contexts/AuthContext";
+import React from 'react';
+import styled from 'styled-components';
+import { useAuth } from '../contexts/AuthContext';
 import { Navigate } from '@tanstack/react-router';
-import AdminLayout from "../components/features/AdminLayout";
-import StoreRequestsManager from "../components/features/StoreRequestsManager";
+import AdminLayout from '../components/features/AdminLayout';
+import StoreRequestsManager from '../components/features/StoreRequestsManager';
 
 const PageHeader = styled.div`
   margin-bottom: 2rem;
@@ -45,7 +45,7 @@ const AdminStoresPage: React.FC = () => {
   }
 
   if (!user || user.role?.toLowerCase() !== 'admin') {
-    return <Navigate to="/profile" replace />;
+    return <Navigate to='/profile' replace />;
   }
 
   return (

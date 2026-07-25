@@ -1,11 +1,11 @@
-import React, { useState, useEffect, useRef } from "react";
-import styled from "styled-components";
-import { FiX, FiSave, FiUser, FiCalendar, FiActivity, FiCamera, FiTrash2 } from "react-icons/fi";
-import { GiTennisRacket } from "react-icons/gi";
-import { motion, AnimatePresence } from "framer-motion";
-import { UserProfile } from "../../services/userProfileService";
-import { UploadService } from "../../services/uploadService";
-import { useRackets } from "../../contexts/RacketsContext";
+import React, { useState, useEffect, useRef } from 'react';
+import styled from 'styled-components';
+import { FiX, FiSave, FiUser, FiCalendar, FiActivity, FiCamera, FiTrash2 } from 'react-icons/fi';
+import { GiTennisRacket } from 'react-icons/gi';
+import { motion, AnimatePresence } from 'framer-motion';
+import { UserProfile } from '../../services/userProfileService';
+import { UploadService } from '../../services/uploadService';
+import { useRackets } from '../../contexts/RacketsContext';
 
 interface EditProfileModalProps {
   isOpen: boolean;
@@ -206,7 +206,7 @@ const ButtonGroup = styled.div`
   }
 `;
 
-const Button = styled.button<{ variant?: "primary" | "secondary" }>`
+const Button = styled.button<{ variant?: 'primary' | 'secondary' }>`
   flex: 1;
   padding: 0.875rem 1.5rem;
   border: none;
@@ -220,8 +220,8 @@ const Button = styled.button<{ variant?: "primary" | "secondary" }>`
   justify-content: center;
   gap: 0.5rem;
 
-  ${(props) =>
-    props.variant === "primary"
+  ${props =>
+    props.variant === 'primary'
       ? `
     background: linear-gradient(135deg, var(--brand-surface) 0%, var(--brand-surface-hover) 100%);
     color: var(--brand-on-surface);
@@ -291,7 +291,7 @@ const AvatarButtons = styled.div`
   justify-content: center;
 `;
 
-const AvatarButton = styled.button<{ variant?: "primary" | "danger" }>`
+const AvatarButton = styled.button<{ variant?: 'primary' | 'danger' }>`
   padding: 0.625rem 1rem;
   border: none;
   border-radius: 8px;
@@ -303,8 +303,8 @@ const AvatarButton = styled.button<{ variant?: "primary" | "danger" }>`
   align-items: center;
   gap: 0.5rem;
 
-  ${(props) =>
-    props.variant === "danger"
+  ${props =>
+    props.variant === 'danger'
       ? `
     background: var(--danger-subtle);
     color: var(--danger);
@@ -344,22 +344,22 @@ export const EditProfileModal: React.FC<EditProfileModalProps> = ({
 }) => {
   const { rackets, loading: racketsLoading } = useRackets();
   const [formData, setFormData] = useState({
-    nickname: "",
-    full_name: "",
-    current_racket: "",
-    weight: "",
-    height: "",
-    birthdate: "",
-    game_level: "",
-    limitations: "",
-    gender: "",
-    physical_condition: "",
-    position: "",
-    frequency: "",
-    touch_preference: "",
-    balance_preference: "",
-    shape_preference: "",
-    weight_preference: "",
+    nickname: '',
+    full_name: '',
+    current_racket: '',
+    weight: '',
+    height: '',
+    birthdate: '',
+    game_level: '',
+    limitations: '',
+    gender: '',
+    physical_condition: '',
+    position: '',
+    frequency: '',
+    touch_preference: '',
+    balance_preference: '',
+    shape_preference: '',
+    weight_preference: '',
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
@@ -371,22 +371,22 @@ export const EditProfileModal: React.FC<EditProfileModalProps> = ({
   useEffect(() => {
     if (isOpen && userProfile) {
       setFormData({
-        nickname: userProfile.nickname || "",
-        full_name: userProfile.full_name || "",
-        current_racket: userProfile.current_racket || "",
-        weight: userProfile.weight?.toString() || "",
-        height: userProfile.height?.toString() || "",
-        birthdate: userProfile.birthdate || "",
-        game_level: userProfile.game_level || "",
-        limitations: userProfile.limitations?.[0] || "", // Tomar el primer elemento del array
-        gender: userProfile.gender || "",
-        physical_condition: userProfile.physical_condition || "",
-        position: userProfile.position || "",
-        frequency: userProfile.frequency || "",
-        touch_preference: userProfile.touch_preference || "",
-        balance_preference: userProfile.balance_preference || "",
-        shape_preference: userProfile.shape_preference || "",
-        weight_preference: userProfile.weight_preference || "",
+        nickname: userProfile.nickname || '',
+        full_name: userProfile.full_name || '',
+        current_racket: userProfile.current_racket || '',
+        weight: userProfile.weight?.toString() || '',
+        height: userProfile.height?.toString() || '',
+        birthdate: userProfile.birthdate || '',
+        game_level: userProfile.game_level || '',
+        limitations: userProfile.limitations?.[0] || '', // Tomar el primer elemento del array
+        gender: userProfile.gender || '',
+        physical_condition: userProfile.physical_condition || '',
+        position: userProfile.position || '',
+        frequency: userProfile.frequency || '',
+        touch_preference: userProfile.touch_preference || '',
+        balance_preference: userProfile.balance_preference || '',
+        shape_preference: userProfile.shape_preference || '',
+        weight_preference: userProfile.weight_preference || '',
       });
       setAvatarPreview(userProfile.avatar_url || null);
       setAvatarFile(null);
@@ -404,12 +404,10 @@ export const EditProfileModal: React.FC<EditProfileModalProps> = ({
   }, [avatarPreview, avatarFile]);
 
   const handleChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    setFormData(prev => ({ ...prev, [name]: value }));
   };
 
   const handleAvatarClick = () => {
@@ -425,7 +423,7 @@ export const EditProfileModal: React.FC<EditProfileModalProps> = ({
     // Validar el archivo
     const validation = UploadService.validateImageFile(file);
     if (!validation.isValid) {
-      setAvatarError(validation.error || "Archivo no válido");
+      setAvatarError(validation.error || 'Archivo no válido');
       return;
     }
 
@@ -462,8 +460,8 @@ export const EditProfileModal: React.FC<EditProfileModalProps> = ({
       // Actualizar el perfil sin avatar
       await onSave({ avatar_url: null } as any);
     } catch (error: any) {
-      console.error("Error removing avatar:", error);
-      setAvatarError(error.message || "Error al eliminar el avatar");
+      console.error('Error removing avatar:', error);
+      setAvatarError(error.message || 'Error al eliminar el avatar');
     } finally {
       setIsUploadingAvatar(false);
     }
@@ -474,7 +472,7 @@ export const EditProfileModal: React.FC<EditProfileModalProps> = ({
 
     setIsSubmitting(true);
     setAvatarError(null);
-    
+
     try {
       // Subir avatar si hay uno nuevo
       let avatarUrl = userProfile.avatar_url;
@@ -483,7 +481,7 @@ export const EditProfileModal: React.FC<EditProfileModalProps> = ({
           setIsUploadingAvatar(true);
           avatarUrl = await UploadService.uploadAvatar(avatarFile);
         } catch (error: any) {
-          setAvatarError(error.message || "Error al subir el avatar");
+          setAvatarError(error.message || 'Error al subir el avatar');
           setIsUploadingAvatar(false);
           setIsSubmitting(false);
           return;
@@ -556,7 +554,7 @@ export const EditProfileModal: React.FC<EditProfileModalProps> = ({
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.9, opacity: 0 }}
-            onClick={(e) => e.stopPropagation()}
+            onClick={e => e.stopPropagation()}
           >
             <Header>
               <Title>
@@ -573,24 +571,24 @@ export const EditProfileModal: React.FC<EditProfileModalProps> = ({
               <AvatarSection>
                 <AvatarPreview>
                   {avatarPreview ? (
-                    <img src={avatarPreview} alt="Avatar preview" loading='lazy' />
+                    <img src={avatarPreview} alt='Avatar preview' loading='lazy' />
                   ) : (
                     <FiUser size={48} />
                   )}
                 </AvatarPreview>
                 <AvatarButtons>
                   <AvatarButton
-                    type="button"
+                    type='button'
                     onClick={handleAvatarClick}
                     disabled={isSubmitting || isUploadingAvatar}
                   >
                     <FiCamera size={16} />
-                    {avatarPreview ? "Cambiar Foto" : "Subir Foto"}
+                    {avatarPreview ? 'Cambiar Foto' : 'Subir Foto'}
                   </AvatarButton>
                   {(avatarPreview || userProfile.avatar_url) && (
                     <AvatarButton
-                      type="button"
-                      variant="danger"
+                      type='button'
+                      variant='danger'
                       onClick={handleRemoveAvatar}
                       disabled={isSubmitting || isUploadingAvatar}
                     >
@@ -601,17 +599,13 @@ export const EditProfileModal: React.FC<EditProfileModalProps> = ({
                 </AvatarButtons>
                 <HiddenInput
                   ref={fileInputRef}
-                  type="file"
-                  accept="image/jpeg,image/jpg,image/png,image/webp"
+                  type='file'
+                  accept='image/jpeg,image/jpg,image/png,image/webp'
                   onChange={handleAvatarChange}
                 />
                 {avatarError && <ErrorText>{avatarError}</ErrorText>}
-                {isUploadingAvatar && (
-                  <HelperText>Subiendo imagen...</HelperText>
-                )}
-                <HelperText>
-                  Formatos: JPEG, PNG, WebP. Tamaño máximo: 5MB
-                </HelperText>
+                {isUploadingAvatar && <HelperText>Subiendo imagen...</HelperText>}
+                <HelperText>Formatos: JPEG, PNG, WebP. Tamaño máximo: 5MB</HelperText>
               </AvatarSection>
 
               <FormSection>
@@ -621,12 +615,12 @@ export const EditProfileModal: React.FC<EditProfileModalProps> = ({
                 </SectionTitle>
 
                 <FormGroup>
-                  <Label htmlFor="nickname">Nickname *</Label>
+                  <Label htmlFor='nickname'>Nickname *</Label>
                   <Input
-                    id="nickname"
-                    type="text"
-                    name="nickname"
-                    placeholder="Tu nickname"
+                    id='nickname'
+                    type='text'
+                    name='nickname'
+                    placeholder='Tu nickname'
                     value={formData.nickname}
                     onChange={handleChange}
                     disabled={isSubmitting}
@@ -636,12 +630,12 @@ export const EditProfileModal: React.FC<EditProfileModalProps> = ({
                 </FormGroup>
 
                 <FormGroup>
-                  <Label htmlFor="full_name">Nombre Completo</Label>
+                  <Label htmlFor='full_name'>Nombre Completo</Label>
                   <Input
-                    id="full_name"
-                    type="text"
-                    name="full_name"
-                    placeholder="Tu nombre completo"
+                    id='full_name'
+                    type='text'
+                    name='full_name'
+                    placeholder='Tu nombre completo'
                     value={formData.full_name}
                     onChange={handleChange}
                     disabled={isSubmitting}
@@ -650,17 +644,18 @@ export const EditProfileModal: React.FC<EditProfileModalProps> = ({
                 </FormGroup>
 
                 <FormGroup>
-                  <Label htmlFor="current_racket">Pala actual</Label>
+                  <Label htmlFor='current_racket'>Pala actual</Label>
                   <Select
-                    id="current_racket"
-                    name="current_racket"
+                    id='current_racket'
+                    name='current_racket'
                     value={formData.current_racket}
                     onChange={handleChange}
                     disabled={isSubmitting || racketsLoading}
                   >
-                    <option value="">Selecciona tu pala actual</option>
+                    <option value=''>Selecciona tu pala actual</option>
                     {rackets.map(racket => {
-                      const displayName = `${racket.marca} ${racket.modelo || racket.nombre}`.trim();
+                      const displayName =
+                        `${racket.marca} ${racket.modelo || racket.nombre}`.trim();
                       return (
                         <option key={racket.id} value={displayName}>
                           {displayName}
@@ -668,18 +663,20 @@ export const EditProfileModal: React.FC<EditProfileModalProps> = ({
                       );
                     })}
                   </Select>
-                  <HelperText>Este dato se utilizará para personalizar recomendaciones futuras</HelperText>
+                  <HelperText>
+                    Este dato se utilizará para personalizar recomendaciones futuras
+                  </HelperText>
                 </FormGroup>
 
                 <FormGroup>
-                  <Label htmlFor="birthdate">
+                  <Label htmlFor='birthdate'>
                     <FiCalendar />
                     Fecha de Nacimiento
                   </Label>
                   <Input
-                    id="birthdate"
-                    type="date"
-                    name="birthdate"
+                    id='birthdate'
+                    type='date'
+                    name='birthdate'
                     value={formData.birthdate}
                     onChange={handleChange}
                     disabled={isSubmitting}
@@ -688,40 +685,40 @@ export const EditProfileModal: React.FC<EditProfileModalProps> = ({
 
                 <InputGroup>
                   <FormGroup>
-                    <Label htmlFor="weight">
+                    <Label htmlFor='weight'>
                       <FiActivity />
                       Peso (kg)
                     </Label>
                     <Input
-                      id="weight"
-                      type="number"
-                      name="weight"
-                      placeholder="70"
+                      id='weight'
+                      type='number'
+                      name='weight'
+                      placeholder='70'
                       value={formData.weight}
                       onChange={handleChange}
                       disabled={isSubmitting}
-                      min="30"
-                      max="200"
-                      step="0.1"
+                      min='30'
+                      max='200'
+                      step='0.1'
                     />
                   </FormGroup>
 
                   <FormGroup>
-                    <Label htmlFor="height">
+                    <Label htmlFor='height'>
                       <FiActivity />
                       Altura (cm)
                     </Label>
                     <Input
-                      id="height"
-                      type="number"
-                      name="height"
-                      placeholder="175"
+                      id='height'
+                      type='number'
+                      name='height'
+                      placeholder='175'
                       value={formData.height}
                       onChange={handleChange}
                       disabled={isSubmitting}
-                      min="100"
-                      max="250"
-                      step="1"
+                      min='100'
+                      max='250'
+                      step='1'
                     />
                   </FormGroup>
                 </InputGroup>
@@ -734,36 +731,35 @@ export const EditProfileModal: React.FC<EditProfileModalProps> = ({
                 </SectionTitle>
 
                 <FormGroup>
-                  <Label htmlFor="game_level">Nivel de Juego</Label>
+                  <Label htmlFor='game_level'>Nivel de Juego</Label>
                   <Select
-                    id="game_level"
-                    name="game_level"
+                    id='game_level'
+                    name='game_level'
                     value={formData.game_level}
                     onChange={handleChange}
                     disabled={isSubmitting}
                   >
-                    <option value="">Selecciona tu nivel</option>
-                    <option value="Principiante">Principiante</option>
-                    <option value="Intermedio">Intermedio</option>
-                    <option value="Avanzado">Avanzado</option>
-                    <option value="Profesional">Profesional</option>
+                    <option value=''>Selecciona tu nivel</option>
+                    <option value='Principiante'>Principiante</option>
+                    <option value='Intermedio'>Intermedio</option>
+                    <option value='Avanzado'>Avanzado</option>
+                    <option value='Profesional'>Profesional</option>
                   </Select>
                 </FormGroup>
 
                 <FormGroup>
-                  <Label htmlFor="limitations">Limitaciones o Lesiones</Label>
+                  <Label htmlFor='limitations'>Limitaciones o Lesiones</Label>
                   <TextArea
-                    id="limitations"
-                    name="limitations"
-                    placeholder="Describe cualquier limitación física o lesión que debamos tener en cuenta..."
+                    id='limitations'
+                    name='limitations'
+                    placeholder='Describe cualquier limitación física o lesión que debamos tener en cuenta...'
                     value={formData.limitations}
                     onChange={handleChange}
                     disabled={isSubmitting}
                     maxLength={500}
                   />
                   <HelperText>
-                    Esta información nos ayuda a recomendarte las palas más
-                    adecuadas
+                    Esta información nos ayuda a recomendarte las palas más adecuadas
                   </HelperText>
                 </FormGroup>
               </FormSection>
@@ -775,134 +771,134 @@ export const EditProfileModal: React.FC<EditProfileModalProps> = ({
 
                 <InputGroup>
                   <FormGroup>
-                    <Label htmlFor="gender">Género</Label>
+                    <Label htmlFor='gender'>Género</Label>
                     <Select
-                      id="gender"
-                      name="gender"
+                      id='gender'
+                      name='gender'
                       value={formData.gender}
                       onChange={handleChange}
                       disabled={isSubmitting}
                     >
-                      <option value="">Selecciona género</option>
-                      <option value="masculino">Masculino</option>
-                      <option value="femenino">Femenino</option>
+                      <option value=''>Selecciona género</option>
+                      <option value='masculino'>Masculino</option>
+                      <option value='femenino'>Femenino</option>
                     </Select>
                   </FormGroup>
 
                   <FormGroup>
-                    <Label htmlFor="physical_condition">Condición física</Label>
+                    <Label htmlFor='physical_condition'>Condición física</Label>
                     <Select
-                      id="physical_condition"
-                      name="physical_condition"
+                      id='physical_condition'
+                      name='physical_condition'
                       value={formData.physical_condition}
                       onChange={handleChange}
                       disabled={isSubmitting}
                     >
-                      <option value="">Selecciona condición</option>
-                      <option value="asiduo">Asiduo al deporte</option>
-                      <option value="ocasional">Ocasional</option>
+                      <option value=''>Selecciona condición</option>
+                      <option value='asiduo'>Asiduo al deporte</option>
+                      <option value='ocasional'>Ocasional</option>
                     </Select>
                   </FormGroup>
                 </InputGroup>
 
                 <InputGroup>
                   <FormGroup>
-                    <Label htmlFor="position">Posición en pista</Label>
+                    <Label htmlFor='position'>Posición en pista</Label>
                     <Select
-                      id="position"
-                      name="position"
+                      id='position'
+                      name='position'
                       value={formData.position}
                       onChange={handleChange}
                       disabled={isSubmitting}
                     >
-                      <option value="">Selecciona posición</option>
-                      <option value="reves">Revés</option>
-                      <option value="drive">Drive</option>
-                      <option value="ambos">Indiferente</option>
+                      <option value=''>Selecciona posición</option>
+                      <option value='reves'>Revés</option>
+                      <option value='drive'>Drive</option>
+                      <option value='ambos'>Indiferente</option>
                     </Select>
                   </FormGroup>
 
                   <FormGroup>
-                    <Label htmlFor="frequency">Frecuencia de juego</Label>
+                    <Label htmlFor='frequency'>Frecuencia de juego</Label>
                     <Select
-                      id="frequency"
-                      name="frequency"
+                      id='frequency'
+                      name='frequency'
                       value={formData.frequency}
                       onChange={handleChange}
                       disabled={isSubmitting}
                     >
-                      <option value="">Selecciona frecuencia</option>
-                      <option value="1">1 vez/semana o menos</option>
-                      <option value="2-3">2-3 veces/semana</option>
-                      <option value="4+">4+ veces/semana</option>
+                      <option value=''>Selecciona frecuencia</option>
+                      <option value='1'>1 vez/semana o menos</option>
+                      <option value='2-3'>2-3 veces/semana</option>
+                      <option value='4+'>4+ veces/semana</option>
                     </Select>
                   </FormGroup>
                 </InputGroup>
 
                 <InputGroup>
                   <FormGroup>
-                    <Label htmlFor="touch_preference">Tacto de pala</Label>
+                    <Label htmlFor='touch_preference'>Tacto de pala</Label>
                     <Select
-                      id="touch_preference"
-                      name="touch_preference"
+                      id='touch_preference'
+                      name='touch_preference'
                       value={formData.touch_preference}
                       onChange={handleChange}
                       disabled={isSubmitting}
                     >
-                      <option value="">Selecciona tacto</option>
-                      <option value="duro">Duro</option>
-                      <option value="medio">Medio</option>
-                      <option value="blando">Blando</option>
+                      <option value=''>Selecciona tacto</option>
+                      <option value='duro'>Duro</option>
+                      <option value='medio'>Medio</option>
+                      <option value='blando'>Blando</option>
                     </Select>
                   </FormGroup>
 
                   <FormGroup>
-                    <Label htmlFor="weight_preference">Peso de pala</Label>
+                    <Label htmlFor='weight_preference'>Peso de pala</Label>
                     <Select
-                      id="weight_preference"
-                      name="weight_preference"
+                      id='weight_preference'
+                      name='weight_preference'
                       value={formData.weight_preference}
                       onChange={handleChange}
                       disabled={isSubmitting}
                     >
-                      <option value="">No sé</option>
-                      <option value="ligera">Ligera (&lt;360g)</option>
-                      <option value="media">Media (360-375g)</option>
-                      <option value="pesada">Pesada (&gt;375g)</option>
+                      <option value=''>No sé</option>
+                      <option value='ligera'>Ligera (&lt;360g)</option>
+                      <option value='media'>Media (360-375g)</option>
+                      <option value='pesada'>Pesada (&gt;375g)</option>
                     </Select>
                   </FormGroup>
                 </InputGroup>
 
                 <InputGroup>
                   <FormGroup>
-                    <Label htmlFor="balance_preference">Balance de pala</Label>
+                    <Label htmlFor='balance_preference'>Balance de pala</Label>
                     <Select
-                      id="balance_preference"
-                      name="balance_preference"
+                      id='balance_preference'
+                      name='balance_preference'
                       value={formData.balance_preference}
                       onChange={handleChange}
                       disabled={isSubmitting}
                     >
-                      <option value="">No sé</option>
-                      <option value="bajo">Bajo (Manejable)</option>
-                      <option value="medio">Medio (Equilibrado)</option>
-                      <option value="alto">Alto (Potencia)</option>
+                      <option value=''>No sé</option>
+                      <option value='bajo'>Bajo (Manejable)</option>
+                      <option value='medio'>Medio (Equilibrado)</option>
+                      <option value='alto'>Alto (Potencia)</option>
                     </Select>
                   </FormGroup>
 
                   <FormGroup>
-                    <Label htmlFor="shape_preference">Forma de pala</Label>
+                    <Label htmlFor='shape_preference'>Forma de pala</Label>
                     <Select
-                      id="shape_preference"
-                      name="shape_preference"
+                      id='shape_preference'
+                      name='shape_preference'
                       value={formData.shape_preference}
                       onChange={handleChange}
                       disabled={isSubmitting}
                     >
-                      <option value="">No sé</option>
-                      <option value="redonda">Redonda</option>
-                      <option value="lagrima">Lágrima</option>
-                      <option value="diamante">Diamante</option>
+                      <option value=''>No sé</option>
+                      <option value='redonda'>Redonda</option>
+                      <option value='lagrima'>Lágrima</option>
+                      <option value='diamante'>Diamante</option>
                     </Select>
                   </FormGroup>
                 </InputGroup>
@@ -914,20 +910,20 @@ export const EditProfileModal: React.FC<EditProfileModalProps> = ({
 
               <ButtonGroup>
                 <Button
-                  type="button"
-                  variant="secondary"
+                  type='button'
+                  variant='secondary'
                   onClick={handleClose}
                   disabled={isSubmitting}
                 >
                   Cancelar
                 </Button>
                 <Button
-                  type="submit"
-                  variant="primary"
+                  type='submit'
+                  variant='primary'
                   disabled={!formData.nickname.trim() || isSubmitting}
                 >
                   <FiSave size={20} />
-                  {isSubmitting ? "Guardando..." : "Guardar Cambios"}
+                  {isSubmitting ? 'Guardando...' : 'Guardar Cambios'}
                 </Button>
               </ButtonGroup>
             </Form>

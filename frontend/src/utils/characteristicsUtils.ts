@@ -1,13 +1,7 @@
 // Utility functions for handling racket characteristics
 
 // Fields that should not be displayed in technical characteristics
-export const HIDDEN_CHARACTERISTIC_FIELDS = [
-  "formato",
-  "color_2",
-  "color",
-  "producto",
-  "marca",
-];
+export const HIDDEN_CHARACTERISTIC_FIELDS = ['formato', 'color_2', 'color', 'producto', 'marca'];
 
 /**
  * Filters out unwanted characteristic fields
@@ -20,8 +14,8 @@ export const filterCharacteristics = (characteristics: Record<string, any>) => {
       ([key, value]) =>
         !HIDDEN_CHARACTERISTIC_FIELDS.includes(key) &&
         value &&
-        value !== "Unknown" &&
-        value !== "Unknow"
+        value !== 'Unknown' &&
+        value !== 'Unknow'
     )
   );
 };
@@ -32,14 +26,11 @@ export const filterCharacteristics = (characteristics: Record<string, any>) => {
  * @param value - The characteristic value
  * @returns boolean indicating if the field should be displayed
  */
-export const shouldDisplayCharacteristic = (
-  key: string,
-  value: any
-): boolean => {
+export const shouldDisplayCharacteristic = (key: string, value: any): boolean => {
   return (
     !HIDDEN_CHARACTERISTIC_FIELDS.includes(key) &&
     value &&
-    value !== "Unknown" &&
-    value !== "Unknow"
+    value !== 'Unknown' &&
+    value !== 'Unknow'
   );
 };

@@ -23,7 +23,13 @@ export function cacheSet<T>(key: string, value: T): void {
   store.set(key, { value, expiresAt: Date.now() + TTL_MS });
 }
 
-export function generateProfileHash(data: Record<string, unknown>): string {
-  const str = JSON.stringify(data, Object.keys(data).sort());
+/**
+ * catalogVersion should change whenever the racket catalog does (see
+ * getCatalogVersion in racket-service.ts) so that a price/catalog sync
+ * invalidates every cached recommendation instead of serving stale data
+ * for up to the full TTL.
+ */
+export function generateProfileHash(data: Record<string, unknown>, catalogVersion?: string): string {
+  const str = JSON.stringify(data, Object.keys(data).sort()) + '|' + (catalogVersion ?? '');
   return crypto.createHash('md5').update(str).digest('hex');
 }

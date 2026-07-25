@@ -102,7 +102,8 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
       activeUsersChange: 0,
     }));
   } catch (err: any) {
+    console.error('Error fetching metrics:', err?.message);
     res.writeHead(500, { 'Content-Type': 'application/json' });
-    res.end(JSON.stringify({ error: 'Error fetching metrics', details: err?.message }));
+    res.end(JSON.stringify({ error: 'Error fetching metrics' }));
   }
 }

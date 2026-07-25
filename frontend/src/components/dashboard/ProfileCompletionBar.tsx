@@ -28,10 +28,11 @@ const Percentage = styled.span<{ $percentage: number }>`
   font-size: 1.25rem;
   font-weight: 700;
   color: ${props =>
-    props.$percentage >= 80 ? 'var(--primary)' :
-    props.$percentage >= 50 ? 'var(--accent)' :
-    'var(--error)'
-  };
+    props.$percentage >= 80
+      ? 'var(--primary)'
+      : props.$percentage >= 50
+        ? 'var(--accent)'
+        : 'var(--error)'};
 `;
 
 const ProgressBarContainer = styled.div`
@@ -46,10 +47,11 @@ const ProgressBarContainer = styled.div`
 const ProgressBarFill = styled.div<{ $percentage: number }>`
   height: 100%;
   background: ${props =>
-    props.$percentage >= 80 ? 'var(--primary)' :
-    props.$percentage >= 50 ? 'var(--accent)' :
-    'var(--error)'
-  };
+    props.$percentage >= 80
+      ? 'var(--primary)'
+      : props.$percentage >= 50
+        ? 'var(--accent)'
+        : 'var(--error)'};
   width: ${props => props.$percentage}%;
   transition: width 0.3s ease;
   border-radius: 4px;
@@ -110,7 +112,7 @@ export const ProfileCompletionBar: React.FC<ProfileCompletionBarProps> = ({
         <Title>Completitud del perfil</Title>
         <Percentage $percentage={percentage}>{percentage}%</Percentage>
       </Header>
-      
+
       <ProgressBarContainer>
         <ProgressBarFill $percentage={percentage} />
       </ProgressBarContainer>
@@ -122,7 +124,7 @@ export const ProfileCompletionBar: React.FC<ProfileCompletionBarProps> = ({
               <Suggestion key={index}>{suggestion}</Suggestion>
             ))}
           </Suggestions>
-          
+
           <CompleteButton onClick={() => navigate({ to: '/profile' })}>
             Completar perfil
           </CompleteButton>

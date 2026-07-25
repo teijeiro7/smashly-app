@@ -101,7 +101,7 @@ export class GoogleAuthService {
   static async signInWithGoogle(): Promise<GoogleAuthResponse> {
     try {
       logger.log('[GoogleAuth] Starting sign in...');
-      
+
       // Ensure SDK is loaded
       await this.initialize();
       logger.log('[GoogleAuth] SDK initialized');
@@ -159,19 +159,22 @@ export class GoogleAuthService {
           client_id: GOOGLE_CLIENT_ID!,
           scope: 'openid email profile',
           callback: async (response: any) => {
-            logger.log('[GoogleAuth] Popup callback received:', { 
-              hasError: !!response.error, 
+            logger.log('[GoogleAuth] Popup callback received:', {
+              hasError: !!response.error,
               hasAccessToken: !!response.access_token,
-              error: response.error 
+              error: response.error,
             });
-            
+
             if (response.error) {
               reject(new Error(`Google OAuth error: ${response.error}`));
               return;
             }
 
             if (response.access_token) {
-              logger.log('[GoogleAuth] Access token received, length:', response.access_token.length);
+              logger.log(
+                '[GoogleAuth] Access token received, length:',
+                response.access_token.length
+              );
               resolve(response.access_token);
             } else {
               reject(new Error('No token received from Google'));
@@ -207,7 +210,7 @@ export class GoogleAuthService {
     try {
       const url = buildApiUrl(API_ENDPOINTS.AUTH_GOOGLE);
       logger.log('[GoogleAuth] Sending token to backend:', url);
-      
+
       const response = await fetch(url, {
         method: 'POST',
         credentials: 'include',

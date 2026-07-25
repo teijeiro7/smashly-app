@@ -63,7 +63,10 @@ const PrimaryBtn = styled(Link)`
   border-radius: 10px;
   font-weight: 600;
   text-decoration: none;
-  transition: background-color 0.2s ease, transform 0.2s ease, color 0.2s ease;
+  transition:
+    background-color 0.2s ease,
+    transform 0.2s ease,
+    color 0.2s ease;
 
   &:hover {
     background: var(--primary-hover);
@@ -84,7 +87,10 @@ const SecondaryBtn = styled(Link)`
   font-weight: 600;
   text-decoration: none;
   border: 1px solid var(--border);
-  transition: border-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
+  transition:
+    border-color 0.2s ease,
+    color 0.2s ease,
+    transform 0.2s ease;
 
   &:hover {
     border-color: var(--primary);
@@ -109,8 +115,7 @@ export default function NotFoundPage() {
         <Emoji>🎾</Emoji>
         <Title>Página no encontrada</Title>
         <Description>
-          Parece que la página o el recurso que buscas no existe... o quizás la URL ha
-          cambiado.
+          Parece que la página o el recurso que buscas no existe... o quizás la URL ha cambiado.
         </Description>
         <Actions>
           <PrimaryBtn to='/'>

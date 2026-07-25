@@ -133,8 +133,6 @@ const PopupButtons = styled.div`
   gap: 0.75rem;
 `;
 
-
-
 const CloseButton = styled.button`
   position: absolute;
   top: 0.75rem;
@@ -219,11 +217,7 @@ const MobileBottomNav = React.memo(() => {
             }
 
             return (
-              <NavItemLink
-                key={item.to}
-                to={item.to}
-                $active={isActive}
-              >
+              <NavItemLink key={item.to} to={item.to} $active={isActive}>
                 {item.icon}
                 <span>{item.label}</span>
               </NavItemLink>
@@ -255,7 +249,8 @@ const MobileBottomNav = React.memo(() => {
                 Inicia sesión
               </PopupTitle>
               <PopupText>
-                Para acceder a tu perfil y personalizar tus recomendaciones, necesitas iniciar sesión.
+                Para acceder a tu perfil y personalizar tus recomendaciones, necesitas iniciar
+                sesión.
               </PopupText>
               <PopupButtons>
                 <Button variant='primary' onClick={handleLogin}>
@@ -292,7 +287,8 @@ const MobileBottomNav = React.memo(() => {
                 Completa tu perfil
               </PopupTitle>
               <PopupText>
-                Para ver tu perfil personalizado, primero complétalo con tu nivel de juego y preferencias.
+                Para ver tu perfil personalizado, primero complétalo con tu nivel de juego y
+                preferencias.
               </PopupText>
               <PopupButtons>
                 <Button variant='primary' onClick={handleGoToOnboarding}>
@@ -310,5 +306,7 @@ const MobileBottomNav = React.memo(() => {
     </>
   );
 });
+
+MobileBottomNav.displayName = 'MobileBottomNav';
 
 export default MobileBottomNav;

@@ -24,7 +24,9 @@ import ProfileAvatar from '../components/features/ProfileAvatar';
 import ActivityStats from '../components/features/ActivityStats';
 import UserCollections from '../components/features/UserCollections';
 import AccountSettings from '../components/features/AccountSettings';
-import RacketSearchInput, { RacketSearchResult } from '../components/recommendation/RacketSearchInput';
+import RacketSearchInput, {
+  RacketSearchResult,
+} from '../components/recommendation/RacketSearchInput';
 
 const Container = styled.div`
   min-height: 100vh;
@@ -603,7 +605,10 @@ const UserProfilePage: React.FC = () => {
       sileo.success({ title: 'Éxito', description: 'Perfil actualizado correctamente' });
     } catch (error: any) {
       console.error('Update profile error:', error);
-      sileo.error({ title: 'Error', description: error?.message || 'Error al actualizar el perfil' });
+      sileo.error({
+        title: 'Error',
+        description: error?.message || 'Error al actualizar el perfil',
+      });
     } finally {
       setSaving(false);
     }
@@ -731,16 +736,23 @@ const UserProfilePage: React.FC = () => {
                             <RacketSearchInput
                               value={
                                 formData.current_racket
-                                  ? ({ id: 0, name: formData.current_racket, marca: '' } as RacketSearchResult)
+                                  ? ({
+                                      id: 0,
+                                      name: formData.current_racket,
+                                      marca: '',
+                                    } as RacketSearchResult)
                                   : null
                               }
-                              onChange={(racket) => {
-                                const display = racket ? `${racket.marca} ${racket.name}`.trim() : '';
+                              onChange={racket => {
+                                const display = racket
+                                  ? `${racket.marca} ${racket.name}`.trim()
+                                  : '';
                                 setFormData(prev => ({ ...prev, current_racket: display }));
                               }}
                             />
                             <HelperText>
-                              Busca tu pala escribiendo el nombre o marca. También puedes añadirla manualmente.
+                              Busca tu pala escribiendo el nombre o marca. También puedes añadirla
+                              manualmente.
                             </HelperText>
                           </SearchWrapper>
                           <SmallButton
@@ -753,9 +765,15 @@ const UserProfilePage: React.FC = () => {
                                   current_racket: formData.current_racket || undefined,
                                 } as any);
                                 await refreshUserProfile();
-                                sileo.success({ title: 'Éxito', description: 'Pala actual guardada' });
+                                sileo.success({
+                                  title: 'Éxito',
+                                  description: 'Pala actual guardada',
+                                });
                               } catch (err: any) {
-                                sileo.error({ title: 'Error', description: err?.message || 'Error al guardar pala' });
+                                sileo.error({
+                                  title: 'Error',
+                                  description: err?.message || 'Error al guardar pala',
+                                });
                               } finally {
                                 setSaving(false);
                               }
@@ -944,7 +962,8 @@ const UserProfilePage: React.FC = () => {
                         </FormGroup>
                       </FormGrid>
                       <HelperText style={{ marginTop: '0.5rem' }}>
-                        Estas preferencias se usan para pre-rellenar los formularios de recomendación
+                        Estas preferencias se usan para pre-rellenar los formularios de
+                        recomendación
                       </HelperText>
                     </FormSection>
 

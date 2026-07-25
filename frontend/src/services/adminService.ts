@@ -2,7 +2,9 @@ import { API_ENDPOINTS, buildApiUrl, getCommonHeaders, ApiResponse } from '../co
 import { supabase } from '../lib/supabase';
 
 async function getAuthHeaders(): Promise<HeadersInit> {
-  const { data: { session } } = await supabase.auth.getSession();
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
   const headers: HeadersInit = { 'Content-Type': 'application/json' };
   if (session?.access_token) headers['Authorization'] = `Bearer ${session.access_token}`;
   return headers;
@@ -347,31 +349,69 @@ export class AdminService {
   }
 
   /**
-   * Obtiene todas las marcas con el conteo de palas
+   * Obtiene todas las marcas con el conteo de palas.
+   * /api/v1/admin/brands no existe (backend/api fue retirado) — se agrega
+   * directamente sobre `rackets`, que tiene lectura pública por RLS.
    */
   static async getBrands(): Promise<Brand[]> {
-    const response = await fetch(buildApiUrl(API_ENDPOINTS.ADMIN.BRANDS), {
-      method: 'GET',
-      credentials: 'include',
-      headers: getCommonHeaders(),
-    });
+    // rackets uses English column names (brand, not marca — see
+    // api/_lib/racket-mapper.ts for the full story).
+    const { data, error } = await supabase.from('rackets').select('brand');
+    if (error) throw error;
 
-    return handleApiResponse<Brand[]>(response);
+    // Grouped case-insensitively — the real data has casing variants of the
+    // same brand (e.g. "Lok" / "LOK") that would otherwise show up as two
+    // separate rows with split counts.
+    const groups = groupCaseInsensitive((data ?? []).map((r: any) => r.brand));
+
+    return Array.from(groups.values())
+      .map(({ display, count }) => ({ name: display, racketCount: count }))
+      .sort((a, b) => b.racketCount - a.racketCount);
   }
 
   /**
-   * Obtiene todas las categorías (formas) con el conteo de palas
+   * Obtiene todas las categorías (formas) con el conteo de palas.
+   * Same situation as getBrands — aggregated client-side over
+   * characteristics_shape instead of calling the dead REST endpoint.
+   * Descriptions reused from the domain rules already authored in
+   * api/comparison.ts's buildComparisonPrompt (REGLAS DE DOMINIO).
    */
   static async getCategories(): Promise<Category[]> {
-    const response = await fetch(buildApiUrl(API_ENDPOINTS.ADMIN.CATEGORIES), {
-      method: 'GET',
-      credentials: 'include',
-      headers: getCommonHeaders(),
-    });
+    const { data, error } = await supabase.from('rackets').select('characteristics_shape');
+    if (error) throw error;
 
-    return handleApiResponse<Category[]>(response);
+    const groups = groupCaseInsensitive((data ?? []).map((r: any) => r.characteristics_shape));
+
+    return Array.from(groups.values())
+      .map(({ display, count }) => ({
+        name: display,
+        description: SHAPE_DESCRIPTIONS[display.toLowerCase()] || '',
+        racketCount: count,
+      }))
+      .sort((a, b) => b.racketCount - a.racketCount);
   }
 }
+
+/** Groups raw string values case-insensitively, keeping the first-seen casing for display. */
+function groupCaseInsensitive(values: unknown[]): Map<string, { display: string; count: number }> {
+  const groups = new Map<string, { display: string; count: number }>();
+  values.forEach(value => {
+    const raw = typeof value === 'string' ? value.trim() : '';
+    if (!raw) return;
+    const key = raw.toLowerCase();
+    const existing = groups.get(key);
+    if (existing) existing.count += 1;
+    else groups.set(key, { display: raw, count: 1 });
+  });
+  return groups;
+}
+
+const SHAPE_DESCRIPTIONS: Record<string, string> = {
+  diamante: 'Balance alto, máxima potencia. Mayor riesgo de epicondilitis.',
+  redonda: 'Balance bajo, máximo control y punto dulce amplio. Ideal con lesiones.',
+  lágrima: 'Polivalente, balance medio. Equilibrio entre potencia y control.',
+  lagrima: 'Polivalente, balance medio. Equilibrio entre potencia y control.',
+};
 
 export interface Activity {
   id: string;

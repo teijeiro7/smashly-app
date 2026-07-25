@@ -1,4 +1,4 @@
-import { API_ENDPOINTS, API_URL } from "../config/api";
+import { API_ENDPOINTS, API_URL } from '../config/api';
 
 export interface Store {
   id: string;
@@ -43,15 +43,12 @@ const storeService = {
   /**
    * Crear una nueva solicitud de tienda
    */
-  async createStoreRequest(
-    storeData: CreateStoreRequest,
-    token: string
-  ): Promise<Store> {
+  async createStoreRequest(storeData: CreateStoreRequest, token: string): Promise<Store> {
     const url = `${API_URL}${API_ENDPOINTS.STORES}`;
     const response = await fetch(url, {
-      method: "POST",
+      method: 'POST',
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify(storeData),
@@ -59,7 +56,7 @@ const storeService = {
 
     if (!response.ok) {
       const error = await response.json();
-      throw new Error(error.error || "Error al crear la tienda");
+      throw new Error(error.error || 'Error al crear la tienda');
     }
 
     const data = await response.json();
@@ -72,24 +69,24 @@ const storeService = {
   async getAllStores(verified?: boolean, token?: string): Promise<Store[]> {
     const url = new URL(`${API_URL}${API_ENDPOINTS.STORES}`);
     if (verified !== undefined) {
-      url.searchParams.append("verified", String(verified));
+      url.searchParams.append('verified', String(verified));
     }
 
     const headers: HeadersInit = {
-      "Content-Type": "application/json",
+      'Content-Type': 'application/json',
     };
     if (token) {
       headers.Authorization = `Bearer ${token}`;
     }
 
     const response = await fetch(url.toString(), {
-      method: "GET",
+      method: 'GET',
       headers,
     });
 
     if (!response.ok) {
       const error = await response.json();
-      throw new Error(error.error || "Error al obtener las tiendas");
+      throw new Error(error.error || 'Error al obtener las tiendas');
     }
 
     return response.json();
@@ -99,20 +96,17 @@ const storeService = {
    * Obtener una tienda por ID
    */
   async getStoreById(storeId: string, token: string): Promise<Store> {
-    const response = await fetch(
-      `${API_URL}${API_ENDPOINTS.STORES_BY_ID(storeId)}`,
-      {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
+    const response = await fetch(`${API_URL}${API_ENDPOINTS.STORES_BY_ID(storeId)}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+    });
 
     if (!response.ok) {
       const error = await response.json();
-      throw new Error(error.error || "Error al obtener la tienda");
+      throw new Error(error.error || 'Error al obtener la tienda');
     }
 
     return response.json();
@@ -123,16 +117,13 @@ const storeService = {
    */
   async getMyStore(token: string): Promise<Store | null> {
     try {
-      const response = await fetch(
-        `${API_URL}${API_ENDPOINTS.STORES_MY_STORE}`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response = await fetch(`${API_URL}${API_ENDPOINTS.STORES_MY_STORE}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
       if (response.status === 404) {
         return null;
@@ -140,12 +131,12 @@ const storeService = {
 
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.error || "Error al obtener tu tienda");
+        throw new Error(error.error || 'Error al obtener tu tienda');
       }
 
       return response.json();
     } catch (error: any) {
-      if (error.message === "Error al obtener tu tienda") {
+      if (error.message === 'Error al obtener tu tienda') {
         throw error;
       }
       return null;
@@ -160,21 +151,18 @@ const storeService = {
     updates: Partial<CreateStoreRequest>,
     token: string
   ): Promise<Store> {
-    const response = await fetch(
-      `${API_URL}${API_ENDPOINTS.STORES_BY_ID(storeId)}`,
-      {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(updates),
-      }
-    );
+    const response = await fetch(`${API_URL}${API_ENDPOINTS.STORES_BY_ID(storeId)}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(updates),
+    });
 
     if (!response.ok) {
       const error = await response.json();
-      throw new Error(error.error || "Error al actualizar la tienda");
+      throw new Error(error.error || 'Error al actualizar la tienda');
     }
 
     return response.json();
@@ -184,20 +172,17 @@ const storeService = {
    * Eliminar una tienda
    */
   async deleteStore(storeId: string, token: string): Promise<void> {
-    const response = await fetch(
-      `${API_URL}${API_ENDPOINTS.STORES_BY_ID(storeId)}`,
-      {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
+    const response = await fetch(`${API_URL}${API_ENDPOINTS.STORES_BY_ID(storeId)}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+    });
 
     if (!response.ok) {
       const error = await response.json();
-      throw new Error(error.error || "Error al eliminar la tienda");
+      throw new Error(error.error || 'Error al eliminar la tienda');
     }
   },
 };

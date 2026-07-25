@@ -1,7 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { useParams, useNavigate } from '@tanstack/react-router';
-import { FiMapPin, FiMail, FiPhone, FiGlobe, FiArrowLeft, FiStar, FiEye, FiShoppingCart, FiMessageSquare } from 'react-icons/fi';
+import {
+  FiMapPin,
+  FiMail,
+  FiPhone,
+  FiGlobe,
+  FiArrowLeft,
+  FiStar,
+  FiEye,
+  FiShoppingCart,
+  FiMessageSquare,
+} from 'react-icons/fi';
 import { motion } from 'framer-motion';
 import { API_URL, API_ENDPOINTS } from '../config/api';
 import { Store } from '../services/storeService';
@@ -31,7 +41,9 @@ const BackLink = styled.button`
   padding: 0.5rem 0;
   transition: color 0.2s;
 
-  &:hover { color: var(--primary); }
+  &:hover {
+    color: var(--primary);
+  }
 `;
 
 const Hero = styled.div<{ $cover?: string }>`
@@ -48,7 +60,7 @@ const Hero = styled.div<{ $cover?: string }>`
 const HeroOverlay = styled.div`
   position: absolute;
   inset: 0;
-  background: linear-gradient(transparent 40%, rgba(0,0,0,0.6));
+  background: linear-gradient(transparent 40%, rgba(0, 0, 0, 0.6));
 `;
 
 const HeroContent = styled.div`
@@ -69,13 +81,13 @@ const Logo = styled.img`
   border-radius: 20px;
   object-fit: cover;
   border: 4px solid white;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
   background: white;
 `;
 
 const HeroText = styled.div`
   color: white;
-  text-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 `;
 
 const StoreTitle = styled.h1`
@@ -88,7 +100,7 @@ const StoreStatus = styled.span`
   display: inline-block;
   margin-top: 0.5rem;
   padding: 0.25rem 0.75rem;
-  background: rgba(255,255,255,0.2);
+  background: rgba(255, 255, 255, 0.2);
   border-radius: 100px;
   font-size: 0.8rem;
   font-weight: 600;
@@ -166,15 +178,22 @@ const InfoItem = styled.div`
   color: var(--text);
   font-size: 0.9rem;
 
-  svg { color: var(--primary); flex-shrink: 0; }
+  svg {
+    color: var(--primary);
+    flex-shrink: 0;
+  }
 
-  & + & { border-top: 1px solid var(--border); }
+  & + & {
+    border-top: 1px solid var(--border);
+  }
 `;
 
 const InfoLink = styled.a`
   color: var(--primary);
   text-decoration: none;
-  &:hover { text-decoration: underline; }
+  &:hover {
+    text-decoration: underline;
+  }
 `;
 
 const GalleryGrid = styled.div`
@@ -267,7 +286,9 @@ const Stat = styled.div`
   color: var(--text-muted);
   font-size: 0.85rem;
 
-  svg { color: var(--primary); }
+  svg {
+    color: var(--primary);
+  }
 `;
 
 const Spinner = styled.div`
@@ -296,7 +317,10 @@ const PublicStorePage: React.FC = () => {
     const fetchStore = async () => {
       try {
         const res = await fetch(`${API_URL}${API_ENDPOINTS.STORES_BY_ID(slug)}`);
-        if (!res.ok) { setNotFound(true); return; }
+        if (!res.ok) {
+          setNotFound(true);
+          return;
+        }
         const data = await res.json();
         setStore(data);
         analyticsService.trackEvent(data.id, 'view');
@@ -308,7 +332,9 @@ const PublicStorePage: React.FC = () => {
             const catData = await catRes.json();
             setCatalog(catData.data || []);
           }
-        } catch { /* catalog optional */ }
+        } catch {
+          /* catalog optional */
+        }
       } catch {
         setNotFound(true);
       } finally {
@@ -319,7 +345,12 @@ const PublicStorePage: React.FC = () => {
   }, [slug]);
 
   if (loading) return <Spinner>Cargando tienda...</Spinner>;
-  if (notFound || !store) return <NotFound><p>Tienda no encontrada</p></NotFound>;
+  if (notFound || !store)
+    return (
+      <NotFound>
+        <p>Tienda no encontrada</p>
+      </NotFound>
+    );
 
   return (
     <Page>
@@ -335,7 +366,18 @@ const PublicStorePage: React.FC = () => {
           {store.logo_url ? (
             <Logo src={store.logo_url} alt={store.store_name} />
           ) : (
-            <Logo as="div" style={{ background: 'var(--primary)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '2.5rem', fontWeight: 800 }}>
+            <Logo
+              as='div'
+              style={{
+                background: 'var(--primary)',
+                color: 'white',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '2.5rem',
+                fontWeight: 800,
+              }}
+            >
               {store.store_name.charAt(0)}
             </Logo>
           )}
@@ -343,8 +385,13 @@ const PublicStorePage: React.FC = () => {
             <StoreTitle>{store.store_name}</StoreTitle>
             {store.location && <StoreStatus>{store.location}</StoreStatus>}
             <StatRow>
-              <Stat><FiEye /> {store.views_count} visitas</Stat>
-              <Stat><FiStar /> {store.rating_avg > 0 ? store.rating_avg.toFixed(1) : '—'} ({store.rating_count})</Stat>
+              <Stat>
+                <FiEye /> {store.views_count} visitas
+              </Stat>
+              <Stat>
+                <FiStar /> {store.rating_avg > 0 ? store.rating_avg.toFixed(1) : '—'} (
+                {store.rating_count})
+              </Stat>
             </StatRow>
           </HeroText>
         </HeroContent>
@@ -356,7 +403,9 @@ const PublicStorePage: React.FC = () => {
             <Section>
               <SectionTitle>Sobre nosotros</SectionTitle>
               <Description>{store.short_description}</Description>
-              {store.description && <Description style={{ marginTop: '1rem' }}>{store.description}</Description>}
+              {store.description && (
+                <Description style={{ marginTop: '1rem' }}>{store.description}</Description>
+              )}
             </Section>
           )}
 
@@ -364,7 +413,9 @@ const PublicStorePage: React.FC = () => {
             <Section>
               <SectionTitle>Especialidades</SectionTitle>
               <SpecialtyTags>
-                {store.specialties.map((s, i) => <SpecialtyTag key={i}>{s}</SpecialtyTag>)}
+                {store.specialties.map((s, i) => (
+                  <SpecialtyTag key={i}>{s}</SpecialtyTag>
+                ))}
               </SpecialtyTags>
             </Section>
           )}
@@ -385,16 +436,35 @@ const PublicStorePage: React.FC = () => {
               <SectionTitle>Catálogo ({catalog.length})</SectionTitle>
               <CatalogGrid>
                 {catalog.map(item => (
-                  <RacketCard key={item.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+                  <RacketCard
+                    key={item.id}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                  >
                     {item.racket?.images?.[0] ? (
                       <RacketImg src={item.racket.images[0]} alt={item.racket.name} />
                     ) : (
-                      <RacketImg as="div" style={{ background: 'var(--surface-3)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '2rem', color: 'var(--text-subtle)' }} />
+                      <RacketImg
+                        as='div'
+                        style={{
+                          background: 'var(--surface-3)',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          fontSize: '2rem',
+                          color: 'var(--text-subtle)',
+                        }}
+                      />
                     )}
                     <RacketName>{item.racket?.name || `Pala #${item.racket_id}`}</RacketName>
                     {item.price && <RacketPrice>{item.price}€</RacketPrice>}
                     {item.link && (
-                      <RacketLink href={item.link} target="_blank" rel="noopener" onClick={() => analyticsService.trackEvent(store!.id, 'click')}>
+                      <RacketLink
+                        href={item.link}
+                        target='_blank'
+                        rel='noopener'
+                        onClick={() => analyticsService.trackEvent(store!.id, 'click')}
+                      >
                         <FiShoppingCart /> Ver en tienda
                       </RacketLink>
                     )}
@@ -410,16 +480,40 @@ const PublicStorePage: React.FC = () => {
             <SectionTitle>Contacto</SectionTitle>
             <InfoItem>
               <FiMessageSquare />
-              <InfoLink as="button" onClick={() => navigate({ to: '/messages' })} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--primary)', fontSize: '0.9rem', fontWeight: 600, padding: 0 }}>
+              <InfoLink
+                as='button'
+                onClick={() => navigate({ to: '/messages' })}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
+                  color: 'var(--primary)',
+                  fontSize: '0.9rem',
+                  fontWeight: 600,
+                  padding: 0,
+                }}
+              >
                 Enviar mensaje
               </InfoLink>
             </InfoItem>
             <SectionTitle style={{ marginTop: '1rem' }}>Información</SectionTitle>
-            <InfoItem><FiMapPin /> {store.location}</InfoItem>
-            <InfoItem><FiMail /> <InfoLink href={`mailto:${store.contact_email}`}>{store.contact_email}</InfoLink></InfoItem>
-            <InfoItem><FiPhone /> {store.phone_number}</InfoItem>
+            <InfoItem>
+              <FiMapPin /> {store.location}
+            </InfoItem>
+            <InfoItem>
+              <FiMail />{' '}
+              <InfoLink href={`mailto:${store.contact_email}`}>{store.contact_email}</InfoLink>
+            </InfoItem>
+            <InfoItem>
+              <FiPhone /> {store.phone_number}
+            </InfoItem>
             {store.website_url && (
-              <InfoItem><FiGlobe /> <InfoLink href={store.website_url} target="_blank" rel="noopener">{store.website_url}</InfoLink></InfoItem>
+              <InfoItem>
+                <FiGlobe />{' '}
+                <InfoLink href={store.website_url} target='_blank' rel='noopener'>
+                  {store.website_url}
+                </InfoLink>
+              </InfoItem>
             )}
           </InfoCard>
         </SideCol>

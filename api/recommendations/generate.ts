@@ -1,11 +1,12 @@
 import type { IncomingMessage, ServerResponse } from 'http';
 import { generateContent } from '../_lib/ai';
-import { getAllRackets } from '../_lib/racket-service';
+import { getAllRackets, getCatalogVersion } from '../_lib/racket-service';
 import { filterRacketsWithScores, assessBiomechanicalSafety } from '../_lib/racket-filter';
 import { getTesteaMetrics } from '../_lib/testea-metrics';
 import { buildCompactSelectionPrompt } from '../_lib/prompt-compression';
 import { cacheGet, cacheSet, generateProfileHash } from '../_lib/cache';
 import { parseAiJson } from '../_lib/json-parse';
+import { checkRateLimit, tooManyRequests } from '../_lib/rate-limit';
 
 function normalizeFormData(data: any): any {
   if (!data || typeof data !== 'object') return data;
@@ -134,6 +135,16 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
     return;
   }
 
+  const allowed = await checkRateLimit(req, {
+    keyPrefix: 'recommend-generate',
+    limit: 5,
+    windowSeconds: 3600,
+  });
+  if (!allowed) {
+    tooManyRequests(res);
+    return;
+  }
+
   let body: any;
   try {
     body = await readBody(req);
@@ -159,7 +170,8 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
 
   try {
     const profile = normalizeFormData(data);
-    const cacheHash = generateProfileHash(profile);
+    const catalogVersion = await getCatalogVersion();
+    const cacheHash = generateProfileHash(profile, catalogVersion);
     const cached = cacheGet(cacheHash);
     if (cached) {
       res.writeHead(200, { 'Content-Type': 'application/json' });

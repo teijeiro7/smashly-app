@@ -1,6 +1,5 @@
 import { supabase } from '../lib/supabase';
 import { Racket } from '../types/racket';
-import { API_ENDPOINTS, buildApiUrl, getCommonHeaders } from '../config/api';
 
 // ── Price history types ───────────────────────────────────────────────────────
 export interface PricePoint {
@@ -49,9 +48,27 @@ function calculateBestPrice(raw: any): {
   fuente: string;
 } {
   const stores = [
-    { name: 'padelnuestro', current_price: raw.padelnuestro_actual_price, original_price: raw.padelnuestro_original_price, discount_percentage: raw.padelnuestro_discount_percentage, link: raw.padelnuestro_link },
-    { name: 'padelmarket', current_price: raw.padelmarket_actual_price, original_price: raw.padelmarket_original_price, discount_percentage: raw.padelmarket_discount_percentage, link: raw.padelmarket_link },
-    { name: 'padelproshop', current_price: raw.padelproshop_actual_price, original_price: raw.padelproshop_original_price, discount_percentage: raw.padelproshop_discount_percentage, link: raw.padelproshop_link },
+    {
+      name: 'padelnuestro',
+      current_price: raw.padelnuestro_actual_price,
+      original_price: raw.padelnuestro_original_price,
+      discount_percentage: raw.padelnuestro_discount_percentage,
+      link: raw.padelnuestro_link,
+    },
+    {
+      name: 'padelmarket',
+      current_price: raw.padelmarket_actual_price,
+      original_price: raw.padelmarket_original_price,
+      discount_percentage: raw.padelmarket_discount_percentage,
+      link: raw.padelmarket_link,
+    },
+    {
+      name: 'padelproshop',
+      current_price: raw.padelproshop_actual_price,
+      original_price: raw.padelproshop_original_price,
+      discount_percentage: raw.padelproshop_discount_percentage,
+      link: raw.padelproshop_link,
+    },
   ].filter(s => s.current_price != null && s.current_price > 0);
 
   if (stores.length === 0) {
@@ -151,10 +168,7 @@ function mapDbToFrontend(raw: any): Racket {
 // ── Service ───────────────────────────────────────────────────────────────────
 const racketService = {
   async getAllRackets(): Promise<Racket[]> {
-    const { data, error } = await supabase
-      .from('rackets')
-      .select('*')
-      .order('name');
+    const { data, error } = await supabase.from('rackets').select('*').order('name');
 
     if (error) throw new Error(error.message);
     return (data ?? []).map(mapDbToFrontend);
@@ -178,21 +192,14 @@ const racketService = {
   },
 
   async getRacketById(id: number): Promise<Racket | null> {
-    const { data, error } = await supabase
-      .from('rackets')
-      .select('*')
-      .eq('id', id)
-      .maybeSingle();
+    const { data, error } = await supabase.from('rackets').select('*').eq('id', id).maybeSingle();
 
     if (error) throw new Error(error.message);
     return data ? mapDbToFrontend(data) : null;
   },
 
   async getRacketsByIds(ids: number[]): Promise<Racket[]> {
-    const { data, error } = await supabase
-      .from('rackets')
-      .select('*')
-      .in('id', ids);
+    const { data, error } = await supabase.from('rackets').select('*').in('id', ids);
 
     if (error) throw new Error(error.message);
     return (data ?? []).map(mapDbToFrontend);
@@ -249,9 +256,7 @@ const racketService = {
       }
     }
 
-    const { data, count, error } = await q
-      .order('name')
-      .range(from, from + limit - 1);
+    const { data, count, error } = await q.order('name').range(from, from + limit - 1);
 
     if (error) throw new Error(error.message);
 
@@ -274,11 +279,7 @@ const racketService = {
 
   async getBestsellerRackets(): Promise<Racket[]> {
     // es_bestseller does not exist in DB — return top rackets by name
-    const { data, error } = await supabase
-      .from('rackets')
-      .select('*')
-      .order('name')
-      .limit(20);
+    const { data, error } = await supabase.from('rackets').select('*').order('name').limit(20);
 
     if (error) throw new Error(error.message);
     return (data ?? []).map(mapDbToFrontend);
@@ -296,17 +297,19 @@ const racketService = {
   },
 
   async getUniqueBrands(): Promise<string[]> {
-    const { data, error } = await supabase
-      .from('rackets')
-      .select('brand')
-      .order('brand');
+    const { data, error } = await supabase.from('rackets').select('brand').order('brand');
 
     if (error) throw new Error(error.message);
     const brands = [...new Set((data ?? []).map((r: any) => r.brand).filter(Boolean))];
     return brands as string[];
   },
 
-  async getStats(): Promise<{ total: number; bestsellers: number; onSale: number; brands: number }> {
+  async getStats(): Promise<{
+    total: number;
+    bestsellers: number;
+    onSale: number;
+    brands: number;
+  }> {
     const [totalRes, onSaleRes, brandsRes] = await Promise.all([
       supabase.from('rackets').select('*', { count: 'exact', head: true }),
       supabase.from('rackets').select('*', { count: 'exact', head: true }).eq('on_offer', true),
@@ -356,86 +359,64 @@ const racketService = {
     return { updatedCount: data?.length ?? 0 };
   },
 
-  // ── Price history ──────────────────────────────────────────────────────────
+  // ── Price history ────────────────────────────────────────────────────────
+  // price_history has public RLS SELECT (service-role-only writes, from the
+  // scraper's record_price_history()), so this reads straight from Supabase
+  // instead of /api/v1/rackets/:id/price-history, whose handler still queries
+  // columns the table doesn't have (store_id/created_at instead of
+  // store/recorded_at) and therefore always 500s.
   async getPriceHistory(
     racketId: number,
     days = 90,
     store?: string
   ): Promise<PriceHistoryResult | null> {
     try {
-      const params: Record<string, any> = { days };
-      if (store) params.store = store;
+      const since = new Date();
+      since.setDate(since.getDate() - days);
 
-      const url = buildApiUrl(API_ENDPOINTS.RACKETS_PRICE_HISTORY(racketId), params);
-      const response = await fetch(url, { method: 'GET', headers: getCommonHeaders() });
-      if (!response.ok) return null;
+      let query = supabase
+        .from('price_history')
+        .select('store, price, recorded_at')
+        .eq('racket_id', racketId)
+        .gte('recorded_at', since.toISOString())
+        .order('recorded_at', { ascending: true });
 
-      const rawData: any[] = await response.json();
-      if (!Array.isArray(rawData) || rawData.length === 0) return null;
+      if (store) query = query.eq('store', store);
 
-      const storeMap = new Map<string, { prices: { date: string; price: number }[] }>();
+      const { data, error } = await query;
+      if (error || !data) return null;
 
-      for (const row of rawData) {
-        const storeName = row.store?.store_name || 'Unknown Store';
-        const storeKey = normalizeStoreName(storeName);
+      const points: PricePoint[] = data.map((row: any) => ({
+        date: row.recorded_at,
+        price: row.price,
+        store: row.store,
+      }));
 
-        if (!storeMap.has(storeKey)) {
-          storeMap.set(storeKey, { prices: [] });
+      const byStore = new Map<string, PricePoint[]>();
+      for (const point of points) {
+        const list = byStore.get(point.store) ?? [];
+        list.push(point);
+        byStore.set(point.store, list);
+      }
+
+      const stores: StorePriceHistory[] = Array.from(byStore.entries()).map(
+        ([storeName, history]) => {
+          const prices = history.map(h => h.price);
+          return {
+            store: storeName,
+            history,
+            currentPrice: prices.length ? prices[prices.length - 1] : null,
+            minPrice: prices.length ? Math.min(...prices) : null,
+            maxPrice: prices.length ? Math.max(...prices) : null,
+          };
         }
-        storeMap.get(storeKey)!.prices.push({
-          date: row.created_at,
-          price: row.price,
-        });
-      }
+      );
 
-      const stores: StorePriceHistory[] = [];
-      const combined: PricePoint[] = [];
-
-      for (const [key, value] of storeMap) {
-        const sortedPrices = value.prices.sort(
-          (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
-        );
-        const prices = sortedPrices.map(p => p.price);
-        const currentPrice = prices[prices.length - 1] ?? null;
-        const minPrice = prices.length > 0 ? Math.min(...prices) : null;
-        const maxPrice = prices.length > 0 ? Math.max(...prices) : null;
-
-        stores.push({
-          store: key,
-          history: sortedPrices.map(p => ({ date: p.date, price: p.price, store: key })),
-          currentPrice,
-          minPrice,
-          maxPrice,
-        });
-
-        sortedPrices.forEach(p => {
-          combined.push({ date: p.date, price: p.price, store: key });
-        });
-      }
-
-      return {
-        racketId,
-        days,
-        stores,
-        combined: combined.sort(
-          (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
-        ),
-      };
+      return { racketId, days, stores, combined: points };
     } catch {
       return null;
     }
   },
 };
-
-/** Normalize store name to lowercase key for chart color/label mapping */
-function normalizeStoreName(name: string): string {
-  const map: Record<string, string> = {
-    'padel nuestro': 'padelnuestro',
-    'padel market': 'padelmarket',
-    'padel pro shop': 'padelproshop',
-  };
-  const lower = name.toLowerCase().trim();
-  return map[lower] || lower.replace(/\s+/g, '_');
-}
 
 export default racketService;

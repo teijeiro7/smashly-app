@@ -5,14 +5,15 @@
   "scripts": {
     "dev": "node scripts/dev-server.mjs",
     "install:all": "pnpm install",
+    "typecheck:api": "cd api && pnpm exec tsc --noEmit",
     "lint": "cd frontend && pnpm lint",
     "lint:fix": "cd frontend && pnpm lint:fix",
     "format": "cd frontend && pnpm format",
     "format:check": "cd frontend && pnpm format:check",
-    "quality:check": "pnpm lint && pnpm format:check",
+    "quality:check": "pnpm typecheck:api && pnpm lint && pnpm format:check",
     "quality:fix": "pnpm lint:fix && pnpm format",
-    "test:all": "cd frontend && pnpm test",
-    "build:all": "cd frontend && pnpm build",
+    "test:all": "cd frontend && pnpm test:unit",
+    "build:all": "pnpm typecheck:api && cd frontend && pnpm build",
     "record:demo": "node testing/scripts/record-demo.cjs"
   },
   "devDependencies": {

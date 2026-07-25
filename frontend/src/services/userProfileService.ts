@@ -1,4 +1,5 @@
 import { API_ENDPOINTS, buildApiUrl, getCommonHeaders, ApiResponse } from '../config/api';
+import { supabase } from '../lib/supabase';
 import { logger } from '../utils/logger';
 
 // Interfaz para el perfil de usuario
@@ -60,7 +61,7 @@ export class UserProfileService {
     try {
       const url = buildApiUrl(API_ENDPOINTS.USERS_PROFILE);
       const response = await fetch(url, {
-        credentials: 'include',  // send httpOnly auth cookie
+        credentials: 'include', // send httpOnly auth cookie
         method: 'POST',
         headers: getCommonHeaders(),
         body: JSON.stringify({
@@ -90,7 +91,7 @@ export class UserProfileService {
     try {
       const url = buildApiUrl(API_ENDPOINTS.USERS_PROFILE);
       const response = await fetch(url, {
-        credentials: 'include',  // send httpOnly auth cookie
+        credentials: 'include', // send httpOnly auth cookie
         method: 'GET',
         headers: getCommonHeaders(),
       });
@@ -120,22 +121,31 @@ export class UserProfileService {
   }
 
   /**
-   * Actualiza el perfil del usuario autenticado
-   * El userId se obtiene del token JWT en el backend
+   * Actualiza el perfil del usuario autenticado.
+   * Escribe directamente en Supabase (user_profiles) — /api/v1/users/profile
+   * no existe desde que se retiró el backend Express. La migración
+   * 20260725000001 restringe por GRANT qué columnas puede tocar
+   * `authenticated` (nunca `role`), así que esto es tan seguro como el
+   * endpoint REST que sustituye.
    */
   static async updateUserProfile(
     updates: Partial<Omit<UserProfile, 'id' | 'created_at'>>
   ): Promise<UserProfile> {
     try {
-      const url = buildApiUrl(API_ENDPOINTS.USERS_PROFILE);
-      const response = await fetch(url, {
-        credentials: 'include',  // send httpOnly auth cookie
-        method: 'PUT',
-        headers: getCommonHeaders(),
-        body: JSON.stringify(updates),
-      });
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      if (!session) throw new Error('No hay sesión activa');
 
-      return await handleApiResponse<UserProfile>(response);
+      const { data, error } = await supabase
+        .from('user_profiles')
+        .update(updates)
+        .eq('id', session.user.id)
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data as UserProfile;
     } catch (error: any) {
       logger.error('Error updating user profile:', error);
       throw new Error(error.message || 'Error inesperado al actualizar el perfil de usuario');
@@ -168,7 +178,7 @@ export class UserProfileService {
     try {
       const url = buildApiUrl(API_ENDPOINTS.USERS_PROFILE);
       const response = await fetch(url, {
-        credentials: 'include',  // send httpOnly auth cookie
+        credentials: 'include', // send httpOnly auth cookie
         method: 'DELETE',
         headers: getCommonHeaders(),
       });

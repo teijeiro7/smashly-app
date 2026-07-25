@@ -1,8 +1,8 @@
-import { motion } from "framer-motion";
-import React from "react";
-import { FiTarget, FiTrendingUp, FiZap, FiChevronRight } from "react-icons/fi";
+import { motion } from 'framer-motion';
+import React from 'react';
+import { FiTarget, FiTrendingUp, FiZap, FiChevronRight } from 'react-icons/fi';
 import { useNavigate } from '@tanstack/react-router';
-import styled from "styled-components";
+import styled from 'styled-components';
 
 const BannerContainer = styled(motion.div)`
   background: linear-gradient(135deg, var(--brand-surface) 0%, var(--brand-surface-hover) 100%);
@@ -17,7 +17,7 @@ const BannerContainer = styled(motion.div)`
   transform: translateZ(0);
 
   &::before {
-    content: "";
+    content: '';
     position: absolute;
     top: 0;
     left: 0;
@@ -108,15 +108,13 @@ const CTASection = styled.div`
   flex-wrap: wrap;
 `;
 
-const CTAButton = styled.button<{ variant?: "primary" | "secondary" }>`
+const CTAButton = styled.button<{ variant?: 'primary' | 'secondary' }>`
   padding: 1rem 2rem;
   border-radius: 12px;
-  border: ${(props) =>
-    props.variant === "secondary"
-      ? "2px solid rgba(255, 255, 255, 0.3)"
-      : "none"};
-  background: ${(props) =>
-    props.variant === "secondary" ? "rgba(255, 255, 255, 0.1)" : "rgba(255, 255, 255, 0.25)"};
+  border: ${props =>
+    props.variant === 'secondary' ? '2px solid rgba(255, 255, 255, 0.3)' : 'none'};
+  background: ${props =>
+    props.variant === 'secondary' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(255, 255, 255, 0.25)'};
   color: var(--brand-on-surface);
   font-weight: 600;
   font-size: 1rem;
@@ -132,18 +130,14 @@ const CTAButton = styled.button<{ variant?: "primary" | "secondary" }>`
   @media (max-width: 768px) {
     backdrop-filter: none;
     -webkit-backdrop-filter: none;
-    background: ${(props) =>
-      props.variant === "secondary"
-        ? "rgba(255, 255, 255, 0.15)"
-        : "rgba(255, 255, 255, 0.35)"};
+    background: ${props =>
+      props.variant === 'secondary' ? 'rgba(255, 255, 255, 0.15)' : 'rgba(255, 255, 255, 0.35)'};
     transition: transform 0.1s ease;
   }
 
   &:hover {
-    background: ${(props) =>
-      props.variant === "secondary"
-        ? "rgba(255, 255, 255, 0.2)"
-        : "rgba(255, 255, 255, 0.4)"};
+    background: ${props =>
+      props.variant === 'secondary' ? 'rgba(255, 255, 255, 0.2)' : 'rgba(255, 255, 255, 0.4)'};
     transform: translateY(-2px);
   }
 
@@ -170,8 +164,8 @@ const AiBanner: React.FC = () => {
       <BannerContent>
         <BannerTitle>🤖 Potenciado por Inteligencia Artificial</BannerTitle>
         <BannerSubtitle>
-          Descubre la mejor pala para tu juego con análisis personalizado y
-          comparaciones inteligentes
+          Descubre la mejor pala para tu juego con análisis personalizado y comparaciones
+          inteligentes
         </BannerSubtitle>
 
         <FeaturesRow>
@@ -196,18 +190,12 @@ const AiBanner: React.FC = () => {
         </FeaturesRow>
 
         <CTASection>
-          <CTAButton
-            variant="primary"
-            onClick={() => navigate({ to: '/best-racket' })}
-          >
+          <CTAButton variant='primary' onClick={() => navigate({ to: '/best-racket' })}>
             <FiZap />
             Encontrar Mi Pala Ideal
             <FiChevronRight />
           </CTAButton>
-          <CTAButton
-            variant="secondary"
-            onClick={() => navigate({ to: '/compare-rackets' })}
-          >
+          <CTAButton variant='secondary' onClick={() => navigate({ to: '/compare-rackets' })}>
             <FiTrendingUp />
             Comparar Palas
           </CTAButton>

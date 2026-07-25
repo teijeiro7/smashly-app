@@ -5,18 +5,19 @@ import { FiCpu, FiLayers, FiArrowRight, FiBookmark } from 'react-icons/fi';
 import { useNavigate } from '@tanstack/react-router';
 import { useAuth } from '../contexts/AuthContext';
 import SEO from '../components/seo/SEO';
-import {
-  organizationSchema,
-  webPageSchema,
-  breadcrumbSchema,
-} from '../utils/seoSchemas';
+import { organizationSchema, webPageSchema, breadcrumbSchema } from '../utils/seoSchemas';
 import { buildUrl, allKeywords } from '../config/seo';
 
 const Container = styled.div`
   min-height: 100dvh;
   background:
     radial-gradient(circle at top right, rgba(var(--primary-rgb-dark), 0.08), transparent 42%),
-    linear-gradient(150deg, var(--surface-2) 0%, var(--primary-subtle) 45%, var(--primary-subtle) 100%);
+    linear-gradient(
+      150deg,
+      var(--surface-2) 0%,
+      var(--primary-subtle) 45%,
+      var(--primary-subtle) 100%
+    );
   padding: 1rem 1rem calc(6.5rem + env(safe-area-inset-bottom));
 
   @media (min-width: 769px) {
@@ -30,7 +31,9 @@ const Header = styled.div`
   max-width: 1200px;
   margin: 0 auto;
   padding: 2.5rem 1.5rem;
-  box-shadow: 0 4px 6px -1px var(--shadow-color), 0 2px 4px -1px var(--shadow-color);
+  box-shadow:
+    0 4px 6px -1px var(--shadow-color),
+    0 2px 4px -1px var(--shadow-color);
   text-align: center;
 
   @media (max-width: 768px) {
@@ -90,7 +93,10 @@ const SecondaryButton = styled.button`
   font-weight: 600;
   font-size: 0.875rem;
   cursor: pointer;
-  transition: background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    background-color 0.2s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
 
   &:hover {
     background: rgba(var(--primary-rgb), 0.05);
@@ -118,21 +124,28 @@ const Card = styled(motion.div)`
   background: var(--surface);
   border-radius: 20px;
   padding: 3rem 2rem;
-  box-shadow: 0 4px 6px -1px var(--shadow-color), 0 2px 4px -1px var(--shadow-color);
+  box-shadow:
+    0 4px 6px -1px var(--shadow-color),
+    0 2px 4px -1px var(--shadow-color);
   border: 1px solid rgba(0, 0, 0, 0.06);
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
   cursor: pointer;
-  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
   position: relative;
   overflow: hidden;
   min-height: 320px;
 
   &:hover {
     transform: translateY(-4px);
-    box-shadow: 0 20px 25px -5px var(--shadow-color), 0 10px 10px -5px var(--shadow-color);
+    box-shadow:
+      0 20px 25px -5px var(--shadow-color),
+      0 10px 10px -5px var(--shadow-color);
     border-color: rgba(var(--primary-rgb-dark), 0.3);
 
     .icon-container {
@@ -171,7 +184,10 @@ const IconContainer = styled.div`
   justify-content: center;
   font-size: 2.5rem;
   margin-bottom: 2rem;
-  transition: background-color 0.3s ease, color 0.3s ease, transform 0.3s ease;
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease,
+    transform 0.3s ease;
 
   @media (max-width: 768px) {
     width: 56px;
@@ -231,7 +247,9 @@ const ActionButton = styled.div`
 `;
 
 const ArrowIcon = styled(FiArrowRight)`
-  transition: transform 0.3s ease, opacity 0.3s ease;
+  transition:
+    transform 0.3s ease,
+    opacity 0.3s ease;
   opacity: 0.7;
 `;
 
@@ -251,7 +269,8 @@ const ComparePage: React.FC = () => {
           organizationSchema(),
           webPageSchema({
             name: 'Comparador de Palas de Pádel — Smashly',
-            description: 'Compara palas de pádel lado a lado por especificaciones, precio y opiniones.',
+            description:
+              'Compara palas de pádel lado a lado por especificaciones, precio y opiniones.',
             url: buildUrl('/compare'),
           }),
           breadcrumbSchema([

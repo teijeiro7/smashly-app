@@ -146,9 +146,9 @@ describe('RecommendationService', () => {
         json: async () => ({ error: 'Error generating recommendation' }),
       });
 
-      await expect(
-        RecommendationService.generate('basic', {} as any)
-      ).rejects.toThrow('Error generating recommendation');
+      await expect(RecommendationService.generate('basic', {} as any)).rejects.toThrow(
+        'Error generating recommendation'
+      );
     });
   });
 
@@ -190,9 +190,9 @@ describe('RecommendationService', () => {
         json: async () => ({ error: 'Error generating RAG recommendation' }),
       });
 
-      await expect(
-        RecommendationService.generateWithRAG('basic', {} as any)
-      ).rejects.toThrow('Error generating RAG recommendation');
+      await expect(RecommendationService.generateWithRAG('basic', {} as any)).rejects.toThrow(
+        'Error generating RAG recommendation'
+      );
     });
   });
 
@@ -222,9 +222,9 @@ describe('RecommendationService', () => {
         data: { session: null },
       });
 
-      await expect(
-        RecommendationService.save('basic', {} as any, {} as any)
-      ).rejects.toThrow('No autenticado');
+      await expect(RecommendationService.save('basic', {} as any, {} as any)).rejects.toThrow(
+        'No autenticado'
+      );
     });
   });
 

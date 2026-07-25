@@ -12,7 +12,7 @@
     "dev": "concurrently -k -n API,WEB -c blue,green \"node scripts/dev-api.mjs\" \"vite\"",
     "dev:web": "vite",
     "dev:api": "node scripts/dev-api.mjs",
-    "build": "tsc && vite build",
+    "build": "node scripts/generate-sitemap.mjs && tsc && vite build",
     "lint": "eslint src --ext .ts,.tsx",
     "lint:fix": "eslint src --ext .ts,.tsx --fix",
     "format": "prettier --write \"src/**/*.{ts,tsx,js,jsx,json,css}\"",

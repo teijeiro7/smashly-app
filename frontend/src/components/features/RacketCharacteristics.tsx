@@ -1,14 +1,16 @@
-import { motion } from "framer-motion";
-import React from "react";
-import styled from "styled-components";
-import { RacketCharacteristics as RacketCharacteristicsType } from "../../types/racket";
-import { shouldDisplayCharacteristic } from "../../utils/characteristicsUtils";
+import { motion } from 'framer-motion';
+import React from 'react';
+import styled from 'styled-components';
+import { RacketCharacteristics as RacketCharacteristicsType } from '../../types/racket';
+import { shouldDisplayCharacteristic } from '../../utils/characteristicsUtils';
 
 const CharacteristicsContainer = styled(motion.div)`
   background: var(--surface);
   border-radius: 16px;
   padding: 1.5rem;
-  box-shadow: 0 4px 6px -1px var(--shadow-color), 0 2px 4px -1px var(--shadow-color);
+  box-shadow:
+    0 4px 6px -1px var(--shadow-color),
+    0 2px 4px -1px var(--shadow-color);
   margin-bottom: 1.5rem;
 `;
 
@@ -86,31 +88,30 @@ interface RacketCharacteristicsProps {
 
 // Mapeo de nombres técnicos a nombres amigables
 const characteristicLabels: Record<string, string> = {
-  marca: "Marca",
-  color: "Color",
-  color_secundario: "Color Secundario",
-  balance: "Balance",
-  nucleo: "Núcleo",
-  dureza: "Dureza",
-  acabado: "Acabado",
-  superficie: "Superficie",
-  forma: "Forma",
-  tipo_juego: "Tipo de Juego",
-  nivel_jugador: "Nivel del Jugador",
-  nivel_juego: "Nivel de Juego",
-  peso: "Peso",
-  grosor: "Grosor",
-  material: "Material",
-  material_cara: "Material de la Cara",
-  material_marco: "Material del Marco",
+  marca: 'Marca',
+  color: 'Color',
+  color_secundario: 'Color Secundario',
+  balance: 'Balance',
+  nucleo: 'Núcleo',
+  dureza: 'Dureza',
+  acabado: 'Acabado',
+  superficie: 'Superficie',
+  forma: 'Forma',
+  tipo_juego: 'Tipo de Juego',
+  nivel_jugador: 'Nivel del Jugador',
+  nivel_juego: 'Nivel de Juego',
+  peso: 'Peso',
+  grosor: 'Grosor',
+  material: 'Material',
+  material_cara: 'Material de la Cara',
+  material_marco: 'Material del Marco',
 };
 
 const RacketCharacteristics: React.FC<RacketCharacteristicsProps> = ({
   características,
   descripcion,
 }) => {
-  const hasCharacteristics =
-    características && Object.keys(características).length > 0;
+  const hasCharacteristics = características && Object.keys(características).length > 0;
   const hasDescription = descripcion && descripcion.trim().length > 0;
 
   if (!hasCharacteristics && !hasDescription) {
@@ -121,9 +122,7 @@ const RacketCharacteristics: React.FC<RacketCharacteristicsProps> = ({
         transition={{ duration: 0.3 }}
       >
         <SectionTitle>Características Técnicas</SectionTitle>
-        <EmptyState>
-          No hay características técnicas disponibles para esta pala.
-        </EmptyState>
+        <EmptyState>No hay características técnicas disponibles para esta pala.</EmptyState>
       </CharacteristicsContainer>
     );
   }
@@ -141,7 +140,7 @@ const RacketCharacteristics: React.FC<RacketCharacteristicsProps> = ({
           {Object.entries(características!).map(([key, value]) => {
             if (!shouldDisplayCharacteristic(key, value)) return null;
 
-            const label = characteristicLabels[key] || key.replace(/_/g, " ");
+            const label = characteristicLabels[key] || key.replace(/_/g, ' ');
 
             return (
               <CharacteristicItem key={key}>

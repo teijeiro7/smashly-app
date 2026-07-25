@@ -1,9 +1,9 @@
-import React, { useEffect } from "react";
-import styled from "styled-components";
-import { FiX, FiPlus, FiList, FiCheck } from "react-icons/fi";
-import { motion, AnimatePresence } from "framer-motion";
-import { useList } from "../../contexts/ListsContext";
-import { CreateListModal } from "./CreateListModal";
+import React, { useEffect } from 'react';
+import styled from 'styled-components';
+import { FiX, FiPlus, FiList, FiCheck } from 'react-icons/fi';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useList } from '../../contexts/ListsContext';
+import { CreateListModal } from './CreateListModal';
 
 interface AddToListModalProps {
   isOpen: boolean;
@@ -141,8 +141,8 @@ const ListsGrid = styled.div`
 const ListItem = styled.button<{ isAdded?: boolean }>`
   width: 100%;
   padding: 1rem;
-  background: ${(props) => (props.isAdded ? "var(--primary-subtle)" : "var(--surface)")};
-  border: 2px solid ${(props) => (props.isAdded ? "var(--primary)" : "var(--border)")};
+  background: ${props => (props.isAdded ? 'var(--primary-subtle)' : 'var(--surface)')};
+  border: 2px solid ${props => (props.isAdded ? 'var(--primary)' : 'var(--border)')};
   border-radius: 12px;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -165,8 +165,8 @@ const ListItem = styled.button<{ isAdded?: boolean }>`
 const ListIcon = styled.div<{ isAdded?: boolean }>`
   width: 40px;
   height: 40px;
-  background: ${(props) => (props.isAdded ? "var(--primary)" : "var(--surface-3)")};
-  color: ${(props) => (props.isAdded ? "var(--brand-on-surface)" : "var(--text-muted)")};
+  background: ${props => (props.isAdded ? 'var(--primary)' : 'var(--surface-3)')};
+  color: ${props => (props.isAdded ? 'var(--brand-on-surface)' : 'var(--text-muted)')};
   border-radius: 10px;
   display: flex;
   align-items: center;
@@ -223,9 +223,7 @@ export const AddToListModal: React.FC<AddToListModalProps> = ({
   racketName,
 }) => {
   const { lists, loading, fetchLists, addRacketToList, createList } = useList();
-  const [addingToListId, setAddingToListId] = React.useState<string | null>(
-    null
-  );
+  const [addingToListId, setAddingToListId] = React.useState<string | null>(null);
   const [showCreateModal, setShowCreateModal] = React.useState(false);
 
   useEffect(() => {
@@ -280,7 +278,7 @@ export const AddToListModal: React.FC<AddToListModalProps> = ({
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
-              onClick={(e) => e.stopPropagation()}
+              onClick={e => e.stopPropagation()}
             >
               <Header>
                 <HeaderContent>
@@ -303,13 +301,11 @@ export const AddToListModal: React.FC<AddToListModalProps> = ({
                 ) : lists.length === 0 ? (
                   <EmptyState>
                     <EmptyIcon>📋</EmptyIcon>
-                    <EmptyText>
-                      Aún no tienes listas. Crea una para empezar.
-                    </EmptyText>
+                    <EmptyText>Aún no tienes listas. Crea una para empezar.</EmptyText>
                   </EmptyState>
                 ) : (
                   <ListsGrid>
-                    {lists.map((list) => {
+                    {lists.map(list => {
                       const isAdded = false; // TODO: Implementar lógica para saber si ya está añadida
                       return (
                         <ListItem
@@ -319,17 +315,12 @@ export const AddToListModal: React.FC<AddToListModalProps> = ({
                           disabled={addingToListId === list.id}
                         >
                           <ListIcon isAdded={isAdded}>
-                            {isAdded ? (
-                              <FiCheck size={20} />
-                            ) : (
-                              <FiList size={20} />
-                            )}
+                            {isAdded ? <FiCheck size={20} /> : <FiList size={20} />}
                           </ListIcon>
                           <ListInfo>
                             <ListName>{list.name}</ListName>
                             <ListMeta>
-                              {list.racket_count || 0}{" "}
-                              {list.racket_count === 1 ? "pala" : "palas"}
+                              {list.racket_count || 0} {list.racket_count === 1 ? 'pala' : 'palas'}
                             </ListMeta>
                           </ListInfo>
                         </ListItem>

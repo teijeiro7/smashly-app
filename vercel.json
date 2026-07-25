@@ -58,9 +58,19 @@
   ],
   "headers": [
     {
-      "source": "/api/(.*)",
+      "source": "/(.*)",
       "headers": [
-        { "key": "Access-Control-Allow-Credentials", "value": "true" }
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
+        { "key": "Strict-Transport-Security", "value": "max-age=63072000; includeSubDomains" },
+        {
+          "key": "Permissions-Policy",
+          "value": "camera=(), microphone=(), geolocation=(), payment=(), usb=(), midi=()"
+        },
+        {
+          "key": "Content-Security-Policy",
+          "value": "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; manifest-src 'self'; script-src 'self' 'sha256-XgaQKKrSv+3sI3KslgzR0D3tc/ZMoroIXMftcGN1+5Q='; style-src 'self' 'unsafe-inline' https://api.fontshare.com; font-src 'self' https://cdn.fontshare.com; img-src 'self' data: blob: https://lrdgyfmkkboyhoycrnov.supabase.co https://lh3.googleusercontent.com; connect-src 'self' https://lrdgyfmkkboyhoycrnov.supabase.co wss://lrdgyfmkkboyhoycrnov.supabase.co"
+        }
       ]
     }
   ]

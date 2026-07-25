@@ -21,7 +21,9 @@ class ErrorBoundary extends Component<Props, State> {
 
   public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     logger.error('Error capturado por ErrorBoundary:', error, errorInfo);
-    Sentry.captureException(error, { contexts: { react: { componentStack: errorInfo.componentStack } } });
+    Sentry.captureException(error, {
+      contexts: { react: { componentStack: errorInfo.componentStack } },
+    });
   }
 
   private handleGoToError = () => {
@@ -50,7 +52,8 @@ class ErrorBoundary extends Component<Props, State> {
             minHeight: '100vh',
             padding: '2rem',
             textAlign: 'center',
-            background: 'linear-gradient(135deg, var(--primary-subtle) 0%, var(--primary-faint) 100%)',
+            background:
+              'linear-gradient(135deg, var(--primary-subtle) 0%, var(--primary-faint) 100%)',
           }}
         >
           <div
@@ -63,16 +66,28 @@ class ErrorBoundary extends Component<Props, State> {
               boxShadow: '0 10px 40px rgba(var(--primary-rgb), 0.12)',
             }}
           >
-            <h1 style={{ fontSize: '3rem', margin: '0', color: 'var(--danger)', fontWeight: '700' }}>
+            <h1
+              style={{ fontSize: '3rem', margin: '0', color: 'var(--danger)', fontWeight: '700' }}
+            >
               ¡Ups!
             </h1>
             <h2 style={{ fontSize: '1.5rem', margin: '1rem 0', color: 'var(--text)' }}>
               Algo salió mal
             </h2>
-            <p style={{ fontSize: '1rem', color: 'var(--text-muted)', margin: '1.5rem 0', lineHeight: '1.6' }}>
-              Ha ocurrido un error inesperado. Puedes intentar recargar la página o volver al inicio.
+            <p
+              style={{
+                fontSize: '1rem',
+                color: 'var(--text-muted)',
+                margin: '1.5rem 0',
+                lineHeight: '1.6',
+              }}
+            >
+              Ha ocurrido un error inesperado. Puedes intentar recargar la página o volver al
+              inicio.
             </p>
-            <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', marginTop: '2rem' }}>
+            <div
+              style={{ display: 'flex', gap: '1rem', justifyContent: 'center', marginTop: '2rem' }}
+            >
               <button
                 onClick={this.handleRetry}
                 style={{

@@ -22,7 +22,9 @@ export const removeAuthToken = (): void => {
   // Also clean any legacy localStorage tokens from before this migration
   try {
     localStorage.removeItem('auth_token');
-  } catch (_) { /* ignore */ }
+  } catch (_) {
+    /* ignore */
+  }
 };
 
 /**
@@ -156,10 +158,7 @@ export const detectOrphanedTokens = (): string[] => {
     }
 
     if (orphanedKeys.length > 0) {
-      logger.warn(
-        `🔍 Detected ${orphanedKeys.length} potential orphaned auth keys:`,
-        orphanedKeys
-      );
+      logger.warn(`🔍 Detected ${orphanedKeys.length} potential orphaned auth keys:`, orphanedKeys);
     }
 
     return orphanedKeys;

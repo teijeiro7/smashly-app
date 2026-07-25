@@ -69,7 +69,9 @@ const Tab = styled.button<{ $active: boolean }>`
   font-weight: 500;
   border: none;
   cursor: pointer;
-  transition: background-color 0.2s ease, color 0.2s ease;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
   white-space: nowrap;
   background: ${props => (props.$active ? 'var(--text)' : 'transparent')};
   color: ${props => (props.$active ? 'white' : 'var(--text-muted)')};
@@ -182,7 +184,9 @@ const ListItem = styled(motion.div)`
   background: var(--surface-2);
   border-radius: 12px;
   border: 1px solid transparent;
-  transition: background-color 0.2s ease, border-color 0.2s ease;
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease;
 
   &:hover {
     background: var(--surface);
@@ -237,13 +241,16 @@ const IconButton = styled(motion.button)<{ $variant?: 'danger' }>`
   justify-content: center;
   border: none;
   cursor: pointer;
-  transition: background-color 0.2s ease, color 0.2s ease;
-  background: ${props => props.$variant === 'danger' ? 'var(--danger-subtle)' : 'var(--surface-3)'};
-  color: ${props => props.$variant === 'danger' ? 'var(--danger)' : 'var(--text-muted)'};
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
+  background: ${props =>
+    props.$variant === 'danger' ? 'var(--danger-subtle)' : 'var(--surface-3)'};
+  color: ${props => (props.$variant === 'danger' ? 'var(--danger)' : 'var(--text-muted)')};
 
   &:hover {
-    background: ${props => props.$variant === 'danger' ? 'var(--danger)' : 'var(--text)'};
-    color: ${props => props.$variant === 'danger' ? 'white' : 'white'};
+    background: ${props => (props.$variant === 'danger' ? 'var(--danger)' : 'var(--text)')};
+    color: ${props => (props.$variant === 'danger' ? 'white' : 'white')};
   }
 `;
 
@@ -283,7 +290,9 @@ const FormInput = styled.input`
   border: 1px solid var(--border);
   border-radius: 8px;
   font-size: 0.875rem;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
   background: var(--surface);
 
   &:focus {
@@ -302,8 +311,6 @@ const FormActions = styled.div`
   gap: 0.625rem;
   justify-content: flex-end;
 `;
-
-
 
 const EmptyState = styled.div`
   text-align: center;
@@ -373,7 +380,9 @@ const SettingsInput = styled.input`
   border: 1px solid var(--border);
   border-radius: 8px;
   font-size: 0.875rem;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
   background: var(--surface);
 
   &:focus {
@@ -528,23 +537,41 @@ const SettingsContent: React.FC = () => {
           <Subtitle>Gestiona marcas, categorías y opciones del sistema</Subtitle>
         </HeaderInfo>
         <TabsContainer>
-          <Tab $active={activeTab === 'brands'} onClick={() => { setActiveTab('brands'); setIsAdding(false); }}>
+          <Tab
+            $active={activeTab === 'brands'}
+            onClick={() => {
+              setActiveTab('brands');
+              setIsAdding(false);
+            }}
+          >
             <FiTag /> Marcas
           </Tab>
-          <Tab $active={activeTab === 'categories'} onClick={() => { setActiveTab('categories'); setIsAdding(false); }}>
+          <Tab
+            $active={activeTab === 'categories'}
+            onClick={() => {
+              setActiveTab('categories');
+              setIsAdding(false);
+            }}
+          >
             <FiGrid /> Categorías
           </Tab>
-          <Tab $active={activeTab === 'general'} onClick={() => { setActiveTab('general'); setIsAdding(false); }}>
+          <Tab
+            $active={activeTab === 'general'}
+            onClick={() => {
+              setActiveTab('general');
+              setIsAdding(false);
+            }}
+          >
             <FiSettings /> General
           </Tab>
         </TabsContainer>
       </HeaderSection>
 
       <MainContent>
-        <AnimatePresence mode="wait">
+        <AnimatePresence mode='wait'>
           {activeTab === 'brands' && (
             <motion.div
-              key="brands"
+              key='brands'
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -8 }}
@@ -585,7 +612,7 @@ const SettingsContent: React.FC = () => {
                           <FormGroup>
                             <FormLabel>Nombre de la marca</FormLabel>
                             <FormInput
-                              placeholder="Ej: Babolat"
+                              placeholder='Ej: Babolat'
                               value={newBrandName}
                               onChange={e => setNewBrandName(e.target.value)}
                             />
@@ -593,14 +620,16 @@ const SettingsContent: React.FC = () => {
                           <FormGroup>
                             <FormLabel>País de origen</FormLabel>
                             <FormInput
-                              placeholder="Ej: Francia"
+                              placeholder='Ej: Francia'
                               value={newBrandCountry}
                               onChange={e => setNewBrandCountry(e.target.value)}
                             />
                           </FormGroup>
                         </FormGrid>
                         <FormActions>
-                          <Button variant='secondary' onClick={() => setIsAdding(false)}>Cancelar</Button>
+                          <Button variant='secondary' onClick={() => setIsAdding(false)}>
+                            Cancelar
+                          </Button>
                           <Button variant='primary' onClick={handleAddBrand}>
                             <FiCheck /> Guardar
                           </Button>
@@ -611,29 +640,33 @@ const SettingsContent: React.FC = () => {
                   <ListContainer>
                     {brands.length === 0 ? (
                       <EmptyState>
-                        <EmptyIcon><FiTag /></EmptyIcon>
+                        <EmptyIcon>
+                          <FiTag />
+                        </EmptyIcon>
                         <p>No hay marcas registradas</p>
                       </EmptyState>
                     ) : (
-                      brands.map((brand) => (
+                      brands.map(brand => (
                         <ListItem
                           key={brand.name}
                           initial={{ opacity: 0, x: -8 }}
                           animate={{ opacity: 1, x: 0 }}
                         >
                           <ItemInfo>
-                            <ItemAvatar color="#8b5cf6">{brand.name.charAt(0)}</ItemAvatar>
+                            <ItemAvatar color='#8b5cf6'>{brand.name.charAt(0)}</ItemAvatar>
                             <ItemDetails>
                               <ItemName>{brand.name}</ItemName>
                               <ItemMeta>
                                 {brand.country}
-                                <Badge color="#8b5cf6"><FiPackage size={10} /> {brand.racketCount}</Badge>
+                                <Badge color='#8b5cf6'>
+                                  <FiPackage size={10} /> {brand.racketCount}
+                                </Badge>
                               </ItemMeta>
                             </ItemDetails>
                           </ItemInfo>
                           <ItemActions>
                             <IconButton
-                              $variant="danger"
+                              $variant='danger'
                               onClick={() => handleDeleteBrand(brand.name)}
                               whileHover={{ scale: 1.05 }}
                               whileTap={{ scale: 0.95 }}
@@ -652,7 +685,7 @@ const SettingsContent: React.FC = () => {
 
           {activeTab === 'categories' && (
             <motion.div
-              key="categories"
+              key='categories'
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -8 }}
@@ -689,7 +722,7 @@ const SettingsContent: React.FC = () => {
                           <FormGroup>
                             <FormLabel>Nombre de la categoría</FormLabel>
                             <FormInput
-                              placeholder="Ej: Redonda"
+                              placeholder='Ej: Redonda'
                               value={newCategoryName}
                               onChange={e => setNewCategoryName(e.target.value)}
                             />
@@ -697,14 +730,16 @@ const SettingsContent: React.FC = () => {
                           <FormGroup>
                             <FormLabel>Descripción</FormLabel>
                             <FormInput
-                              placeholder="Breve descripción"
+                              placeholder='Breve descripción'
                               value={newCategoryDesc}
                               onChange={e => setNewCategoryDesc(e.target.value)}
                             />
                           </FormGroup>
                         </FormGrid>
                         <FormActions>
-                          <Button variant='secondary' onClick={() => setIsAdding(false)}>Cancelar</Button>
+                          <Button variant='secondary' onClick={() => setIsAdding(false)}>
+                            Cancelar
+                          </Button>
                           <Button variant='primary' onClick={handleAddCategory}>
                             <FiCheck /> Guardar
                           </Button>
@@ -715,18 +750,22 @@ const SettingsContent: React.FC = () => {
                   <ListContainer>
                     {categories.length === 0 ? (
                       <EmptyState>
-                        <EmptyIcon><FiGrid /></EmptyIcon>
+                        <EmptyIcon>
+                          <FiGrid />
+                        </EmptyIcon>
                         <p>No hay categorías registradas</p>
                       </EmptyState>
                     ) : (
-                      categories.map((category) => (
+                      categories.map(category => (
                         <ListItem
                           key={category.name}
                           initial={{ opacity: 0, x: -8 }}
                           animate={{ opacity: 1, x: 0 }}
                         >
                           <ItemInfo>
-                            <ItemAvatar color="var(--primary)">{category.name.charAt(0)}</ItemAvatar>
+                            <ItemAvatar color='var(--primary)'>
+                              {category.name.charAt(0)}
+                            </ItemAvatar>
                             <ItemDetails>
                               <ItemName>{category.name}</ItemName>
                               <ItemMeta>{category.description}</ItemMeta>
@@ -734,7 +773,7 @@ const SettingsContent: React.FC = () => {
                           </ItemInfo>
                           <ItemActions>
                             <IconButton
-                              $variant="danger"
+                              $variant='danger'
                               onClick={() => handleDeleteCategory(category.name)}
                               whileHover={{ scale: 1.05 }}
                               whileTap={{ scale: 0.95 }}
@@ -753,7 +792,7 @@ const SettingsContent: React.FC = () => {
 
           {activeTab === 'general' && (
             <motion.div
-              key="general"
+              key='general'
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -8 }}
@@ -769,12 +808,16 @@ const SettingsContent: React.FC = () => {
                   <SettingsGrid>
                     <SettingsCard>
                       <SettingsRow>
-                        <SettingsIcon color="var(--text)"><FiTag /></SettingsIcon>
+                        <SettingsIcon color='var(--text)'>
+                          <FiTag />
+                        </SettingsIcon>
                         <SettingsInfo style={{ flex: 1 }}>
                           <SettingsLabel>Nombre de la Aplicación</SettingsLabel>
                           <SettingsInput
                             value={generalSettings.appName}
-                            onChange={e => setGeneralSettings({ ...generalSettings, appName: e.target.value })}
+                            onChange={e =>
+                              setGeneralSettings({ ...generalSettings, appName: e.target.value })
+                            }
                           />
                         </SettingsInfo>
                       </SettingsRow>
@@ -782,13 +825,20 @@ const SettingsContent: React.FC = () => {
 
                     <SettingsCard>
                       <SettingsRow>
-                        <SettingsIcon color="var(--info)"><FiMail /></SettingsIcon>
+                        <SettingsIcon color='var(--info)'>
+                          <FiMail />
+                        </SettingsIcon>
                         <SettingsInfo style={{ flex: 1 }}>
                           <SettingsLabel>Email de Contacto</SettingsLabel>
                           <SettingsInput
-                            type="email"
+                            type='email'
                             value={generalSettings.contactEmail}
-                            onChange={e => setGeneralSettings({ ...generalSettings, contactEmail: e.target.value })}
+                            onChange={e =>
+                              setGeneralSettings({
+                                ...generalSettings,
+                                contactEmail: e.target.value,
+                              })
+                            }
                           />
                         </SettingsInfo>
                       </SettingsRow>
@@ -796,12 +846,16 @@ const SettingsContent: React.FC = () => {
 
                     <SettingsCard>
                       <SettingsRow>
-                        <SettingsIcon color="#06b6d4"><FiGlobe /></SettingsIcon>
+                        <SettingsIcon color='#06b6d4'>
+                          <FiGlobe />
+                        </SettingsIcon>
                         <SettingsInfo style={{ flex: 1 }}>
                           <SettingsLabel>URL del Sitio Web</SettingsLabel>
                           <SettingsInput
                             value={generalSettings.websiteUrl}
-                            onChange={e => setGeneralSettings({ ...generalSettings, websiteUrl: e.target.value })}
+                            onChange={e =>
+                              setGeneralSettings({ ...generalSettings, websiteUrl: e.target.value })
+                            }
                           />
                         </SettingsInfo>
                       </SettingsRow>
@@ -833,7 +887,7 @@ const AdminSettingsPageWithLayout: React.FC = () => {
   }
 
   if (!user || user.role?.toLowerCase() !== 'admin') {
-    return <Navigate to="/profile" replace />;
+    return <Navigate to='/profile' replace />;
   }
 
   return (

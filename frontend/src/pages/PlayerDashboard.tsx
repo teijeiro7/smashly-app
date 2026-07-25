@@ -4,7 +4,16 @@ import { useAuth } from '../contexts/AuthContext';
 import { racketImageUrl } from '../utils/imageUrl';
 import { Link, useRouterState, useNavigate } from '@tanstack/react-router';
 import { QuickActionCard } from '../components/dashboard/QuickActionCard';
-import { FaLightbulb, FaBalanceScale, FaChartBar, FaUser, FaBullseye, FaHeart, FaFire, FaStar } from 'react-icons/fa';
+import {
+  FaLightbulb,
+  FaBalanceScale,
+  FaChartBar,
+  FaUser,
+  FaBullseye,
+  FaHeart,
+  FaFire,
+  FaStar,
+} from 'react-icons/fa';
 import racketService from '../services/racketService';
 import { RacketViewService, RecentlyViewedRacket } from '../services/racketViewService';
 import { Racket } from '../types/racket';
@@ -167,7 +176,10 @@ const RacketCard = styled.div`
   padding: 1rem;
   box-shadow: 0 2px 10px var(--shadow-color);
   border: 1px solid rgba(22, 163, 74, 0.1);
-  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease,
+    border-color 0.3s ease;
   cursor: pointer;
 
   &:hover {
@@ -237,7 +249,12 @@ const RecommendationSection = styled.section`
 `;
 
 const RecommendationHero = styled.div`
-  background: linear-gradient(135deg, var(--brand-surface-deep) 0%, var(--brand-surface-strong) 55%, var(--brand-surface) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--brand-surface-deep) 0%,
+    var(--brand-surface-strong) 55%,
+    var(--brand-surface) 100%
+  );
   border-radius: 24px;
   padding: clamp(1.25rem, 3vw, 2rem);
   color: white;
@@ -302,7 +319,9 @@ const RecommendationActionButton = styled.button`
   color: var(--brand-surface-strong);
   font-weight: 700;
   cursor: pointer;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
 
   &:hover {
     transform: translateY(-2px);
@@ -358,7 +377,6 @@ const RacketImageSmall = styled.img`
   height: 180px;
   object-fit: contain;
 `;
-
 
 const ScoreRow = styled.div`
   display: flex;
@@ -448,7 +466,10 @@ const DetailLinkButton = styled(Link)`
   color: white;
   font-weight: 700;
   text-decoration: none;
-  transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    background-color 0.2s ease;
 
   &:hover {
     transform: translateY(-1px);
@@ -484,7 +505,10 @@ const formatRecommendationModelName = (name?: string | null, brand?: string | nu
   }
 
   let normalized = rawName || rawBrand;
-  normalized = normalized.replace(/\s*\([^)]*\)\s*/g, ' ').replace(/\s+/g, ' ').trim();
+  normalized = normalized
+    .replace(/\s*\([^)]*\)\s*/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
 
   if (rawBrand) {
     const lowerBrand = rawBrand.toLowerCase();
@@ -636,7 +660,9 @@ export const PlayerDashboard: React.FC = () => {
 
         {/* Quick Actions */}
         <Section>
-          <SectionTitle><FaBullseye /> Accesos Rápidos</SectionTitle>
+          <SectionTitle>
+            <FaBullseye /> Accesos Rápidos
+          </SectionTitle>
           <QuickActionsGrid>
             {quickActions.map((action, index) => (
               <QuickActionCard key={index} {...action} />
@@ -647,7 +673,9 @@ export const PlayerDashboard: React.FC = () => {
         {/* Favorites Preview */}
         {favorites.length > 0 && (
           <Section>
-            <SectionTitle><FaHeart /> Tus Favoritas</SectionTitle>
+            <SectionTitle>
+              <FaHeart /> Tus Favoritas
+            </SectionTitle>
             <RacketsGrid>
               {favorites.map(racket => (
                 <RacketCard
@@ -663,14 +691,18 @@ export const PlayerDashboard: React.FC = () => {
                 </RacketCard>
               ))}
             </RacketsGrid>
-            <ViewAllButton onClick={() => navigate({ to: '/favorites' as any })}>Ver todas →</ViewAllButton>
+            <ViewAllButton onClick={() => navigate({ to: '/favorites' as any })}>
+              Ver todas →
+            </ViewAllButton>
           </Section>
         )}
 
         {/* Recently Viewed Rackets */}
         {recentlyViewed.length > 0 && (
           <Section>
-            <SectionTitle><FaStar /> Últimas Palas Vistas</SectionTitle>
+            <SectionTitle>
+              <FaStar /> Últimas Palas Vistas
+            </SectionTitle>
             <RacketsGrid>
               {recentlyViewed.slice(0, 4).map(racket => (
                 <RacketCard
@@ -692,7 +724,9 @@ export const PlayerDashboard: React.FC = () => {
         {/* Offers */}
         {offers.length > 0 && (
           <Section>
-            <SectionTitle><FaFire /> Ofertas que te pueden interesar</SectionTitle>
+            <SectionTitle>
+              <FaFire /> Ofertas que te pueden interesar
+            </SectionTitle>
             <RacketsGrid>
               {offers.map(racket => (
                 <RacketCard
@@ -743,8 +777,8 @@ export const PlayerDashboard: React.FC = () => {
                 <>
                   <strong>Averigua cuál es tu siguiente pala</strong>
                   <span>
-                    Completa el formulario y guardaremos tus 3 primeras recomendaciones para que
-                    las tengas siempre a mano.
+                    Completa el formulario y guardaremos tus 3 primeras recomendaciones para que las
+                    tengas siempre a mano.
                   </span>
                   <RecommendationActionButton onClick={() => setShowFinderModal(true)}>
                     Averigua cuál es tu siguiente pala
@@ -757,36 +791,45 @@ export const PlayerDashboard: React.FC = () => {
 
         {hasRecommendation && (
           <Section>
-            <SectionTitle><FaStar /> Tus próximas palas</SectionTitle>
+            <SectionTitle>
+              <FaStar /> Tus próximas palas
+            </SectionTitle>
             <RecommendationsGrid>
-              {lastRecommendation!.recommendation_result.rackets.slice(0, 3).map((racket, index) => (
-                <RecommendedRacketCard key={racket.id}>
-                  <RacketPosition>#{index + 1}</RacketPosition>
-                  <RacketImageWrap>
-                    {racket.image ? <RacketImageSmall src={racket.image} alt={racket.name} /> : null}
-                  </RacketImageWrap>
-                  <RecommendedRacketBody>
-                    <div>
-                      <RacketName>{formatRecommendationModelName(racket.name, racket.brand)}</RacketName>
-                      <ScoreRow>
-                        <ScoreLabel>Match</ScoreLabel>
-                        <ScoreBarTrack>
-                          <ScoreBarFill $pct={racket.match_score} />
-                        </ScoreBarTrack>
-                        <ScoreValue>{(racket.match_score / 10).toFixed(1)}/10</ScoreValue>
-                      </ScoreRow>
-                      {racket.price
-                        ? <PriceTag>€{racket.price.toFixed(2)}</PriceTag>
-                        : <NoPriceTag>Solo para recomendación</NoPriceTag>
-                      }
-                    </div>
-                    <RacketReason>{racket.reason}</RacketReason>
-                  </RecommendedRacketBody>
-                  <DetailLinkButton to={`/racket-detail?id=${racket.id}`}>
-                    Ver detalle
-                  </DetailLinkButton>
-                </RecommendedRacketCard>
-              ))}
+              {lastRecommendation!.recommendation_result.rackets
+                .slice(0, 3)
+                .map((racket, index) => (
+                  <RecommendedRacketCard key={racket.id}>
+                    <RacketPosition>#{index + 1}</RacketPosition>
+                    <RacketImageWrap>
+                      {racket.image ? (
+                        <RacketImageSmall src={racket.image} alt={racket.name} />
+                      ) : null}
+                    </RacketImageWrap>
+                    <RecommendedRacketBody>
+                      <div>
+                        <RacketName>
+                          {formatRecommendationModelName(racket.name, racket.brand)}
+                        </RacketName>
+                        <ScoreRow>
+                          <ScoreLabel>Match</ScoreLabel>
+                          <ScoreBarTrack>
+                            <ScoreBarFill $pct={racket.match_score} />
+                          </ScoreBarTrack>
+                          <ScoreValue>{(racket.match_score / 10).toFixed(1)}/10</ScoreValue>
+                        </ScoreRow>
+                        {racket.price ? (
+                          <PriceTag>€{racket.price.toFixed(2)}</PriceTag>
+                        ) : (
+                          <NoPriceTag>Solo para recomendación</NoPriceTag>
+                        )}
+                      </div>
+                      <RacketReason>{racket.reason}</RacketReason>
+                    </RecommendedRacketBody>
+                    <DetailLinkButton to={`/racket-detail?id=${racket.id}`}>
+                      Ver detalle
+                    </DetailLinkButton>
+                  </RecommendedRacketCard>
+                ))}
             </RecommendationsGrid>
           </Section>
         )}

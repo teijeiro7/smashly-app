@@ -269,7 +269,11 @@ const ActionButton = styled.button<{ variant?: 'primary' | 'danger' }>`
         ? 'linear-gradient(135deg, var(--primary) 0%, var(--success) 100%)'
         : 'var(--surface-2)'};
   color: ${props =>
-    props.variant === 'danger' ? 'var(--danger)' : props.variant === 'primary' ? 'white' : 'var(--text)'};
+    props.variant === 'danger'
+      ? 'var(--danger)'
+      : props.variant === 'primary'
+        ? 'white'
+        : 'var(--text)'};
 
   &:hover {
     transform: translateY(-2px);

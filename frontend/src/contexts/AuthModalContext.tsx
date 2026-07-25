@@ -32,11 +32,13 @@ export const AuthModalProvider: React.FC<{ children: ReactNode }> = ({ children 
   };
 
   const toggleView = () => {
-    setView((prev) => (prev === 'login' ? 'register' : 'login'));
+    setView(prev => (prev === 'login' ? 'register' : 'login'));
   };
 
   return (
-    <AuthModalContext.Provider value={{ isOpen, view, openLogin, openRegister, closeModal, toggleView }}>
+    <AuthModalContext.Provider
+      value={{ isOpen, view, openLogin, openRegister, closeModal, toggleView }}
+    >
       {children}
     </AuthModalContext.Provider>
   );

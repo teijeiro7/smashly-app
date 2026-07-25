@@ -447,10 +447,11 @@ export const GlobalSearch: React.FC<GlobalSearchProps> = ({
         const racketResults = searchReadyRackets
           .filter(racket => {
             const queryWords = query.split(/\s+/);
-            return queryWords.every(word => 
-              racket._lowName.includes(word) || 
-              racket._lowBrand.includes(word) || 
-              racket._lowModel.includes(word)
+            return queryWords.every(
+              word =>
+                racket._lowName.includes(word) ||
+                racket._lowBrand.includes(word) ||
+                racket._lowModel.includes(word)
             );
           })
           .slice(0, 6);

@@ -154,14 +154,12 @@ export const NotificationBell: React.FC = () => {
 
   return (
     <BellContainer ref={dropdownRef}>
-      <BellButton onClick={handleBellClick} aria-label="Notificaciones">
+      <BellButton onClick={handleBellClick} aria-label='Notificaciones'>
         <FiBell />
         {unreadCount > 0 && <Badge>{unreadCount > 99 ? '99+' : unreadCount}</Badge>}
       </BellButton>
-      
-      {isDropdownOpen && (
-        <NotificationDropdown onClose={handleCloseDropdown} />
-      )}
+
+      {isDropdownOpen && <NotificationDropdown onClose={handleCloseDropdown} />}
     </BellContainer>
   );
 };
@@ -194,14 +192,12 @@ export const MobileNotificationBell: React.FC = () => {
 
   return (
     <BellContainer ref={dropdownRef}>
-      <MobileBellButton onClick={() => setIsOpen(!isOpen)} aria-label="Notificaciones">
+      <MobileBellButton onClick={() => setIsOpen(!isOpen)} aria-label='Notificaciones'>
         <FiBell />
         {unreadCount > 0 && <MobileBadge>{unreadCount > 99 ? '99+' : unreadCount}</MobileBadge>}
       </MobileBellButton>
-      
-      {isOpen && (
-        <NotificationDropdown onClose={() => setIsOpen(false)} />
-      )}
+
+      {isOpen && <NotificationDropdown onClose={() => setIsOpen(false)} />}
     </BellContainer>
   );
 };

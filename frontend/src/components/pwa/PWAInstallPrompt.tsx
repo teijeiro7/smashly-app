@@ -134,9 +134,10 @@ export const PWAInstallPrompt: React.FC = () => {
 
   useEffect(() => {
     // 1. Check if already installed
-    const isStandalone = window.matchMedia('(display-mode: standalone)').matches 
-      || (window.navigator as any).standalone 
-      || document.referrer.includes('android-app://');
+    const isStandalone =
+      window.matchMedia('(display-mode: standalone)').matches ||
+      (window.navigator as any).standalone ||
+      document.referrer.includes('android-app://');
 
     if (isStandalone) return;
 
@@ -144,7 +145,7 @@ export const PWAInstallPrompt: React.FC = () => {
     const ua = window.navigator.userAgent.toLowerCase();
     const isIOS = /iphone|ipad|ipod/.test(ua);
     const isAndroid = /android/.test(ua);
-    
+
     if (isIOS) setPlatform('ios');
     else if (isAndroid) setPlatform('android');
 
@@ -152,7 +153,7 @@ export const PWAInstallPrompt: React.FC = () => {
     const handler = (e: Event) => {
       e.preventDefault();
       setDeferredPrompt(e as BeforeInstallPromptEvent);
-      
+
       // Only show if not dismissed recently
       const dismissedUntil = localStorage.getItem('pwa-prompt-dismissed-until');
       if (!dismissedUntil || new Date().getTime() > parseInt(dismissedUntil)) {
@@ -179,7 +180,7 @@ export const PWAInstallPrompt: React.FC = () => {
 
     deferredPrompt.prompt();
     const { outcome } = await deferredPrompt.userChoice;
-    
+
     if (outcome === 'accepted') {
       setIsVisible(false);
     }
@@ -212,8 +213,8 @@ export const PWAInstallPrompt: React.FC = () => {
           </Header>
 
           <Content>
-            ¡Consigue la mejor experiencia! Instala nuestra app para acceder rápidamente a tus
-            palas favoritas y comparar precios en segundos.
+            ¡Consigue la mejor experiencia! Instala nuestra app para acceder rápidamente a tus palas
+            favoritas y comparar precios en segundos.
           </Content>
 
           {platform === 'ios' ? (
@@ -226,9 +227,7 @@ export const PWAInstallPrompt: React.FC = () => {
               </div>
             </IOSInstructions>
           ) : (
-            <ActionButton onClick={handleInstall}>
-              Instalar App
-            </ActionButton>
+            <ActionButton onClick={handleInstall}>Instalar App</ActionButton>
           )}
         </PromptContainer>
       )}

@@ -24,16 +24,25 @@ export interface CatalogSearchResult {
   brand: string;
   model: string;
   images: string[];
+  // Nombre fijado por el productor: api/_v1/stores/catalog/[storeId]/search.ts
+  // devuelve `_score`, así que renombrarlo aquí rompería el mapeo.
+  // eslint-disable-next-line @typescript-eslint/naming-convention
   _score: number;
 }
 
 async function getToken(): Promise<string> {
-  const { data: { session } } = await supabase.auth.getSession();
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
   return session?.access_token || '';
 }
 
 const catalogService = {
-  async list(storeId: string, page = 1, limit = 50): Promise<{ data: StorePrice[]; total: number }> {
+  async list(
+    storeId: string,
+    page = 1,
+    limit = 50
+  ): Promise<{ data: StorePrice[]; total: number }> {
     const token = await getToken();
     const url = new URL(`${API_URL}${API_ENDPOINTS.STORES_CATALOG(storeId)}`);
     url.searchParams.set('page', String(page));
@@ -51,13 +60,16 @@ const catalogService = {
     return res.json();
   },
 
-  async add(storeId: string, data: {
-    racket_id: number;
-    price?: number;
-    original_price?: number;
-    link?: string;
-    in_stock?: boolean;
-  }): Promise<StorePrice> {
+  async add(
+    storeId: string,
+    data: {
+      racket_id: number;
+      price?: number;
+      original_price?: number;
+      link?: string;
+      in_stock?: boolean;
+    }
+  ): Promise<StorePrice> {
     const token = await getToken();
     const res = await fetch(`${API_URL}${API_ENDPOINTS.STORES_CATALOG(storeId)}`, {
       method: 'POST',
@@ -73,12 +85,16 @@ const catalogService = {
     return res.json();
   },
 
-  async update(storeId: string, priceId: string, data: {
-    price?: number;
-    original_price?: number;
-    link?: string;
-    in_stock?: boolean;
-  }): Promise<StorePrice> {
+  async update(
+    storeId: string,
+    priceId: string,
+    data: {
+      price?: number;
+      original_price?: number;
+      link?: string;
+      in_stock?: boolean;
+    }
+  ): Promise<StorePrice> {
     const token = await getToken();
     const res = await fetch(`${API_URL}${API_ENDPOINTS.STORES_CATALOG_ITEM(storeId, priceId)}`, {
       method: 'PUT',
@@ -107,7 +123,12 @@ const catalogService = {
     }
   },
 
-  async search(storeId: string, query: string, page = 1, limit = 20): Promise<{ data: CatalogSearchResult[]; total: number }> {
+  async search(
+    storeId: string,
+    query: string,
+    page = 1,
+    limit = 20
+  ): Promise<{ data: CatalogSearchResult[]; total: number }> {
     const token = await getToken();
     const res = await fetch(`${API_URL}${API_ENDPOINTS.STORES_CATALOG_SEARCH(storeId)}`, {
       method: 'POST',

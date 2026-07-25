@@ -92,7 +92,10 @@ const OptionCard = styled.button<{ $selected: boolean }>`
   border: 1.5px solid ${props => (props.$selected ? 'var(--primary-hover)' : 'var(--border)')};
   background: ${props => (props.$selected ? 'var(--surface-2)' : 'var(--surface)')};
   cursor: pointer;
-  transition: border-color 0.15s ease, background-color 0.15s ease, transform 0.15s ease;
+  transition:
+    border-color 0.15s ease,
+    background-color 0.15s ease,
+    transform 0.15s ease;
   text-align: left;
   font-size: 0.95rem;
   font-weight: 500;
@@ -118,9 +121,13 @@ const Input = styled.input`
   color: var(--text);
   font-size: 0.95rem;
   font-weight: 500;
-  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
 
-  &::placeholder { color: var(--text-subtle); }
+  &::placeholder {
+    color: var(--text-subtle);
+  }
 
   &:focus {
     outline: none;
@@ -140,9 +147,13 @@ const TextArea = styled.textarea`
   font-weight: 500;
   min-height: 100px;
   resize: vertical;
-  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
 
-  &::placeholder { color: var(--text-subtle); }
+  &::placeholder {
+    color: var(--text-subtle);
+  }
 
   &:focus {
     outline: none;
@@ -174,7 +185,10 @@ const NavButton = styled.button<{ $primary?: boolean }>`
   cursor: pointer;
   background: ${props => (props.$primary ? 'var(--primary-hover)' : 'var(--surface-3)')};
   color: ${props => (props.$primary ? 'var(--brand-on-surface)' : 'var(--text)')};
-  transition: background-color 0.15s ease, transform 0.15s ease, color 0.15s ease;
+  transition:
+    background-color 0.15s ease,
+    transform 0.15s ease,
+    color 0.15s ease;
   font-size: 0.95rem;
   flex: 1;
   letter-spacing: -0.01em;
@@ -229,7 +243,9 @@ const CheckboxLabel = styled.label`
   border: 1.5px solid var(--border);
   background: var(--surface);
   cursor: pointer;
-  transition: border-color 0.15s ease, background-color 0.15s ease;
+  transition:
+    border-color 0.15s ease,
+    background-color 0.15s ease;
   font-weight: 500;
   color: var(--text);
   font-size: 0.95rem;
@@ -548,7 +564,12 @@ const ADVANCED_QUESTIONS: Question[] = [
   },
 ];
 
-export const WizardForm: React.FC<WizardFormProps> = ({ mode, onSubmit, isLoading, initialData }) => {
+export const WizardForm: React.FC<WizardFormProps> = ({
+  mode,
+  onSubmit,
+  isLoading,
+  initialData,
+}) => {
   const questions = mode === 'basic' ? BASIC_QUESTIONS : ADVANCED_QUESTIONS;
   const [currentIndex, setCurrentIndex] = useState(0);
 
@@ -595,7 +616,7 @@ export const WizardForm: React.FC<WizardFormProps> = ({ mode, onSubmit, isLoadin
   useEffect(() => {
     setFormData(getInitialData());
     setCurrentIndex(0);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialData]);
 
   const currentQuestion = questions[currentIndex];
@@ -649,7 +670,9 @@ export const WizardForm: React.FC<WizardFormProps> = ({ mode, onSubmit, isLoadin
           <ProgressFill style={{ width: `${progress}%` }} />
         </ProgressBar>
         <ProgressCounter>
-          <ProgressText>Pregunta {currentIndex + 1} de {questions.length}</ProgressText>
+          <ProgressText>
+            Pregunta {currentIndex + 1} de {questions.length}
+          </ProgressText>
           <ProgressText>{Math.round(progress)}%</ProgressText>
         </ProgressCounter>
       </ProgressBarContainer>

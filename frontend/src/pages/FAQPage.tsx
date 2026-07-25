@@ -1,19 +1,14 @@
-import React, { useState } from "react";
-import {
-  FiChevronDown,
-  FiChevronUp,
-  FiHelpCircle,
-  FiMail,
-} from "react-icons/fi";
-import styled from "styled-components";
-import SEO from "../components/seo/SEO";
+import React, { useState } from 'react';
+import { FiChevronDown, FiChevronUp, FiHelpCircle, FiMail } from 'react-icons/fi';
+import styled from 'styled-components';
+import SEO from '../components/seo/SEO';
 import {
   organizationSchema,
   webPageSchema,
   breadcrumbSchema,
   faqSchema,
-} from "../utils/seoSchemas";
-import { buildUrl, allKeywords } from "../config/seo";
+} from '../utils/seoSchemas';
+import { buildUrl, allKeywords } from '../config/seo';
 
 // Interface for FAQ item structure
 interface FAQItem {
@@ -116,52 +111,47 @@ const CategoryScrollContainer = styled.div`
 const CategoryButton = styled.button<{ $isActive: boolean }>`
   padding: 0.625rem 1.25rem;
   border-radius: 50px;
-  background: ${(props) =>
+  background: ${props =>
     props.$isActive
-      ? "linear-gradient(135deg, var(--primary-hover) 0%, var(--success) 100%)"
-      : "white"};
-  border: 2px solid ${(props) => (props.$isActive ? "var(--primary-hover)" : "var(--border)")};
+      ? 'linear-gradient(135deg, var(--primary-hover) 0%, var(--success) 100%)'
+      : 'white'};
+  border: 2px solid ${props => (props.$isActive ? 'var(--primary-hover)' : 'var(--border)')};
   font-size: 0.8125rem;
-  font-weight: ${(props) => (props.$isActive ? "600" : "500")};
-  color: ${(props) => (props.$isActive ? "white" : "var(--text-muted)")};
+  font-weight: ${props => (props.$isActive ? '600' : '500')};
+  color: ${props => (props.$isActive ? 'white' : 'var(--text-muted)')};
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   white-space: nowrap;
   position: relative;
   overflow: hidden;
-  box-shadow: ${(props) =>
+  box-shadow: ${props =>
     props.$isActive
-      ? "0 4px 14px rgba(var(--primary-rgb-dark), 0.3)"
-      : "0 2px 4px rgba(0, 0, 0, 0.05)"};
+      ? '0 4px 14px rgba(var(--primary-rgb-dark), 0.3)'
+      : '0 2px 4px rgba(0, 0, 0, 0.05)'};
 
   &::before {
-    content: "";
+    content: '';
     position: absolute;
     top: 0;
     left: -100%;
     width: 100%;
     height: 100%;
-    background: linear-gradient(
-      90deg,
-      transparent,
-      rgba(255, 255, 255, 0.2),
-      transparent
-    );
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
     transition: left 0.5s;
   }
 
   &:hover {
     transform: translateY(-2px);
-    background: ${(props) =>
+    background: ${props =>
       props.$isActive
-        ? "linear-gradient(135deg, var(--success) 0%, var(--success) 100%)"
-        : "var(--surface-2)"};
-    border-color: ${(props) => (props.$isActive ? "var(--success)" : "var(--primary-hover)")};
-    color: ${(props) => (props.$isActive ? "white" : "var(--primary-hover)")};
-    box-shadow: ${(props) =>
+        ? 'linear-gradient(135deg, var(--success) 0%, var(--success) 100%)'
+        : 'var(--surface-2)'};
+    border-color: ${props => (props.$isActive ? 'var(--success)' : 'var(--primary-hover)')};
+    color: ${props => (props.$isActive ? 'white' : 'var(--primary-hover)')};
+    box-shadow: ${props =>
       props.$isActive
-        ? "0 8px 25px rgba(var(--primary-rgb-dark), 0.4)"
-        : "0 4px 12px rgba(var(--primary-rgb-dark), 0.15)"};
+        ? '0 8px 25px rgba(var(--primary-rgb-dark), 0.4)'
+        : '0 4px 12px rgba(var(--primary-rgb-dark), 0.15)'};
 
     &::before {
       left: 100%;
@@ -375,99 +365,97 @@ const FAQPage: React.FC = () => {
   // State to track which FAQ item is currently expanded
   const [expandedItem, setExpandedItem] = useState<number | null>(null);
   // State to track active category filter
-  const [activeCategory, setActiveCategory] = useState<string>("Todas");
+  const [activeCategory, setActiveCategory] = useState<string>('Todas');
 
   // Array of FAQ data with different categories
   const faqData: FAQItem[] = [
     {
       id: 1,
-      question: "¿Qué es Smashly y cómo funciona?",
+      question: '¿Qué es Smashly y cómo funciona?',
       answer:
-        "Smashly es una plataforma web diseñada para jugadores de pádel amateur que te permite comparar palas, obtener recomendaciones personalizadas con IA y encontrar la pala perfecta para tu estilo de juego. La plataforma analiza tus preferencias y nivel para ofrecerte las mejores opciones del mercado.",
-      category: "General",
+        'Smashly es una plataforma web diseñada para jugadores de pádel amateur que te permite comparar palas, obtener recomendaciones personalizadas con IA y encontrar la pala perfecta para tu estilo de juego. La plataforma analiza tus preferencias y nivel para ofrecerte las mejores opciones del mercado.',
+      category: 'General',
     },
     {
       id: 2,
-      question: "¿Es gratuita la plataforma?",
+      question: '¿Es gratuita la plataforma?',
       answer:
-        "Sí, Smashly es completamente gratuita para usar. Ofrecemos todas las funciones principales sin costo, incluyendo el comparador de palas, recomendaciones con IA y acceso a nuestra base de datos de productos. Nuestro objetivo es ayudar a todos los jugadores a encontrar su pala ideal.",
-      category: "General",
+        'Sí, Smashly es completamente gratuita para usar. Ofrecemos todas las funciones principales sin costo, incluyendo el comparador de palas, recomendaciones con IA y acceso a nuestra base de datos de productos. Nuestro objetivo es ayudar a todos los jugadores a encontrar su pala ideal.',
+      category: 'General',
     },
     {
       id: 3,
-      question: "¿Cómo funciona el comparador de palas?",
+      question: '¿Cómo funciona el comparador de palas?',
       answer:
-        "Nuestro comparador te permite seleccionar hasta 3 palas diferentes y compararlas lado a lado. Utilizamos inteligencia artificial para analizar las características técnicas, precios y especificaciones de cada pala, proporcionándote un análisis detallado para ayudarte a tomar la mejor decisión.",
-      category: "Palas",
+        'Nuestro comparador te permite seleccionar hasta 3 palas diferentes y compararlas lado a lado. Utilizamos inteligencia artificial para analizar las características técnicas, precios y especificaciones de cada pala, proporcionándote un análisis detallado para ayudarte a tomar la mejor decisión.',
+      category: 'Palas',
     },
     {
       id: 4,
-      question: "¿Cómo obtiene Smashly los datos de las palas?",
+      question: '¿Cómo obtiene Smashly los datos de las palas?',
       answer:
-        "Recopilamos información de múltiples fuentes confiables incluyendo fabricantes, tiendas especializadas y sitios web de pádel. Nuestros datos incluyen especificaciones técnicas, precios actualizados, imágenes y disponibilidad en tiempo real.",
-      category: "Palas",
+        'Recopilamos información de múltiples fuentes confiables incluyendo fabricantes, tiendas especializadas y sitios web de pádel. Nuestros datos incluyen especificaciones técnicas, precios actualizados, imágenes y disponibilidad en tiempo real.',
+      category: 'Palas',
     },
     {
       id: 5,
-      question: "¿Qué información necesito para obtener recomendaciones?",
+      question: '¿Qué información necesito para obtener recomendaciones?',
       answer:
-        "Para obtener recomendaciones personalizadas, necesitamos conocer tu nivel de juego, estilo preferido, presupuesto, altura, peso y forma de pala que prefieres. Cuanta más información proporciones, más precisas serán nuestras recomendaciones.",
-      category: "Recomendaciones",
+        'Para obtener recomendaciones personalizadas, necesitamos conocer tu nivel de juego, estilo preferido, presupuesto, altura, peso y forma de pala que prefieres. Cuanta más información proporciones, más precisas serán nuestras recomendaciones.',
+      category: 'Recomendaciones',
     },
     {
       id: 6,
-      question: "¿Puedo comprar palas directamente en Smashly?",
+      question: '¿Puedo comprar palas directamente en Smashly?',
       answer:
-        "No vendemos palas directamente, pero te dirigimos a tiendas confiables donde puedes realizar tu compra. Proporcionamos enlaces directos a los mejores precios disponibles en el mercado y te ayudamos a encontrar ofertas especiales.",
-      category: "Compras",
+        'No vendemos palas directamente, pero te dirigimos a tiendas confiables donde puedes realizar tu compra. Proporcionamos enlaces directos a los mejores precios disponibles en el mercado y te ayudamos a encontrar ofertas especiales.',
+      category: 'Compras',
     },
     {
       id: 7,
-      question: "¿Con qué frecuencia se actualizan los precios?",
+      question: '¿Con qué frecuencia se actualizan los precios?',
       answer:
-        "Actualizamos nuestros precios semanalmente para asegurar que tengas la información más reciente. También monitoreamos ofertas especiales y descuentos para mantenerte informado de las mejores oportunidades de compra.",
-      category: "Precios",
+        'Actualizamos nuestros precios semanalmente para asegurar que tengas la información más reciente. También monitoreamos ofertas especiales y descuentos para mantenerte informado de las mejores oportunidades de compra.',
+      category: 'Precios',
     },
     {
       id: 8,
       question: "¿Qué significa que una pala sea 'bestseller'?",
       answer:
         "Las palas marcadas como 'bestseller' son aquellas que han demostrado alta popularidad entre los usuarios y tienen excelentes valoraciones. Estos productos suelen ser opciones seguras y bien valoradas por la comunidad de jugadores.",
-      category: "Palas",
+      category: 'Palas',
     },
     {
       id: 9,
-      question: "¿Puedo guardar mis palas favoritas?",
+      question: '¿Puedo guardar mis palas favoritas?',
       answer:
-        "Actualmente estamos desarrollando la funcionalidad de cuenta de usuario que te permitirá guardar tus palas favoritas, crear listas de deseos y acceder a un historial de comparaciones. Esta función estará disponible próximamente.",
-      category: "Cuenta",
+        'Actualmente estamos desarrollando la funcionalidad de cuenta de usuario que te permitirá guardar tus palas favoritas, crear listas de deseos y acceder a un historial de comparaciones. Esta función estará disponible próximamente.',
+      category: 'Cuenta',
     },
     {
       id: 10,
-      question: "¿Cómo puedo contactar con el equipo de soporte?",
+      question: '¿Cómo puedo contactar con el equipo de soporte?',
       answer:
-        "Puedes contactarnos a través del formulario de contacto en nuestra web o enviando un email directo. Nuestro equipo responde todas las consultas en un plazo máximo de 24 horas durante días laborables.",
-      category: "Soporte",
+        'Puedes contactarnos a través del formulario de contacto en nuestra web o enviando un email directo. Nuestro equipo responde todas las consultas en un plazo máximo de 24 horas durante días laborables.',
+      category: 'Soporte',
     },
   ];
 
   // Array of categories for filtering
   const categories = [
-    "Todas",
-    "General",
-    "Palas",
-    "Recomendaciones",
-    "Compras",
-    "Precios",
-    "Cuenta",
-    "Soporte",
+    'Todas',
+    'General',
+    'Palas',
+    'Recomendaciones',
+    'Compras',
+    'Precios',
+    'Cuenta',
+    'Soporte',
   ];
 
   // Filter FAQ items based on selected category
   const filteredFAQ =
-    activeCategory === "Todas"
-      ? faqData
-      : faqData.filter((item) => item.category === activeCategory);
+    activeCategory === 'Todas' ? faqData : faqData.filter(item => item.category === activeCategory);
 
   // Function to toggle FAQ item expansion
   const toggleExpansion = (id: number) => {
@@ -477,8 +465,7 @@ const FAQPage: React.FC = () => {
   // Function to handle contact (you can implement modal or redirect to contact page)
   const handleContact = () => {
     // For now, open email client
-    window.location.href =
-      "mailto:soporte@smashly.com?subject=Consulta desde FAQ";
+    window.location.href = 'mailto:soporte@smashly.com?subject=Consulta desde FAQ';
   };
 
   return (
@@ -500,35 +487,28 @@ const FAQPage: React.FC = () => {
             { name: 'Inicio', url: buildUrl('/') },
             { name: 'FAQ', url: buildUrl('/faq') },
           ]),
-          faqSchema(
-            faqData.map(f => ({ question: f.question, answer: f.answer }))
-          ),
+          faqSchema(faqData.map(f => ({ question: f.question, answer: f.answer }))),
         ]}
       />
       <HeroSection>
         <MainTitle>
           Preguntas <HighlightText>Frecuentes</HighlightText>
         </MainTitle>
-        <Subtitle>
-          Encuentra respuestas a las preguntas más comunes sobre Smashly
-        </Subtitle>
+        <Subtitle>Encuentra respuestas a las preguntas más comunes sobre Smashly</Subtitle>
       </HeroSection>
 
       {/* Category filter section */}
       <CategorySection>
         <CategoryContainer>
-          <CategorySelect 
-            value={activeCategory} 
-            onChange={(e) => setActiveCategory(e.target.value)}
-          >
-            {categories.map((category) => (
+          <CategorySelect value={activeCategory} onChange={e => setActiveCategory(e.target.value)}>
+            {categories.map(category => (
               <option key={category} value={category}>
                 {category}
               </option>
             ))}
           </CategorySelect>
           <CategoryScrollContainer>
-            {categories.map((category) => (
+            {categories.map(category => (
               <CategoryButton
                 key={category}
                 $isActive={activeCategory === category}
@@ -543,17 +523,13 @@ const FAQPage: React.FC = () => {
 
       {/* FAQ items section */}
       <FAQSection>
-        {filteredFAQ.map((item) => (
+        {filteredFAQ.map(item => (
           <FAQItem key={item.id}>
             {/* Question header - clickable to expand/collapse */}
             <QuestionHeader onClick={() => toggleExpansion(item.id)}>
               <QuestionText>{item.question}</QuestionText>
               <ChevronIcon>
-                {expandedItem === item.id ? (
-                  <FiChevronUp size={24} />
-                ) : (
-                  <FiChevronDown size={24} />
-                )}
+                {expandedItem === item.id ? <FiChevronUp size={24} /> : <FiChevronDown size={24} />}
               </ChevronIcon>
             </QuestionHeader>
 
@@ -574,12 +550,11 @@ const FAQPage: React.FC = () => {
       <ContactSection>
         <ContactCard>
           <ContactIconContainer>
-            <FiHelpCircle size={32} color="var(--primary-hover)" />
+            <FiHelpCircle size={32} color='var(--primary-hover)' />
           </ContactIconContainer>
           <ContactTitle>¿No encuentras lo que buscas?</ContactTitle>
           <ContactDescription>
-            Nuestro equipo de soporte está aquí para ayudarte con cualquier
-            pregunta adicional
+            Nuestro equipo de soporte está aquí para ayudarte con cualquier pregunta adicional
           </ContactDescription>
           <ContactButton onClick={handleContact}>
             <FiMail size={16} />

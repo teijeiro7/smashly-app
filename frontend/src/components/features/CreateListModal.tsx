@@ -1,7 +1,7 @@
-import React, { useState } from "react";
-import styled from "styled-components";
-import { FiX, FiPlus } from "react-icons/fi";
-import { motion, AnimatePresence } from "framer-motion";
+import React, { useState } from 'react';
+import styled from 'styled-components';
+import { FiX, FiPlus } from 'react-icons/fi';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface CreateListModalProps {
   isOpen: boolean;
@@ -117,7 +117,7 @@ const ButtonGroup = styled.div`
   margin-top: 1rem;
 `;
 
-const Button = styled.button<{ variant?: "primary" | "secondary" }>`
+const Button = styled.button<{ variant?: 'primary' | 'secondary' }>`
   flex: 1;
   padding: 0.75rem 1.5rem;
   border: none;
@@ -131,8 +131,8 @@ const Button = styled.button<{ variant?: "primary" | "secondary" }>`
   justify-content: center;
   gap: 0.5rem;
 
-  ${(props) =>
-    props.variant === "primary"
+  ${props =>
+    props.variant === 'primary'
       ? `
     background: var(--brand-surface);
     color: var(--brand-on-surface);
@@ -158,8 +158,8 @@ export const CreateListModal: React.FC<CreateListModalProps> = ({
   onClose,
   onCreateList,
 }) => {
-  const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
+  const [name, setName] = useState('');
+  const [description, setDescription] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -170,8 +170,8 @@ export const CreateListModal: React.FC<CreateListModalProps> = ({
     setIsSubmitting(true);
     try {
       await onCreateList(name.trim(), description.trim() || undefined);
-      setName("");
-      setDescription("");
+      setName('');
+      setDescription('');
       onClose();
     } catch (error) {
       // Error handled by parent
@@ -182,8 +182,8 @@ export const CreateListModal: React.FC<CreateListModalProps> = ({
 
   const handleClose = () => {
     if (!isSubmitting) {
-      setName("");
-      setDescription("");
+      setName('');
+      setDescription('');
       onClose();
     }
   };
@@ -201,7 +201,7 @@ export const CreateListModal: React.FC<CreateListModalProps> = ({
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.9, opacity: 0 }}
-            onClick={(e) => e.stopPropagation()}
+            onClick={e => e.stopPropagation()}
           >
             <Header>
               <Title>Crear Nueva Lista</Title>
@@ -212,13 +212,13 @@ export const CreateListModal: React.FC<CreateListModalProps> = ({
 
             <Form onSubmit={handleSubmit}>
               <FormGroup>
-                <Label htmlFor="name">Nombre de la lista *</Label>
+                <Label htmlFor='name'>Nombre de la lista *</Label>
                 <Input
-                  id="name"
-                  type="text"
-                  placeholder="Ej: Mis palas favoritas"
+                  id='name'
+                  type='text'
+                  placeholder='Ej: Mis palas favoritas'
                   value={name}
-                  onChange={(e) => setName(e.target.value)}
+                  onChange={e => setName(e.target.value)}
                   disabled={isSubmitting}
                   required
                   maxLength={100}
@@ -226,12 +226,12 @@ export const CreateListModal: React.FC<CreateListModalProps> = ({
               </FormGroup>
 
               <FormGroup>
-                <Label htmlFor="description">Descripción (opcional)</Label>
+                <Label htmlFor='description'>Descripción (opcional)</Label>
                 <TextArea
-                  id="description"
-                  placeholder="Describe tu lista..."
+                  id='description'
+                  placeholder='Describe tu lista...'
                   value={description}
-                  onChange={(e) => setDescription(e.target.value)}
+                  onChange={e => setDescription(e.target.value)}
                   disabled={isSubmitting}
                   maxLength={500}
                 />
@@ -239,20 +239,16 @@ export const CreateListModal: React.FC<CreateListModalProps> = ({
 
               <ButtonGroup>
                 <Button
-                  type="button"
-                  variant="secondary"
+                  type='button'
+                  variant='secondary'
                   onClick={handleClose}
                   disabled={isSubmitting}
                 >
                   Cancelar
                 </Button>
-                <Button
-                  type="submit"
-                  variant="primary"
-                  disabled={!name.trim() || isSubmitting}
-                >
+                <Button type='submit' variant='primary' disabled={!name.trim() || isSubmitting}>
                   <FiPlus size={20} />
-                  {isSubmitting ? "Creando..." : "Crear Lista"}
+                  {isSubmitting ? 'Creando...' : 'Crear Lista'}
                 </Button>
               </ButtonGroup>
             </Form>

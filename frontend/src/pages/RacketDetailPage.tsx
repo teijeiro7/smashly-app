@@ -132,7 +132,7 @@ const AuthBanner = styled.div`
 const AuthCard = styled.div`
   background: var(--primary-faint);
   border: 1px solid var(--color-gray-200);
-    border-radius: 16px;
+  border-radius: 16px;
   padding: 2.5rem;
   text-align: center;
   box-shadow: 0 4px 20px var(--shadow-color);
@@ -208,8 +208,6 @@ const AuthActions = styled.div`
   z-index: 1;
 `;
 
-
-
 const MainGrid = styled.div`
   display: grid;
   grid-template-columns: 1.2fr 0.8fr;
@@ -240,7 +238,10 @@ const GallerySection = styled.div`
   background: var(--racket-image-bg);
   border: var(--racket-image-border);
   border-radius: var(--racket-image-radius-detail);
-  box-shadow: var(--racket-image-shadow), 0 4px 6px -1px var(--shadow-color), 0 2px 4px -1px var(--shadow-color);
+  box-shadow:
+    var(--racket-image-shadow),
+    0 4px 6px -1px var(--shadow-color),
+    0 2px 4px -1px var(--shadow-color);
   padding: 2rem;
   display: flex;
   flex-direction: column;
@@ -251,10 +252,15 @@ const GallerySection = styled.div`
   min-width: 0;
   min-height: 600px;
   overflow: hidden;
-  transition: box-shadow 0.2s ease, transform 0.2s ease;
+  transition:
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
 
   &:hover {
-    box-shadow: var(--racket-image-shadow), 0 10px 15px -3px var(--shadow-color), 0 4px 6px -2px var(--shadow-color);
+    box-shadow:
+      var(--racket-image-shadow),
+      0 10px 15px -3px var(--shadow-color),
+      0 4px 6px -2px var(--shadow-color);
     transform: translateY(-2px);
   }
 
@@ -286,20 +292,36 @@ const MainImage = styled.img<{ $entering?: 'left' | 'right' }>`
     opacity: 0.95;
   }
 
-  ${props => props.$entering === 'left' && `
+  ${props =>
+    props.$entering === 'left' &&
+    `
     animation: slideInFromLeft 0.28s cubic-bezier(0.4, 0, 0.2, 1);
   `}
-  ${props => props.$entering === 'right' && `
+  ${props =>
+    props.$entering === 'right' &&
+    `
     animation: slideInFromRight 0.28s cubic-bezier(0.4, 0, 0.2, 1);
   `}
 
   @keyframes slideInFromLeft {
-    from { opacity: 0; transform: translateX(-40px); }
-    to { opacity: 1; transform: translateX(0); }
+    from {
+      opacity: 0;
+      transform: translateX(-40px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
   }
   @keyframes slideInFromRight {
-    from { opacity: 0; transform: translateX(40px); }
-    to { opacity: 1; transform: translateX(0); }
+    from {
+      opacity: 0;
+      transform: translateX(40px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
   }
 `;
 
@@ -351,7 +373,11 @@ const ScrollButton = styled.button`
   justify-content: center;
   cursor: pointer;
   color: var(--color-gray-700);
-  transition: background-color 0.2s, border-color 0.2s, color 0.2s, box-shadow 0.2s;
+  transition:
+    background-color 0.2s,
+    border-color 0.2s,
+    color 0.2s,
+    box-shadow 0.2s;
   flex-shrink: 0;
   box-shadow: var(--shadow-sm);
 
@@ -388,7 +414,10 @@ const Thumbnail = styled.img<{ $isActive: boolean }>`
   background: var(--racket-image-bg);
   box-shadow: var(--racket-image-shadow);
   cursor: pointer;
-  transition: border-color 0.2s, background-color 0.2s, transform 0.2s;
+  transition:
+    border-color 0.2s,
+    background-color 0.2s,
+    transform 0.2s;
   padding: 0.25rem;
   flex-shrink: 0;
   scroll-snap-align: center; // Snap to center on mobile
@@ -413,7 +442,9 @@ const WishlistButton = styled.button`
   justify-content: center;
   box-shadow: var(--shadow-md);
   cursor: pointer;
-  transition: transform 0.2s, background-color 0.2s;
+  transition:
+    transform 0.2s,
+    background-color 0.2s;
   color: var(--color-error);
 
   &:hover {
@@ -438,7 +469,9 @@ const Dot = styled.button<{ $isActive: boolean }>`
   border: none;
   background: ${props => (props.$isActive ? 'var(--color-primary)' : 'var(--color-gray-300)')};
   cursor: pointer;
-  transition: background-color 0.2s, transform 0.2s;
+  transition:
+    background-color 0.2s,
+    transform 0.2s;
   padding: 0;
 
   &:hover {
@@ -560,7 +593,9 @@ const PriceCard = styled.div`
   border-radius: 16px;
   padding: 1.5rem;
   border: 1px solid var(--color-gray-200);
-  box-shadow: 0 4px 6px -1px var(--shadow-color), 0 2px 4px -1px var(--shadow-color);
+  box-shadow:
+    0 4px 6px -1px var(--shadow-color),
+    0 2px 4px -1px var(--shadow-color);
 `;
 
 const BestPriceLabel = styled.div`
@@ -638,7 +673,10 @@ const PrimaryButton = styled.a`
   font-weight: 700;
   font-size: 1.125rem;
   text-decoration: none;
-  transition: background-color 0.2s, transform 0.2s, box-shadow 0.2s;
+  transition:
+    background-color 0.2s,
+    transform 0.2s,
+    box-shadow 0.2s;
   box-shadow: 0 4px 12px rgba(var(--brand-rgb), 0.3);
   position: relative;
   overflow: hidden;
@@ -681,7 +719,12 @@ const AlertButton = styled.button`
   font-weight: 600;
   font-size: 1rem;
   cursor: pointer;
-  transition: background-color 0.25s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.25s cubic-bezier(0.4, 0, 0.2, 1), color 0.25s cubic-bezier(0.4, 0, 0.2, 1), transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  transition:
+    background-color 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+    border-color 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+    color 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+    transform 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   margin-top: 1rem;
   &:hover {
     background: var(--color-gray-50);
@@ -739,8 +782,13 @@ const WatchSaveButton = styled.button`
   cursor: pointer;
   white-space: nowrap;
   transition: background-color 0.2s;
-  &:hover { background: var(--color-primary-dark); }
-  &:disabled { opacity: 0.5; cursor: not-allowed; }
+  &:hover {
+    background: var(--color-primary-dark);
+  }
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
 `;
 
 const WatchList = styled.div`
@@ -773,13 +821,15 @@ const WatchDeleteButton = styled.button`
   font-size: 0.875rem;
   padding: 0.25rem;
   transition: color 0.2s;
-  &:hover { color: var(--color-error); }
+  &:hover {
+    color: var(--color-error);
+  }
 `;
 
 const WatchMessage = styled.div<{ $error?: boolean }>`
   font-size: 0.8125rem;
   margin-top: 0.5rem;
-  color: ${props => props.$error ? 'var(--color-error)' : 'var(--color-success, #16a34a)'};
+  color: ${props => (props.$error ? 'var(--color-error)' : 'var(--color-success, #16a34a)')};
 `;
 
 const ComparisonOnlyCard = styled.div`
@@ -788,7 +838,9 @@ const ComparisonOnlyCard = styled.div`
   border-radius: 16px;
   padding: 2rem;
   text-align: center;
-  box-shadow: 0 4px 6px -1px var(--shadow-color), 0 2px 4px -1px var(--shadow-color);
+  box-shadow:
+    0 4px 6px -1px var(--shadow-color),
+    0 2px 4px -1px var(--shadow-color);
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
@@ -869,12 +921,17 @@ const SpecCard = styled.div`
   flex-direction: row;
   align-items: center;
   gap: 0.75rem;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
   cursor: default;
 
   &:hover {
     border-color: rgba(var(--primary-rgb-dark), 0.3);
-    box-shadow: 0 4px 6px -1px rgba(var(--primary-rgb-dark), 0.1), 0 2px 4px -1px rgba(var(--primary-rgb-dark), 0.06);
+    box-shadow:
+      0 4px 6px -1px rgba(var(--primary-rgb-dark), 0.1),
+      0 2px 4px -1px rgba(var(--primary-rgb-dark), 0.06);
     transform: translateY(-2px);
 
     ${SpecIconWrapper} {
@@ -906,13 +963,14 @@ const SpecValue = styled.span`
   font-weight: 600;
 `;
 
-
 const PerformanceContainer = styled.div`
   background: var(--surface);
   border-radius: 16px;
   padding: 2rem;
   margin-top: 3rem;
-  box-shadow: 0 4px 6px -1px var(--shadow-color), 0 2px 4px -1px var(--shadow-color);
+  box-shadow:
+    0 4px 6px -1px var(--shadow-color),
+    0 2px 4px -1px var(--shadow-color);
 `;
 
 const PerformanceGrid = styled.div`
@@ -983,7 +1041,9 @@ const CompareTable = styled.div`
   background: var(--surface);
   border-radius: 16px;
   overflow: hidden;
-  box-shadow: 0 4px 6px -1px var(--shadow-color), 0 2px 4px -1px var(--shadow-color);
+  box-shadow:
+    0 4px 6px -1px var(--shadow-color),
+    0 2px 4px -1px var(--shadow-color);
   margin-top: 3rem;
 `;
 
@@ -995,9 +1055,14 @@ const CompareRow = styled.div<{ $isBestPrice?: boolean }>`
   border-bottom: 1px solid var(--color-gray-100);
   gap: 1rem;
   background: ${props =>
-    props.$isBestPrice ? 'linear-gradient(90deg, var(--primary-faint) 0%, var(--primary-subtle) 100%)' : 'transparent'};
+    props.$isBestPrice
+      ? 'linear-gradient(90deg, var(--primary-faint) 0%, var(--primary-subtle) 100%)'
+      : 'transparent'};
   position: relative;
-  transition: background 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition:
+    background 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   cursor: default;
 
   &:hover {
@@ -1063,7 +1128,9 @@ const PriceText = styled.div<{ $isBestPrice?: boolean }>`
   font-size: ${props => (props.$isBestPrice ? '1.5rem' : '1.25rem')};
   color: ${props => (props.$isBestPrice ? 'var(--color-primary)' : 'var(--color-gray-800)')};
   text-align: right;
-  transition: color 0.2s, font-size 0.2s;
+  transition:
+    color 0.2s,
+    font-size 0.2s;
 
   @media (max-width: 768px) {
     grid-column: 2;
@@ -1090,7 +1157,10 @@ const ShopButton = styled.a`
   text-decoration: none;
   text-align: center;
   font-size: 0.9rem;
-  transition: background-color 0.2s, border-color 0.2s, color 0.2s;
+  transition:
+    background-color 0.2s,
+    border-color 0.2s,
+    color 0.2s;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1160,7 +1230,9 @@ const StickyCTA = styled.a`
   text-decoration: none;
   white-space: nowrap;
   flex-shrink: 0;
-  transition: background-color 0.2s, transform 0.2s;
+  transition:
+    background-color 0.2s,
+    transform 0.2s;
 
   &:hover {
     background: var(--color-primary-dark);
@@ -1240,7 +1312,10 @@ const RacketDetailSeo: React.FC<RacketDetailSeoProps> = ({
         breadcrumbSchema([
           { name: 'Inicio', url: buildUrl('/') },
           { name: 'Catálogo', url: buildUrl('/catalog') },
-          { name: racket.marca, url: buildUrl(`/catalog?brand=${encodeURIComponent(racket.marca)}`) },
+          {
+            name: racket.marca,
+            url: buildUrl(`/catalog?brand=${encodeURIComponent(racket.marca)}`),
+          },
           { name: racket.modelo, url: productUrl },
         ]),
       ]}
@@ -1475,48 +1550,58 @@ const RacketDetailPage: React.FC = () => {
 
   if (error || !racket) {
     return (
-      <div style={{
-        minHeight: '70vh',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: '2rem',
-        background: 'linear-gradient(135deg, var(--primary-faint) 0%, var(--surface) 100%)'
-      }}>
-        <div style={{
-          background: 'var(--surface)',
-          borderRadius: '24px',
-          padding: 'clamp(2rem, 5vw, 3rem)',
-          maxWidth: '480px',
-          width: '100%',
-          boxShadow: '0 10px 40px rgba(var(--primary-rgb-dark), 0.08)',
-          border: '1px solid var(--primary-subtle)',
-          textAlign: 'center'
-        }}>
+      <div
+        style={{
+          minHeight: '70vh',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: '2rem',
+          background: 'linear-gradient(135deg, var(--primary-faint) 0%, var(--surface) 100%)',
+        }}
+      >
+        <div
+          style={{
+            background: 'var(--surface)',
+            borderRadius: '24px',
+            padding: 'clamp(2rem, 5vw, 3rem)',
+            maxWidth: '480px',
+            width: '100%',
+            boxShadow: '0 10px 40px rgba(var(--primary-rgb-dark), 0.08)',
+            border: '1px solid var(--primary-subtle)',
+            textAlign: 'center',
+          }}
+        >
           <div style={{ fontSize: '4rem', marginBottom: '1rem' }}>🎾</div>
-          <h1 style={{
-            fontSize: 'clamp(1.5rem, 4vw, 2rem)',
-            fontWeight: 800,
-            color: 'var(--text)',
-            marginBottom: '0.75rem'
-          }}>
+          <h1
+            style={{
+              fontSize: 'clamp(1.5rem, 4vw, 2rem)',
+              fontWeight: 800,
+              color: 'var(--text)',
+              marginBottom: '0.75rem',
+            }}
+          >
             Pala no encontrada
           </h1>
-          <p style={{
-            color: 'var(--text-muted)',
-            lineHeight: 1.6,
-            marginBottom: '2rem',
-            fontSize: '1rem'
-          }}>
+          <p
+            style={{
+              color: 'var(--text-muted)',
+              lineHeight: 1.6,
+              marginBottom: '2rem',
+              fontSize: '1rem',
+            }}
+          >
             {error || 'No hemos podido encontrar la pala que buscas.'}
           </p>
-          <div style={{
-            display: 'flex',
-            gap: '1rem',
-            justifyContent: 'center',
-            flexWrap: 'wrap'
-          }}>
+          <div
+            style={{
+              display: 'flex',
+              gap: '1rem',
+              justifyContent: 'center',
+              flexWrap: 'wrap',
+            }}
+          >
             <Link
               to='/'
               style={{
@@ -1529,13 +1614,13 @@ const RacketDetailPage: React.FC = () => {
                 borderRadius: '10px',
                 fontWeight: 600,
                 textDecoration: 'none',
-                transition: 'all 0.2s ease'
+                transition: 'all 0.2s ease',
               }}
-              onMouseEnter={(e) => {
+              onMouseEnter={e => {
                 e.currentTarget.style.background = 'var(--primary-hover)';
                 e.currentTarget.style.transform = 'translateY(-2px)';
               }}
-              onMouseLeave={(e) => {
+              onMouseLeave={e => {
                 e.currentTarget.style.background = 'var(--primary-hover)';
                 e.currentTarget.style.transform = 'translateY(0)';
               }}
@@ -1556,14 +1641,14 @@ const RacketDetailPage: React.FC = () => {
                 fontWeight: 600,
                 textDecoration: 'none',
                 border: '1px solid var(--border)',
-                transition: 'all 0.2s ease'
+                transition: 'all 0.2s ease',
               }}
-              onMouseEnter={(e) => {
+              onMouseEnter={e => {
                 e.currentTarget.style.borderColor = 'var(--primary-hover)';
                 e.currentTarget.style.color = 'var(--primary-hover)';
                 e.currentTarget.style.transform = 'translateY(-2px)';
               }}
-              onMouseLeave={(e) => {
+              onMouseLeave={e => {
                 e.currentTarget.style.borderColor = 'var(--border)';
                 e.currentTarget.style.color = 'var(--text)';
                 e.currentTarget.style.transform = 'translateY(0)';
@@ -1709,10 +1794,15 @@ const RacketDetailPage: React.FC = () => {
                 onClick={() => racket && addRacket(racket)}
                 disabled={racket ? isRacketInComparison(racket.nombre) : false}
               >
-                {racket && isRacketInComparison(racket.nombre)
-                  ? <><FiCheck /> Añadida al comparador</>
-                  : <><FiBarChart2 /> Añadir al comparador</>
-                }
+                {racket && isRacketInComparison(racket.nombre) ? (
+                  <>
+                    <FiCheck /> Añadida al comparador
+                  </>
+                ) : (
+                  <>
+                    <FiBarChart2 /> Añadir al comparador
+                  </>
+                )}
               </AlertButton>
             </ComparisonOnlyCard>
           ) : (
@@ -1753,10 +1843,15 @@ const RacketDetailPage: React.FC = () => {
                 onClick={() => racket && addRacket(racket)}
                 disabled={racket ? isRacketInComparison(racket.nombre) : false}
               >
-                {racket && isRacketInComparison(racket.nombre)
-                  ? <><FiCheck /> Añadida al comparador</>
-                  : <><FiBarChart2 /> Añadir al comparador</>
-                }
+                {racket && isRacketInComparison(racket.nombre) ? (
+                  <>
+                    <FiCheck /> Añadida al comparador
+                  </>
+                ) : (
+                  <>
+                    <FiBarChart2 /> Añadir al comparador
+                  </>
+                )}
               </AlertButton>
 
               {isAuthenticated && (
@@ -1764,10 +1859,10 @@ const RacketDetailPage: React.FC = () => {
                   <WatchTitle>Alerta de precio</WatchTitle>
                   <WatchInputRow>
                     <WatchInput
-                      type="number"
-                      step="0.01"
-                      min="0"
-                      placeholder="Precio objetivo (€)"
+                      type='number'
+                      step='0.01'
+                      min='0'
+                      placeholder='Precio objetivo (€)'
                       value={targetPriceInput}
                       onChange={e => setTargetPriceInput(e.target.value)}
                       onKeyDown={e => e.key === 'Enter' && handleCreateWatch()}
@@ -1780,14 +1875,16 @@ const RacketDetailPage: React.FC = () => {
                   {watchSaveMessage && <WatchMessage>{watchSaveMessage}</WatchMessage>}
                   {watches.filter(w => w.active).length > 0 && (
                     <WatchList>
-                      {watches.filter(w => w.active).map(w => (
-                        <WatchItem key={w.id}>
-                          <WatchItemLabel>↓ {w.target_price.toFixed(2)}€</WatchItemLabel>
-                          <WatchDeleteButton onClick={() => handleDeleteWatch(w.id)}>
-                            ✕
-                          </WatchDeleteButton>
-                        </WatchItem>
-                      ))}
+                      {watches
+                        .filter(w => w.active)
+                        .map(w => (
+                          <WatchItem key={w.id}>
+                            <WatchItemLabel>↓ {w.target_price.toFixed(2)}€</WatchItemLabel>
+                            <WatchDeleteButton onClick={() => handleDeleteWatch(w.id)}>
+                              ✕
+                            </WatchDeleteButton>
+                          </WatchItem>
+                        ))}
                     </WatchList>
                   )}
                 </WatchSection>
@@ -1957,7 +2054,6 @@ const RacketDetailPage: React.FC = () => {
           </PerformanceContainer>
         </div>
       )}
-
 
       {/* Price Comparison - Only show for authenticated users */}
       {isAuthenticated && (

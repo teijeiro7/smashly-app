@@ -19,7 +19,9 @@ const Card = styled(motion.div)`
   background: var(--surface);
   padding: 2.5rem;
   border-radius: 24px;
-  box-shadow: 0 10px 25px -5px var(--shadow-color), 0 8px 10px -6px var(--shadow-color);
+  box-shadow:
+    0 10px 25px -5px var(--shadow-color),
+    0 8px 10px -6px var(--shadow-color);
   width: 100%;
   max-width: 450px;
   border: 1px solid var(--surface-3);
@@ -77,7 +79,7 @@ const InputWrapper = styled.div<{ $hasError?: boolean }>`
   svg {
     position: absolute;
     left: 1rem;
-    color: ${props => props.$hasError ? 'var(--error)' : 'var(--text-subtle)'};
+    color: ${props => (props.$hasError ? 'var(--error)' : 'var(--text-subtle)')};
     transition: color 0.2s ease;
   }
 `;
@@ -86,16 +88,19 @@ const Input = styled.input<{ $hasError?: boolean }>`
   width: 100%;
   padding: 0.75rem 1rem 0.75rem 2.75rem;
   border-radius: 12px;
-  border: 1.5px solid ${props => props.$hasError ? '#fca5a5' : 'var(--border)'};
-  background: ${props => props.$hasError ? 'var(--danger-subtle)' : 'var(--surface)'};
+  border: 1.5px solid ${props => (props.$hasError ? '#fca5a5' : 'var(--border)')};
+  background: ${props => (props.$hasError ? 'var(--danger-subtle)' : 'var(--surface)')};
   font-size: 1rem;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
   color: var(--text);
 
   &:focus {
     outline: none;
-    border-color: ${props => props.$hasError ? 'var(--error)' : 'var(--primary)'};
-    box-shadow: 0 0 0 4px ${props => props.$hasError ? 'rgba(239, 68, 68, 0.1)' : 'rgba(22, 163, 74, 0.1)'};
+    border-color: ${props => (props.$hasError ? 'var(--error)' : 'var(--primary)')};
+    box-shadow: 0 0 0 4px
+      ${props => (props.$hasError ? 'rgba(239, 68, 68, 0.1)' : 'rgba(22, 163, 74, 0.1)')};
   }
 
   &::placeholder {
@@ -133,7 +138,10 @@ const SubmitButton = styled.button`
   align-items: center;
   justify-content: center;
   gap: 0.75rem;
-  transition: background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    background-color 0.2s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
   margin-top: 0.5rem;
 
   &:hover:not(:disabled) {
@@ -227,10 +235,10 @@ const UpdatePasswordPage: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!token) {
-        setError('No tienes un token válido para realizar esta acción.');
-        return;
+      setError('No tienes un token válido para realizar esta acción.');
+      return;
     }
 
     if (newPassword.length < 8) {
@@ -249,9 +257,9 @@ const UpdatePasswordPage: React.FC = () => {
     try {
       const response = await fetch(buildApiUrl(API_ENDPOINTS.AUTH_UPDATE_PASSWORD), {
         method: 'POST',
-        headers: { 
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({ newPassword }),
       });
@@ -290,27 +298,28 @@ const UpdatePasswordPage: React.FC = () => {
         <HeaderIcon>
           <FiShield />
         </HeaderIcon>
-        
+
         <Title>Nueva Contraseña</Title>
         <Description>
-          Introduce tu nueva contraseña a continuación. Asegúrate de que sea segura y difícil de adivinar.
+          Introduce tu nueva contraseña a continuación. Asegúrate de que sea segura y difícil de
+          adivinar.
         </Description>
 
         <Form onSubmit={handleSubmit}>
           <FormGroup>
-            <Label htmlFor="new-password">Nueva Contraseña</Label>
+            <Label htmlFor='new-password'>Nueva Contraseña</Label>
             <InputWrapper $hasError={!!error && error.includes('contraseña')}>
               <FiLock />
               <Input
-                id="new-password"
+                id='new-password'
                 type={showPassword ? 'text' : 'password'}
-                placeholder="Mínimo 8 caracteres"
+                placeholder='Mínimo 8 caracteres'
                 value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
+                onChange={e => setNewPassword(e.target.value)}
                 $hasError={!!error && error.includes('contraseña')}
                 disabled={loading || !token}
               />
-              <PasswordToggle type="button" onClick={() => setShowPassword(!showPassword)}>
+              <PasswordToggle type='button' onClick={() => setShowPassword(!showPassword)}>
                 {showPassword ? <FiEyeOff /> : <FiEye />}
               </PasswordToggle>
             </InputWrapper>
@@ -318,15 +327,15 @@ const UpdatePasswordPage: React.FC = () => {
           </FormGroup>
 
           <FormGroup>
-            <Label htmlFor="confirm-password">Confirmar Contraseña</Label>
+            <Label htmlFor='confirm-password'>Confirmar Contraseña</Label>
             <InputWrapper $hasError={!!error && error.includes('coinciden')}>
               <FiLock />
               <Input
-                id="confirm-password"
+                id='confirm-password'
                 type={showPassword ? 'text' : 'password'}
-                placeholder="Repite tu contraseña"
+                placeholder='Repite tu contraseña'
                 value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
+                onChange={e => setConfirmPassword(e.target.value)}
                 $hasError={!!error && error.includes('coinciden')}
                 disabled={loading || !token}
               />
@@ -338,7 +347,7 @@ const UpdatePasswordPage: React.FC = () => {
             )}
           </FormGroup>
 
-          <SubmitButton type="submit" disabled={loading || !token}>
+          <SubmitButton type='submit' disabled={loading || !token}>
             {loading ? (
               <>
                 <motion.div

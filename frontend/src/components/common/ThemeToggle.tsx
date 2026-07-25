@@ -16,12 +16,18 @@ const Button = styled.button<{ $variant: Variant }>`
   border: 1px solid ${p => (p.$variant === 'onBrand' ? 'rgba(255, 255, 255, 0.4)' : 'var(--text)')};
   color: ${p => (p.$variant === 'onBrand' ? 'var(--brand-on-surface)' : 'var(--text)')};
   cursor: pointer;
-  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.15s ease;
 
   &:hover {
-    background: ${p => (p.$variant === 'onBrand' ? 'rgba(255, 255, 255, 0.12)' : 'var(--primary-subtle)')};
+    background: ${p =>
+      p.$variant === 'onBrand' ? 'rgba(255, 255, 255, 0.12)' : 'var(--primary-subtle)'};
     color: ${p => (p.$variant === 'onBrand' ? 'var(--brand-on-surface)' : 'var(--primary)')};
-    border-color: ${p => (p.$variant === 'onBrand' ? 'rgba(255, 255, 255, 0.7)' : 'var(--primary)')};
+    border-color: ${p =>
+      p.$variant === 'onBrand' ? 'rgba(255, 255, 255, 0.7)' : 'var(--primary)'};
   }
 
   &:active {
@@ -29,7 +35,8 @@ const Button = styled.button<{ $variant: Variant }>`
   }
 
   &:focus-visible {
-    outline: 3px solid ${p => (p.$variant === 'onBrand' ? 'var(--brand-on-surface)' : 'var(--primary)')};
+    outline: 3px solid
+      ${p => (p.$variant === 'onBrand' ? 'var(--brand-on-surface)' : 'var(--primary)')};
     outline-offset: 2px;
   }
 
@@ -66,7 +73,9 @@ const MenuItem = styled.button<{ $active: boolean }>`
   font-weight: 500;
   cursor: pointer;
   text-align: left;
-  transition: background 0.15s ease, color 0.15s ease;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease;
 
   &:hover {
     background: var(--surface-2);

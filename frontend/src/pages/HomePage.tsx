@@ -27,7 +27,13 @@ const Container = styled.div`
 
 const HeroSection = styled.section`
   padding: clamp(80px, 12vw, 140px) 20px clamp(60px, 8vw, 100px);
-  background: linear-gradient(145deg, var(--brand-surface-deep) 0%, var(--brand-surface-strong) 30%, var(--brand-surface) 60%, var(--brand-surface-hover) 100%);
+  background: linear-gradient(
+    145deg,
+    var(--brand-surface-deep) 0%,
+    var(--brand-surface-strong) 30%,
+    var(--brand-surface) 60%,
+    var(--brand-surface-hover) 100%
+  );
   color: var(--brand-on-surface);
   position: relative;
   overflow: hidden;
@@ -178,8 +184,6 @@ const CTAButtons = styled.div`
   }
 `;
 
-
-
 const TrustBar = styled.div`
   display: flex;
   align-items: center;
@@ -278,8 +282,15 @@ const ScrollIndicator = styled.div`
   }
 
   @keyframes scrollWheel {
-    0%, 100% { opacity: 1; top: 8px; }
-    50% { opacity: 0.3; top: 20px; }
+    0%,
+    100% {
+      opacity: 1;
+      top: 8px;
+    }
+    50% {
+      opacity: 0.3;
+      top: 20px;
+    }
   }
 `;
 
@@ -328,9 +339,11 @@ const StepsContainer = styled.div`
 
 const StepCard = styled.div<{ $inView: boolean }>`
   text-align: center;
-  opacity: ${(props) => (props.$inView ? 1 : 0)};
-  transform: ${(props) => (props.$inView ? 'translateY(0)' : 'translateY(20px)')};
-  transition: opacity 0.5s ease, transform 0.5s ease;
+  opacity: ${props => (props.$inView ? 1 : 0)};
+  transform: ${props => (props.$inView ? 'translateY(0)' : 'translateY(20px)')};
+  transition:
+    opacity 0.5s ease,
+    transform 0.5s ease;
   transition-delay: var(--delay, 0s);
 
   @media (prefers-reduced-motion: reduce) {
@@ -395,7 +408,7 @@ const FeatureLayout = styled.div`
 
   &:nth-child(even) {
     direction: rtl;
-    
+
     > * {
       direction: ltr;
     }
@@ -448,7 +461,9 @@ const FeatureLink = styled(Link)`
   font-weight: 600;
   text-decoration: none;
   font-size: 1rem;
-  transition: color 0.2s cubic-bezier(0.4, 0, 0.2, 1), gap 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  transition:
+    color 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+    gap 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 
   &:hover {
     color: var(--primary-hover);
@@ -465,7 +480,9 @@ const FeatureVisual = styled.div`
   align-items: center;
   justify-content: center;
   min-height: 280px;
-  box-shadow: 0 4px 6px -1px var(--shadow-color), 0 2px 4px -1px var(--shadow-color);
+  box-shadow:
+    0 4px 6px -1px var(--shadow-color),
+    0 2px 4px -1px var(--shadow-color);
 `;
 
 const FeatureVisualIcon = styled.div`
@@ -583,7 +600,8 @@ const HomePage: React.FC = () => {
           </Title>
 
           <Subtitle>
-            Compara más de 800 palas de pádel con datos reales: peso, balance, forma, materiales y precio. Filtra, compara y encuentra la pala que se ajusta a tu juego.
+            Compara más de 800 palas de pádel con datos reales: peso, balance, forma, materiales y
+            precio. Filtra, compara y encuentra la pala que se ajusta a tu juego.
           </Subtitle>
 
           <CTAButtons>
@@ -599,19 +617,21 @@ const HomePage: React.FC = () => {
 
           <TrustBar>
             <TrustItem>
-              <Check size={18} color="var(--primary-light)" />
+              <Check size={18} color='var(--primary-light)' />
               +800 palas analizadas
             </TrustItem>
             <TrustItem>
-              <Check size={18} color="var(--primary-light)" />
+              <Check size={18} color='var(--primary-light)' />
               Sin registro obligatorio
             </TrustItem>
           </TrustBar>
 
-          <ScrollIndicator onClick={() => window.scrollTo({ top: window.innerHeight, behavior: 'smooth' })}>
+          <ScrollIndicator
+            onClick={() => window.scrollTo({ top: window.innerHeight, behavior: 'smooth' })}
+          >
             <span>Descubre más</span>
-            <div className="mouse">
-              <div className="wheel" />
+            <div className='mouse'>
+              <div className='wheel' />
             </div>
           </ScrollIndicator>
         </HeroContent>
@@ -621,11 +641,17 @@ const HomePage: React.FC = () => {
         <HowItWorksContent>
           <SectionHeader>
             <SectionTitle>Encontrar tu pala ideal es simple</SectionTitle>
-            <SectionSubtitle>Tres pasos para descubrir la pala perfecta para tu juego</SectionSubtitle>
+            <SectionSubtitle>
+              Tres pasos para descubrir la pala perfecta para tu juego
+            </SectionSubtitle>
           </SectionHeader>
 
           <StepsContainer>
-            <StepCard ref={step1.ref} $inView={step1.inView} style={{ '--delay': '0s' } as React.CSSProperties}>
+            <StepCard
+              ref={step1.ref}
+              $inView={step1.inView}
+              style={{ '--delay': '0s' } as React.CSSProperties}
+            >
               <StepNumber>1</StepNumber>
               <StepTitle>Cuéntanos tu estilo</StepTitle>
               <StepDescription>
@@ -633,7 +659,11 @@ const HomePage: React.FC = () => {
               </StepDescription>
             </StepCard>
 
-            <StepCard ref={step2.ref} $inView={step2.inView} style={{ '--delay': '0.15s' } as React.CSSProperties}>
+            <StepCard
+              ref={step2.ref}
+              $inView={step2.inView}
+              style={{ '--delay': '0.15s' } as React.CSSProperties}
+            >
               <StepNumber>2</StepNumber>
               <StepTitle>Recibe recomendaciones</StepTitle>
               <StepDescription>
@@ -641,7 +671,11 @@ const HomePage: React.FC = () => {
               </StepDescription>
             </StepCard>
 
-            <StepCard ref={step3.ref} $inView={step3.inView} style={{ '--delay': '0.3s' } as React.CSSProperties}>
+            <StepCard
+              ref={step3.ref}
+              $inView={step3.inView}
+              style={{ '--delay': '0.3s' } as React.CSSProperties}
+            >
               <StepNumber>3</StepNumber>
               <StepTitle>Compara y elige</StepTitle>
               <StepDescription>
@@ -656,7 +690,9 @@ const HomePage: React.FC = () => {
         <FeaturesContent>
           <SectionHeader>
             <SectionTitle>Todo lo que necesitas para elegir bien</SectionTitle>
-            <SectionSubtitle>Herramientas pensadas para jugadores que saben lo que quieren</SectionSubtitle>
+            <SectionSubtitle>
+              Herramientas pensadas para jugadores que saben lo que quieren
+            </SectionSubtitle>
           </SectionHeader>
 
           <FeatureLayout>
@@ -667,7 +703,8 @@ const HomePage: React.FC = () => {
               </FeatureTag>
               <FeatureTitle>Compara hasta 3 palas lado a lado</FeatureTitle>
               <FeatureDescription>
-                Analiza pros y contras de cada modelo con datos técnicos detallados. Pesos, balances, formas, materiales: toda la información que importa, en una sola pantalla.
+                Analiza pros y contras de cada modelo con datos técnicos detallados. Pesos,
+                balances, formas, materiales: toda la información que importa, en una sola pantalla.
               </FeatureDescription>
               <FeatureLink to='/compare'>
                 Probar comparador
@@ -689,7 +726,8 @@ const HomePage: React.FC = () => {
               </FeatureTag>
               <FeatureTitle>Encuentra tu pala en segundos</FeatureTitle>
               <FeatureDescription>
-                Filtra por marca, forma, balance, peso, rango de precio y más. Nuestro buscador entiende lo que buscas, incluso si no sabes el nombre exacto.
+                Filtra por marca, forma, balance, peso, rango de precio y más. Nuestro buscador
+                entiende lo que buscas, incluso si no sabes el nombre exacto.
               </FeatureDescription>
               <FeatureLink to='/catalog'>
                 Explorar catálogo
@@ -708,7 +746,8 @@ const HomePage: React.FC = () => {
       <SocialProofSection>
         <SocialProofContent>
           <Quote>
-            Gracias a Smashly encontré la pala que necesitaba. En 5 minutos supe exactamente qué modelo comprar y dónde conseguirlo más barato.
+            Gracias a Smashly encontré la pala que necesitaba. En 5 minutos supe exactamente qué
+            modelo comprar y dónde conseguirlo más barato.
           </Quote>
           <QuoteAuthor>Carlos Martínez</QuoteAuthor>
           <QuoteRole>Jugador amateur, Madrid</QuoteRole>

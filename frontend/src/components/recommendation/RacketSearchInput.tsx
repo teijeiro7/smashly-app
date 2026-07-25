@@ -187,7 +187,7 @@ export const RacketSearchInput: React.FC<RacketSearchInputProps> = ({
     if (!isFocused) {
       setQuery(value ? `${value.marca} ${value.name}`.trim() : '');
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value?.name, value?.marca]);
 
   useEffect(() => {
@@ -235,7 +235,7 @@ export const RacketSearchInput: React.FC<RacketSearchInputProps> = ({
           <FiSearch size={18} />
         </SearchIcon>
         <Input
-          type="text"
+          type='text'
           value={query}
           onChange={e => setQuery(e.target.value)}
           onFocus={() => setIsFocused(true)}
@@ -285,7 +285,6 @@ export const RacketSearchInput: React.FC<RacketSearchInputProps> = ({
             </ManualEntryHint>
           </ResultsDropdown>
         )}
-
       </AnimatePresence>
     </SearchContainer>
   );

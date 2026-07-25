@@ -108,7 +108,10 @@ const CloseButton = styled.button`
   display: grid;
   place-items: center;
   cursor: pointer;
-  transition: background 0.15s ease, color 0.15s ease, transform 0.15s ease;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease,
+    transform 0.15s ease;
   flex-shrink: 0;
 
   &:hover {
@@ -173,7 +176,9 @@ const Select = styled.select`
   background: var(--surface);
   color: var(--text);
   font-weight: 500;
-  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
   appearance: none;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
@@ -247,7 +252,9 @@ const PrimaryButton = styled.button`
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  transition: transform 0.15s ease, background 0.15s ease;
+  transition:
+    transform 0.15s ease,
+    background 0.15s ease;
   flex: 1;
   letter-spacing: -0.01em;
 
@@ -276,7 +283,11 @@ const SecondaryButton = styled.button`
   color: var(--text);
   font-weight: 600;
   font-size: 0.95rem;
-  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease, transform 0.15s ease;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease,
+    transform 0.15s ease;
 
   &:hover {
     background: var(--surface-2);
@@ -332,8 +343,14 @@ const StockToggleRow = styled.label`
   font-weight: 500;
   color: var(--text);
   transition: border-color 0.15s;
-  &:hover { border-color: var(--primary); }
-  input { accent-color: var(--primary); width: 18px; height: 18px; }
+  &:hover {
+    border-color: var(--primary);
+  }
+  input {
+    accent-color: var(--primary);
+    width: 18px;
+    height: 18px;
+  }
 `;
 
 // ── Objective Options ───────────────────────────────────────────────────────
@@ -495,8 +512,20 @@ const CurrentRacketFinderModal: React.FC<CurrentRacketFinderModalProps> = ({
         current_racket_dislikes: '',
         style: objective,
         weakest_shot: '',
-        goals: [objective === 'potencia' ? 'Más potencia' : objective === 'control' ? 'Más control' : 'Más equilibrio'],
-        objectives: [objective === 'potencia' ? 'Más potencia' : objective === 'control' ? 'Más control' : 'Más equilibrio'],
+        goals: [
+          objective === 'potencia'
+            ? 'Más potencia'
+            : objective === 'control'
+              ? 'Más control'
+              : 'Más equilibrio',
+        ],
+        objectives: [
+          objective === 'potencia'
+            ? 'Más potencia'
+            : objective === 'control'
+              ? 'Más control'
+              : 'Más equilibrio',
+        ],
         characteristic_priorities: getPriorityOrder(objective),
         only_in_stock: onlyInStock,
       };
@@ -562,7 +591,7 @@ const CurrentRacketFinderModal: React.FC<CurrentRacketFinderModalProps> = ({
                   Indícanos tu pala actual, qué quieres mejorar y cuánto quieres invertir.
                 </Description>
               </TitleWrap>
-              <CloseButton type="button" onClick={onClose} aria-label="Cerrar">
+              <CloseButton type='button' onClick={onClose} aria-label='Cerrar'>
                 <FiX size={18} />
               </CloseButton>
             </Header>
@@ -571,33 +600,31 @@ const CurrentRacketFinderModal: React.FC<CurrentRacketFinderModalProps> = ({
               <SummaryCard>
                 <SummaryLabel>Tu pala actual</SummaryLabel>
                 <SummaryValue>{currentRacketLabel}</SummaryValue>
-                <HelperText>
-                  Puedes cambiarla aquí si has empezado a usar otra pala.
-                </HelperText>
+                <HelperText>Puedes cambiarla aquí si has empezado a usar otra pala.</HelperText>
               </SummaryCard>
 
               <FormGroup>
-                <Label htmlFor="current_racket">
+                <Label htmlFor='current_racket'>
                   <FiTarget size={14} /> Selecciona tu pala actual
                 </Label>
                 <Select
-                  id="current_racket"
+                  id='current_racket'
                   value={currentRacket}
                   onChange={e => setCurrentRacket(e.target.value)}
                   disabled={racketsLoading}
                   required
                 >
-                  <option value="">Selecciona una pala del catálogo</option>
+                  <option value=''>Selecciona una pala del catálogo</option>
                   {racketOptions}
                 </Select>
               </FormGroup>
 
               <FormGroup>
-                <Label htmlFor="objective">
+                <Label htmlFor='objective'>
                   <FiTrendingUp size={14} /> ¿Qué quieres mejorar?
                 </Label>
                 <Select
-                  id="objective"
+                  id='objective'
                   value={objective}
                   onChange={e => setObjective(e.target.value as typeof objective)}
                   required
@@ -616,45 +643,41 @@ const CurrentRacketFinderModal: React.FC<CurrentRacketFinderModalProps> = ({
 
               <FormGrid>
                 <FormGroup>
-                  <Label htmlFor="level">Nivel de juego</Label>
-                  <Select
-                    id="level"
-                    value={level}
-                    onChange={e => setLevel(e.target.value)}
-                  >
-                    <option value="">Selecciona tu nivel</option>
-                    <option value="principiante">Principiante</option>
-                    <option value="intermedio">Intermedio</option>
-                    <option value="avanzado">Avanzado</option>
-                    <option value="profesional">Profesional</option>
+                  <Label htmlFor='level'>Nivel de juego</Label>
+                  <Select id='level' value={level} onChange={e => setLevel(e.target.value)}>
+                    <option value=''>Selecciona tu nivel</option>
+                    <option value='principiante'>Principiante</option>
+                    <option value='intermedio'>Intermedio</option>
+                    <option value='avanzado'>Avanzado</option>
+                    <option value='profesional'>Profesional</option>
                   </Select>
                 </FormGroup>
 
                 <FormGroup>
-                  <Label htmlFor="frequency">Frecuencia</Label>
+                  <Label htmlFor='frequency'>Frecuencia</Label>
                   <Select
-                    id="frequency"
+                    id='frequency'
                     value={frequency}
                     onChange={e => setFrequency(e.target.value)}
                   >
-                    <option value="">Selecciona frecuencia</option>
-                    <option value="1">1 vez/semana o menos</option>
-                    <option value="2-3">2-3 veces/semana</option>
-                    <option value="4+">4+ veces/semana</option>
+                    <option value=''>Selecciona frecuencia</option>
+                    <option value='1'>1 vez/semana o menos</option>
+                    <option value='2-3'>2-3 veces/semana</option>
+                    <option value='4+'>4+ veces/semana</option>
                   </Select>
                 </FormGroup>
 
                 <FormGroup>
-                  <Label htmlFor="position">Posición</Label>
+                  <Label htmlFor='position'>Posición</Label>
                   <Select
-                    id="position"
+                    id='position'
                     value={position}
                     onChange={e => setPosition(e.target.value)}
                   >
-                    <option value="">Selecciona posición</option>
-                    <option value="reves">Revés</option>
-                    <option value="drive">Drive</option>
-                    <option value="ambos">Indiferente</option>
+                    <option value=''>Selecciona posición</option>
+                    <option value='reves'>Revés</option>
+                    <option value='drive'>Drive</option>
+                    <option value='ambos'>Indiferente</option>
                   </Select>
                 </FormGroup>
               </FormGrid>
@@ -665,42 +688,42 @@ const CurrentRacketFinderModal: React.FC<CurrentRacketFinderModalProps> = ({
 
               <FormGrid>
                 <FormGroup>
-                  <Label htmlFor="gender">Género</Label>
+                  <Label htmlFor='gender'>Género</Label>
                   <Select
-                    id="gender"
+                    id='gender'
                     value={gender}
                     onChange={e => setGender(e.target.value as 'masculino' | 'femenino' | '')}
                   >
-                    <option value="">Selecciona género</option>
-                    <option value="masculino">Masculino</option>
-                    <option value="femenino">Femenino</option>
+                    <option value=''>Selecciona género</option>
+                    <option value='masculino'>Masculino</option>
+                    <option value='femenino'>Femenino</option>
                   </Select>
                 </FormGroup>
 
                 <FormGroup>
-                  <Label htmlFor="physicalCondition">Condición física</Label>
+                  <Label htmlFor='physicalCondition'>Condición física</Label>
                   <Select
-                    id="physicalCondition"
+                    id='physicalCondition'
                     value={physicalCondition}
                     onChange={e => setPhysicalCondition(e.target.value)}
                   >
-                    <option value="">Selecciona condición</option>
-                    <option value="asiduo">Asiduo al deporte</option>
-                    <option value="ocasional">Ocasional</option>
+                    <option value=''>Selecciona condición</option>
+                    <option value='asiduo'>Asiduo al deporte</option>
+                    <option value='ocasional'>Ocasional</option>
                   </Select>
                 </FormGroup>
 
                 <FormGroup>
-                  <Label htmlFor="injuries">Lesiones</Label>
+                  <Label htmlFor='injuries'>Lesiones</Label>
                   <Select
-                    id="injuries"
+                    id='injuries'
                     value={injuries}
                     onChange={e => setInjuries(e.target.value)}
                   >
-                    <option value="no">No</option>
-                    <option value="codo">Codo (epicondilitis)</option>
-                    <option value="hombro">Hombro</option>
-                    <option value="muneca">Muñeca</option>
+                    <option value='no'>No</option>
+                    <option value='codo'>Codo (epicondilitis)</option>
+                    <option value='hombro'>Hombro</option>
+                    <option value='muneca'>Muñeca</option>
                   </Select>
                 </FormGroup>
               </FormGrid>
@@ -711,58 +734,58 @@ const CurrentRacketFinderModal: React.FC<CurrentRacketFinderModalProps> = ({
 
               <FormGrid>
                 <FormGroup>
-                  <Label htmlFor="touchPreference">Tacto</Label>
+                  <Label htmlFor='touchPreference'>Tacto</Label>
                   <Select
-                    id="touchPreference"
+                    id='touchPreference'
                     value={touchPreference}
                     onChange={e => setTouchPreference(e.target.value)}
                   >
-                    <option value="">Selecciona tacto</option>
-                    <option value="duro">Duro</option>
-                    <option value="medio">Medio</option>
-                    <option value="blando">Blando</option>
+                    <option value=''>Selecciona tacto</option>
+                    <option value='duro'>Duro</option>
+                    <option value='medio'>Medio</option>
+                    <option value='blando'>Blando</option>
                   </Select>
                 </FormGroup>
 
                 <FormGroup>
-                  <Label htmlFor="weightPreference">Peso pala</Label>
+                  <Label htmlFor='weightPreference'>Peso pala</Label>
                   <Select
-                    id="weightPreference"
+                    id='weightPreference'
                     value={weightPreference}
                     onChange={e => setWeightPreference(e.target.value)}
                   >
-                    <option value="no_se">No sé</option>
-                    <option value="ligera">Ligera (&lt;360g)</option>
-                    <option value="media">Media (360-375g)</option>
-                    <option value="pesada">Pesada (&gt;375g)</option>
+                    <option value='no_se'>No sé</option>
+                    <option value='ligera'>Ligera (&lt;360g)</option>
+                    <option value='media'>Media (360-375g)</option>
+                    <option value='pesada'>Pesada (&gt;375g)</option>
                   </Select>
                 </FormGroup>
 
                 <FormGroup>
-                  <Label htmlFor="balancePreference">Balance</Label>
+                  <Label htmlFor='balancePreference'>Balance</Label>
                   <Select
-                    id="balancePreference"
+                    id='balancePreference'
                     value={balancePreference}
                     onChange={e => setBalancePreference(e.target.value)}
                   >
-                    <option value="no_se">No sé</option>
-                    <option value="bajo">Bajo (Manejable)</option>
-                    <option value="medio">Medio (Equilibrado)</option>
-                    <option value="alto">Alto (Potencia)</option>
+                    <option value='no_se'>No sé</option>
+                    <option value='bajo'>Bajo (Manejable)</option>
+                    <option value='medio'>Medio (Equilibrado)</option>
+                    <option value='alto'>Alto (Potencia)</option>
                   </Select>
                 </FormGroup>
 
                 <FormGroup>
-                  <Label htmlFor="shapePreference">Forma</Label>
+                  <Label htmlFor='shapePreference'>Forma</Label>
                   <Select
-                    id="shapePreference"
+                    id='shapePreference'
                     value={shapePreference}
                     onChange={e => setShapePreference(e.target.value)}
                   >
-                    <option value="no_se">No sé</option>
-                    <option value="redonda">Redonda</option>
-                    <option value="lagrima">Lágrima</option>
-                    <option value="diamante">Diamante</option>
+                    <option value='no_se'>No sé</option>
+                    <option value='redonda'>Redonda</option>
+                    <option value='lagrima'>Lágrima</option>
+                    <option value='diamante'>Diamante</option>
                   </Select>
                 </FormGroup>
               </FormGrid>
@@ -776,15 +799,19 @@ const CurrentRacketFinderModal: React.FC<CurrentRacketFinderModalProps> = ({
                     {budget.min}€ – {budget.max}€
                   </BudgetValue>
                 </BudgetHeader>
-                <PriceRangeSlider min={50} max={700} step={10} value={budget} onChange={setBudget} />
-                <HelperText>
-                  El mínimo recomendado es 50€ y el máximo 700€.
-                </HelperText>
+                <PriceRangeSlider
+                  min={50}
+                  max={700}
+                  step={10}
+                  value={budget}
+                  onChange={setBudget}
+                />
+                <HelperText>El mínimo recomendado es 50€ y el máximo 700€.</HelperText>
               </BudgetCard>
 
               <StockToggleRow>
                 <input
-                  type="checkbox"
+                  type='checkbox'
                   checked={onlyInStock}
                   onChange={e => setOnlyInStock(e.target.checked)}
                 />
@@ -792,10 +819,10 @@ const CurrentRacketFinderModal: React.FC<CurrentRacketFinderModalProps> = ({
               </StockToggleRow>
 
               <ActionRow>
-                <SecondaryButton type="button" onClick={onClose}>
+                <SecondaryButton type='button' onClick={onClose}>
                   Cancelar
                 </SecondaryButton>
-                <PrimaryButton type="submit" disabled={loading}>
+                <PrimaryButton type='submit' disabled={loading}>
                   {loading ? 'Generando...' : 'Encontrar mi nueva pala'}
                   <FiCheckCircle size={16} />
                 </PrimaryButton>

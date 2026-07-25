@@ -11,7 +11,9 @@ export interface RecentlyViewedRacket {
 
 export class RacketViewService {
   static async recordView(racketId: number): Promise<void> {
-    const { data: { session } } = await supabase.auth.getSession();
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
     if (!session) return;
 
     const { error } = await supabase
@@ -42,22 +44,18 @@ export class RacketViewService {
   }
 
   static async removeView(racketId: number): Promise<void> {
-    const { error } = await supabase
-      .from('racket_views')
-      .delete()
-      .eq('racket_id', racketId);
+    const { error } = await supabase.from('racket_views').delete().eq('racket_id', racketId);
 
     if (error) throw new Error(error.message);
   }
 
   static async clearHistory(): Promise<void> {
-    const { data: { session } } = await supabase.auth.getSession();
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
     if (!session) return;
 
-    const { error } = await supabase
-      .from('racket_views')
-      .delete()
-      .eq('user_id', session.user.id);
+    const { error } = await supabase.from('racket_views').delete().eq('user_id', session.user.id);
 
     if (error) throw new Error(error.message);
   }

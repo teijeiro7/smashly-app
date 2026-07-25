@@ -50,7 +50,8 @@ const PhraseSpan = styled.span<{ $isExiting: boolean }>`
   display: inline-block;
   text-align: center;
   white-space: nowrap;
-  animation: ${(props) => (props.$isExiting ? rotateOut : rotateIn)} ${FADE_DURATION}s ease-in-out forwards;
+  animation: ${props => (props.$isExiting ? rotateOut : rotateIn)} ${FADE_DURATION}s ease-in-out
+    forwards;
   will-change: transform, opacity;
 
   @media (max-width: 640px) {
@@ -82,7 +83,7 @@ const RotatingPhrases: React.FC<RotatingPhrasesProps> = ({ phrases }) => {
 
       // 2. Wait for exit animation to complete, then change phrase
       const exitTimeout = setTimeout(() => {
-        setDisplayIndex((prev) => (prev + 1) % phrases.length);
+        setDisplayIndex(prev => (prev + 1) % phrases.length);
         setIsExiting(false);
       }, FADE_DURATION * 1000);
 
@@ -93,7 +94,7 @@ const RotatingPhrases: React.FC<RotatingPhrasesProps> = ({ phrases }) => {
   }, [phrases.length]);
 
   return (
-    <RotatingContainer aria-live="polite">
+    <RotatingContainer aria-live='polite'>
       <PhraseSpan key={displayIndex} $isExiting={isExiting}>
         {phrases[displayIndex]}
       </PhraseSpan>

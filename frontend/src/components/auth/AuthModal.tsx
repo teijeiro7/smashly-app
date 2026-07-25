@@ -5,15 +5,10 @@ import { FiX } from 'react-icons/fi';
 import { useAuthModal } from '../../contexts/AuthModalContext';
 import LoginForm from './LoginForm';
 import RegisterForm from './RegisterForm';
-import {
-  FormTitle,
-  FormSubtitle,
-  TabContainer,
-  Tab
-} from './AuthStyles';
+import { FormTitle, FormSubtitle, TabContainer, Tab } from './AuthStyles';
 
-// Optimized Overlay: Removed generic backdrop-filter for performance, 
-// used simple rgba. If blur is needed, use a separate static pseudo-element 
+// Optimized Overlay: Removed generic backdrop-filter for performance,
+// used simple rgba. If blur is needed, use a separate static pseudo-element
 // or ensure it's not animating constantly.
 const Overlay = styled(motion.div)`
   position: fixed;
@@ -23,7 +18,7 @@ const Overlay = styled(motion.div)`
   bottom: 0;
   background: rgba(0, 0, 0, 0.6);
   // blurred background can be expensive during animation
-  // backdrop-filter: blur(4px); 
+  // backdrop-filter: blur(4px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -55,7 +50,8 @@ const ModalContainer = styled(motion.div)`
 
 const LeftPanel = styled.div<{ $bgImage: string }>`
   flex: 1;
-  background-image: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.6)), url(${props => props.$bgImage});
+  background-image:
+    linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.6)), url(${props => props.$bgImage});
   background-size: cover;
   background-position: center;
   display: flex;
@@ -67,7 +63,7 @@ const LeftPanel = styled.div<{ $bgImage: string }>`
   will-change: background-image;
 
   @media (max-width: 768px) {
-    display: none; 
+    display: none;
   }
 `;
 
@@ -115,7 +111,7 @@ const Branding = styled.div`
   gap: 12px;
   font-weight: 700;
   font-size: 1.5rem;
-  
+
   img {
     height: 60px;
     width: auto;
@@ -141,8 +137,10 @@ const HeroDescription = styled.p`
 `;
 
 // Preload images content
-const LOGIN_IMAGE = "https://lrdgyfmkkboyhoycrnov.supabase.co/storage/v1/object/sign/images/login_image.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jY2NkNjhmMi03NDg2LTQzNGUtYjE0ZC1mYmE0YzJkM2RiNzMiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJpbWFnZXMvbG9naW5faW1hZ2UucG5nIiwiaWF0IjoxNzcxNTc5NjcyLCJleHAiOjE4MDMxMTU2NzJ9.9NpKzdw9rO8edv-6lPdKTsvdYSRN6e9LR51eB6NfmjQ";
-const REGISTER_IMAGE = "https://lrdgyfmkkboyhoycrnov.supabase.co/storage/v1/object/sign/images/register_image.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jY2NkNjhmMi03NDg2LTQzNGUtYjE0ZC1mYmE0YzJkM2RiNzMiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJpbWFnZXMvcmVnaXN0ZXJfaW1hZ2UuanBnIiwiaWF0IjoxNzcxNTc5Njk3LCJleHAiOjE4MDMxMTU2OTd9.i3zj8yOi70CpqKHcWj2c2k0yA8cevX7G58z-shmwbtw";
+const LOGIN_IMAGE =
+  'https://lrdgyfmkkboyhoycrnov.supabase.co/storage/v1/object/sign/images/login_image.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jY2NkNjhmMi03NDg2LTQzNGUtYjE0ZC1mYmE0YzJkM2RiNzMiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJpbWFnZXMvbG9naW5faW1hZ2UucG5nIiwiaWF0IjoxNzcxNTc5NjcyLCJleHAiOjE4MDMxMTU2NzJ9.9NpKzdw9rO8edv-6lPdKTsvdYSRN6e9LR51eB6NfmjQ';
+const REGISTER_IMAGE =
+  'https://lrdgyfmkkboyhoycrnov.supabase.co/storage/v1/object/sign/images/register_image.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jY2NkNjhmMi03NDg2LTQzNGUtYjE0ZC1mYmE0YzJkM2RiNzMiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJpbWFnZXMvcmVnaXN0ZXJfaW1hZ2UuanBnIiwiaWF0IjoxNzcxNTc5Njk3LCJleHAiOjE4MDMxMTU2OTd9.i3zj8yOi70CpqKHcWj2c2k0yA8cevX7G58z-shmwbtw';
 
 const AuthModal: React.FC = () => {
   const { isOpen, view, closeModal, openLogin, openRegister } = useAuthModal();
@@ -170,25 +168,34 @@ const AuthModal: React.FC = () => {
   const bgImage = view === 'login' ? LOGIN_IMAGE : REGISTER_IMAGE;
 
   // Memoize static content to prevent unnecessary re-renders of the left panel structure
-  const leftPanelContent = useMemo(() => (
-    <>
-      <Branding>
-        <img src="https://lrdgyfmkkboyhoycrnov.supabase.co/storage/v1/object/sign/images/smashly-large-icon.ico?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jY2NkNjhmMi03NDg2LTQzNGUtYjE0ZC1mYmE0YzJkM2RiNzMiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJpbWFnZXMvc21hc2hseS1sYXJnZS1pY29uLmljbyIsImlhdCI6MTc3MTU3OTQ4NCwiZXhwIjoxODAzMTE1NDg0fQ.gccmibb2sAt_EekW0HRgQEBFfsKKwc_3GoO75SVqbJc" alt="Smashly" loading='eager' onError={(e) => { e.currentTarget.style.display = 'none'; }} />
-      </Branding>
-      <div>
-        <HeroTitle>
-          {view === 'login' ? 'Domina la Pista' : 'Únete a la'}
-          <span>{view === 'login' ? 'con Datos' : 'Comunidad'}</span>
-        </HeroTitle>
-        <HeroDescription>
-          {view === 'login' 
-            ? "Únete a la comunidad de pádel de más rápido crecimiento. Rastrea tu rendimiento, analiza tus golpes con IA y encuentra partidos que eleven tu juego."
-            : "Crea tu cuenta hoy y lleva tu juego de pádel al siguiente nivel."
-          }
-        </HeroDescription>
-      </div>
-    </>
-  ), [view]);
+  const leftPanelContent = useMemo(
+    () => (
+      <>
+        <Branding>
+          <img
+            src='https://lrdgyfmkkboyhoycrnov.supabase.co/storage/v1/object/sign/images/smashly-large-icon.ico?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jY2NkNjhmMi03NDg2LTQzNGUtYjE0ZC1mYmE0YzJkM2RiNzMiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJpbWFnZXMvc21hc2hseS1sYXJnZS1pY29uLmljbyIsImlhdCI6MTc3MTU3OTQ4NCwiZXhwIjoxODAzMTE1NDg0fQ.gccmibb2sAt_EekW0HRgQEBFfsKKwc_3GoO75SVqbJc'
+            alt='Smashly'
+            loading='eager'
+            onError={e => {
+              e.currentTarget.style.display = 'none';
+            }}
+          />
+        </Branding>
+        <div>
+          <HeroTitle>
+            {view === 'login' ? 'Domina la Pista' : 'Únete a la'}
+            <span>{view === 'login' ? 'con Datos' : 'Comunidad'}</span>
+          </HeroTitle>
+          <HeroDescription>
+            {view === 'login'
+              ? 'Únete a la comunidad de pádel de más rápido crecimiento. Rastrea tu rendimiento, analiza tus golpes con IA y encuentra partidos que eleven tu juego.'
+              : 'Crea tu cuenta hoy y lleva tu juego de pádel al siguiente nivel.'}
+          </HeroDescription>
+        </div>
+      </>
+    ),
+    [view]
+  );
 
   return (
     <AnimatePresence>
@@ -205,11 +212,9 @@ const AuthModal: React.FC = () => {
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.95, opacity: 0 }}
             transition={{ type: 'spring', damping: 25, stiffness: 350, mass: 0.8 }} // Snappier spring
-            onClick={(e) => e.stopPropagation()}
+            onClick={e => e.stopPropagation()}
           >
-            <LeftPanel $bgImage={bgImage}>
-               {leftPanelContent}
-            </LeftPanel>
+            <LeftPanel $bgImage={bgImage}>{leftPanelContent}</LeftPanel>
 
             <RightPanel>
               <CloseButton onClick={closeModal}>
@@ -219,15 +224,18 @@ const AuthModal: React.FC = () => {
               <div style={{ maxWidth: '440px', margin: '0 auto', width: '100%' }}>
                 <FormTitle>{view === 'login' ? 'Bienvenido de nuevo' : 'Crear Cuenta'}</FormTitle>
                 <FormSubtitle>
-                  {view === 'login' 
-                    ? 'Introduce tus datos para acceder a tu panel.' 
-                    : 'Rellena tus datos para comenzar.'
-                  }
+                  {view === 'login'
+                    ? 'Introduce tus datos para acceder a tu panel.'
+                    : 'Rellena tus datos para comenzar.'}
                 </FormSubtitle>
 
                 <TabContainer>
-                  <Tab as="button" to="" $active={view === 'login'} onClick={openLogin}>Iniciar Sesión</Tab>
-                  <Tab as="button" to="" $active={view === 'register'} onClick={openRegister}>Registrarse</Tab>
+                  <Tab as='button' to='' $active={view === 'login'} onClick={openLogin}>
+                    Iniciar Sesión
+                  </Tab>
+                  <Tab as='button' to='' $active={view === 'register'} onClick={openRegister}>
+                    Registrarse
+                  </Tab>
                 </TabContainer>
 
                 {view === 'login' ? (
@@ -245,4 +253,3 @@ const AuthModal: React.FC = () => {
 };
 
 export default React.memo(AuthModal);
-

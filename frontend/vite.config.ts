@@ -108,7 +108,9 @@ export default defineConfig(({ mode }) => ({
             options: {
               cacheName: 'images',
               expiration: {
-                maxEntries: 50,
+                // Catalog has ~800 rackets; 50 entries evicted constantly
+                // and defeated offline/repeat-visit caching almost entirely.
+                maxEntries: 250,
                 maxAgeSeconds: 60 * 60 * 24 * 30,
               },
             },

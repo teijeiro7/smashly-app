@@ -26,14 +26,14 @@ const IconBox = styled.div<{ $status: string }>`
     $status === 'verified'
       ? 'var(--primary-subtle)'
       : $status === 'rejected'
-      ? 'rgba(220, 38, 38, 0.10)'
-      : 'rgba(217, 119, 6, 0.10)'};
+        ? 'rgba(220, 38, 38, 0.10)'
+        : 'rgba(217, 119, 6, 0.10)'};
   color: ${({ $status }) =>
     $status === 'verified'
       ? 'var(--primary-hover)'
       : $status === 'rejected'
-      ? 'var(--danger)'
-      : '#d97706'};
+        ? 'var(--danger)'
+        : '#d97706'};
 `;
 
 const Content = styled.div`
@@ -50,8 +50,8 @@ const StatusLabel = styled.div<{ $status: string }>`
     $status === 'verified'
       ? 'var(--primary-hover)'
       : $status === 'rejected'
-      ? 'var(--danger)'
-      : '#d97706'};
+        ? 'var(--danger)'
+        : '#d97706'};
 `;
 
 const Title = styled.h3`
@@ -89,7 +89,8 @@ const config = {
     icon: FiClock,
     label: 'Pendiente de revisión',
     title: 'Tu tienda está en revisión',
-    message: 'El equipo de Smashly verificará tu información en las próximas 24-48 horas. Te notificaremos cuando esté lista.',
+    message:
+      'El equipo de Smashly verificará tu información en las próximas 24-48 horas. Te notificaremos cuando esté lista.',
   },
   verified: {
     icon: FiCheckCircle,
@@ -105,7 +106,11 @@ const config = {
   },
 };
 
-const StoreStatusCard: React.FC<StoreStatusCardProps> = ({ status, storeName: _storeName, rejectionReason }) => {
+const StoreStatusCard: React.FC<StoreStatusCardProps> = ({
+  status,
+  storeName: _storeName,
+  rejectionReason,
+}) => {
   const { icon: Icon, label, title, message } = config[status];
 
   return (

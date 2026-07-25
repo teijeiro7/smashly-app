@@ -6,14 +6,24 @@ import catalogService, { CatalogSearchResult } from '../../services/catalogServi
 
 const Overlay = styled.div`
   position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(0,0,0,0.5);
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 1000;
   animation: fadeIn 0.2s ease;
-  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
 `;
 
 const Modal = styled.div`
@@ -24,9 +34,18 @@ const Modal = styled.div`
   max-height: 85vh;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
   animation: slideUp 0.3s ease;
-  @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+  @keyframes slideUp {
+    from {
+      transform: translateY(20px);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
 `;
 
 const Header = styled.div`
@@ -51,7 +70,10 @@ const CloseBtn = styled.button`
   cursor: pointer;
   padding: 0.375rem;
   border-radius: 6px;
-  &:hover { background: var(--surface-3); color: var(--text); }
+  &:hover {
+    background: var(--surface-3);
+    color: var(--text);
+  }
 `;
 
 const SearchBar = styled.div`
@@ -75,7 +97,11 @@ const SearchInput = styled.input`
   font-size: 0.95rem;
   background: var(--surface);
   color: var(--text);
-  &:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(var(--primary-rgb),0.1); }
+  &:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.1);
+  }
 `;
 
 const ResultsList = styled.div`
@@ -99,11 +125,14 @@ const ResultRow = styled.div<{ $selected?: boolean }>`
     background: ${({ $selected }) => ($selected ? 'var(--primary-subtle)' : 'var(--surface-2)')};
   }
 
-  & + & { margin-top: 0.5rem; }
+  & + & {
+    margin-top: 0.5rem;
+  }
 `;
 
 const ResultImg = styled.img`
-  width: 48px; height: 48px;
+  width: 48px;
+  height: 48px;
   object-fit: contain;
   border-radius: 8px;
   background: var(--surface);
@@ -111,24 +140,32 @@ const ResultImg = styled.img`
 `;
 
 const ResultInfo = styled.div`
-  flex: 1; min-width: 0;
+  flex: 1;
+  min-width: 0;
 `;
 
 const ResultName = styled.div`
-  font-weight: 600; color: var(--text); font-size: 0.9rem;
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  font-weight: 600;
+  color: var(--text);
+  font-size: 0.9rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 `;
 
 const ResultBrand = styled.div`
-  font-size: 0.8rem; color: var(--text-muted);
+  font-size: 0.8rem;
+  color: var(--text-muted);
 `;
 
 const ResultScore = styled.span`
-  font-size: 0.7rem; color: var(--text-subtle);
+  font-size: 0.7rem;
+  color: var(--text-subtle);
 `;
 
 const SelectCheck = styled.div`
-  width: 28px; height: 28px;
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
   background: var(--primary);
   color: white;
@@ -159,7 +196,10 @@ const FormInput = styled.input`
   font-size: 0.9rem;
   background: var(--surface);
   color: var(--text);
-  &:focus { outline: none; border-color: var(--primary); }
+  &:focus {
+    outline: none;
+    border-color: var(--primary);
+  }
 `;
 
 const AddToCatalogBtn = styled.button`
@@ -176,8 +216,15 @@ const AddToCatalogBtn = styled.button`
   justify-content: center;
   gap: 0.5rem;
 
-  &:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(var(--primary-rgb),0.3); }
-  &:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 16px rgba(var(--primary-rgb), 0.3);
+  }
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+  }
 `;
 
 const Spinner = styled.div`
@@ -272,7 +319,9 @@ const AddRacketModal: React.FC<AddRacketModalProps> = ({ storeId, isOpen, onClos
       <Modal onClick={e => e.stopPropagation()}>
         <Header>
           <Title>Añadir pala al catálogo</Title>
-          <CloseBtn onClick={onClose}><FiX size={22} /></CloseBtn>
+          <CloseBtn onClick={onClose}>
+            <FiX size={22} />
+          </CloseBtn>
         </Header>
 
         <SearchBar>
@@ -282,7 +331,7 @@ const AddRacketModal: React.FC<AddRacketModalProps> = ({ storeId, isOpen, onClos
             value={query}
             onChange={e => setQuery(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="Buscar por nombre, marca o modelo..."
+            placeholder='Buscar por nombre, marca o modelo...'
           />
         </SearchBar>
 
@@ -291,14 +340,27 @@ const AddRacketModal: React.FC<AddRacketModalProps> = ({ storeId, isOpen, onClos
         ) : results.length > 0 ? (
           <ResultsList>
             {results.map(r => (
-              <ResultRow key={r.id} $selected={r.id === selectedId} onClick={() => handleSelect(r.id)}>
-                {r.images?.[0] ? <ResultImg src={r.images[0]} alt={r.name} /> : <ResultImg src="" alt="" style={{ background: 'var(--surface-3)' }} />}
+              <ResultRow
+                key={r.id}
+                $selected={r.id === selectedId}
+                onClick={() => handleSelect(r.id)}
+              >
+                {r.images?.[0] ? (
+                  <ResultImg src={r.images[0]} alt={r.name} />
+                ) : (
+                  <ResultImg src='' alt='' style={{ background: 'var(--surface-3)' }} />
+                )}
                 <ResultInfo>
                   <ResultName>{r.name}</ResultName>
-                  <ResultBrand>{r.brand} {r.model ? `- ${r.model}` : ''} <ResultScore>({r._score}%)</ResultScore></ResultBrand>
+                  <ResultBrand>
+                    {r.brand} {r.model ? `- ${r.model}` : ''}{' '}
+                    <ResultScore>({r._score}%)</ResultScore>
+                  </ResultBrand>
                 </ResultInfo>
                 {r.id === selectedId && (
-                  <SelectCheck><FiCheck size={16} /></SelectCheck>
+                  <SelectCheck>
+                    <FiCheck size={16} />
+                  </SelectCheck>
                 )}
               </ResultRow>
             ))}
@@ -318,14 +380,14 @@ const AddRacketModal: React.FC<AddRacketModalProps> = ({ storeId, isOpen, onClos
           <PriceForm>
             <PriceRow>
               <FormInput
-                type="number"
-                step="0.01"
-                placeholder="Precio (€)"
+                type='number'
+                step='0.01'
+                placeholder='Precio (€)'
                 value={price}
                 onChange={e => setPrice(e.target.value)}
               />
               <FormInput
-                placeholder="URL de tu tienda (opcional)"
+                placeholder='URL de tu tienda (opcional)'
                 value={link}
                 onChange={e => setLink(e.target.value)}
               />

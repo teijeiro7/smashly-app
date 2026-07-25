@@ -1,8 +1,8 @@
-import { motion } from "framer-motion";
-import React from "react";
-import { FiClock, FiHome } from "react-icons/fi";
+import { motion } from 'framer-motion';
+import React from 'react';
+import { FiClock, FiHome } from 'react-icons/fi';
 import { Link } from '@tanstack/react-router';
-import styled from "styled-components";
+import styled from 'styled-components';
 
 const Container = styled.div`
   min-height: calc(100vh - 70px);
@@ -93,7 +93,7 @@ const ButtonGroup = styled.div`
   flex-wrap: wrap;
 `;
 
-const Button = styled(Link)<{ variant?: "primary" | "secondary" }>`
+const Button = styled(Link)<{ variant?: 'primary' | 'secondary' }>`
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
@@ -105,8 +105,8 @@ const Button = styled(Link)<{ variant?: "primary" | "secondary" }>`
   transition: all 0.3s ease;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 
-  ${(props) =>
-    props.variant === "primary"
+  ${props =>
+    props.variant === 'primary'
       ? `
     background: linear-gradient(135deg, var(--brand-surface) 0%, var(--brand-surface-hover) 100%);
     color: white;
@@ -149,26 +149,26 @@ const ComingSoonPage: React.FC = () => {
         <IconWrapper
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
-          transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
+          transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
         >
           <FiClock />
         </IconWrapper>
 
         <Title>
-          <span className="highlight">Próximamente</span> Disponible
+          <span className='highlight'>Próximamente</span> Disponible
         </Title>
 
         <Subtitle>
-          Estamos trabajando arduamente para traerte esta funcionalidad
-          increíble. ¡Pronto estará lista!
+          Estamos trabajando arduamente para traerte esta funcionalidad increíble. ¡Pronto estará
+          lista!
         </Subtitle>
 
         <ButtonGroup>
-          <Button to="/" variant="primary">
+          <Button to='/' variant='primary'>
             <FiHome />
             Volver al Inicio
           </Button>
-          <Button to="/catalog" variant="secondary">
+          <Button to='/catalog' variant='secondary'>
             Ver Catálogo
           </Button>
         </ButtonGroup>

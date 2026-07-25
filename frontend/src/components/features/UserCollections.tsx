@@ -159,12 +159,12 @@ const ActionButton = styled(motion.button)<{ $danger?: boolean }>`
   justify-content: center;
   border: none;
   cursor: pointer;
-  background: ${props => props.$danger ? 'rgba(220, 38, 38, 0.10)' : 'transparent'};
-  color: ${props => props.$danger ? 'var(--danger)' : 'var(--text-muted)'};
+  background: ${props => (props.$danger ? 'rgba(220, 38, 38, 0.10)' : 'transparent')};
+  color: ${props => (props.$danger ? 'var(--danger)' : 'var(--text-muted)')};
 
   &:hover {
-    background: ${props => props.$danger ? 'var(--danger)' : 'var(--surface-3)'};
-    color: ${props => props.$danger ? 'var(--brand-on-surface)' : 'var(--primary)'};
+    background: ${props => (props.$danger ? 'var(--danger)' : 'var(--surface-3)')};
+    color: ${props => (props.$danger ? 'var(--brand-on-surface)' : 'var(--primary)')};
   }
 `;
 
@@ -245,8 +245,8 @@ const Button = styled.button<{ $primary?: boolean }>`
   font-weight: 600;
   cursor: pointer;
   border: none;
-  background: ${props => props.$primary ? 'var(--primary)' : 'var(--surface-3)'};
-  color: ${props => props.$primary ? 'var(--brand-on-surface)' : 'var(--text-muted)'};
+  background: ${props => (props.$primary ? 'var(--primary)' : 'var(--surface-3)')};
+  color: ${props => (props.$primary ? 'var(--brand-on-surface)' : 'var(--text-muted)')};
 `;
 
 const UserCollections: React.FC = () => {
@@ -266,9 +266,9 @@ const UserCollections: React.FC = () => {
     try {
       const listsData = await ListService.getUserLists();
       setLists(listsData as any);
-      
+
       const comparisonsData = await comparisonService.getUserComparisons();
-      
+
       const allRacketIds = [...new Set(comparisonsData.flatMap(c => c.racket_ids))];
       const rackets: Record<number, any> = {};
       await Promise.all(
@@ -311,7 +311,7 @@ const UserCollections: React.FC = () => {
   const handleDeleteList = async (id: string, e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    
+
     if (!window.confirm('¿Eliminar esta lista?')) return;
 
     try {
@@ -334,17 +334,19 @@ const UserCollections: React.FC = () => {
         </Tab>
       </TabsContainer>
 
-      <AnimatePresence mode="wait">
+      <AnimatePresence mode='wait'>
         {activeTab === 'lists' && (
           <motion.div
-            key="lists"
+            key='lists'
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
           >
             <ContentCard>
               <CardHeader>
-                <CardTitle><FiList /> Mis Listas</CardTitle>
+                <CardTitle>
+                  <FiList /> Mis Listas
+                </CardTitle>
                 <AddButton
                   onClick={() => setShowCreateForm(true)}
                   whileHover={{ scale: 1.02 }}
@@ -364,7 +366,7 @@ const UserCollections: React.FC = () => {
                       <FormGroup>
                         <FormLabel>Nombre de la lista</FormLabel>
                         <FormInput
-                          placeholder="Ej: Mis favoritas"
+                          placeholder='Ej: Mis favoritas'
                           value={newListName}
                           onChange={e => setNewListName(e.target.value)}
                           autoFocus
@@ -372,7 +374,7 @@ const UserCollections: React.FC = () => {
                       </FormGroup>
                       <FormCheckbox>
                         <input
-                          type="checkbox"
+                          type='checkbox'
                           checked={newListPublic}
                           onChange={e => setNewListPublic(e.target.checked)}
                         />
@@ -392,7 +394,9 @@ const UserCollections: React.FC = () => {
 
                 {lists.length === 0 ? (
                   <EmptyState>
-                    <EmptyIcon><FiList /></EmptyIcon>
+                    <EmptyIcon>
+                      <FiList />
+                    </EmptyIcon>
                     <p>No tienes listas creadas</p>
                     <Button
                       $primary
@@ -422,7 +426,7 @@ const UserCollections: React.FC = () => {
                           <ListActions>
                             <ActionButton
                               $danger
-                              onClick={(e) => handleDeleteList(list.id, e)}
+                              onClick={e => handleDeleteList(list.id, e)}
                               whileHover={{ scale: 1.1 }}
                               whileTap={{ scale: 0.9 }}
                             >
@@ -441,26 +445,25 @@ const UserCollections: React.FC = () => {
 
         {activeTab === 'comparisons' && (
           <motion.div
-            key="comparisons"
+            key='comparisons'
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
           >
             <ContentCard>
               <CardHeader>
-                <CardTitle><FiGitBranch /> Mis Comparaciones</CardTitle>
+                <CardTitle>
+                  <FiGitBranch /> Mis Comparaciones
+                </CardTitle>
               </CardHeader>
               <CardContent>
                 {comparisons.length === 0 ? (
                   <EmptyState>
-                    <EmptyIcon><FiGitBranch /></EmptyIcon>
+                    <EmptyIcon>
+                      <FiGitBranch />
+                    </EmptyIcon>
                     <p>No tienes comparaciones guardadas</p>
-                    <Button
-                      $primary
-                      as={Link}
-                      to="/compare"
-                      style={{ marginTop: '1rem' }}
-                    >
+                    <Button $primary as={Link} to='/compare' style={{ marginTop: '1rem' }}>
                       <FiPlus size={16} /> Crear comparación
                     </Button>
                   </EmptyState>

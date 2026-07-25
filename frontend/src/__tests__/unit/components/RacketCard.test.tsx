@@ -21,9 +21,7 @@ const defaultProps = {
 
 describe('RacketCard', () => {
   const renderRacketCard = (racket = mockRacket) => {
-    return render(
-      <RacketCard racket={racket as any} {...defaultProps} />
-    );
+    return render(<RacketCard racket={racket as any} {...defaultProps} />);
   };
 
   it('renders racket information correctly', () => {

@@ -278,7 +278,7 @@ const StoreCatalogManager: React.FC<StoreCatalogManagerProps> = ({ storeId }) =>
         price: editPrice ? parseFloat(editPrice) : undefined,
         link: editLink || undefined,
       });
-      setPrices(prev => prev.map(p => p.id === updated.id ? updated : p));
+      setPrices(prev => prev.map(p => (p.id === updated.id ? updated : p)));
       setEditingId(null);
       sileo.success({ title: 'Actualizado' });
     } catch (error: any) {
@@ -311,13 +311,17 @@ const StoreCatalogManager: React.FC<StoreCatalogManagerProps> = ({ storeId }) =>
       </Header>
 
       {loading ? (
-        <EmptyState><p>Cargando catálogo...</p></EmptyState>
+        <EmptyState>
+          <p>Cargando catálogo...</p>
+        </EmptyState>
       ) : prices.length === 0 ? (
         <EmptyState>
-          <EmptyIcon><FiPackage /></EmptyIcon>
+          <EmptyIcon>
+            <FiPackage />
+          </EmptyIcon>
           <EmptyText>
-            Aún no has añadido ninguna pala a tu catálogo.
-            Busca en nuestra base de datos las palas que vendes y añade tu precio.
+            Aún no has añadido ninguna pala a tu catálogo. Busca en nuestra base de datos las palas
+            que vendes y añade tu precio.
           </EmptyText>
           <AddButton onClick={() => setShowAddModal(true)}>
             <FiSearch /> Buscar y añadir
@@ -336,7 +340,17 @@ const StoreCatalogManager: React.FC<StoreCatalogManagerProps> = ({ storeId }) =>
                 {item.racket?.images?.[0] ? (
                   <RacketImage src={item.racket.images[0]} alt={item.racket.name} />
                 ) : (
-                  <RacketImage src="" alt="" style={{ background: 'var(--surface-3)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.25rem' }} />
+                  <RacketImage
+                    src=''
+                    alt=''
+                    style={{
+                      background: 'var(--surface-3)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: '1.25rem',
+                    }}
+                  />
                 )}
 
                 <RacketInfo>
@@ -347,14 +361,14 @@ const StoreCatalogManager: React.FC<StoreCatalogManagerProps> = ({ storeId }) =>
                 {editingId === item.id ? (
                   <EditRow>
                     <PriceInput
-                      type="number"
-                      step="0.01"
-                      placeholder="€"
+                      type='number'
+                      step='0.01'
+                      placeholder='€'
                       value={editPrice}
                       onChange={e => setEditPrice(e.target.value)}
                     />
                     <LinkInput
-                      placeholder="URL (opcional)"
+                      placeholder='URL (opcional)'
                       value={editLink}
                       onChange={e => setEditLink(e.target.value)}
                     />
@@ -369,8 +383,14 @@ const StoreCatalogManager: React.FC<StoreCatalogManagerProps> = ({ storeId }) =>
                   <>
                     <PriceSection>
                       {item.price ? <PriceDisplay>{item.price}€</PriceDisplay> : null}
-                      {item.original_price ? <OriginalPrice>{item.original_price}€</OriginalPrice> : null}
-                      {item.link && <LinkDisplay href={item.link} target="_blank" rel="noopener">{item.link}</LinkDisplay>}
+                      {item.original_price ? (
+                        <OriginalPrice>{item.original_price}€</OriginalPrice>
+                      ) : null}
+                      {item.link && (
+                        <LinkDisplay href={item.link} target='_blank' rel='noopener'>
+                          {item.link}
+                        </LinkDisplay>
+                      )}
                     </PriceSection>
                     <Actions>
                       <IconButton onClick={() => handleStartEdit(item)}>

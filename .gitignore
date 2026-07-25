@@ -249,6 +249,9 @@ lighthouse-report.html
 lhci_reports/
 performance/
 
+# Generated output of frontend/audit-all.js and audit-full.js
+frontend/performance-audit/
+
 # ===================================
 # BUILD & DEPLOYMENT
 # ===================================

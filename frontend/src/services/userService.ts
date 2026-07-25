@@ -1,10 +1,5 @@
-import {
-  API_ENDPOINTS,
-  buildApiUrl,
-  getCommonHeaders,
-  ApiResponse,
-} from "../config/api";
-import { logger } from "../utils/logger";
+import { API_ENDPOINTS, buildApiUrl, getCommonHeaders, ApiResponse } from '../config/api';
+import { logger } from '../utils/logger';
 
 // Interfaz para el perfil de usuario
 export interface UserProfile {
@@ -52,15 +47,13 @@ export interface UpdateUserProfileRequest {
 async function handleApiResponse<T>(response: Response): Promise<T> {
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
-    throw new Error(
-      errorData.message || `Error: ${response.status} ${response.statusText}`
-    );
+    throw new Error(errorData.message || `Error: ${response.status} ${response.statusText}`);
   }
 
   const data: ApiResponse<T> = await response.json();
 
   if (!data.success) {
-    throw new Error(data.message || data.error || "Error desconocido");
+    throw new Error(data.message || data.error || 'Error desconocido');
   }
 
   return data.data as T;
@@ -74,7 +67,7 @@ export class UserService {
     try {
       const url = buildApiUrl(API_ENDPOINTS.USERS_PROFILE);
       const response = await fetch(url, {
-        method: "GET",
+        method: 'GET',
         headers: getCommonHeaders(),
       });
 
@@ -84,8 +77,8 @@ export class UserService {
 
       return await handleApiResponse<UserProfile>(response);
     } catch (error: any) {
-      logger.error("Error fetching user profile:", error);
-      if (error.message?.includes("404")) {
+      logger.error('Error fetching user profile:', error);
+      if (error.message?.includes('404')) {
         return null;
       }
       throw error;
@@ -95,20 +88,18 @@ export class UserService {
   /**
    * Crea un nuevo perfil de usuario desde la API REST
    */
-  static async createUserProfile(
-    profileData: CreateUserProfileRequest
-  ): Promise<UserProfile> {
+  static async createUserProfile(profileData: CreateUserProfileRequest): Promise<UserProfile> {
     try {
       const url = buildApiUrl(API_ENDPOINTS.USERS_PROFILE);
       const response = await fetch(url, {
-        method: "POST",
+        method: 'POST',
         headers: getCommonHeaders(),
         body: JSON.stringify(profileData),
       });
 
       return await handleApiResponse<UserProfile>(response);
     } catch (error: any) {
-      logger.error("Error creating user profile:", error);
+      logger.error('Error creating user profile:', error);
       throw error;
     }
   }
@@ -116,20 +107,18 @@ export class UserService {
   /**
    * Actualiza el perfil del usuario desde la API REST
    */
-  static async updateUserProfile(
-    updates: UpdateUserProfileRequest
-  ): Promise<UserProfile> {
+  static async updateUserProfile(updates: UpdateUserProfileRequest): Promise<UserProfile> {
     try {
       const url = buildApiUrl(API_ENDPOINTS.USERS_PROFILE);
       const response = await fetch(url, {
-        method: "PUT",
+        method: 'PUT',
         headers: getCommonHeaders(),
         body: JSON.stringify(updates),
       });
 
       return await handleApiResponse<UserProfile>(response);
     } catch (error: any) {
-      logger.error("Error updating user profile:", error);
+      logger.error('Error updating user profile:', error);
       throw error;
     }
   }
@@ -141,13 +130,13 @@ export class UserService {
     try {
       const url = buildApiUrl(API_ENDPOINTS.USERS_FAVORITES);
       const response = await fetch(url, {
-        method: "GET",
+        method: 'GET',
         headers: getCommonHeaders(),
       });
 
       return await handleApiResponse<number[]>(response);
     } catch (error: any) {
-      logger.error("Error fetching favorites:", error);
+      logger.error('Error fetching favorites:', error);
       throw error;
     }
   }
@@ -159,14 +148,14 @@ export class UserService {
     try {
       const url = buildApiUrl(API_ENDPOINTS.USERS_FAVORITES);
       const response = await fetch(url, {
-        method: "POST",
+        method: 'POST',
         headers: getCommonHeaders(),
         body: JSON.stringify({ racket_id: racketId }),
       });
 
       await handleApiResponse<void>(response);
     } catch (error: any) {
-      logger.error("Error adding favorite:", error);
+      logger.error('Error adding favorite:', error);
       throw error;
     }
   }
@@ -178,13 +167,13 @@ export class UserService {
     try {
       const url = buildApiUrl(API_ENDPOINTS.USERS_FAVORITE_BY_ID(racketId));
       const response = await fetch(url, {
-        method: "DELETE",
+        method: 'DELETE',
         headers: getCommonHeaders(),
       });
 
       await handleApiResponse<void>(response);
     } catch (error: any) {
-      logger.error("Error removing favorite:", error);
+      logger.error('Error removing favorite:', error);
       throw error;
     }
   }

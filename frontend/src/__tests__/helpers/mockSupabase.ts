@@ -22,10 +22,19 @@ function mockSelectReturn(resp: MockResponse) {
     error: resp.error,
   }));
   chain.select = vi.fn(() => chain);
-  chain.insert = vi.fn(() => ({ ...chain, select: vi.fn(() => ({ ...chain, single: vi.fn(async () => resp) })) }));
-  chain.update = vi.fn(() => ({ ...chain, select: vi.fn(() => ({ ...chain, single: vi.fn(async () => resp) })) }));
+  chain.insert = vi.fn(() => ({
+    ...chain,
+    select: vi.fn(() => ({ ...chain, single: vi.fn(async () => resp) })),
+  }));
+  chain.update = vi.fn(() => ({
+    ...chain,
+    select: vi.fn(() => ({ ...chain, single: vi.fn(async () => resp) })),
+  }));
   chain.delete = vi.fn(() => chain);
-  chain.upsert = vi.fn(() => ({ ...chain, select: vi.fn(() => ({ ...chain, single: vi.fn(async () => resp) })) }));
+  chain.upsert = vi.fn(() => ({
+    ...chain,
+    select: vi.fn(() => ({ ...chain, single: vi.fn(async () => resp) })),
+  }));
   chain.then = async (resolve: any) => resolve(resp);
   return chain;
 }
@@ -35,7 +44,12 @@ export function mockSupabase(resp: MockResponse) {
     from: vi.fn(() => mockSelectReturn(resp)),
     auth: {
       getSession: vi.fn(async () => ({
-        data: { session: { access_token: 'test-token', user: { id: 'test-user', email: 'test@test.com' } } },
+        data: {
+          session: {
+            access_token: 'test-token',
+            user: { id: 'test-user', email: 'test@test.com' },
+          },
+        },
         error: null,
       })),
       signOut: vi.fn(async () => ({ error: null })),

@@ -1,5 +1,14 @@
 import React, { memo, useState, useEffect } from 'react';
-import { Eye, Tag, Heart, Lightning, Crosshair, Cloud, RocketLaunch, Sparkle } from '@phosphor-icons/react';
+import {
+  Eye,
+  Tag,
+  Heart,
+  Lightning,
+  Crosshair,
+  Cloud,
+  RocketLaunch,
+  Sparkle,
+} from '@phosphor-icons/react';
 import styled from 'styled-components';
 import { Racket } from '../../types/racket';
 import { getLowestPrice } from '../../utils/priceUtils';
@@ -10,17 +19,23 @@ const RacketCardContainer = styled.li<{ $view: 'grid' | 'list'; $index: number }
   background: var(--surface);
   border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 1px 3px var(--shadow-color), 0 1px 2px var(--shadow-color);
+  box-shadow:
+    0 1px 3px var(--shadow-color),
+    0 1px 2px var(--shadow-color);
   cursor: pointer;
-  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1), background 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition:
+    transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    background 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   contain: layout style paint;
   will-change: transform, opacity;
   display: flex;
   flex-direction: ${props => (props.$view === 'list' ? 'row' : 'column')};
   height: ${props => (props.$view === 'grid' ? '100%' : 'auto')};
-  animation: ${props => props.$index < 12 ? 'cardFadeIn 0.4s ease forwards' : 'none'};
-  animation-delay: ${props => props.$index < 12 ? `${Math.min(props.$index * 0.05, 0.5)}s` : '0s'};
-  opacity: ${props => props.$index < 12 ? 0 : 1};
+  animation: ${props => (props.$index < 12 ? 'cardFadeIn 0.4s ease forwards' : 'none')};
+  animation-delay: ${props =>
+    props.$index < 12 ? `${Math.min(props.$index * 0.05, 0.5)}s` : '0s'};
+  opacity: ${props => (props.$index < 12 ? 0 : 1)};
 
   @keyframes cardFadeIn {
     from {
@@ -175,7 +190,9 @@ const ViewDetailsButton = styled.button`
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  transition: background-color 0.2s cubic-bezier(0.4, 0, 0.2, 1), transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  transition:
+    background-color 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+    transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 
   &:hover {
     background: var(--primary);
@@ -290,8 +307,8 @@ const RacketCardComponent: React.FC<RacketCardProps> = memo(
             loading={index < 4 ? 'eager' : 'lazy'}
             fetchPriority={index === 0 ? 'high' : 'auto'}
             decoding={index < 4 ? 'sync' : 'async'}
-            width="200"
-            height="200"
+            width='200'
+            height='200'
           />
           {racket.view_count !== undefined && racket.view_count > 10 && (
             <RacketBadge $variant='bestseller'>
@@ -345,24 +362,34 @@ const RacketCardComponent: React.FC<RacketCardProps> = memo(
 
           {racket.radar_potencia && (
             <MetricsSummary>
-              <MetricBadge title="Potencia">
-                <MetricLabel><Lightning size={14} /> Pot</MetricLabel>
+              <MetricBadge title='Potencia'>
+                <MetricLabel>
+                  <Lightning size={14} /> Pot
+                </MetricLabel>
                 <MetricValue>{racket.radar_potencia.toFixed(1)}</MetricValue>
               </MetricBadge>
-              <MetricBadge title="Control">
-                <MetricLabel><Crosshair size={14} /> Ctrl</MetricLabel>
+              <MetricBadge title='Control'>
+                <MetricLabel>
+                  <Crosshair size={14} /> Ctrl
+                </MetricLabel>
                 <MetricValue>{racket.radar_control?.toFixed(1)}</MetricValue>
               </MetricBadge>
-              <MetricBadge title="Manejabilidad">
-                <MetricLabel><Cloud size={14} /> Man</MetricLabel>
+              <MetricBadge title='Manejabilidad'>
+                <MetricLabel>
+                  <Cloud size={14} /> Man
+                </MetricLabel>
                 <MetricValue>{racket.radar_manejabilidad?.toFixed(1)}</MetricValue>
               </MetricBadge>
-              <MetricBadge title="Salida de Bola">
-                <MetricLabel><RocketLaunch size={14} /> Sal</MetricLabel>
+              <MetricBadge title='Salida de Bola'>
+                <MetricLabel>
+                  <RocketLaunch size={14} /> Sal
+                </MetricLabel>
                 <MetricValue>{racket.radar_salida_bola?.toFixed(1)}</MetricValue>
               </MetricBadge>
-              <MetricBadge title="Punto Dulce">
-                <MetricLabel><Sparkle size={14} /> Dul</MetricLabel>
+              <MetricBadge title='Punto Dulce'>
+                <MetricLabel>
+                  <Sparkle size={14} /> Dul
+                </MetricLabel>
                 <MetricValue>{racket.radar_punto_dulce?.toFixed(1)}</MetricValue>
               </MetricBadge>
             </MetricsSummary>
@@ -371,7 +398,10 @@ const RacketCardComponent: React.FC<RacketCardProps> = memo(
           <ActionButtons $view={view}>
             <ViewDetailsButton onClick={() => onClick(racket)}>Ver detalles</ViewDetailsButton>
             {isAuthenticated && onAddToList && (
-              <ViewDetailsButton onClick={handleAddToList} style={{ background: 'var(--primary-hover)' }}>
+              <ViewDetailsButton
+                onClick={handleAddToList}
+                style={{ background: 'var(--primary-hover)' }}
+              >
                 <Heart size={14} />
                 Mis listas
               </ViewDetailsButton>

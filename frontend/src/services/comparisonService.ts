@@ -18,7 +18,9 @@ export interface SavedComparison {
 }
 
 async function getAuthHeader(): Promise<HeadersInit> {
-  const { data: { session } } = await supabase.auth.getSession();
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
   const headers: HeadersInit = { 'Content-Type': 'application/json' };
   if (session?.access_token) {
     headers['Authorization'] = `Bearer ${session.access_token}`;
@@ -48,7 +50,9 @@ const comparisonService = {
     racketIds: number[],
     comparison: ComparisonResult
   ): Promise<SavedComparison> => {
-    const { data: { session } } = await supabase.auth.getSession();
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
     if (!session) throw new Error('No autenticado');
 
     const { data, error } = await supabase
@@ -67,7 +71,9 @@ const comparisonService = {
   },
 
   getUserComparisons: async (): Promise<SavedComparison[]> => {
-    const { data: { session } } = await supabase.auth.getSession();
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
     if (!session) return [];
 
     const { data, error } = await supabase
@@ -81,11 +87,7 @@ const comparisonService = {
   },
 
   getComparisonById: async (id: string): Promise<SavedComparison> => {
-    const { data, error } = await supabase
-      .from('comparisons')
-      .select('*')
-      .eq('id', id)
-      .single();
+    const { data, error } = await supabase.from('comparisons').select('*').eq('id', id).single();
 
     if (error) throw new Error(error.message);
     return data as SavedComparison;
@@ -97,7 +99,9 @@ const comparisonService = {
   },
 
   getComparisonCount: async (): Promise<number> => {
-    const { data: { session } } = await supabase.auth.getSession();
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
     if (!session) return 0;
 
     const { count, error } = await supabase
@@ -124,10 +128,7 @@ const comparisonService = {
   },
 
   unshareComparison: async (id: string): Promise<void> => {
-    const { error } = await supabase
-      .from('comparisons')
-      .update({ is_public: false })
-      .eq('id', id);
+    const { error } = await supabase.from('comparisons').update({ is_public: false }).eq('id', id);
 
     if (error) throw new Error(error.message);
   },

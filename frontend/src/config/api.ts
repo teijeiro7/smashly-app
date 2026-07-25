@@ -26,7 +26,6 @@ export const API_ENDPOINTS = {
   RACKETS_STATS: '/api/v1/rackets/stats',
   RACKETS_BULK_UPDATE: '/api/v1/rackets/bulk-update',
   RACKETS_BY_BRAND: (brand: string) => `/api/v1/rackets/brands/${brand}`,
-  RACKETS_PRICE_HISTORY: (id: number) => `/api/v1/rackets/${id}/price-history`,
   RECOMMENDATION_RAG: '/api/recommendations/generate-rag',
 
   // Users
@@ -49,7 +48,8 @@ export const API_ENDPOINTS = {
   STORES_MY_STORE: '/api/v1/stores/my-store',
   STORES_CATALOG: (storeId: string) => `/api/v1/stores/catalog/${storeId}`,
   STORES_CATALOG_SEARCH: (storeId: string) => `/api/v1/stores/catalog/${storeId}/search`,
-  STORES_CATALOG_ITEM: (storeId: string, priceId: string) => `/api/v1/stores/catalog/${storeId}/${priceId}`,
+  STORES_CATALOG_ITEM: (storeId: string, priceId: string) =>
+    `/api/v1/stores/catalog/${storeId}/${priceId}`,
 
   // Admin
   ADMIN: {
@@ -97,7 +97,9 @@ export const API_ENDPOINTS = {
 
 // Feature Flags
 export const FEATURE_FLAGS = {
-  USE_RAG_RECOMMENDATIONS: (import.meta as any).env?.VITE_USE_RAG === 'true' || true, // Enabling by default for testing
+  // Defaults to RAG on, but VITE_USE_RAG=false lets it be switched back to
+  // the deterministic recommender without a code change.
+  USE_RAG_RECOMMENDATIONS: (import.meta as any).env?.VITE_USE_RAG !== 'false',
 };
 
 /**
@@ -136,7 +138,9 @@ export const getAuthToken = (): string | null => {
   try {
     const legacy = localStorage.getItem('auth_token');
     if (legacy) return legacy;
-  } catch (_) { /* SSR or storage disabled */ }
+  } catch (_) {
+    /* SSR or storage disabled */
+  }
   return null;
 };
 
@@ -155,7 +159,11 @@ export const getCommonHeaders = (): HeadersInit => {
   if (legacyToken) {
     headers['Authorization'] = `Bearer ${legacyToken}`;
     // Clean it up so the user migrates to cookie auth on next login
-    try { localStorage.removeItem('auth_token'); } catch (_) { /* ignore */ }
+    try {
+      localStorage.removeItem('auth_token');
+    } catch (_) {
+      /* ignore */
+    }
   }
 
   return headers;

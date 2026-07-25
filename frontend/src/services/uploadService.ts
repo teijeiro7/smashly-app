@@ -1,4 +1,4 @@
-import { buildApiUrl, getCommonHeaders } from "../config/api";
+import { buildApiUrl, getCommonHeaders } from '../config/api';
 
 interface UploadAvatarResponse {
   success: boolean;
@@ -40,7 +40,7 @@ export class UploadService {
       // Enviar el archivo al backend
       const url = buildApiUrl('/api/v1/upload/avatar');
       const headers = getCommonHeaders() as Record<string, string>;
-      
+
       // Eliminar Content-Type para que el navegador lo configure automáticamente con el boundary
       delete headers['Content-Type'];
 

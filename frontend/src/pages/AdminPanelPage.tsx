@@ -1,9 +1,9 @@
-import React from "react";
-import styled from "styled-components";
-import { useAuth } from "../contexts/AuthContext";
+import React from 'react';
+import styled from 'styled-components';
+import { useAuth } from '../contexts/AuthContext';
 import { Navigate } from '@tanstack/react-router';
-import AdminLayout from "../components/features/AdminLayout";
-import AdminDashboard from "../components/features/AdminDashboard";
+import AdminLayout from '../components/features/AdminLayout';
+import AdminDashboard from '../components/features/AdminDashboard';
 
 const LoadingContainer = styled.div`
   display: flex;
@@ -24,7 +24,7 @@ const AdminPanelPage: React.FC = () => {
   }
 
   if (!user || user.role?.toLowerCase() !== 'admin') {
-    return <Navigate to="/profile" replace />;
+    return <Navigate to='/profile' replace />;
   }
 
   return (

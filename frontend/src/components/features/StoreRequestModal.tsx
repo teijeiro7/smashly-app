@@ -1,6 +1,6 @@
-import React from "react";
-import styled from "styled-components";
-import { FiCheckCircle, FiX } from "react-icons/fi";
+import React from 'react';
+import styled from 'styled-components';
+import { FiCheckCircle, FiX } from 'react-icons/fi';
 
 const Overlay = styled.div`
   position: fixed;
@@ -136,7 +136,7 @@ const ButtonGroup = styled.div`
   justify-content: center;
 `;
 
-const Button = styled.button<{ variant?: "primary" | "secondary" }>`
+const Button = styled.button<{ variant?: 'primary' | 'secondary' }>`
   padding: 0.875rem 2rem;
   border-radius: 12px;
   font-size: 1rem;
@@ -145,8 +145,8 @@ const Button = styled.button<{ variant?: "primary" | "secondary" }>`
   transition: all 0.2s ease;
   border: none;
 
-  ${(props) =>
-    props.variant === "secondary"
+  ${props =>
+    props.variant === 'secondary'
       ? `
     background: var(--surface-3);
     color: var(--text);
@@ -185,7 +185,7 @@ const StoreRequestModal: React.FC<StoreRequestModalProps> = ({
 
   return (
     <Overlay onClick={onClose}>
-      <ModalContainer onClick={(e) => e.stopPropagation()}>
+      <ModalContainer onClick={e => e.stopPropagation()}>
         <CloseButton onClick={onClose}>
           <FiX size={24} />
         </CloseButton>
@@ -199,29 +199,26 @@ const StoreRequestModal: React.FC<StoreRequestModalProps> = ({
         <Title>¡Solicitud Enviada!</Title>
 
         <Message>
-          Tu solicitud de registro para <strong>{storeName}</strong> ha sido
-          enviada correctamente.
+          Tu solicitud de registro para <strong>{storeName}</strong> ha sido enviada correctamente.
         </Message>
 
         <InfoBox>
           <InfoTitle>📋 ¿Qué sigue?</InfoTitle>
           <InfoText>
-            El equipo de Smashly revisará la información de tu tienda en las
-            próximas 24-48 horas. Te notificaremos por email cuando tu tienda
-            sea verificada y esté lista para usar.
+            El equipo de Smashly revisará la información de tu tienda en las próximas 24-48 horas.
+            Te notificaremos por email cuando tu tienda sea verificada y esté lista para usar.
           </InfoText>
         </InfoBox>
 
         <InfoBox>
           <InfoTitle>✉️ Confirma tu email</InfoTitle>
           <InfoText>
-            Revisa tu bandeja de entrada para confirmar tu dirección de email y
-            activar tu cuenta.
+            Revisa tu bandeja de entrada para confirmar tu dirección de email y activar tu cuenta.
           </InfoText>
         </InfoBox>
 
         <ButtonGroup>
-          <Button variant="primary" onClick={onContinue}>
+          <Button variant='primary' onClick={onContinue}>
             Entendido
           </Button>
         </ButtonGroup>

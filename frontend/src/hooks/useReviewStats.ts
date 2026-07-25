@@ -14,10 +14,7 @@ interface UseReviewStatsResult {
 }
 
 async function fetchReviewStats(racketId: number): Promise<ReviewStats> {
-  const { data, error } = await supabase
-    .from('reviews')
-    .select('rating')
-    .eq('racket_id', racketId);
+  const { data, error } = await supabase.from('reviews').select('rating').eq('racket_id', racketId);
 
   if (error) throw new Error(error.message);
 
@@ -39,7 +36,11 @@ async function fetchReviewStats(racketId: number): Promise<ReviewStats> {
 }
 
 export const useReviewStats = (racketId: number | undefined): UseReviewStatsResult => {
-  const { data: stats = null, isLoading, error } = useQuery<ReviewStats | null, Error>({
+  const {
+    data: stats = null,
+    isLoading,
+    error,
+  } = useQuery<ReviewStats | null, Error>({
     queryKey: ['review-stats', racketId],
     queryFn: () => fetchReviewStats(racketId!),
     enabled: !!racketId,

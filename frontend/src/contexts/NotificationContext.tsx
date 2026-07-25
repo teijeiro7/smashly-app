@@ -26,7 +26,9 @@ export const useNotifications = (): NotificationContextType => {
   return context;
 };
 
-interface NotificationProviderProps { children: ReactNode }
+interface NotificationProviderProps {
+  children: ReactNode;
+}
 
 const QUERY_KEY = ['notifications'];
 
@@ -34,7 +36,12 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({ chil
   const { isAuthenticated } = useAuth();
   const queryClient = useQueryClient();
 
-  const { data: notifications = [], isLoading, error, refetch } = useQuery<Notification[], Error>({
+  const {
+    data: notifications = [],
+    isLoading,
+    error,
+    refetch,
+  } = useQuery<Notification[], Error>({
     queryKey: QUERY_KEY,
     queryFn: () => NotificationService.fetchNotifications({ limit: 50 }),
     enabled: isAuthenticated,
@@ -43,20 +50,21 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({ chil
     refetchIntervalInBackground: false,
   });
 
-  const unreadCount = useMemo(
-    () => notifications.filter(n => !n.is_read).length,
-    [notifications]
-  );
+  const unreadCount = useMemo(() => notifications.filter(n => !n.is_read).length, [notifications]);
 
-  const fetchNotifications = useCallback(async () => { await refetch(); }, [refetch]);
-  const fetchUnreadCount = useCallback(async () => { await refetch(); }, [refetch]);
+  const fetchNotifications = useCallback(async () => {
+    await refetch();
+  }, [refetch]);
+  const fetchUnreadCount = useCallback(async () => {
+    await refetch();
+  }, [refetch]);
 
   const markAsReadMutation = useMutation({
     mutationFn: (id: string) => NotificationService.markAsRead(id),
-    onMutate: async (id) => {
+    onMutate: async id => {
       await queryClient.cancelQueries({ queryKey: QUERY_KEY });
       queryClient.setQueryData<Notification[]>(QUERY_KEY, old =>
-        (old ?? []).map(n => n.id === id ? { ...n, is_read: true } : n)
+        (old ?? []).map(n => (n.id === id ? { ...n, is_read: true } : n))
       );
     },
     onSettled: () => queryClient.invalidateQueries({ queryKey: QUERY_KEY }),
@@ -75,7 +83,7 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({ chil
 
   const deleteMutation = useMutation({
     mutationFn: (id: string) => NotificationService.deleteNotification(id),
-    onMutate: async (id) => {
+    onMutate: async id => {
       await queryClient.cancelQueries({ queryKey: QUERY_KEY });
       queryClient.setQueryData<Notification[]>(QUERY_KEY, old =>
         (old ?? []).filter(n => n.id !== id)
@@ -84,46 +92,63 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({ chil
     onSettled: () => queryClient.invalidateQueries({ queryKey: QUERY_KEY }),
   });
 
-  const markAsRead = useCallback(async (id: string) => {
-    await markAsReadMutation.mutateAsync(id);
-  }, [markAsReadMutation]);
+  const markAsRead = useCallback(
+    async (id: string) => {
+      await markAsReadMutation.mutateAsync(id);
+    },
+    [markAsReadMutation]
+  );
 
   const markAllAsRead = useCallback(async () => {
     await markAllAsReadMutation.mutateAsync();
   }, [markAllAsReadMutation]);
 
-  const deleteNotification = useCallback(async (id: string) => {
-    await deleteMutation.mutateAsync(id);
-  }, [deleteMutation]);
+  const deleteNotification = useCallback(
+    async (id: string) => {
+      await deleteMutation.mutateAsync(id);
+    },
+    [deleteMutation]
+  );
 
   const incrementUnreadCount = useCallback(() => {
     // No-op: unreadCount derived from notifications data
   }, []);
 
-  const addNotification = useCallback((notification: Notification) => {
-    queryClient.setQueryData<Notification[]>(QUERY_KEY, old =>
-      [notification, ...(old ?? [])]
-    );
-  }, [queryClient]);
+  const addNotification = useCallback(
+    (notification: Notification) => {
+      queryClient.setQueryData<Notification[]>(QUERY_KEY, old => [notification, ...(old ?? [])]);
+    },
+    [queryClient]
+  );
 
-  const value = useMemo<NotificationContextType>(() => ({
-    notifications,
-    unreadCount,
-    loading: isLoading,
-    error: error ? error.message : null,
-    fetchNotifications,
-    fetchUnreadCount,
-    markAsRead,
-    markAllAsRead,
-    deleteNotification,
-    incrementUnreadCount,
-    addNotification,
-  }), [
-    notifications, unreadCount, isLoading, error,
-    fetchNotifications, fetchUnreadCount,
-    markAsRead, markAllAsRead, deleteNotification,
-    incrementUnreadCount, addNotification,
-  ]);
+  const value = useMemo<NotificationContextType>(
+    () => ({
+      notifications,
+      unreadCount,
+      loading: isLoading,
+      error: error ? error.message : null,
+      fetchNotifications,
+      fetchUnreadCount,
+      markAsRead,
+      markAllAsRead,
+      deleteNotification,
+      incrementUnreadCount,
+      addNotification,
+    }),
+    [
+      notifications,
+      unreadCount,
+      isLoading,
+      error,
+      fetchNotifications,
+      fetchUnreadCount,
+      markAsRead,
+      markAllAsRead,
+      deleteNotification,
+      incrementUnreadCount,
+      addNotification,
+    ]
+  );
 
   return <NotificationContext.Provider value={value}>{children}</NotificationContext.Provider>;
 };

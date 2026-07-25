@@ -22,11 +22,21 @@ export function parseAiJson(text: string): any {
   const noCommas = candidate.replace(/,(\s*[}\]])/g, '$1');
   try { return JSON.parse(noCommas); } catch { /* continue */ }
 
-  // 3. Append missing close brackets (truncated response)
-  try { return JSON.parse(candidate + ']}'); } catch { /* continue */ }
+  // 3. Append missing close brackets (truncated response). This can silently
+  // drop whatever the AI hadn't finished writing yet (e.g. a partial racket
+  // in the middle of an array) — log it so a run of these isn't invisible.
+  try {
+    const parsed = JSON.parse(candidate + ']}');
+    console.warn('parseAiJson: repaired a truncated AI response by appending closing brackets');
+    return parsed;
+  } catch { /* continue */ }
 
-  // 4. Both repairs combined
-  try { return JSON.parse(noCommas + ']}'); } catch { /* continue */ }
+  // 4. Both repairs combined — same truncation risk as step 3.
+  try {
+    const parsed = JSON.parse(noCommas + ']}');
+    console.warn('parseAiJson: repaired a truncated AI response (trailing commas + closing brackets)');
+    return parsed;
+  } catch { /* continue */ }
 
   throw new Error('Failed to parse AI response JSON after repair attempts');
 }

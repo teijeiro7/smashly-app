@@ -98,9 +98,9 @@ describe('catalogService', () => {
         json: async () => ({ error: 'Racket already in catalog' }),
       });
 
-      await expect(
-        catalogService.add('store-1', { racket_id: 1 })
-      ).rejects.toThrow('Racket already in catalog');
+      await expect(catalogService.add('store-1', { racket_id: 1 })).rejects.toThrow(
+        'Racket already in catalog'
+      );
     });
   });
 
@@ -140,9 +140,9 @@ describe('catalogService', () => {
         json: async () => ({ error: 'Item not found' }),
       });
 
-      await expect(
-        catalogService.update('store-1', 'price-1', { price: 100 })
-      ).rejects.toThrow('Item not found');
+      await expect(catalogService.update('store-1', 'price-1', { price: 100 })).rejects.toThrow(
+        'Item not found'
+      );
     });
   });
 

@@ -1,11 +1,6 @@
 import React from 'react';
 import { Helmet } from 'react-helmet-async';
-import {
-  SITE,
-  SITE_URL,
-  buildUrl,
-  type SeoPayload,
-} from '../../config/seo';
+import { SITE, SITE_URL, buildUrl, type SeoPayload } from '../../config/seo';
 
 interface SEOProps extends SeoPayload {
   /** JSON-LD schema objects (will be stringified into <script type="application/ld+json">) */
@@ -71,10 +66,7 @@ const SEO: React.FC<SEOProps> = ({
       <meta name='robots' content={robotsContent} />
       <meta name='googlebot' content={robotsContent} />
       {SITE.googleSiteVerification && (
-        <meta
-          name='google-site-verification'
-          content={SITE.googleSiteVerification}
-        />
+        <meta name='google-site-verification' content={SITE.googleSiteVerification} />
       )}
       {SITE.bingSiteVerification && (
         <meta name='msvalidate.01' content={SITE.bingSiteVerification} />
@@ -92,7 +84,6 @@ const SEO: React.FC<SEOProps> = ({
       {/* OpenGraph */}
       <meta property='og:site_name' content={SITE.name} />
       <meta property='og:locale' content={SITE.locale} />
-      <meta property='og:locale:alternate' content={SITE.alternateLocale} />
       <meta property='og:type' content={type} />
       <meta property='og:title' content={fullTitle} />
       <meta property='og:description' content={description} />
@@ -104,15 +95,9 @@ const SEO: React.FC<SEOProps> = ({
       <meta property='og:image:alt' content={imageAlt} />
       <meta property='og:image:type' content='image/png' />
 
-      {publishedTime && (
-        <meta property='article:published_time' content={publishedTime} />
-      )}
-      {modifiedTime && (
-        <meta property='article:modified_time' content={modifiedTime} />
-      )}
-      {type === 'article' && (
-        <meta property='article:author' content={author} />
-      )}
+      {publishedTime && <meta property='article:published_time' content={publishedTime} />}
+      {modifiedTime && <meta property='article:modified_time' content={modifiedTime} />}
+      {type === 'article' && <meta property='article:author' content={author} />}
 
       {/* Twitter Card */}
       <meta name='twitter:card' content={SITE.twitterCard} />
@@ -124,9 +109,7 @@ const SEO: React.FC<SEOProps> = ({
       <meta name='twitter:image:alt' content={imageAlt} />
 
       {/* Facebook App ID (optional, helps Insights) */}
-      {SITE.facebookAppId && (
-        <meta property='fb:app_id' content={SITE.facebookAppId} />
-      )}
+      {SITE.facebookAppId && <meta property='fb:app_id' content={SITE.facebookAppId} />}
 
       {/* Extra meta (e.g., price, availability for products) */}
       {extraMeta.map((m, i) => (
