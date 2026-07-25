@@ -34,7 +34,8 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
     res.writeHead(200, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify({ success: true, data: data || [] }));
   } catch (err: any) {
+    console.error('Error fetching users:', err?.message);
     res.writeHead(500, { 'Content-Type': 'application/json' });
-    res.end(JSON.stringify({ error: 'Error fetching users', details: err?.message }));
+    res.end(JSON.stringify({ error: 'Error fetching users' }));
   }
 }

@@ -87,8 +87,9 @@ export default async function handler(req: IncomingMessage & { query?: any }, re
       .single();
 
     if (error) {
+      console.error('Error updating user role:', error.message);
       res.writeHead(500, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({ error: error.message }));
+      res.end(JSON.stringify({ error: 'Error al actualizar el rol' }));
       return;
     }
 
@@ -108,8 +109,9 @@ export default async function handler(req: IncomingMessage & { query?: any }, re
     // Delete from auth.users via admin (cascades to user_profiles via trigger/FK)
     const { error: authError } = await supabaseAdmin.auth.admin.deleteUser(targetUserId);
     if (authError) {
+      console.error('Error deleting user:', authError.message);
       res.writeHead(500, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({ error: authError.message }));
+      res.end(JSON.stringify({ error: 'Error al eliminar el usuario' }));
       return;
     }
 

@@ -191,7 +191,8 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
     res.writeHead(200, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify({ comparison }));
   } catch (err: any) {
+    console.error('Error generating comparison:', err?.message);
     res.writeHead(500, { 'Content-Type': 'application/json' });
-    res.end(JSON.stringify({ error: 'Error al generar la comparación', details: err?.message }));
+    res.end(JSON.stringify({ error: 'Error al generar la comparación' }));
   }
 }

@@ -79,8 +79,9 @@ export default async function handler(req: IncomingMessage & { query?: any }, re
       .single();
 
     if (error) {
+      console.error('Error updating store:', error.message);
       res.writeHead(500, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({ error: error.message }));
+      res.end(JSON.stringify({ error: 'Error al actualizar la tienda' }));
       return;
     }
 
