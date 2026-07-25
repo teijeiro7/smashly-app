@@ -15,6 +15,11 @@ jobs:
 
       - name: Set up pnpm
         uses: pnpm/action-setup@v4
+        with:
+          # package.json has no "packageManager" field for the action to read
+          # the version from; 11.x is what generated pnpm-lock.yaml
+          # (lockfileVersion 9.0).
+          version: 11
 
       - name: Set up Node
         uses: actions/setup-node@v4
