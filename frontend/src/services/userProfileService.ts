@@ -15,7 +15,7 @@ export interface UserProfile {
   birthdate?: string;
   game_level?: string;
   limitations?: string[]; // Array de strings en Supabase
-  role?: string; // 'player' o 'admin'
+  role?: 'Player' | 'Store' | 'Admin';
   // Player preferences
   gender?: string;
   physical_condition?: string;

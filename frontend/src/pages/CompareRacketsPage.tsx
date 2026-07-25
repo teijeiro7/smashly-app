@@ -7,7 +7,7 @@ import { useRackets } from '../contexts/RacketsContext';
 import { useAuth } from '../contexts/AuthContext';
 import { useComparison } from '../contexts/ComparisonContext';
 import { useNotifications } from '../contexts/NotificationContext';
-import { ComparisonService } from '../services/comparisonService';
+import comparisonService from '../services/comparisonService';
 import { ListService } from '../services/listService';
 import { NotificationService } from '../services/notificationService';
 import { Racket, ComparisonResult, RacketComparisonData } from '../types/racket';
@@ -854,7 +854,7 @@ const CompareRacketsPage: React.FC = () => {
       }
 
       const racketIds = selectedRackets.map(r => r.id!);
-      const response = await ComparisonService.compareRackets(racketIds, userProfile);
+      const response = await comparisonService.compareRackets(racketIds, userProfile);
 
       setComparisonResult(response.comparison);
       setComparisonMetrics(response.comparison.metrics || null);
@@ -951,7 +951,7 @@ const CompareRacketsPage: React.FC = () => {
     if (!comparisonResult) return;
 
     try {
-      await ComparisonService.saveComparison(
+      await comparisonService.saveComparison(
         selectedRackets.map(r => r.id!),
         comparisonResult
       );
@@ -1014,6 +1014,7 @@ const CompareRacketsPage: React.FC = () => {
                   <img
                     src={racket.imagenes?.[0] || '/placeholder-racket.png'}
                     alt={racket.nombre}
+                    loading='lazy'
                     style={{
                       width: 40,
                       height: 40,
@@ -1060,6 +1061,7 @@ const CompareRacketsPage: React.FC = () => {
                     <img
                       src={racket.imagenes?.[0] || '/placeholder-racket.png'}
                       alt={racket.nombre}
+                      loading='lazy'
                       style={{
                         width: 60,
                         height: 60,

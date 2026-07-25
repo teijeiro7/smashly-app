@@ -1,38 +1,21 @@
 import type { IncomingMessage, ServerResponse } from 'http';
 import { supabaseAdmin } from '../../_lib/supabase';
-import { getAuthUser, isAdmin, unauthorized, forbidden } from '../../_lib/auth';
+import { getAuthUser, isAdmin, readBody, setCorsHeaders, handleOptions, unauthorized, forbidden, badRequest } from '../../_lib/auth';
 
-function readBody(req: IncomingMessage): Promise<any> {
-  return new Promise((resolve, reject) => {
-    let body = '';
-    req.on('data', (chunk) => { body += chunk.toString(); });
-    req.on('end', () => {
-      try { resolve(body ? JSON.parse(body) : {}); } catch { reject(new Error('Invalid JSON')); }
-    });
-    req.on('error', reject);
-  });
-}
+export default async function handler(req: IncomingMessage, res: ServerResponse): Promise<void> {
+  setCorsHeaders(req, res);
 
-export default async function handler(req: IncomingMessage & { query?: any }, res: ServerResponse): Promise<void> {
-  res.setHeader('Access-Control-Allow-Origin', process.env.FRONTEND_URL || '*');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, PATCH, OPTIONS');
-
-  if (req.method === 'OPTIONS') {
-    res.writeHead(204);
-    res.end();
-    return;
-  }
+  if (handleOptions(req, res)) return;
 
   const user = await getAuthUser(req);
   if (!user) return unauthorized(res);
   if (!(await isAdmin(user.id))) return forbidden(res);
 
-  const storeId = req.query?.id;
+  const url = new URL(req.url || '', `http://${req.headers.host || 'localhost'}`);
+  const segments = url.pathname.split('/').filter(Boolean);
+  const storeId = segments[segments.length - 1];
   if (!storeId) {
-    res.writeHead(400, { 'Content-Type': 'application/json' });
-    res.end(JSON.stringify({ error: 'Store ID required' }));
-    return;
+    return badRequest(res, 'Store ID required');
   }
 
   if (req.method === 'GET') {
@@ -56,22 +39,25 @@ export default async function handler(req: IncomingMessage & { query?: any }, re
   if (req.method === 'PATCH') {
     let body: any;
     try { body = await readBody(req); } catch {
-      res.writeHead(400, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({ error: 'Invalid request body' }));
-      return;
+      return badRequest(res, 'Invalid request body');
     }
 
     const updates: Record<string, unknown> = {};
-    if ('verified' in body) updates.verified = Boolean(body.verified);
-    if ('name' in body) updates.name = body.name;
-
-    if (Object.keys(updates).length === 0) {
-      res.writeHead(400, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({ error: 'No fields to update' }));
-      return;
+    if ('status' in body) {
+      if (!['pending', 'verified', 'rejected'].includes(body.status)) {
+        return badRequest(res, 'Invalid status value');
+      }
+      updates.status = body.status;
+    }
+    if ('rejection_reason' in body) {
+      updates.rejection_reason = body.rejection_reason;
     }
 
-    const { data, error } = await supabaseAdmin
+    if (Object.keys(updates).length === 0) {
+      return badRequest(res, 'No fields to update');
+    }
+
+    const { data: store, error } = await supabaseAdmin
       .from('stores')
       .update(updates)
       .eq('id', storeId)
@@ -85,8 +71,35 @@ export default async function handler(req: IncomingMessage & { query?: any }, re
       return;
     }
 
+    // Notify store owner when status changes
+    if (updates.status && store) {
+      const title = updates.status === 'verified'
+        ? 'Tienda verificada'
+        : updates.status === 'rejected'
+          ? 'Solicitud de tienda rechazada'
+          : 'Estado de tienda actualizado';
+
+      const message = updates.status === 'verified'
+        ? 'Tu tienda ha sido verificada. Ya puedes gestionar tu perfil y catálogo.'
+        : updates.status === 'rejected'
+          ? `Tu solicitud de tienda ha sido rechazada. Motivo: ${body.rejection_reason || 'No especificado'}`
+          : 'El estado de tu tienda ha sido actualizado.';
+
+      const { data: owner } = await supabaseAdmin
+        .from('notifications')
+        .insert({
+          user_id: store.admin_user_id,
+          type: 'store_status',
+          title,
+          message,
+          data: { store_id: store.id, status: updates.status, rejection_reason: updates.rejection_reason || null },
+        })
+        .select()
+        .single();
+    }
+
     res.writeHead(200, { 'Content-Type': 'application/json' });
-    res.end(JSON.stringify({ success: true, data }));
+    res.end(JSON.stringify({ success: true, data: store }));
     return;
   }
 

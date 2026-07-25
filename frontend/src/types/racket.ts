@@ -47,7 +47,6 @@ export interface Racket {
   marca: string;
   modelo: string;
   imagenes: string[];
-  es_bestseller: boolean;
   en_oferta: boolean;
   scrapeado_en?: string;
   descripcion?: string | null;

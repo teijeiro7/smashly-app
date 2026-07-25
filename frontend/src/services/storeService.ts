@@ -9,9 +9,19 @@ export interface Store {
   phone_number: string;
   website_url?: string;
   logo_url?: string;
+  cover_image_url?: string;
   short_description?: string;
+  description?: string;
   location: string;
-  verified: boolean;
+  status: 'pending' | 'verified' | 'rejected';
+  rejection_reason?: string;
+  slug: string;
+  gallery_images?: string[];
+  specialties?: string[];
+  views_count: number;
+  clicks_count: number;
+  rating_avg: number;
+  rating_count: number;
   admin_user_id: string;
   created_at: string;
   updated_at: string;
@@ -37,7 +47,8 @@ const storeService = {
     storeData: CreateStoreRequest,
     token: string
   ): Promise<Store> {
-    const response = await fetch(`${API_URL}${API_ENDPOINTS.STORES}`, {
+    const url = `${API_URL}${API_ENDPOINTS.STORES}`;
+    const response = await fetch(url, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -52,7 +63,7 @@ const storeService = {
     }
 
     const data = await response.json();
-    return data.store;
+    return data.store ?? data;
   },
 
   /**

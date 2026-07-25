@@ -44,7 +44,7 @@ export interface AdminUser {
   email: string;
   nickname: string;
   full_name?: string;
-  role: 'admin' | 'player';
+  role: 'Admin' | 'Player' | 'Store';
   created_at: string;
 }
 
@@ -59,7 +59,8 @@ export interface StoreRequest {
   logo_url?: string;
   short_description?: string;
   location: string;
-  verified: boolean;
+  status: 'pending' | 'verified' | 'rejected';
+  rejection_reason?: string;
   admin_user_id: string;
   created_at: string;
   updated_at: string;
@@ -119,7 +120,7 @@ export class AdminService {
   /**
    * Actualiza el rol de un usuario
    */
-  static async updateUserRole(userId: string, role: 'admin' | 'player'): Promise<AdminUser> {
+  static async updateUserRole(userId: string, role: 'Admin' | 'Player'): Promise<AdminUser> {
     const headers = await getAuthHeaders();
     const response = await fetch(`${API_ENDPOINTS.ADMIN.USERS}/${userId}`, {
       method: 'PATCH',
@@ -147,10 +148,10 @@ export class AdminService {
    * Obtiene todas las solicitudes de tiendas
    */
   static async getStoreRequests(): Promise<StoreRequest[]> {
-    const response = await fetch(buildApiUrl(API_ENDPOINTS.ADMIN.STORE_REQUESTS), {
+    const headers = await getAuthHeaders();
+    const response = await fetch(buildApiUrl(API_ENDPOINTS.STORES), {
       method: 'GET',
-      credentials: 'include',
-      headers: getCommonHeaders(),
+      headers,
     });
 
     return handleApiResponse<StoreRequest[]>(response);
@@ -282,7 +283,7 @@ export class AdminService {
     const response = await fetch(API_ENDPOINTS.ADMIN.VERIFY_STORE(storeId), {
       method: 'PATCH',
       headers,
-      body: JSON.stringify({ verified: true }),
+      body: JSON.stringify({ status: 'verified' }),
     });
 
     return handleApiResponse<any>(response);
@@ -291,12 +292,12 @@ export class AdminService {
   /**
    * Rechaza una solicitud de tienda
    */
-  static async rejectStore(storeId: string): Promise<void> {
+  static async rejectStore(storeId: string, reason?: string): Promise<void> {
     const headers = await getAuthHeaders();
     const response = await fetch(API_ENDPOINTS.ADMIN.REJECT_STORE(storeId), {
       method: 'PATCH',
       headers,
-      body: JSON.stringify({ verified: false }),
+      body: JSON.stringify({ status: 'rejected', rejection_reason: reason || '' }),
     });
 
     await handleApiResponse<void>(response);
@@ -309,7 +310,7 @@ export class AdminService {
     const response = await fetch(buildApiUrl(API_ENDPOINTS.ADMIN.RECENT_ACTIVITY, { limit }), {
       method: 'GET',
       credentials: 'include',
-      headers: getCommonHeaders(),
+      headers: await getAuthHeaders(),
     });
 
     return handleApiResponse<Activity[]>(response);
@@ -322,7 +323,7 @@ export class AdminService {
     const response = await fetch(buildApiUrl(API_ENDPOINTS.ADMIN.CONFLICTS), {
       method: 'GET',
       credentials: 'include',
-      headers: getCommonHeaders(),
+      headers: await getAuthHeaders(),
     });
 
     return handleApiResponse<any[]>(response);

@@ -39,8 +39,8 @@ describe('AdminService', () => {
   describe('getAllUsers', () => {
     it('should fetch all users', async () => {
       const mockUsers = [
-        { id: '1', email: 'user1@test.com', nickname: 'user1', role: 'player' },
-        { id: '2', email: 'user2@test.com', nickname: 'user2', role: 'admin' },
+        { id: '1', email: 'user1@test.com', nickname: 'user1', role: 'Player' },
+        { id: '2', email: 'user2@test.com', nickname: 'user2', role: 'Admin' },
       ];
 
       (global.fetch as any).mockResolvedValueOnce({
@@ -119,13 +119,13 @@ describe('AdminService', () => {
         json: async () => ({ success: true }),
       });
 
-      await AdminService.updateUserRole('user-1', 'admin');
+      await AdminService.updateUserRole('user-1', 'Admin');
 
       expect(global.fetch).toHaveBeenCalledWith(
-        expect.stringContaining('/api/v1/admin/users/user-1/role'),
+        expect.stringContaining('/api/admin/users/'),
         expect.objectContaining({
           method: 'PATCH',
-          body: JSON.stringify({ role: 'admin' }),
+          body: JSON.stringify({ role: 'Admin' }),
         })
       );
     });
@@ -141,7 +141,7 @@ describe('AdminService', () => {
       await AdminService.deleteUser('user-1');
 
       expect(global.fetch).toHaveBeenCalledWith(
-        expect.stringContaining('/api/v1/admin/users/user-1'),
+        expect.stringContaining('/api/admin/users/'),
         expect.objectContaining({
           method: 'DELETE',
         })

@@ -21,7 +21,7 @@ AS $$
     SELECT 1
     FROM user_profiles
     WHERE id = auth.uid()
-      AND lower(role) = 'admin'
+      AND role::text = 'Admin'
   );
 $$;
 
@@ -41,7 +41,7 @@ BEGIN
   VALUES (
     NEW.id,
     NEW.email,
-    COALESCE(NEW.raw_user_meta_data->>'role', 'player')
+    COALESCE(NEW.raw_user_meta_data->>'role', 'Player')
   )
   ON CONFLICT (id) DO NOTHING;
   RETURN NEW;

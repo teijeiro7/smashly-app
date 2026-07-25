@@ -477,7 +477,7 @@ const CurrentRacketFinderModal: React.FC<CurrentRacketFinderModalProps> = ({
       const formData = {
         level: level || normalizeLevel(user?.game_level),
         frequency: frequency || '2-3',
-        injuries: injuries,
+        injuries,
         gender: (gender || undefined) as 'masculino' | 'femenino' | undefined,
         physical_condition: (physicalCondition || undefined) as 'asiduo' | 'ocasional' | undefined,
         budget,

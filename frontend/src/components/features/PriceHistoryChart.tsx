@@ -11,7 +11,7 @@ import {
   YAxis,
 } from 'recharts';
 import styled from 'styled-components';
-import { RacketService, PriceHistoryResult } from '../../services/racketService';
+import racketService, { PriceHistoryResult } from '../../services/racketService';
 
 // ── Styled components ────────────────────────────────────────────────────────
 
@@ -161,7 +161,7 @@ export const PriceHistoryChart: React.FC<PriceHistoryChartProps> = ({
     let cancelled = false;
     setLoading(true);
 
-    RacketService.getPriceHistory(racketId, days).then(data => {
+    racketService.getPriceHistory(racketId, days).then(data => {
       if (!cancelled) {
         setHistoryData(data);
         setLoading(false);

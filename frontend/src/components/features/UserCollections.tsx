@@ -14,8 +14,8 @@ import {
 import { Link } from '@tanstack/react-router';
 import { sileo } from 'sileo';
 import { ListService } from '../../services/listService';
-import { ComparisonService, SavedComparison } from '../../services/comparisonService';
-import { RacketService } from '../../services/racketService';
+import comparisonService, { SavedComparison } from '../../services/comparisonService';
+import racketService from '../../services/racketService';
 
 const Container = styled.div`
   display: flex;
@@ -267,14 +267,14 @@ const UserCollections: React.FC = () => {
       const listsData = await ListService.getUserLists();
       setLists(listsData as any);
       
-      const comparisonsData = await ComparisonService.getUserComparisons();
+      const comparisonsData = await comparisonService.getUserComparisons();
       
       const allRacketIds = [...new Set(comparisonsData.flatMap(c => c.racket_ids))];
       const rackets: Record<number, any> = {};
       await Promise.all(
         allRacketIds.map(async (id: number) => {
           try {
-            const racket = await RacketService.getRacketById(id);
+            const racket = await racketService.getRacketById(id);
             rackets[id] = racket;
           } catch {
             rackets[id] = { nombre: `Pala ${id}` };

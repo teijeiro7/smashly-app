@@ -39,22 +39,18 @@ export const ComparisonProvider: React.FC<ComparisonProviderProps> = ({ children
 
   // Add racket to comparison
   const addRacket = useCallback((racket: Racket): boolean => {
-    let added = false;
-    setRackets(prev => {
-      if (prev.some(r => r.nombre === racket.nombre)) {
-        sileo.error({ title: 'Error', description: 'Esta pala ya está en la comparación' });
-        return prev;
-      }
-      if (prev.length >= 3) {
-        sileo.error({ title: 'Error', description: 'Solo puedes comparar hasta 3 palas a la vez' });
-        return prev;
-      }
-      added = true;
-      sileo.success({ title: 'Éxito', description: `${racket.nombre} añadida a la comparación` });
-      return [...prev, racket];
-    });
-    return added;
-  }, []);
+    if (rackets.some(r => r.nombre === racket.nombre)) {
+      sileo.error({ title: 'Error', description: 'Esta pala ya está en la comparación' });
+      return false;
+    }
+    if (rackets.length >= 3) {
+      sileo.error({ title: 'Error', description: 'Solo puedes comparar hasta 3 palas a la vez' });
+      return false;
+    }
+    setRackets(prev => [...prev, racket]);
+    sileo.success({ title: 'Éxito', description: `${racket.nombre} añadida a la comparación` });
+    return true;
+  }, [rackets]);
 
   // Remove racket from comparison
   const removeRacket = useCallback((racketName: string) => {

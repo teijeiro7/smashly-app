@@ -5,7 +5,7 @@ import { racketImageUrl } from '../utils/imageUrl';
 import { Link, useRouterState, useNavigate } from '@tanstack/react-router';
 import { QuickActionCard } from '../components/dashboard/QuickActionCard';
 import { FaLightbulb, FaBalanceScale, FaChartBar, FaUser, FaBullseye, FaHeart, FaFire, FaStar } from 'react-icons/fa';
-import { RacketService } from '../services/racketService';
+import racketService from '../services/racketService';
 import { RacketViewService, RecentlyViewedRacket } from '../services/racketViewService';
 import { Racket } from '../types/racket';
 import { ListService } from '../services/listService';
@@ -553,7 +553,7 @@ export const PlayerDashboard: React.FC = () => {
 
         // Fetch offers and recently viewed in parallel
         const [allRackets, recentlyViewedData] = await Promise.all([
-          RacketService.getAllRackets(),
+          racketService.getAllRackets(),
           RacketViewService.getRecentlyViewed(4).catch(() => []), // Obtener últimas 4 palas vistas
         ]);
 

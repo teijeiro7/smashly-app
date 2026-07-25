@@ -18,7 +18,7 @@ import { dirname, resolve } from 'node:path';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 
-const child = spawn('vercel', ['dev', '--listen', '3000'], {
+const child = spawn('vercel', ['dev', '--listen', '4000', '--local-config', 'vercel.dev.json'], {
   cwd: root,
   stdio: 'inherit',
   env: process.env,

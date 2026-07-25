@@ -148,7 +148,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess, onLoginClick }) 
         value.password,
         value.nickname.trim(),
         value.fullName.trim() || undefined,
-        value.registrationType === 'store' ? 'store_owner' : 'player'
+        value.registrationType === 'store' ? 'Store' : 'Player'
       );
 
       if (error) {

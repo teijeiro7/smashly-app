@@ -1,6 +1,7 @@
 import { defineConfig } from 'vitest/config';
 import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
+import { ViteImageOptimizer } from 'vite-plugin-image-optimizer';
 import path from 'path';
 
 export default defineConfig(({ mode }) => ({
@@ -17,6 +18,27 @@ export default defineConfig(({ mode }) => ({
         parserOpts: {
           plugins: ['styled-components'],
         },
+      },
+    }),
+    ViteImageOptimizer({
+      includePublic: true,
+      logStats: true,
+      ansiColors: true,
+      png: {
+        quality: 75,
+        palette: true,
+      },
+      jpeg: {
+        quality: 75,
+      },
+      jpg: {
+        quality: 75,
+      },
+      webp: {
+        quality: 75,
+      },
+      avif: {
+        quality: 60,
       },
     }),
     VitePWA({
@@ -121,7 +143,24 @@ export default defineConfig(({ mode }) => ({
     host: true,
     proxy: {
       '/api': {
-        target: 'http://localhost:3000',
+        // Vercel dev server runs the API serverless functions.
+        // Default to 4001 (set by `pnpm dev`), fall back to 4000 (`pnpm dev` from root).
+        target: process.env.VITE_API_PROXY_TARGET || 'http://localhost:4001',
+        changeOrigin: true,
+      },
+      // Safari does not CORS-prefetch to Supabase REST properly during
+      // local dev — the preflight OPTIONS is silently swallowed. Proxy
+      // through Vite so all Supabase calls are same-origin.
+      '/auth/v1': {
+        target: 'https://lrdgyfmkkboyhoycrnov.supabase.co',
+        changeOrigin: true,
+      },
+      '/rest/v1': {
+        target: 'https://lrdgyfmkkboyhoycrnov.supabase.co',
+        changeOrigin: true,
+      },
+      '/storage/v1': {
+        target: 'https://lrdgyfmkkboyhoycrnov.supabase.co',
         changeOrigin: true,
       },
     },

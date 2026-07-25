@@ -151,7 +151,7 @@ const CloseButton = styled.button`
   }
 `;
 
-const MobileBottomNav: React.FC = () => {
+const MobileBottomNav = React.memo(() => {
   const { location } = useRouterState();
   const navigate = useNavigate();
   const { user, isAuthenticated, userProfile } = useAuth();
@@ -309,6 +309,6 @@ const MobileBottomNav: React.FC = () => {
       </AnimatePresence>
     </>
   );
-};
+});
 
 export default MobileBottomNav;

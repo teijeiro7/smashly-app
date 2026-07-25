@@ -22,8 +22,9 @@ import styled from 'styled-components';
 import Button from '../components/common/Button';
 import { AddToListModal } from '../components/features/AddToListModal';
 import { ProductReviews } from '../components/features/ProductReviews';
-import { RacketService } from '../services/racketService';
+import racketService from '../services/racketService';
 import { RacketViewService } from '../services/racketViewService';
+import priceWatchService, { PriceWatch } from '../services/priceWatchService';
 import { getLowestPrice, getAllStorePrices } from '../utils/priceUtils';
 import { toTitleCase } from '../utils/textUtils';
 import { EditRacketModal } from '../components/admin/EditRacketModal';
@@ -695,6 +696,92 @@ const AlertButton = styled.button`
   }
 `;
 
+const WatchSection = styled.div`
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--color-gray-100);
+`;
+
+const WatchTitle = styled.div`
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-gray-700);
+  margin-bottom: 0.75rem;
+`;
+
+const WatchInputRow = styled.div`
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+`;
+
+const WatchInput = styled.input`
+  flex: 1;
+  padding: 0.625rem 0.75rem;
+  border: 1px solid var(--color-gray-200);
+  border-radius: 8px;
+  font-size: 0.9375rem;
+  outline: none;
+  transition: border-color 0.2s;
+  &:focus {
+    border-color: var(--color-primary);
+  }
+`;
+
+const WatchSaveButton = styled.button`
+  padding: 0.625rem 1rem;
+  background: var(--color-primary);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.875rem;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background-color 0.2s;
+  &:hover { background: var(--color-primary-dark); }
+  &:disabled { opacity: 0.5; cursor: not-allowed; }
+`;
+
+const WatchList = styled.div`
+  margin-top: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+`;
+
+const WatchItem = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 0.75rem;
+  background: var(--color-gray-50);
+  border-radius: 8px;
+  font-size: 0.875rem;
+`;
+
+const WatchItemLabel = styled.span`
+  color: var(--color-gray-700);
+  font-weight: 500;
+`;
+
+const WatchDeleteButton = styled.button`
+  background: none;
+  border: none;
+  color: var(--color-gray-400);
+  cursor: pointer;
+  font-size: 0.875rem;
+  padding: 0.25rem;
+  transition: color 0.2s;
+  &:hover { color: var(--color-error); }
+`;
+
+const WatchMessage = styled.div<{ $error?: boolean }>`
+  font-size: 0.8125rem;
+  margin-top: 0.5rem;
+  color: ${props => props.$error ? 'var(--color-error)' : 'var(--color-success, #16a34a)'};
+`;
+
 const ComparisonOnlyCard = styled.div`
   background: var(--surface-2);
   border: 1px solid var(--color-gray-200);
@@ -1176,6 +1263,11 @@ const RacketDetailPage: React.FC = () => {
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [showLightbox, setShowLightbox] = useState(false);
   const [showStickyBar, setShowStickyBar] = useState(false);
+  const [watches, setWatches] = useState<PriceWatch[]>([]);
+  const [targetPriceInput, setTargetPriceInput] = useState<string>('');
+  const [creatingWatch, setCreatingWatch] = useState(false);
+  const [watchError, setWatchError] = useState<string | null>(null);
+  const [watchSaveMessage, setWatchSaveMessage] = useState<string | null>(null);
   const carouselRef = useRef<HTMLDivElement>(null);
   const touchStartX = useRef<number | null>(null);
   const slideDirectionRef = useRef<'left' | 'right'>('left');
@@ -1205,7 +1297,7 @@ const RacketDetailPage: React.FC = () => {
       let foundRacket: Racket | null = null;
 
       if (!isNaN(numericId)) {
-        foundRacket = await RacketService.getRacketById(numericId);
+        foundRacket = await racketService.getRacketById(numericId);
       }
 
       // Fallback: search in catalog context (if loaded)
@@ -1213,7 +1305,7 @@ const RacketDetailPage: React.FC = () => {
         const decodedRacketId = decodeURIComponent(racketId);
         foundRacket = rackets.find(pala => pala.nombre === decodedRacketId) || null;
         if (!foundRacket) {
-          foundRacket = await RacketService.getRacketByName(decodedRacketId);
+          foundRacket = await racketService.getRacketByName(decodedRacketId);
         }
       }
 
@@ -1258,6 +1350,43 @@ const RacketDetailPage: React.FC = () => {
       RacketViewService.recordView(racket.id).catch(console.error);
     }
   }, [racket, isAuthenticated]);
+
+  useEffect(() => {
+    if (racket?.id && isAuthenticated) {
+      priceWatchService.listWatches(racket.id).then(setWatches).catch(console.error);
+    }
+  }, [racket, isAuthenticated]);
+
+  const handleCreateWatch = async () => {
+    if (!racket?.id || !targetPriceInput) return;
+    const price = parseFloat(targetPriceInput);
+    if (isNaN(price) || price <= 0) {
+      setWatchError('Introduce un precio válido');
+      return;
+    }
+    setCreatingWatch(true);
+    setWatchError(null);
+    setWatchSaveMessage(null);
+    try {
+      const watch = await priceWatchService.createWatch(racket.id, price);
+      setWatches(prev => [...prev, watch]);
+      setTargetPriceInput('');
+      setWatchSaveMessage('Alerta creada. Te avisaremos cuando baje de precio.');
+    } catch (err: any) {
+      setWatchError(err.message);
+    } finally {
+      setCreatingWatch(false);
+    }
+  };
+
+  const handleDeleteWatch = async (watchId: string) => {
+    try {
+      await priceWatchService.deleteWatch(watchId);
+      setWatches(prev => prev.filter(w => w.id !== watchId));
+    } catch (err: any) {
+      setWatchError(err.message);
+    }
+  };
 
   // Keyboard navigation for gallery
   useEffect(() => {
@@ -1629,6 +1758,40 @@ const RacketDetailPage: React.FC = () => {
                   : <><FiBarChart2 /> Añadir al comparador</>
                 }
               </AlertButton>
+
+              {isAuthenticated && (
+                <WatchSection>
+                  <WatchTitle>Alerta de precio</WatchTitle>
+                  <WatchInputRow>
+                    <WatchInput
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      placeholder="Precio objetivo (€)"
+                      value={targetPriceInput}
+                      onChange={e => setTargetPriceInput(e.target.value)}
+                      onKeyDown={e => e.key === 'Enter' && handleCreateWatch()}
+                    />
+                    <WatchSaveButton onClick={handleCreateWatch} disabled={creatingWatch}>
+                      {creatingWatch ? '...' : 'Avísame'}
+                    </WatchSaveButton>
+                  </WatchInputRow>
+                  {watchError && <WatchMessage $error>{watchError}</WatchMessage>}
+                  {watchSaveMessage && <WatchMessage>{watchSaveMessage}</WatchMessage>}
+                  {watches.filter(w => w.active).length > 0 && (
+                    <WatchList>
+                      {watches.filter(w => w.active).map(w => (
+                        <WatchItem key={w.id}>
+                          <WatchItemLabel>↓ {w.target_price.toFixed(2)}€</WatchItemLabel>
+                          <WatchDeleteButton onClick={() => handleDeleteWatch(w.id)}>
+                            ✕
+                          </WatchDeleteButton>
+                        </WatchItem>
+                      ))}
+                    </WatchList>
+                  )}
+                </WatchSection>
+              )}
             </PriceCard>
           )}
         </InfoSection>

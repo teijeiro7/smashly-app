@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiX, FiSave, FiAlertCircle } from 'react-icons/fi';
 import { Racket } from '@/types/racket';
-import { RacketService } from '@/services/racketService';
+import racketService from '@/services/racketService';
 
 const Overlay = styled(motion.div)`
   position: fixed;
@@ -199,7 +199,7 @@ export const EditRacketModal: React.FC<EditRacketModalProps> = ({
     try {
       setLoading(true);
       setError(null);
-      const updated = await RacketService.updateRacket(racket.id, formData);
+      const updated = await racketService.updateRacket(racket.id, formData);
       onUpdate(updated);
       onClose();
     } catch (err: any) {

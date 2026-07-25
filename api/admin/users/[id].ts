@@ -73,15 +73,16 @@ export default async function handler(req: IncomingMessage & { query?: any }, re
     }
 
     const { role } = body;
-    if (!role || !['admin', 'player'].includes(role.toLowerCase())) {
+    const normalizedRole = role?.toString().charAt(0).toUpperCase() + role?.toString().slice(1).toLowerCase();
+    if (!normalizedRole || !['Admin', 'Player', 'Store'].includes(normalizedRole)) {
       res.writeHead(400, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({ error: "El rol debe ser 'admin' o 'player'" }));
+      res.end(JSON.stringify({ error: "El rol debe ser 'Admin', 'Player' o 'Store'" }));
       return;
     }
 
     const { data, error } = await supabaseAdmin
       .from('user_profiles')
-      .update({ role: role.toLowerCase() })
+      .update({ role: normalizedRole })
       .eq('id', targetUserId)
       .select()
       .single();
