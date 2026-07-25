@@ -335,8 +335,9 @@ yarn.lock
 # System Files
 .DS_Store?
 ehthumbs.db
-Icon?
+Icon[^[:alnum:]]
 !public/icons/
+!public/images/icons/
 Thumbs.db
 
 # Other
