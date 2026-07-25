@@ -51,10 +51,12 @@ jobs:
         run: pip install -r src/scrapers/requirements.txt
 
       - name: Run Prices Sync
+        env:
+          SYNC_LIMIT: ${{ github.event.inputs.limit }}
         run: |
           LIMIT_ARG=""
-          if [ "${{ github.event.inputs.limit }}" != "" ]; then
-            LIMIT_ARG="--limit ${{ github.event.inputs.limit }}"
+          if [ -n "$SYNC_LIMIT" ]; then
+            LIMIT_ARG="--limit $SYNC_LIMIT"
           fi
           echo "Running prices sync..."
           set +e
@@ -154,10 +156,12 @@ jobs:
 
       - name: Run Full Sync
         if: steps.first_sunday.outputs.run == 'true' || github.event_name == 'workflow_dispatch'
+        env:
+          SYNC_LIMIT: ${{ github.event.inputs.limit }}
         run: |
           LIMIT_ARG=""
-          if [ "${{ github.event.inputs.limit }}" != "" ]; then
-            LIMIT_ARG="--limit ${{ github.event.inputs.limit }}"
+          if [ -n "$SYNC_LIMIT" ]; then
+            LIMIT_ARG="--limit $SYNC_LIMIT"
           fi
           echo "Running full sync (new + discontinued + prices)..."
           set +e
