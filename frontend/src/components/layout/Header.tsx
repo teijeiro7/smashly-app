@@ -1,5 +1,17 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { List, MagnifyingGlass, X, User, SignOut, House, GridFour, ChartBar, Question, SignIn, UserPlus } from '@phosphor-icons/react';
+import {
+  List,
+  MagnifyingGlass,
+  X,
+  User,
+  SignOut,
+  House,
+  GridFour,
+  ChartBar,
+  Question,
+  SignIn,
+  UserPlus,
+} from '@phosphor-icons/react';
 import { Link, useRouterState, useNavigate } from '@tanstack/react-router';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
@@ -13,7 +25,9 @@ import ThemeToggle from '../common/ThemeToggle';
 const HeaderContainer = styled.header`
   background: var(--header-bg);
   padding: 0;
-  box-shadow: 0 1px 3px var(--shadow-color), 0 1px 2px var(--shadow-color);
+  box-shadow:
+    0 1px 3px var(--shadow-color),
+    0 1px 2px var(--shadow-color);
   position: sticky;
   top: 0;
   z-index: 350;
@@ -111,7 +125,10 @@ const MobileSearchButton = styled.button`
   min-height: 40px;
   padding: 8px;
   border-radius: 8px;
-  transition: background-color 0.2s ease, opacity 0.2s ease, transform 0.2s ease;
+  transition:
+    background-color 0.2s ease,
+    opacity 0.2s ease,
+    transform 0.2s ease;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -149,14 +166,16 @@ const MobileMenuDropdown = styled(motion.div)<{ $isOpen: boolean }>`
   height: auto;
   border: 1px solid rgba(0, 0, 0, 0.04);
   border-top: none;
-  
+
   will-change: transform, opacity;
   transform-origin: top;
-  transform: translateY(${props => props.$isOpen ? '0' : '-8px'});
-  opacity: ${props => props.$isOpen ? 1 : 0};
-  visibility: ${props => props.$isOpen ? 'visible' : 'hidden'};
-  pointer-events: ${props => props.$isOpen ? 'auto' : 'none'};
-  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease;
+  transform: translateY(${props => (props.$isOpen ? '0' : '-8px')});
+  opacity: ${props => (props.$isOpen ? 1 : 0)};
+  visibility: ${props => (props.$isOpen ? 'visible' : 'hidden')};
+  pointer-events: ${props => (props.$isOpen ? 'auto' : 'none')};
+  transition:
+    transform 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+    opacity 0.2s ease;
 `;
 
 const MobileSearchContainer = styled.div<{ $isOpen: boolean }>`
@@ -174,7 +193,7 @@ const MobileSearchContainer = styled.div<{ $isOpen: boolean }>`
 
 const MobileNavSection = styled.div`
   padding: 1.25rem 1rem;
-  
+
   &:not(:last-child) {
     border-bottom: 1px solid rgba(229, 231, 235, 0.5);
   }
@@ -224,7 +243,7 @@ const NavLink = styled(Link)<{ $isActive: boolean; $isMobile?: boolean }>`
     color: ${props => (props.$isMobile ? 'var(--primary-hover)' : 'var(--brand-on-surface)')};
     text-decoration: none;
     transform: ${props => (props.$isMobile ? 'translateX(3px)' : 'none')};
-    
+
     svg {
       color: var(--primary-hover);
     }
@@ -281,8 +300,6 @@ const AuthButtons = styled.div`
     display: none;
   }
 `;
-
-
 
 const LogoutButton = styled.button<{
   $variant?: 'primary' | 'secondary';
@@ -434,7 +451,7 @@ const DropdownItem = styled.button`
   &:last-child {
     border-radius: 0 0 12px 12px;
     color: var(--danger);
-    
+
     &:hover {
       background: var(--surface-2);
       color: var(--danger);
@@ -530,7 +547,10 @@ const Header = React.memo(() => {
           {userProfile ? (
             <UserMenuContainer ref={userMenuRef}>
               <NotificationBell />
-              <AvatarButton onClick={() => setIsUserMenuOpen(!isUserMenuOpen)} aria-label="Menú de usuario">
+              <AvatarButton
+                onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
+                aria-label='Menú de usuario'
+              >
                 {userProfile.avatar_url ? (
                   <img src={userProfile.avatar_url} alt='Avatar' loading='lazy' />
                 ) : (
@@ -575,18 +595,18 @@ const Header = React.memo(() => {
         <MobileElements>
           <MobileNotificationBell />
           <ThemeToggle variant='onBrand' />
-          <MobileSearchButton onClick={toggleMobileSearch} aria-label="Buscar">
+          <MobileSearchButton onClick={toggleMobileSearch} aria-label='Buscar'>
             <MagnifyingGlass />
           </MobileSearchButton>
-          <MobileMenuButton onClick={toggleMenu} aria-label={isMenuOpen ? 'Cerrar menú' : 'Abrir menú'}>
+          <MobileMenuButton
+            onClick={toggleMenu}
+            aria-label={isMenuOpen ? 'Cerrar menú' : 'Abrir menú'}
+          >
             {isMenuOpen ? <X /> : <List />}
           </MobileMenuButton>
         </MobileElements>
 
-        <MobileMenuDropdown
-          $isOpen={isMenuOpen || isMobileSearchOpen}
-          initial={false}
-        >
+        <MobileMenuDropdown $isOpen={isMenuOpen || isMobileSearchOpen} initial={false}>
           <MobileSearchContainer $isOpen={isMobileSearchOpen}>
             <GlobalSearch
               onSearchToggle={setIsMobileSearchOpen}
@@ -624,12 +644,7 @@ const Header = React.memo(() => {
                 <ChartBar />
                 Comparar palas
               </NavLink>
-              <NavLink
-                to='/faq'
-                $isActive={isActive('/faq')}
-                $isMobile
-                onClick={closeAllMenus}
-              >
+              <NavLink to='/faq' $isActive={isActive('/faq')} $isMobile onClick={closeAllMenus}>
                 <Question />
                 FAQ
               </NavLink>

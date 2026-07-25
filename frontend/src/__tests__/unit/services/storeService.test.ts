@@ -45,9 +45,9 @@ describe('storeService', () => {
         json: async () => ({ error: 'Invalid data' }),
       });
 
-      await expect(
-        storeService.createStoreRequest({} as any, 'token')
-      ).rejects.toThrow('Invalid data');
+      await expect(storeService.createStoreRequest({} as any, 'token')).rejects.toThrow(
+        'Invalid data'
+      );
     });
   });
 

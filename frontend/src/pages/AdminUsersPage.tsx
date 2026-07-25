@@ -1,9 +1,9 @@
-import React from "react";
-import styled from "styled-components";
-import { useAuth } from "../contexts/AuthContext";
+import React from 'react';
+import styled from 'styled-components';
+import { useAuth } from '../contexts/AuthContext';
 import { Navigate } from '@tanstack/react-router';
-import AdminLayout from "../components/features/AdminLayout";
-import UsersManager from "../components/features/UsersManager";
+import AdminLayout from '../components/features/AdminLayout';
+import UsersManager from '../components/features/UsersManager';
 
 const PageHeader = styled.div`
   margin-bottom: 2rem;
@@ -45,7 +45,7 @@ const AdminUsersPage: React.FC = () => {
   }
 
   if (!user || user.role?.toLowerCase() !== 'admin') {
-    return <Navigate to="/profile" replace />;
+    return <Navigate to='/profile' replace />;
   }
 
   return (

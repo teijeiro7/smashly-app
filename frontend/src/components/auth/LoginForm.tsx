@@ -135,7 +135,12 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, onRegisterClick }) => 
         </SubmitButton>
 
         <div
-          style={{ marginTop: '1rem', textAlign: 'center', fontSize: '0.9rem', color: 'var(--text-muted)' }}
+          style={{
+            marginTop: '1rem',
+            textAlign: 'center',
+            fontSize: '0.9rem',
+            color: 'var(--text-muted)',
+          }}
         >
           ¿No tienes cuenta?{' '}
           <button

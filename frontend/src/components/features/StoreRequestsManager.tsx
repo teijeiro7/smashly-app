@@ -338,7 +338,11 @@ const StoreRequestsManager: React.FC = () => {
               <CardHeader>
                 <StoreName>{request.store_name}</StoreName>
                 <StatusBadge status={request.status === 'verified' ? 'approved' : request.status}>
-                  {request.status === 'verified' ? 'Verificada' : request.status === 'rejected' ? 'Rechazada' : 'Pendiente'}
+                  {request.status === 'verified'
+                    ? 'Verificada'
+                    : request.status === 'rejected'
+                      ? 'Rechazada'
+                      : 'Pendiente'}
                 </StatusBadge>
               </CardHeader>
 
@@ -383,7 +387,9 @@ const StoreRequestsManager: React.FC = () => {
                 </InfoItem>
               )}
 
-              <InfoItem style={{ display: 'block', fontSize: '0.875rem', color: 'var(--text-muted)' }}>
+              <InfoItem
+                style={{ display: 'block', fontSize: '0.875rem', color: 'var(--text-muted)' }}
+              >
                 <strong>Razón Social:</strong> {request.legal_name} ({request.cif_nif})
               </InfoItem>
 

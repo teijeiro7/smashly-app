@@ -1,6 +1,16 @@
 import React from 'react';
 import styled from 'styled-components';
-import { FiBell, FiTrendingDown, FiCheckCircle, FiStar, FiAlertCircle, FiUserPlus, FiShoppingBag, FiX, FiCheck } from 'react-icons/fi';
+import {
+  FiBell,
+  FiTrendingDown,
+  FiCheckCircle,
+  FiStar,
+  FiAlertCircle,
+  FiUserPlus,
+  FiShoppingBag,
+  FiX,
+  FiCheck,
+} from 'react-icons/fi';
 import { useNotifications } from '../../contexts/NotificationContext';
 import { Notification, NotificationType } from '../../types/notification';
 import { useNavigate } from '@tanstack/react-router';
@@ -83,7 +93,7 @@ const NotificationItem = styled.div<{ isRead: boolean }>`
   border-bottom: 1px solid var(--surface-3);
   cursor: pointer;
   transition: background 0.2s;
-  background: ${props => props.isRead ? 'var(--surface)' : 'var(--primary-subtle)'};
+  background: ${props => (props.isRead ? 'var(--surface)' : 'var(--primary-subtle)')};
 
   &:hover {
     background: var(--surface-2);
@@ -158,7 +168,7 @@ const NotificationContent = styled.div`
 
 const NotificationTitle = styled.p<{ isRead: boolean }>`
   font-size: 0.875rem;
-  font-weight: ${props => props.isRead ? '500' : '600'};
+  font-weight: ${props => (props.isRead ? '500' : '600')};
   color: var(--text);
   margin: 0 0 4px 0;
   line-height: 1.3;
@@ -308,13 +318,14 @@ interface NotificationDropdownProps {
 
 export const NotificationDropdown: React.FC<NotificationDropdownProps> = ({ onClose }) => {
   const navigate = useNavigate();
-  const { notifications, unreadCount, markAsRead, markAllAsRead, deleteNotification } = useNotifications();
+  const { notifications, unreadCount, markAsRead, markAllAsRead, deleteNotification } =
+    useNotifications();
 
   const handleNotificationClick = async (notification: Notification) => {
     if (!notification.is_read) {
       await markAsRead(notification.id);
     }
-    
+
     const link = getNotificationLink(notification);
     navigate({ to: link as any });
     onClose();
@@ -336,22 +347,24 @@ export const NotificationDropdown: React.FC<NotificationDropdownProps> = ({ onCl
           <FiBell />
           Notificaciones
           {unreadCount > 0 && (
-            <span style={{ 
-              background: 'var(--primary)', 
-              color: 'white', 
-              fontSize: '0.75rem', 
-              padding: '2px 8px', 
-              borderRadius: '12px',
-              fontWeight: 600
-            }}>
+            <span
+              style={{
+                background: 'var(--primary)',
+                color: 'white',
+                fontSize: '0.75rem',
+                padding: '2px 8px',
+                borderRadius: '12px',
+                fontWeight: 600,
+              }}
+            >
               {unreadCount}
             </span>
           )}
         </DropdownTitle>
-        <MarkAllButton 
-          onClick={handleMarkAllAsRead} 
+        <MarkAllButton
+          onClick={handleMarkAllAsRead}
           disabled={unreadCount === 0}
-          title="Marcar todas como leídas"
+          title='Marcar todas como leídas'
         >
           <FiCheck style={{ marginRight: '4px' }} />
           Todo leído
@@ -365,7 +378,7 @@ export const NotificationDropdown: React.FC<NotificationDropdownProps> = ({ onCl
             <EmptyText>No tienes notificaciones</EmptyText>
           </EmptyState>
         ) : (
-          notifications.map((notification) => (
+          notifications.map(notification => (
             <NotificationItem
               key={notification.id}
               isRead={notification.is_read}
@@ -382,9 +395,9 @@ export const NotificationDropdown: React.FC<NotificationDropdownProps> = ({ onCl
                 <NotificationTime>{formatTimeAgo(notification.created_at)}</NotificationTime>
               </NotificationContent>
               {!notification.is_read && <UnreadDot />}
-              <DeleteButton 
-                onClick={(e) => handleDelete(e, notification.id)}
-                title="Eliminar notificación"
+              <DeleteButton
+                onClick={e => handleDelete(e, notification.id)}
+                title='Eliminar notificación'
               >
                 <FiX size={14} />
               </DeleteButton>

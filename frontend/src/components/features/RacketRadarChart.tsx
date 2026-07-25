@@ -71,7 +71,13 @@ const CustomTooltip = memo(({ active, payload, metrics }: any) => {
       }}
     >
       <p style={{ margin: 0, fontWeight: 600, marginBottom: '8px' }}>
-        {({'S. Bola': 'Salida de Bola', 'Manej.': 'Manejabilidad', 'P. Dulce': 'Punto Dulce'} as Record<string, string>)[payload[0].payload.metric] ?? payload[0].payload.metric}
+        {(
+          {
+            'S. Bola': 'Salida de Bola',
+            'Manej.': 'Manejabilidad',
+            'P. Dulce': 'Punto Dulce',
+          } as Record<string, string>
+        )[payload[0].payload.metric] ?? payload[0].payload.metric}
       </p>
       {payload.map((entry: any, index: number) => {
         const racket = metrics[index];
@@ -217,34 +223,38 @@ const RacketRadarChart: React.FC<RacketRadarChartProps> = ({ metrics }) => {
       </ChartSubtitle>
 
       <RadarWrapper>
-      <ResponsiveContainer width='100%' height='100%'>
-        <RadarChart data={chartData} outerRadius='75%' margin={{ top: 10, right: 40, bottom: 10, left: 40 }}>
-          <PolarGrid strokeDasharray='3 3' stroke='var(--border)' />
-          <PolarAngleAxis
-            dataKey='metric'
-            tick={{ fill: 'var(--text)', fontSize: 12, fontWeight: 600 }}
-          />
-          <PolarRadiusAxis
-            angle={90}
-            domain={[0, 10]}
-            tick={{ fill: 'var(--text-subtle)', fontSize: 10 }}
-            tickCount={6}
-          />
-          <Tooltip content={<CustomTooltip metrics={metrics} />} />
-          {metrics.map((racket, index) => (
-            <Radar
-              key={index}
-              name={toTitleCase(racket.racketName)}
-              dataKey={`pala${index + 1}`}
-              stroke={COLORS[index]}
-              fill={COLORS[index]}
-              fillOpacity={0.2}
-              strokeWidth={3}
-              isAnimationActive={true}
+        <ResponsiveContainer width='100%' height='100%'>
+          <RadarChart
+            data={chartData}
+            outerRadius='75%'
+            margin={{ top: 10, right: 40, bottom: 10, left: 40 }}
+          >
+            <PolarGrid strokeDasharray='3 3' stroke='var(--border)' />
+            <PolarAngleAxis
+              dataKey='metric'
+              tick={{ fill: 'var(--text)', fontSize: 12, fontWeight: 600 }}
             />
-          ))}
-        </RadarChart>
-      </ResponsiveContainer>
+            <PolarRadiusAxis
+              angle={90}
+              domain={[0, 10]}
+              tick={{ fill: 'var(--text-subtle)', fontSize: 10 }}
+              tickCount={6}
+            />
+            <Tooltip content={<CustomTooltip metrics={metrics} />} />
+            {metrics.map((racket, index) => (
+              <Radar
+                key={index}
+                name={toTitleCase(racket.racketName)}
+                dataKey={`pala${index + 1}`}
+                stroke={COLORS[index]}
+                fill={COLORS[index]}
+                fillOpacity={0.2}
+                strokeWidth={3}
+                isAnimationActive={true}
+              />
+            ))}
+          </RadarChart>
+        </ResponsiveContainer>
       </RadarWrapper>
 
       <Legend metrics={metrics} />

@@ -24,10 +24,19 @@ const { mockConfig, supabase } = vi.hoisted(() => {
       error: resp.error,
     }));
     chain.select = vi.fn(() => chain);
-    chain.insert = vi.fn(() => ({ ...chain, select: vi.fn(() => ({ ...chain, single: vi.fn(async () => resp) })) }));
-    chain.update = vi.fn(() => ({ ...chain, select: vi.fn(() => ({ ...chain, single: vi.fn(async () => resp) })) }));
+    chain.insert = vi.fn(() => ({
+      ...chain,
+      select: vi.fn(() => ({ ...chain, single: vi.fn(async () => resp) })),
+    }));
+    chain.update = vi.fn(() => ({
+      ...chain,
+      select: vi.fn(() => ({ ...chain, single: vi.fn(async () => resp) })),
+    }));
     chain.delete = vi.fn(() => chain);
-    chain.upsert = vi.fn(() => ({ ...chain, select: vi.fn(() => ({ ...chain, single: vi.fn(async () => resp) })) }));
+    chain.upsert = vi.fn(() => ({
+      ...chain,
+      select: vi.fn(() => ({ ...chain, single: vi.fn(async () => resp) })),
+    }));
     chain.then = async (resolve: any) => resolve(resp);
     return chain;
   }
@@ -38,7 +47,12 @@ const { mockConfig, supabase } = vi.hoisted(() => {
       from: vi.fn(() => mockSelectReturn(mockConfig)),
       auth: {
         getSession: vi.fn(async () => ({
-          data: { session: { access_token: 'test-token', user: { id: 'test-user', email: 'test@test.com' } } },
+          data: {
+            session: {
+              access_token: 'test-token',
+              user: { id: 'test-user', email: 'test@test.com' },
+            },
+          },
           error: null,
         })),
         signOut: vi.fn(async () => ({ error: null })),

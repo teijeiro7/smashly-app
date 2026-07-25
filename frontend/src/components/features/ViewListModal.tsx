@@ -1,8 +1,8 @@
-import React, { useState } from "react";
-import styled from "styled-components";
-import { FiX, FiTrash2, FiExternalLink } from "react-icons/fi";
-import { motion, AnimatePresence } from "framer-motion";
-import { ListWithRackets } from "../../types/list";
+import React, { useState } from 'react';
+import styled from 'styled-components';
+import { FiX, FiTrash2, FiExternalLink } from 'react-icons/fi';
+import { motion, AnimatePresence } from 'framer-motion';
+import { ListWithRackets } from '../../types/list';
 import { useNavigate } from '@tanstack/react-router';
 
 interface ViewListModalProps {
@@ -199,7 +199,7 @@ const RacketActions = styled.div`
   align-items: center;
 `;
 
-const ActionButton = styled.button<{ variant?: "danger" | "primary" }>`
+const ActionButton = styled.button<{ variant?: 'danger' | 'primary' }>`
   padding: 0.5rem;
   border: none;
   border-radius: 8px;
@@ -209,8 +209,8 @@ const ActionButton = styled.button<{ variant?: "danger" | "primary" }>`
   align-items: center;
   justify-content: center;
 
-  ${(props) =>
-    props.variant === "danger"
+  ${props =>
+    props.variant === 'danger'
       ? `
     background: rgba(220, 38, 38, 0.10);
     color: var(--danger);
@@ -279,17 +279,14 @@ export const ViewListModal: React.FC<ViewListModalProps> = ({
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.9, opacity: 0 }}
-            onClick={(e) => e.stopPropagation()}
+            onClick={e => e.stopPropagation()}
           >
             <Header>
               <HeaderContent>
                 <Title>{list.name}</Title>
-                {list.description && (
-                  <Description>{list.description}</Description>
-                )}
+                {list.description && <Description>{list.description}</Description>}
                 <RacketCount>
-                  {list.rackets?.length || 0}{" "}
-                  {list.rackets?.length === 1 ? "pala" : "palas"}
+                  {list.rackets?.length || 0} {list.rackets?.length === 1 ? 'pala' : 'palas'}
                 </RacketCount>
               </HeaderContent>
               <CloseButton onClick={onClose}>
@@ -303,52 +300,47 @@ export const ViewListModal: React.FC<ViewListModalProps> = ({
               ) : !list.rackets || list.rackets.length === 0 ? (
                 <EmptyState>
                   <EmptyIcon>🎾</EmptyIcon>
-                  <EmptyText>
-                    Esta lista está vacía. Añade palas desde el catálogo.
-                  </EmptyText>
+                  <EmptyText>Esta lista está vacía. Añade palas desde el catálogo.</EmptyText>
                 </EmptyState>
               ) : (
                 <RacketsList>
                   {list.rackets.map((racket: any) => {
                     // Debug log
                     console.log('🎾 Racket data:', racket);
-                    
+
                     return (
                       <RacketCard key={racket.id}>
                         <RacketImage
-                          src={racket.imagenes?.[0] || "/placeholder-racket.png"}
+                          src={racket.imagenes?.[0] || '/placeholder-racket.png'}
                           alt={racket.modelo || racket.nombre}
-                          onError={(e) => {
-                            (e.target as HTMLImageElement).src =
-                              "/placeholder-racket.png";
+                          onError={e => {
+                            (e.target as HTMLImageElement).src = '/placeholder-racket.png';
                           }}
                         />
                         <RacketInfo>
                           <RacketBrand>{racket.marca || 'Marca desconocida'}</RacketBrand>
                           <RacketName>{racket.modelo || racket.nombre}</RacketName>
                           <RacketPrice>
-                            {racket.precio_actual 
-                              ? `${racket.precio_actual}€` 
-                              : (racket.padelnuestro_precio_actual 
-                                ? `${racket.padelnuestro_precio_actual}€` 
-                                : 'Precio no disponible')}
+                            {racket.precio_actual
+                              ? `${racket.precio_actual}€`
+                              : racket.padelnuestro_precio_actual
+                                ? `${racket.padelnuestro_precio_actual}€`
+                                : 'Precio no disponible'}
                           </RacketPrice>
                         </RacketInfo>
                         <RacketActions>
                           <ActionButton
-                            variant="primary"
+                            variant='primary'
                             onClick={() => handleViewRacket(racket.id!)}
-                            title="Ver detalles"
+                            title='Ver detalles'
                           >
                             <FiExternalLink size={18} />
                           </ActionButton>
                           <ActionButton
-                            variant="danger"
-                            onClick={() =>
-                              racket.id && handleRemoveRacket(racket.id)
-                            }
+                            variant='danger'
+                            onClick={() => racket.id && handleRemoveRacket(racket.id)}
                             disabled={removingRacketId === racket.id}
-                            title="Eliminar de la lista"
+                            title='Eliminar de la lista'
                           >
                             <FiTrash2 size={18} />
                           </ActionButton>

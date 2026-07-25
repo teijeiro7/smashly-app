@@ -25,9 +25,17 @@ const TableContainer = styled.div`
   background: var(--surface);
   -webkit-overflow-scrolling: touch;
 
-  &::-webkit-scrollbar { height: 6px; }
-  &::-webkit-scrollbar-track { background: var(--surface-3); border-radius: 3px; }
-  &::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 3px; }
+  &::-webkit-scrollbar {
+    height: 6px;
+  }
+  &::-webkit-scrollbar-track {
+    background: var(--surface-3);
+    border-radius: 3px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: var(--border-strong);
+    border-radius: 3px;
+  }
 
   @media (max-width: 768px) {
     display: none;
@@ -50,15 +58,27 @@ const Th = styled.th`
   border-bottom: 2px solid var(--border);
   white-space: nowrap;
 
-  &:first-child { border-top-left-radius: 16px; width: 25%; min-width: 100px; }
-  &:last-child  { border-top-right-radius: 16px; }
+  &:first-child {
+    border-top-left-radius: 16px;
+    width: 25%;
+    min-width: 100px;
+  }
+  &:last-child {
+    border-top-right-radius: 16px;
+  }
 `;
 
 const Tr = styled.tr`
-  &:last-child td { border-bottom: none; }
-  &:nth-child(even) { background: var(--surface-2); }
+  &:last-child td {
+    border-bottom: none;
+  }
+  &:nth-child(even) {
+    background: var(--surface-2);
+  }
   transition: background 0.2s;
-  &:hover { background: var(--surface-3); }
+  &:hover {
+    background: var(--surface-3);
+  }
 `;
 
 const Td = styled.td`
@@ -68,7 +88,10 @@ const Td = styled.td`
   font-size: 0.875rem;
   line-height: 1.5;
   white-space: nowrap;
-  &:first-child { font-weight: 600; color: var(--text); }
+  &:first-child {
+    font-weight: 600;
+    color: var(--text);
+  }
 `;
 
 const CheckMark = styled(FiCheckCircle)`
@@ -119,7 +142,9 @@ const RacketRow = styled.div`
   gap: 0.625rem;
   border-bottom: 1px solid var(--surface-3);
 
-  &:last-child { border-bottom: none; }
+  &:last-child {
+    border-bottom: none;
+  }
 `;
 
 const RacketDot = styled.div<{ $color: string }>`
@@ -193,7 +218,14 @@ const ComparisonTable: React.FC<ComparisonTableProps> = ({ data, metrics, racket
 
   return (
     <div style={{ marginBottom: '2rem' }}>
-      <h3 style={{ color: 'var(--primary-hover)', marginBottom: '1.5rem', fontSize: '1.5rem', fontWeight: 700 }}>
+      <h3
+        style={{
+          color: 'var(--primary-hover)',
+          marginBottom: '1.5rem',
+          fontSize: '1.5rem',
+          fontWeight: 700,
+        }}
+      >
         Comparativa Detallada
       </h3>
 
@@ -206,7 +238,9 @@ const ComparisonTable: React.FC<ComparisonTableProps> = ({ data, metrics, racket
               {metrics.map((racket, i) => (
                 <Th key={i}>
                   {toTitleCase(racket.racketName)}
-                  {racket.isCertified && <CheckMark size={16} title='Datos certificados por Testea Padel' />}
+                  {racket.isCertified && (
+                    <CheckMark size={16} title='Datos certificados por Testea Padel' />
+                  )}
                 </Th>
               ))}
             </tr>
@@ -242,7 +276,11 @@ const ComparisonTable: React.FC<ComparisonTableProps> = ({ data, metrics, racket
                   <RacketNameMobile>
                     {toTitleCase(racket.racketName)}
                     {racket.isCertified && (
-                      <FiCheckCircle size={11} color='var(--primary-hover)' style={{ marginLeft: 4, verticalAlign: 'middle' }} />
+                      <FiCheckCircle
+                        size={11}
+                        color='var(--primary-hover)'
+                        style={{ marginLeft: 4, verticalAlign: 'middle' }}
+                      />
                     )}
                   </RacketNameMobile>
                   <RacketValueMobile>{val ?? '—'}</RacketValueMobile>

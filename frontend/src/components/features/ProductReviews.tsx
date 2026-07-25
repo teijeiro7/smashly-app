@@ -43,10 +43,14 @@ export const ProductReviews: React.FC<ProductReviewsProps> = ({ racketId }) => {
   };
 
   const handleReviewDeleted = (deletedId: string) => {
-    setReviewsData(prev => prev ? {
-      ...prev,
-      reviews: prev.reviews.filter(r => r.id !== deletedId)
-    } : null);
+    setReviewsData(prev =>
+      prev
+        ? {
+            ...prev,
+            reviews: prev.reviews.filter(r => r.id !== deletedId),
+          }
+        : null
+    );
     loadReviews();
   };
 

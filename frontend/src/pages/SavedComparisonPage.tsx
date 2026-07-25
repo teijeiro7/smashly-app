@@ -466,7 +466,9 @@ const SavedComparisonPage: React.FC = () => {
                   <SectionTitle>Análisis Técnico</SectionTitle>
                   {comparisonResult.technicalAnalysis.map((section, index) => (
                     <SectionContent key={index}>
-                      <h4 style={{ color: 'var(--text)', marginBottom: '0.5rem' }}>{section.title}</h4>
+                      <h4 style={{ color: 'var(--text)', marginBottom: '0.5rem' }}>
+                        {section.title}
+                      </h4>
                       <ReactMarkdown remarkPlugins={[remarkGfm]}>{section.content}</ReactMarkdown>
                     </SectionContent>
                   ))}

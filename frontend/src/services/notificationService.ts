@@ -17,7 +17,7 @@ export class NotificationService {
     }
 
     if (filters?.offset) {
-      query = query.range(filters.offset, (filters.offset + (filters.limit ?? 50)) - 1);
+      query = query.range(filters.offset, filters.offset + (filters.limit ?? 50) - 1);
     }
 
     const { data, error } = await query;
@@ -62,7 +62,9 @@ export class NotificationService {
     message: string,
     data?: Record<string, unknown>
   ): Promise<Notification | null> {
-    const { data: { session } } = await supabase.auth.getSession();
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
     if (!session) return null;
 
     const { data: notification, error } = await supabase
@@ -83,10 +85,7 @@ export class NotificationService {
   }
 
   static async deleteNotification(notificationId: string): Promise<boolean> {
-    const { error } = await supabase
-      .from('notifications')
-      .delete()
-      .eq('id', notificationId);
+    const { error } = await supabase.from('notifications').delete().eq('id', notificationId);
 
     if (error) throw new Error(error.message);
     return true;

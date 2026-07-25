@@ -61,9 +61,17 @@ const PriceBadge = styled.span<{ variant: 'low' | 'neutral' | 'high' }>`
   padding: 2px 8px;
   border-radius: 99px;
   background: ${({ variant }) =>
-    variant === 'low' ? 'var(--primary-subtle)' : variant === 'high' ? 'rgba(220, 38, 38, 0.10)' : 'var(--surface-3)'};
+    variant === 'low'
+      ? 'var(--primary-subtle)'
+      : variant === 'high'
+        ? 'rgba(220, 38, 38, 0.10)'
+        : 'var(--surface-3)'};
   color: ${({ variant }) =>
-    variant === 'low' ? 'var(--primary)' : variant === 'high' ? 'var(--danger)' : 'var(--text-muted)'};
+    variant === 'low'
+      ? 'var(--primary)'
+      : variant === 'high'
+        ? 'var(--danger)'
+        : 'var(--text-muted)'};
 `;
 
 const Controls = styled.div`
@@ -103,17 +111,17 @@ const EmptyState = styled.div`
 // ── Colores por tienda ────────────────────────────────────────────────────────
 
 const STORE_COLORS: Record<string, string> = {
-  padelmarket:  'var(--primary)',
+  padelmarket: 'var(--primary)',
   padelnuestro: '#2563eb',
   padelproshop: '#d97706',
-  otras:       '#8b5cf6', // Agregado: color para tiendas restantes
+  otras: '#8b5cf6', // Agregado: color para tiendas restantes
 };
 
 const STORE_LABELS: Record<string, string> = {
-  padelmarket:  'Padel Market',
+  padelmarket: 'Padel Market',
   padelnuestro: 'Padel Nuestro',
   padelproshop: 'Padel Pro Shop',
-  otras:       'Otras tiendas', // Agregado: label para tiendas restantes
+  otras: 'Otras tiendas', // Agregado: label para tiendas restantes
 };
 
 const DAY_OPTIONS = [30, 60, 90, 180];
@@ -148,10 +156,7 @@ interface PriceHistoryChartProps {
 
 // ── Componente ────────────────────────────────────────────────────────────────
 
-export const PriceHistoryChart: React.FC<PriceHistoryChartProps> = ({
-  racketId,
-  currentPrice,
-}) => {
+export const PriceHistoryChart: React.FC<PriceHistoryChartProps> = ({ racketId, currentPrice }) => {
   const [days, setDays] = useState(90);
   const [historyData, setHistoryData] = useState<PriceHistoryResult | null>(null);
   const [loading, setLoading] = useState(true);
@@ -168,7 +173,9 @@ export const PriceHistoryChart: React.FC<PriceHistoryChartProps> = ({
       }
     });
 
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, [racketId, days]);
 
   // Determinar el precio más bajo y más alto globales para el badge
@@ -232,13 +239,20 @@ export const PriceHistoryChart: React.FC<PriceHistoryChartProps> = ({
 
   const hasRealData = chartData && chartData.length > 1;
   const badgeVariant = getPriceBadgeVariant(currentPrice, globalMin, globalMax);
-  const badgeLabel = badgeVariant === 'low' ? 'Precio bajo' : badgeVariant === 'high' ? 'Precio alto' : 'Precio actual';
+  const badgeLabel =
+    badgeVariant === 'low'
+      ? 'Precio bajo'
+      : badgeVariant === 'high'
+        ? 'Precio alto'
+        : 'Precio actual';
 
   return (
     <ChartContainer>
       <Header>
         <div>
-          <Title><FaChartLine /> Historial de Precios</Title>
+          <Title>
+            <FaChartLine /> Historial de Precios
+          </Title>
           <PriceRow>
             <CurrentPrice>{currentPrice.toFixed(2)}€</CurrentPrice>
             <PriceBadge variant={badgeVariant}>{badgeLabel}</PriceBadge>
@@ -269,7 +283,9 @@ export const PriceHistoryChart: React.FC<PriceHistoryChartProps> = ({
 
       {!loading && !hasRealData && (
         <EmptyState>
-          <span style={{ fontSize: '1.5rem' }}><FaChartLine /></span>
+          <span style={{ fontSize: '1.5rem' }}>
+            <FaChartLine />
+          </span>
           <span>Aún no hay historial de precios acumulado.</span>
           <span style={{ fontSize: '0.75rem' }}>
             Se registrará automáticamente con cada actualización del catálogo.
@@ -283,22 +299,47 @@ export const PriceHistoryChart: React.FC<PriceHistoryChartProps> = ({
             <AreaChart data={chartData} margin={{ top: 4, right: 4, bottom: 0, left: 0 }}>
               <defs>
                 {/* Gradientes para tiendas principales */}
-                {historyData.stores.filter(s => MAIN_STORES.includes(s.store)).map(s => (
-                  <linearGradient key={s.store} id={`grad-${s.store}`} x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%"  stopColor={STORE_COLORS[s.store] || 'var(--text-muted)'} stopOpacity={0.15} />
-                    <stop offset="95%" stopColor={STORE_COLORS[s.store] || 'var(--text-muted)'} stopOpacity={0} />
-                  </linearGradient>
-                ))}
+                {historyData.stores
+                  .filter(s => MAIN_STORES.includes(s.store))
+                  .map(s => (
+                    <linearGradient
+                      key={s.store}
+                      id={`grad-${s.store}`}
+                      x1='0'
+                      y1='0'
+                      x2='0'
+                      y2='1'
+                    >
+                      <stop
+                        offset='5%'
+                        stopColor={STORE_COLORS[s.store] || 'var(--text-muted)'}
+                        stopOpacity={0.15}
+                      />
+                      <stop
+                        offset='95%'
+                        stopColor={STORE_COLORS[s.store] || 'var(--text-muted)'}
+                        stopOpacity={0}
+                      />
+                    </linearGradient>
+                  ))}
                 {/* Gradiente para "otras" tiendas */}
-                <linearGradient id="grad-otras" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%"  stopColor={STORE_COLORS['otras'] || '#8b5cf6'} stopOpacity={0.15} />
-                  <stop offset="95%" stopColor={STORE_COLORS['otras'] || '#8b5cf6'} stopOpacity={0} />
+                <linearGradient id='grad-otras' x1='0' y1='0' x2='0' y2='1'>
+                  <stop
+                    offset='5%'
+                    stopColor={STORE_COLORS['otras'] || '#8b5cf6'}
+                    stopOpacity={0.15}
+                  />
+                  <stop
+                    offset='95%'
+                    stopColor={STORE_COLORS['otras'] || '#8b5cf6'}
+                    stopOpacity={0}
+                  />
                 </linearGradient>
               </defs>
 
-              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--surface-3)" />
+              <CartesianGrid strokeDasharray='3 3' vertical={false} stroke='var(--surface-3)' />
               <XAxis
-                dataKey="date"
+                dataKey='date'
                 axisLine={false}
                 tickLine={false}
                 tick={{ fontSize: 11, fill: 'var(--text-subtle)' }}
@@ -324,8 +365,8 @@ export const PriceHistoryChart: React.FC<PriceHistoryChartProps> = ({
                 ]}
               />
               <Legend
-                formatter={(value) => STORE_LABELS[value] || value}
-                iconType="circle"
+                formatter={value => STORE_LABELS[value] || value}
+                iconType='circle'
                 iconSize={8}
                 wrapperStyle={{ fontSize: '0.75rem', paddingTop: '0.5rem' }}
               />
@@ -335,7 +376,7 @@ export const PriceHistoryChart: React.FC<PriceHistoryChartProps> = ({
                 return (
                   <Area
                     key={s.store}
-                    type="monotone"
+                    type='monotone'
                     dataKey={dataKey}
                     stroke={STORE_COLORS[dataKey] || 'var(--text-muted)'}
                     strokeWidth={2.5}

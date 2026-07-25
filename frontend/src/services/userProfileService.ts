@@ -61,7 +61,7 @@ export class UserProfileService {
     try {
       const url = buildApiUrl(API_ENDPOINTS.USERS_PROFILE);
       const response = await fetch(url, {
-        credentials: 'include',  // send httpOnly auth cookie
+        credentials: 'include', // send httpOnly auth cookie
         method: 'POST',
         headers: getCommonHeaders(),
         body: JSON.stringify({
@@ -91,7 +91,7 @@ export class UserProfileService {
     try {
       const url = buildApiUrl(API_ENDPOINTS.USERS_PROFILE);
       const response = await fetch(url, {
-        credentials: 'include',  // send httpOnly auth cookie
+        credentials: 'include', // send httpOnly auth cookie
         method: 'GET',
         headers: getCommonHeaders(),
       });
@@ -132,7 +132,9 @@ export class UserProfileService {
     updates: Partial<Omit<UserProfile, 'id' | 'created_at'>>
   ): Promise<UserProfile> {
     try {
-      const { data: { session } } = await supabase.auth.getSession();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
       if (!session) throw new Error('No hay sesión activa');
 
       const { data, error } = await supabase
@@ -176,7 +178,7 @@ export class UserProfileService {
     try {
       const url = buildApiUrl(API_ENDPOINTS.USERS_PROFILE);
       const response = await fetch(url, {
-        credentials: 'include',  // send httpOnly auth cookie
+        credentials: 'include', // send httpOnly auth cookie
         method: 'DELETE',
         headers: getCommonHeaders(),
       });

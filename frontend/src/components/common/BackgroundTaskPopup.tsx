@@ -80,7 +80,8 @@ const MinimizedContent = styled.div<{ $status: string }>`
         ? 'linear-gradient(135deg, var(--danger) 0%, var(--danger) 100%)'
         : 'var(--surface-3)'};
   border-radius: 50%;
-  color: ${props => (props.$status === 'running' ? 'var(--text-muted)' : 'var(--brand-on-surface)')};
+  color: ${props =>
+    props.$status === 'running' ? 'var(--text-muted)' : 'var(--brand-on-surface)'};
   position: relative;
   z-index: 1;
   border: ${props => (props.$status === 'running' ? '3px solid var(--primary)' : 'none')};
@@ -319,7 +320,11 @@ const TaskName = styled.p`
 const TaskStatus = styled.span<{ $status: string }>`
   font-size: 0.8rem;
   color: ${props =>
-    props.$status === 'completed' ? 'var(--primary)' : props.$status === 'error' ? 'var(--danger)' : 'var(--info)'};
+    props.$status === 'completed'
+      ? 'var(--primary)'
+      : props.$status === 'error'
+        ? 'var(--danger)'
+        : 'var(--info)'};
   font-weight: 600;
 `;
 
@@ -385,7 +390,7 @@ export const BackgroundTaskPopup: React.FC = () => {
     }
   }, [tasks]);
 
-  // Removed setInterval-based pulse for performance. 
+  // Removed setInterval-based pulse for performance.
   // The pulse animation is now handled directly by Framer Motion.
 
   // Mostrar popup solo si hay tareas
@@ -469,7 +474,7 @@ export const BackgroundTaskPopup: React.FC = () => {
         transition={{
           y: { type: 'spring', stiffness: 300, damping: 25 },
           opacity: { duration: 0.2 },
-          scale: { type: 'spring', stiffness: 300, damping: 25 }
+          scale: { type: 'spring', stiffness: 300, damping: 25 },
         }}
       >
         {minimized ? (
@@ -535,11 +540,7 @@ export const BackgroundTaskPopup: React.FC = () => {
             {/* Contenido del círculo minimizado */}
             <MinimizedContent $status={visibleTask.status}>
               <MinimizedIcon
-                animate={
-                  visibleTask.status === 'running'
-                    ? { rotate: 360 }
-                    : {}
-                }
+                animate={visibleTask.status === 'running' ? { rotate: 360 } : {}}
                 transition={
                   visibleTask.status === 'running'
                     ? { duration: 2, repeat: Infinity, ease: 'linear' }
@@ -645,7 +646,9 @@ export const BackgroundTaskPopup: React.FC = () => {
               {/* Mostrar tareas anteriores si las hay */}
               {tasks.length > 1 && (
                 <div style={{ marginTop: '20px' }}>
-                  <h4 style={{ fontSize: '0.9rem', color: 'var(--text-muted)', marginBottom: '12px' }}>
+                  <h4
+                    style={{ fontSize: '0.9rem', color: 'var(--text-muted)', marginBottom: '12px' }}
+                  >
                     Tareas Recientes
                   </h4>
                   <TaskList>

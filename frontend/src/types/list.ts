@@ -1,4 +1,4 @@
-import { Racket } from "./racket";
+import { Racket } from './racket';
 
 /**
  * Tipos para las listas de palas favoritas

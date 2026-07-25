@@ -48,9 +48,27 @@ function calculateBestPrice(raw: any): {
   fuente: string;
 } {
   const stores = [
-    { name: 'padelnuestro', current_price: raw.padelnuestro_actual_price, original_price: raw.padelnuestro_original_price, discount_percentage: raw.padelnuestro_discount_percentage, link: raw.padelnuestro_link },
-    { name: 'padelmarket', current_price: raw.padelmarket_actual_price, original_price: raw.padelmarket_original_price, discount_percentage: raw.padelmarket_discount_percentage, link: raw.padelmarket_link },
-    { name: 'padelproshop', current_price: raw.padelproshop_actual_price, original_price: raw.padelproshop_original_price, discount_percentage: raw.padelproshop_discount_percentage, link: raw.padelproshop_link },
+    {
+      name: 'padelnuestro',
+      current_price: raw.padelnuestro_actual_price,
+      original_price: raw.padelnuestro_original_price,
+      discount_percentage: raw.padelnuestro_discount_percentage,
+      link: raw.padelnuestro_link,
+    },
+    {
+      name: 'padelmarket',
+      current_price: raw.padelmarket_actual_price,
+      original_price: raw.padelmarket_original_price,
+      discount_percentage: raw.padelmarket_discount_percentage,
+      link: raw.padelmarket_link,
+    },
+    {
+      name: 'padelproshop',
+      current_price: raw.padelproshop_actual_price,
+      original_price: raw.padelproshop_original_price,
+      discount_percentage: raw.padelproshop_discount_percentage,
+      link: raw.padelproshop_link,
+    },
   ].filter(s => s.current_price != null && s.current_price > 0);
 
   if (stores.length === 0) {
@@ -150,10 +168,7 @@ function mapDbToFrontend(raw: any): Racket {
 // ── Service ───────────────────────────────────────────────────────────────────
 const racketService = {
   async getAllRackets(): Promise<Racket[]> {
-    const { data, error } = await supabase
-      .from('rackets')
-      .select('*')
-      .order('name');
+    const { data, error } = await supabase.from('rackets').select('*').order('name');
 
     if (error) throw new Error(error.message);
     return (data ?? []).map(mapDbToFrontend);
@@ -177,21 +192,14 @@ const racketService = {
   },
 
   async getRacketById(id: number): Promise<Racket | null> {
-    const { data, error } = await supabase
-      .from('rackets')
-      .select('*')
-      .eq('id', id)
-      .maybeSingle();
+    const { data, error } = await supabase.from('rackets').select('*').eq('id', id).maybeSingle();
 
     if (error) throw new Error(error.message);
     return data ? mapDbToFrontend(data) : null;
   },
 
   async getRacketsByIds(ids: number[]): Promise<Racket[]> {
-    const { data, error } = await supabase
-      .from('rackets')
-      .select('*')
-      .in('id', ids);
+    const { data, error } = await supabase.from('rackets').select('*').in('id', ids);
 
     if (error) throw new Error(error.message);
     return (data ?? []).map(mapDbToFrontend);
@@ -248,9 +256,7 @@ const racketService = {
       }
     }
 
-    const { data, count, error } = await q
-      .order('name')
-      .range(from, from + limit - 1);
+    const { data, count, error } = await q.order('name').range(from, from + limit - 1);
 
     if (error) throw new Error(error.message);
 
@@ -273,11 +279,7 @@ const racketService = {
 
   async getBestsellerRackets(): Promise<Racket[]> {
     // es_bestseller does not exist in DB — return top rackets by name
-    const { data, error } = await supabase
-      .from('rackets')
-      .select('*')
-      .order('name')
-      .limit(20);
+    const { data, error } = await supabase.from('rackets').select('*').order('name').limit(20);
 
     if (error) throw new Error(error.message);
     return (data ?? []).map(mapDbToFrontend);
@@ -295,17 +297,19 @@ const racketService = {
   },
 
   async getUniqueBrands(): Promise<string[]> {
-    const { data, error } = await supabase
-      .from('rackets')
-      .select('brand')
-      .order('brand');
+    const { data, error } = await supabase.from('rackets').select('brand').order('brand');
 
     if (error) throw new Error(error.message);
     const brands = [...new Set((data ?? []).map((r: any) => r.brand).filter(Boolean))];
     return brands as string[];
   },
 
-  async getStats(): Promise<{ total: number; bestsellers: number; onSale: number; brands: number }> {
+  async getStats(): Promise<{
+    total: number;
+    bestsellers: number;
+    onSale: number;
+    brands: number;
+  }> {
     const [totalRes, onSaleRes, brandsRes] = await Promise.all([
       supabase.from('rackets').select('*', { count: 'exact', head: true }),
       supabase.from('rackets').select('*', { count: 'exact', head: true }).eq('on_offer', true),
@@ -395,16 +399,18 @@ const racketService = {
         byStore.set(point.store, list);
       }
 
-      const stores: StorePriceHistory[] = Array.from(byStore.entries()).map(([storeName, history]) => {
-        const prices = history.map(h => h.price);
-        return {
-          store: storeName,
-          history,
-          currentPrice: prices.length ? prices[prices.length - 1] : null,
-          minPrice: prices.length ? Math.min(...prices) : null,
-          maxPrice: prices.length ? Math.max(...prices) : null,
-        };
-      });
+      const stores: StorePriceHistory[] = Array.from(byStore.entries()).map(
+        ([storeName, history]) => {
+          const prices = history.map(h => h.price);
+          return {
+            store: storeName,
+            history,
+            currentPrice: prices.length ? prices[prices.length - 1] : null,
+            minPrice: prices.length ? Math.min(...prices) : null,
+            maxPrice: prices.length ? Math.max(...prices) : null,
+          };
+        }
+      );
 
       return { racketId, days, stores, combined: points };
     } catch {

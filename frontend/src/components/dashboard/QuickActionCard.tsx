@@ -97,12 +97,8 @@ export const QuickActionCard: React.FC<QuickActionCardProps> = ({
   onClick,
 }) => {
   return (
-    <Card
-      onClick={onClick}
-      whileHover={{ scale: 1.02 }}
-      whileTap={{ scale: 0.98 }}
-    >
-      <IconContainer className="icon-container">
+    <Card onClick={onClick} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+      <IconContainer className='icon-container'>
         <Icon />
       </IconContainer>
       <Title>{title}</Title>

@@ -1,8 +1,15 @@
 import { supabase } from '../lib/supabase';
-import { BasicFormData, AdvancedFormData, RecommendationResult, Recommendation } from '../types/recommendation';
+import {
+  BasicFormData,
+  AdvancedFormData,
+  RecommendationResult,
+  Recommendation,
+} from '../types/recommendation';
 
 async function getAuthHeader(): Promise<HeadersInit> {
-  const { data: { session } } = await supabase.auth.getSession();
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
   const headers: HeadersInit = { 'Content-Type': 'application/json' };
   if (session?.access_token) {
     headers['Authorization'] = `Bearer ${session.access_token}`;
@@ -24,7 +31,9 @@ export class RecommendationService {
 
     if (!response.ok) {
       const body = await response.json().catch(() => ({}));
-      throw new Error(body.error || body.message || `Error ${response.status} generating recommendation`);
+      throw new Error(
+        body.error || body.message || `Error ${response.status} generating recommendation`
+      );
     }
 
     return response.json();
@@ -43,7 +52,9 @@ export class RecommendationService {
 
     if (!response.ok) {
       const body = await response.json().catch(() => ({}));
-      throw new Error(body.error || body.message || `Error ${response.status} generating RAG recommendation`);
+      throw new Error(
+        body.error || body.message || `Error ${response.status} generating RAG recommendation`
+      );
     }
 
     return response.json();
@@ -54,7 +65,9 @@ export class RecommendationService {
     formData: BasicFormData | AdvancedFormData,
     result: RecommendationResult
   ): Promise<Recommendation> {
-    const { data: { session } } = await supabase.auth.getSession();
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
     if (!session) throw new Error('No autenticado');
 
     const { data, error } = await supabase
@@ -73,7 +86,9 @@ export class RecommendationService {
   }
 
   static async getLast(): Promise<Recommendation | null> {
-    const { data: { session } } = await supabase.auth.getSession();
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
     if (!session) return null;
 
     const { data, error } = await supabase

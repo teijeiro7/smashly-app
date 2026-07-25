@@ -11,8 +11,7 @@ export const SITE = {
   tagline: 'Encuentra tu Pala de Pádel Perfecta',
   description:
     'Smashly es el comparador de palas de pádel con IA más completo. Analiza más de 800 modelos, compara precios en tiempo real y descubre la pala ideal para tu nivel y estilo de juego.',
-  shortDescription:
-    'Comparador de palas de pádel con IA. +800 modelos, precios en tiempo real.',
+  shortDescription: 'Comparador de palas de pádel con IA. +800 modelos, precios en tiempo real.',
   locale: 'es_ES',
   language: 'es',
   // Brand colors used in OG image and theme
@@ -27,8 +26,7 @@ export const SITE = {
   facebookAppId: '',
   // Default OG image (1200x630 PNG recommended)
   ogImage: `${SITE_URL}/images/og/smashly-og-1200x630.png`,
-  ogImageAlt:
-    'Smashly — Comparador de palas de pádel con IA. Encuentra la pala perfecta.',
+  ogImageAlt: 'Smashly — Comparador de palas de pádel con IA. Encuentra la pala perfecta.',
   logo: `${SITE_URL}/images/icons/smashly-icon.png`,
   favicon: '/images/icons/smashly-icon.png',
   appleTouchIcon: '/icons/apple-touch-icon.png',
@@ -123,7 +121,9 @@ export const slugify = (text: string): string =>
     .replace(/-+/g, '-')
     .replace(/^-+|-+$/g, '');
 
-export const allKeywords = [...KEYWORDS.primary, ...KEYWORDS.secondary, ...KEYWORDS.longtail].join(', ');
+export const allKeywords = [...KEYWORDS.primary, ...KEYWORDS.secondary, ...KEYWORDS.longtail].join(
+  ', '
+);
 
 /**
  * Type-safe SEO payload for the <SEO /> component.

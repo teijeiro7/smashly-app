@@ -22,7 +22,8 @@ const Panel = styled.div`
 `;
 
 const Row = styled.div<{ $ok?: boolean | null }>`
-  color: ${p => (p.$ok === true ? 'var(--primary-light)' : p.$ok === false ? '#f87171' : 'var(--surface)')};
+  color: ${p =>
+    p.$ok === true ? 'var(--primary-light)' : p.$ok === false ? '#f87171' : 'var(--surface)'};
 `;
 
 /**
@@ -57,7 +58,9 @@ export const ThemeDebug: React.FC = () => {
 
   return (
     <Panel>
-      <Row>mode={mode} resolved={resolved}</Row>
+      <Row>
+        mode={mode} resolved={resolved}
+      </Row>
       <Row $ok={domTheme === resolved}>html[data-theme]={domTheme}</Row>
       <Row $ok={isDark}>expected dark? {isDark ? 'YES' : 'no'}</Row>
       <Row>--bg = {cssBg || '(empty)'}</Row>

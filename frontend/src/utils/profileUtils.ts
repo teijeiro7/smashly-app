@@ -38,7 +38,7 @@ export function calculateProfileCompletion(user: UserProfile | null): ProfileCom
   Object.entries(fields).forEach(([key, config]) => {
     totalWeight += config.weight;
     const value = user[key as keyof UserProfile];
-    
+
     if (value !== null && value !== undefined && value !== '') {
       // Special handling for arrays
       if (Array.isArray(value) && value.length > 0) {

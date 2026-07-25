@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from "react";
-import styled from "styled-components";
-import { FiList, FiPlus, FiTrash2, FiEye, FiPackage } from "react-icons/fi";
-import { useList } from "../../contexts/ListsContext";
-import { CreateListModal } from "./CreateListModal";
-import { ViewListModal } from "./ViewListModal";
-import { ListWithRackets } from "../../types/list";
+import React, { useEffect, useState } from 'react';
+import styled from 'styled-components';
+import { FiList, FiPlus, FiTrash2, FiEye, FiPackage } from 'react-icons/fi';
+import { useList } from '../../contexts/ListsContext';
+import { CreateListModal } from './CreateListModal';
+import { ViewListModal } from './ViewListModal';
+import { ListWithRackets } from '../../types/list';
 
 const Section = styled.div`
   background: var(--surface);
@@ -102,7 +102,7 @@ const ListActions = styled.div`
   gap: 0.5rem;
 `;
 
-const ActionButton = styled.button<{ variant?: "danger" | "primary" }>`
+const ActionButton = styled.button<{ variant?: 'danger' | 'primary' }>`
   width: 32px;
   height: 32px;
   border: none;
@@ -113,8 +113,8 @@ const ActionButton = styled.button<{ variant?: "danger" | "primary" }>`
   justify-content: center;
   transition: all 0.2s ease;
 
-  ${(props) =>
-    props.variant === "danger"
+  ${props =>
+    props.variant === 'danger'
       ? `
     background: var(--danger-subtle);
     color: var(--danger);
@@ -198,20 +198,11 @@ const Spinner = styled.div`
 `;
 
 export const MyListsSection: React.FC = () => {
-  const {
-    lists,
-    loading,
-    fetchLists,
-    deleteList,
-    getListById,
-    removeRacketFromList,
-    createList,
-  } = useList();
+  const { lists, loading, fetchLists, deleteList, getListById, removeRacketFromList, createList } =
+    useList();
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showViewModal, setShowViewModal] = useState(false);
-  const [selectedList, setSelectedList] = useState<ListWithRackets | null>(
-    null
-  );
+  const [selectedList, setSelectedList] = useState<ListWithRackets | null>(null);
   const [loadingListDetail, setLoadingListDetail] = useState(false);
 
   useEffect(() => {
@@ -229,7 +220,7 @@ export const MyListsSection: React.FC = () => {
 
   const handleDeleteList = async (listId: string, e: React.MouseEvent) => {
     e.stopPropagation();
-    if (window.confirm("¿Estás seguro de que quieres eliminar esta lista?")) {
+    if (window.confirm('¿Estás seguro de que quieres eliminar esta lista?')) {
       await deleteList(listId);
     }
   };
@@ -270,26 +261,20 @@ export const MyListsSection: React.FC = () => {
           </LoadingState>
         ) : (
           <ListsGrid>
-            {lists.map((list) => (
-              <ListCard
-                key={list.id}
-                onClick={(e) => handleViewList(list.id, e)}
-              >
+            {lists.map(list => (
+              <ListCard key={list.id} onClick={e => handleViewList(list.id, e)}>
                 <ListHeader>
                   <ListIcon>
                     <FiList />
                   </ListIcon>
                   <ListActions>
-                    <ActionButton
-                      onClick={(e) => handleViewList(list.id, e)}
-                      title="Ver lista"
-                    >
+                    <ActionButton onClick={e => handleViewList(list.id, e)} title='Ver lista'>
                       <FiEye size={16} />
                     </ActionButton>
                     <ActionButton
-                      variant="danger"
-                      onClick={(e) => handleDeleteList(list.id, e)}
-                      title="Eliminar lista"
+                      variant='danger'
+                      onClick={e => handleDeleteList(list.id, e)}
+                      title='Eliminar lista'
                     >
                       <FiTrash2 size={16} />
                     </ActionButton>
@@ -297,15 +282,12 @@ export const MyListsSection: React.FC = () => {
                 </ListHeader>
                 <ListContent>
                   <ListName>{list.name}</ListName>
-                  <ListDescription>
-                    {list.description || "Sin descripción"}
-                  </ListDescription>
+                  <ListDescription>{list.description || 'Sin descripción'}</ListDescription>
                 </ListContent>
                 <ListMeta>
                   <RacketCount>
                     <FiPackage />
-                    {list.racket_count || 0}{" "}
-                    {list.racket_count === 1 ? "pala" : "palas"}
+                    {list.racket_count || 0} {list.racket_count === 1 ? 'pala' : 'palas'}
                   </RacketCount>
                 </ListMeta>
               </ListCard>

@@ -25,20 +25,28 @@ export const useList = (): ListsContextType => {
   return context;
 };
 
-interface ListsProviderProps { children: ReactNode }
+interface ListsProviderProps {
+  children: ReactNode;
+}
 
 export const ListsProvider: React.FC<ListsProviderProps> = ({ children }) => {
   const { isAuthenticated } = useAuth();
   const queryClient = useQueryClient();
 
-  const { data: lists = [], isLoading, refetch } = useQuery({
+  const {
+    data: lists = [],
+    isLoading,
+    refetch,
+  } = useQuery({
     queryKey: ['lists'],
     queryFn: () => ListService.getUserLists(),
     enabled: isAuthenticated,
     staleTime: 1000 * 60 * 5,
   });
 
-  const fetchLists = useCallback(async () => { await refetch(); }, [refetch]);
+  const fetchLists = useCallback(async () => {
+    await refetch();
+  }, [refetch]);
 
   const createMutation = useMutation({
     mutationFn: (data: CreateListRequest) => ListService.createList(data),
@@ -68,36 +76,48 @@ export const ListsProvider: React.FC<ListsProviderProps> = ({ children }) => {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['lists'] }),
   });
 
-  const createList = useCallback(async (data: CreateListRequest): Promise<List | null> => {
-    try {
-      const list = await createMutation.mutateAsync(data);
-      sileo.success({ title: 'Éxito', description: 'Lista creada exitosamente' });
-      return list;
-    } catch (error: any) {
-      sileo.error({ title: 'Error', description: error.message || 'Error al crear la lista' });
-      return null;
-    }
-  }, [createMutation]);
+  const createList = useCallback(
+    async (data: CreateListRequest): Promise<List | null> => {
+      try {
+        const list = await createMutation.mutateAsync(data);
+        sileo.success({ title: 'Éxito', description: 'Lista creada exitosamente' });
+        return list;
+      } catch (error: any) {
+        sileo.error({ title: 'Error', description: error.message || 'Error al crear la lista' });
+        return null;
+      }
+    },
+    [createMutation]
+  );
 
-  const updateList = useCallback(async (listId: string, name: string, description?: string) => {
-    try {
-      await updateMutation.mutateAsync({ id: listId, name, description });
-      sileo.success({ title: 'Éxito', description: 'Lista actualizada exitosamente' });
-    } catch (error: any) {
-      sileo.error({ title: 'Error', description: error.message || 'Error al actualizar la lista' });
-      throw error;
-    }
-  }, [updateMutation]);
+  const updateList = useCallback(
+    async (listId: string, name: string, description?: string) => {
+      try {
+        await updateMutation.mutateAsync({ id: listId, name, description });
+        sileo.success({ title: 'Éxito', description: 'Lista actualizada exitosamente' });
+      } catch (error: any) {
+        sileo.error({
+          title: 'Error',
+          description: error.message || 'Error al actualizar la lista',
+        });
+        throw error;
+      }
+    },
+    [updateMutation]
+  );
 
-  const deleteList = useCallback(async (listId: string) => {
-    try {
-      await deleteMutation.mutateAsync(listId);
-      sileo.success({ title: 'Éxito', description: 'Lista eliminada exitosamente' });
-    } catch (error: any) {
-      sileo.error({ title: 'Error', description: error.message || 'Error al eliminar la lista' });
-      throw error;
-    }
-  }, [deleteMutation]);
+  const deleteList = useCallback(
+    async (listId: string) => {
+      try {
+        await deleteMutation.mutateAsync(listId);
+        sileo.success({ title: 'Éxito', description: 'Lista eliminada exitosamente' });
+      } catch (error: any) {
+        sileo.error({ title: 'Error', description: error.message || 'Error al eliminar la lista' });
+        throw error;
+      }
+    },
+    [deleteMutation]
+  );
 
   const getListById = useCallback(async (listId: string): Promise<ListWithRackets | null> => {
     try {
@@ -108,37 +128,62 @@ export const ListsProvider: React.FC<ListsProviderProps> = ({ children }) => {
     }
   }, []);
 
-  const addRacketToList = useCallback(async (listId: string, racketId: number) => {
-    try {
-      await addRacketMutation.mutateAsync({ listId, racketId });
-      sileo.success({ title: 'Éxito', description: 'Pala añadida a la lista' });
-    } catch (error: any) {
-      sileo.error({ title: 'Error', description: error.message || 'Error al añadir pala a la lista' });
-      throw error;
-    }
-  }, [addRacketMutation]);
+  const addRacketToList = useCallback(
+    async (listId: string, racketId: number) => {
+      try {
+        await addRacketMutation.mutateAsync({ listId, racketId });
+        sileo.success({ title: 'Éxito', description: 'Pala añadida a la lista' });
+      } catch (error: any) {
+        sileo.error({
+          title: 'Error',
+          description: error.message || 'Error al añadir pala a la lista',
+        });
+        throw error;
+      }
+    },
+    [addRacketMutation]
+  );
 
-  const removeRacketFromList = useCallback(async (listId: string, racketId: number) => {
-    try {
-      await removeRacketMutation.mutateAsync({ listId, racketId });
-      sileo.success({ title: 'Éxito', description: 'Pala eliminada de la lista' });
-    } catch (error: any) {
-      sileo.error({ title: 'Error', description: error.message || 'Error al eliminar pala de la lista' });
-      throw error;
-    }
-  }, [removeRacketMutation]);
+  const removeRacketFromList = useCallback(
+    async (listId: string, racketId: number) => {
+      try {
+        await removeRacketMutation.mutateAsync({ listId, racketId });
+        sileo.success({ title: 'Éxito', description: 'Pala eliminada de la lista' });
+      } catch (error: any) {
+        sileo.error({
+          title: 'Error',
+          description: error.message || 'Error al eliminar pala de la lista',
+        });
+        throw error;
+      }
+    },
+    [removeRacketMutation]
+  );
 
-  const value = useMemo<ListsContextType>(() => ({
-    lists,
-    loading: isLoading,
-    fetchLists,
-    createList,
-    updateList,
-    deleteList,
-    getListById,
-    addRacketToList,
-    removeRacketFromList,
-  }), [lists, isLoading, fetchLists, createList, updateList, deleteList, getListById, addRacketToList, removeRacketFromList]);
+  const value = useMemo<ListsContextType>(
+    () => ({
+      lists,
+      loading: isLoading,
+      fetchLists,
+      createList,
+      updateList,
+      deleteList,
+      getListById,
+      addRacketToList,
+      removeRacketFromList,
+    }),
+    [
+      lists,
+      isLoading,
+      fetchLists,
+      createList,
+      updateList,
+      deleteList,
+      getListById,
+      addRacketToList,
+      removeRacketFromList,
+    ]
+  );
 
   return <ListsContext.Provider value={value}>{children}</ListsContext.Provider>;
 };

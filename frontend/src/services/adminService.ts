@@ -2,7 +2,9 @@ import { API_ENDPOINTS, buildApiUrl, getCommonHeaders, ApiResponse } from '../co
 import { supabase } from '../lib/supabase';
 
 async function getAuthHeaders(): Promise<HeadersInit> {
-  const { data: { session } } = await supabase.auth.getSession();
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
   const headers: HeadersInit = { 'Content-Type': 'application/json' };
   if (session?.access_token) headers['Authorization'] = `Bearer ${session.access_token}`;
   return headers;
@@ -407,7 +409,7 @@ function groupCaseInsensitive(values: unknown[]): Map<string, { display: string;
 const SHAPE_DESCRIPTIONS: Record<string, string> = {
   diamante: 'Balance alto, máxima potencia. Mayor riesgo de epicondilitis.',
   redonda: 'Balance bajo, máximo control y punto dulce amplio. Ideal con lesiones.',
-  'lágrima': 'Polivalente, balance medio. Equilibrio entre potencia y control.',
+  lágrima: 'Polivalente, balance medio. Equilibrio entre potencia y control.',
   lagrima: 'Polivalente, balance medio. Equilibrio entre potencia y control.',
 };
 

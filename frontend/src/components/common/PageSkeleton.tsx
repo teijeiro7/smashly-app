@@ -61,7 +61,7 @@ const SkeletonCard = styled(motion.div)<{ $reduced: boolean }>`
   padding: 1.5rem;
   height: 380px;
   border: 1px solid var(--border);
-  opacity: ${props => props.$reduced ? 0.6 : 1};
+  opacity: ${props => (props.$reduced ? 0.6 : 1)};
 `;
 
 const SkeletonImage = styled.div<{ $reduced: boolean }>`
@@ -102,10 +102,7 @@ interface PageSkeletonProps {
   showHeader?: boolean;
 }
 
-export const PageSkeleton: React.FC<PageSkeletonProps> = ({
-  count = 6,
-  showHeader = true
-}) => {
+export const PageSkeleton: React.FC<PageSkeletonProps> = ({ count = 6, showHeader = true }) => {
   const [reducedMotion, setReducedMotion] = useState(false);
 
   useEffect(() => {
@@ -133,11 +130,14 @@ export const PageSkeleton: React.FC<PageSkeletonProps> = ({
             $reduced={reducedMotion}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: reducedMotion ? 0.1 : 0.3, delay: reducedMotion ? 0 : index * 0.05 }}
+            transition={{
+              duration: reducedMotion ? 0.1 : 0.3,
+              delay: reducedMotion ? 0 : index * 0.05,
+            }}
           >
             <SkeletonImage $reduced={reducedMotion} />
-            <SkeletonText width="70%" height="1.25rem" $reduced={reducedMotion} />
-            <SkeletonText width="40%" $reduced={reducedMotion} />
+            <SkeletonText width='70%' height='1.25rem' $reduced={reducedMotion} />
+            <SkeletonText width='40%' $reduced={reducedMotion} />
             <SkeletonButton $reduced={reducedMotion} />
           </SkeletonCard>
         ))}

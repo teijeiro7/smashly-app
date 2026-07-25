@@ -206,7 +206,7 @@ const ActivityIcon = styled.div<{ type: string }>`
   justify-content: center;
   font-size: 1rem;
   flex-shrink: 0;
-  
+
   ${props => {
     switch (props.type) {
       case 'user':
@@ -405,15 +405,13 @@ const AdminDashboard: React.FC = () => {
     <DashboardContainer>
       <WelcomeSection>
         <WelcomeTitle>Panel de Control</WelcomeTitle>
-        <WelcomeSubtitle>
-          Gestiona usuarios, palas y tiendas desde un solo lugar
-        </WelcomeSubtitle>
+        <WelcomeSubtitle>Gestiona usuarios, palas y tiendas desde un solo lugar</WelcomeSubtitle>
       </WelcomeSection>
 
       <StatsRow>
-        <StatCard $accent="var(--info)">
+        <StatCard $accent='var(--info)'>
           <StatHeader>
-            <StatIcon color="var(--info)">
+            <StatIcon color='var(--info)'>
               <FiUsers />
             </StatIcon>
             <StatTrend positive={metrics.usersChange > 0}>
@@ -426,9 +424,9 @@ const AdminDashboard: React.FC = () => {
           <StatLabel>Total Usuarios</StatLabel>
         </StatCard>
 
-        <StatCard $accent="#8b5cf6">
+        <StatCard $accent='#8b5cf6'>
           <StatHeader>
-            <StatIcon color="#8b5cf6">
+            <StatIcon color='#8b5cf6'>
               <FiPackage />
             </StatIcon>
             <StatTrend positive={metrics.racketsChange > 0}>
@@ -441,9 +439,9 @@ const AdminDashboard: React.FC = () => {
           <StatLabel>Palas Registradas</StatLabel>
         </StatCard>
 
-        <StatCard $accent="var(--primary)">
+        <StatCard $accent='var(--primary)'>
           <StatHeader>
-            <StatIcon color="var(--primary)">
+            <StatIcon color='var(--primary)'>
               <FiShoppingBag />
             </StatIcon>
           </StatHeader>
@@ -460,9 +458,7 @@ const AdminDashboard: React.FC = () => {
           <StatValue style={{ color: conflictsCount > 0 ? 'var(--accent)' : 'var(--text)' }}>
             {conflictsCount > 0 ? conflictsCount : 'Todo OK'}
           </StatValue>
-          <StatLabel>
-            {conflictsCount > 0 ? 'Conflictos Pendientes' : 'Sin Conflictos'}
-          </StatLabel>
+          <StatLabel>{conflictsCount > 0 ? 'Conflictos Pendientes' : 'Sin Conflictos'}</StatLabel>
         </StatCard>
       </StatsRow>
 
@@ -471,7 +467,7 @@ const AdminDashboard: React.FC = () => {
           <CardHeader>
             <CardTitle>Actividad Reciente</CardTitle>
             <Link
-              to={"/admin/activity" as any}
+              to={'/admin/activity' as any}
               style={{
                 fontSize: '0.875rem',
                 color: 'var(--primary)',
@@ -488,9 +484,7 @@ const AdminDashboard: React.FC = () => {
             <ActivityList>
               {activities.slice(0, 6).map(activity => (
                 <ActivityItem key={activity.id}>
-                  <ActivityIcon type={activity.type}>
-                    {getActivityIcon(activity.type)}
-                  </ActivityIcon>
+                  <ActivityIcon type={activity.type}>{getActivityIcon(activity.type)}</ActivityIcon>
                   <ActivityContent>
                     <ActivityTitle>{activity.title}</ActivityTitle>
                     <ActivityTime>
@@ -507,19 +501,19 @@ const AdminDashboard: React.FC = () => {
         <div>
           <SectionTitle>Acciones Rápidas</SectionTitle>
           <QuickActions>
-            <QuickActionCard to="/admin/rackets" $color="#8b5cf6">
-              <QuickActionIcon color="#8b5cf6">
+            <QuickActionCard to='/admin/rackets' $color='#8b5cf6'>
+              <QuickActionIcon color='#8b5cf6'>
                 <FiPackage />
               </QuickActionIcon>
               <QuickActionText>
                 <QuickActionTitle>Gestionar Palas</QuickActionTitle>
                 <QuickActionDesc>CRUD completo</QuickActionDesc>
               </QuickActionText>
-              <FiArrowRight size={16} color="#8b5cf6" />
+              <FiArrowRight size={16} color='#8b5cf6' />
             </QuickActionCard>
 
-            <QuickActionCard to="/admin/rackets/review" $color="var(--accent)">
-              <QuickActionIcon color="var(--accent)">
+            <QuickActionCard to='/admin/rackets/review' $color='var(--accent)'>
+              <QuickActionIcon color='var(--accent)'>
                 <FiAlertTriangle />
               </QuickActionIcon>
               <QuickActionText>
@@ -531,40 +525,40 @@ const AdminDashboard: React.FC = () => {
                 </QuickActionTitle>
                 <QuickActionDesc>Duplicados y errores</QuickActionDesc>
               </QuickActionText>
-              <FiArrowRight size={16} color="var(--accent)" />
+              <FiArrowRight size={16} color='var(--accent)' />
             </QuickActionCard>
 
-            <QuickActionCard to="/admin/users" $color="var(--info)">
-              <QuickActionIcon color="var(--info)">
+            <QuickActionCard to='/admin/users' $color='var(--info)'>
+              <QuickActionIcon color='var(--info)'>
                 <FiUsers />
               </QuickActionIcon>
               <QuickActionText>
                 <QuickActionTitle>Usuarios</QuickActionTitle>
                 <QuickActionDesc>Gestión de cuentas</QuickActionDesc>
               </QuickActionText>
-              <FiArrowRight size={16} color="var(--info)" />
+              <FiArrowRight size={16} color='var(--info)' />
             </QuickActionCard>
 
-            <QuickActionCard to="/admin/stores" $color="var(--primary)">
-              <QuickActionIcon color="var(--primary)">
+            <QuickActionCard to='/admin/stores' $color='var(--primary)'>
+              <QuickActionIcon color='var(--primary)'>
                 <FiShoppingBag />
               </QuickActionIcon>
               <QuickActionText>
                 <QuickActionTitle>Tiendas</QuickActionTitle>
                 <QuickActionDesc>Asociaciones</QuickActionDesc>
               </QuickActionText>
-              <FiArrowRight size={16} color="var(--primary)" />
+              <FiArrowRight size={16} color='var(--primary)' />
             </QuickActionCard>
 
-            <QuickActionCard to="/admin/settings" $color="var(--text-muted)">
-              <QuickActionIcon color="var(--text-muted)">
+            <QuickActionCard to='/admin/settings' $color='var(--text-muted)'>
+              <QuickActionIcon color='var(--text-muted)'>
                 <FiSettings />
               </QuickActionIcon>
               <QuickActionText>
                 <QuickActionTitle>Configuración</QuickActionTitle>
                 <QuickActionDesc>Marcas, categorías</QuickActionDesc>
               </QuickActionText>
-              <FiArrowRight size={16} color="var(--text-muted)" />
+              <FiArrowRight size={16} color='var(--text-muted)' />
             </QuickActionCard>
           </QuickActions>
 
@@ -574,28 +568,26 @@ const AdminDashboard: React.FC = () => {
             </CardHeader>
             <CardContent>
               <StatsRow style={{ marginBottom: 0 }}>
-                <StatCard $accent="#ec4899" style={{ padding: '1rem' }}>
+                <StatCard $accent='#ec4899' style={{ padding: '1rem' }}>
                   <StatValue style={{ fontSize: '1.5rem' }}>
                     {metrics.totalReviews.toLocaleString()}
                   </StatValue>
                   <StatLabel>Reviews</StatLabel>
                 </StatCard>
-                <StatCard $accent="#10b981" style={{ padding: '1rem' }}>
+                <StatCard $accent='#10b981' style={{ padding: '1rem' }}>
                   <StatValue style={{ fontSize: '1.5rem' }}>
                     {metrics.activeUsers.toLocaleString()}
                   </StatValue>
                   <StatLabel>Activos</StatLabel>
                 </StatCard>
-                <StatCard $accent="#f43f5e" style={{ padding: '1rem' }}>
+                <StatCard $accent='#f43f5e' style={{ padding: '1rem' }}>
                   <StatValue style={{ fontSize: '1.5rem' }}>
                     {metrics.totalFavorites.toLocaleString()}
                   </StatValue>
                   <StatLabel>Favoritos</StatLabel>
                 </StatCard>
-                <StatCard $accent="var(--accent)" style={{ padding: '1rem' }}>
-                  <StatValue style={{ fontSize: '1.5rem' }}>
-                    {metrics.pendingRequests}
-                  </StatValue>
+                <StatCard $accent='var(--accent)' style={{ padding: '1rem' }}>
+                  <StatValue style={{ fontSize: '1.5rem' }}>{metrics.pendingRequests}</StatValue>
                   <StatLabel>Pendientes</StatLabel>
                 </StatCard>
               </StatsRow>

@@ -199,33 +199,24 @@ const ActivityStats: React.FC<ActivityStatsProps> = ({
   return (
     <Container>
       <StatsGrid>
-        <StatCard
-          $color="var(--accent)"
-          whileHover={{ y: -4 }}
-        >
-          <StatIcon color="var(--accent)">
+        <StatCard $color='var(--accent)' whileHover={{ y: -4 }}>
+          <StatIcon color='var(--accent)'>
             <FiStar />
           </StatIcon>
           <StatValue>{stats.reviewsCount}</StatValue>
           <StatLabel>Reviews escritas</StatLabel>
         </StatCard>
 
-        <StatCard
-          $color="#8b5cf6"
-          whileHover={{ y: -4 }}
-        >
-          <StatIcon color="#8b5cf6">
+        <StatCard $color='#8b5cf6' whileHover={{ y: -4 }}>
+          <StatIcon color='#8b5cf6'>
             <FiList />
           </StatIcon>
           <StatValue>{stats.listsCount}</StatValue>
           <StatLabel>Listas creadas</StatLabel>
         </StatCard>
 
-        <StatCard
-          $color="#06b6d4"
-          whileHover={{ y: -4 }}
-        >
-          <StatIcon color="#06b6d4">
+        <StatCard $color='#06b6d4' whileHover={{ y: -4 }}>
+          <StatIcon color='#06b6d4'>
             <FiGitBranch />
           </StatIcon>
           <StatValue>{stats.comparisonsCount}</StatValue>
@@ -240,19 +231,26 @@ const ActivityStats: React.FC<ActivityStatsProps> = ({
           </SectionTitle>
           <RecentList>
             {recentReviews.slice(0, 3).map(review => (
-              <RecentItem key={review.id} to={`/racket/${review.rackets?.nombre?.toLowerCase().replace(/\s+/g, '-')}`}>
+              <RecentItem
+                key={review.id}
+                to={`/racket/${review.rackets?.nombre?.toLowerCase().replace(/\s+/g, '-')}`}
+              >
                 <RecentItemInfo>
-                  <RecentItemIcon color="var(--accent)">
+                  <RecentItemIcon color='var(--accent)'>
                     <FiStar size={16} />
                   </RecentItemIcon>
                   <RecentItemText>
-                    <RecentItemTitle>{review.rackets?.marca} {review.rackets?.nombre}</RecentItemTitle>
-                    <RecentItemMeta>{review.rating} estrellas • {formatDate(review.created_at)}</RecentItemMeta>
+                    <RecentItemTitle>
+                      {review.rackets?.marca} {review.rackets?.nombre}
+                    </RecentItemTitle>
+                    <RecentItemMeta>
+                      {review.rating} estrellas • {formatDate(review.created_at)}
+                    </RecentItemMeta>
                   </RecentItemText>
                 </RecentItemInfo>
               </RecentItem>
             ))}
-            <ViewAllLink to="/profile?tab=reviews">Ver todas las reviews</ViewAllLink>
+            <ViewAllLink to='/profile?tab=reviews'>Ver todas las reviews</ViewAllLink>
           </RecentList>
         </>
       )}
@@ -266,17 +264,19 @@ const ActivityStats: React.FC<ActivityStatsProps> = ({
             {recentLists.slice(0, 3).map(list => (
               <RecentItem key={list.id} to={`/lists/${list.id}`}>
                 <RecentItemInfo>
-                  <RecentItemIcon color="#8b5cf6">
+                  <RecentItemIcon color='#8b5cf6'>
                     <FiList size={16} />
                   </RecentItemIcon>
                   <RecentItemText>
                     <RecentItemTitle>{list.name}</RecentItemTitle>
-                    <RecentItemMeta>{list.is_public ? 'Pública' : 'Privada'} • {formatDate(list.created_at)}</RecentItemMeta>
+                    <RecentItemMeta>
+                      {list.is_public ? 'Pública' : 'Privada'} • {formatDate(list.created_at)}
+                    </RecentItemMeta>
                   </RecentItemText>
                 </RecentItemInfo>
               </RecentItem>
             ))}
-            <ViewAllLink to="/profile?tab=lists">Ver todas las listas</ViewAllLink>
+            <ViewAllLink to='/profile?tab=lists'>Ver todas las listas</ViewAllLink>
           </RecentList>
         </>
       )}
@@ -290,17 +290,19 @@ const ActivityStats: React.FC<ActivityStatsProps> = ({
             {recentComparisons.slice(0, 3).map(comp => (
               <RecentItem key={comp.id} to={`/compare/${comp.id}`}>
                 <RecentItemInfo>
-                  <RecentItemIcon color="#06b6d4">
+                  <RecentItemIcon color='#06b6d4'>
                     <FiGitBranch size={16} />
                   </RecentItemIcon>
                   <RecentItemText>
                     <RecentItemTitle>{comp.racket_names || 'Comparación'}</RecentItemTitle>
-                    <RecentItemMeta>{comp.is_public ? 'Compartida' : 'Privada'} • {formatDate(comp.created_at)}</RecentItemMeta>
+                    <RecentItemMeta>
+                      {comp.is_public ? 'Compartida' : 'Privada'} • {formatDate(comp.created_at)}
+                    </RecentItemMeta>
                   </RecentItemText>
                 </RecentItemInfo>
               </RecentItem>
             ))}
-            <ViewAllLink to="/profile?tab=comparisons">Ver todas las comparaciones</ViewAllLink>
+            <ViewAllLink to='/profile?tab=comparisons'>Ver todas las comparaciones</ViewAllLink>
           </RecentList>
         </>
       )}

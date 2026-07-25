@@ -28,10 +28,7 @@ export function createLazyRoute(config: LazyRouteConfig) {
         ) : config.fallbackType === 'none' ? (
           <></>
         ) : (
-          <LoadingSpinner
-            text={config.fallbackText || 'Cargando...'}
-            fullScreen
-          />
+          <LoadingSpinner text={config.fallbackText || 'Cargando...'} fullScreen />
         )
       }
     >
@@ -52,11 +49,7 @@ export const LazyWrapper: React.FC<{
   children: React.ReactNode;
   fallback?: React.ReactNode;
 }> = ({ children, fallback }) => {
-  return (
-    <Suspense fallback={fallback || <LoadingSpinner fullScreen />}>
-      {children}
-    </Suspense>
-  );
+  return <Suspense fallback={fallback || <LoadingSpinner fullScreen />}>{children}</Suspense>;
 };
 
 export default createLazyRoute;

@@ -196,7 +196,7 @@ export class RacketPdfGenerator {
 
     const headers = Object.keys(tableData[0]).filter(k => k !== 'feature');
     const head = ['Característica', ...headers];
-    
+
     const body = tableData.map(item => {
       return [item.feature, ...headers.map(h => item[h])];
     });
@@ -439,8 +439,6 @@ export class RacketPdfGenerator {
     });
   }
 
-
-
   private checkPageBreak(neededHeight: number) {
     if (this.currentY + neededHeight > this.pageHeight - this.margin) {
       this.doc.addPage();
@@ -463,9 +461,7 @@ export class RacketPdfGenerator {
     }
   }
 
-  private async loadImages(
-    rackets: Racket[]
-  ): Promise<Record<number, string>> {
+  private async loadImages(rackets: Racket[]): Promise<Record<number, string>> {
     const loaded: Record<number, string> = {};
     const promises = rackets.map(async r => {
       if (!r.imagenes?.[0]) return;

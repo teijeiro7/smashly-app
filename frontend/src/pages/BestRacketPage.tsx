@@ -15,11 +15,7 @@ import {
 import { UserProfile } from '../services/userProfileService';
 import { sileo } from 'sileo';
 import SEO from '../components/seo/SEO';
-import {
-  organizationSchema,
-  webPageSchema,
-  breadcrumbSchema,
-} from '../utils/seoSchemas';
+import { organizationSchema, webPageSchema, breadcrumbSchema } from '../utils/seoSchemas';
 import { buildUrl, allKeywords } from '../config/seo';
 
 const normalizeLevel = (gameLevel?: string): string => {
@@ -100,10 +96,18 @@ const ModeButton = styled.button<{ $active: boolean }>`
   background: ${props => (props.$active ? 'var(--primary-hover)' : 'var(--surface)')};
   color: ${props => (props.$active ? 'white' : 'var(--text-muted)')};
   cursor: pointer;
-  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
   font-weight: 600;
   font-size: 0.9375rem;
-  box-shadow: ${props => props.$active ? '0 4px 6px -1px rgba(var(--primary-rgb-dark), 0.25), 0 2px 4px -1px rgba(var(--primary-rgb-dark), 0.15)' : '0 1px 2px 0 var(--shadow-color)'};
+  box-shadow: ${props =>
+    props.$active
+      ? '0 4px 6px -1px rgba(var(--primary-rgb-dark), 0.25), 0 2px 4px -1px rgba(var(--primary-rgb-dark), 0.15)'
+      : '0 1px 2px 0 var(--shadow-color)'};
 
   &:hover {
     border-color: var(--primary-hover);
@@ -123,7 +127,9 @@ const AlertBox = styled.div`
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
-  box-shadow: 0 4px 6px -1px rgba(var(--primary-rgb-dark), 0.08), 0 2px 4px -1px rgba(var(--primary-rgb-dark), 0.04);
+  box-shadow:
+    0 4px 6px -1px rgba(var(--primary-rgb-dark), 0.08),
+    0 2px 4px -1px rgba(var(--primary-rgb-dark), 0.04);
 `;
 
 const AlertText = styled.p`
@@ -270,11 +276,14 @@ export const BestRacketPage: React.FC = () => {
       setResult(res);
       setStep('completing');
 
-      sessionStorage.setItem('smashly_last_recommendation', JSON.stringify({
-        result: res,
-        formType: 'basic',
-        timestamp: Date.now()
-      }));
+      sessionStorage.setItem(
+        'smashly_last_recommendation',
+        JSON.stringify({
+          result: res,
+          formType: 'basic',
+          timestamp: Date.now(),
+        })
+      );
 
       setTimeout(async () => {
         const notification = await NotificationService.createNotification(
@@ -283,16 +292,16 @@ export const BestRacketPage: React.FC = () => {
           'Tu recomendación básica está lista. ¡Descúbrela!',
           { formType: 'basic' }
         );
-        
+
         if (notification) {
           addNotification(notification);
         }
-        
-        sileo.success({ 
-          title: '¡Recomendación lista!', 
-          description: 'Tu recomendación está lista. ¡Descúbrela!'
+
+        sileo.success({
+          title: '¡Recomendación lista!',
+          description: 'Tu recomendación está lista. ¡Descúbrela!',
         });
-        
+
         setStep('result');
       }, 2500);
     } catch (error) {
@@ -312,11 +321,14 @@ export const BestRacketPage: React.FC = () => {
       setResult(res);
       setStep('completing');
 
-      sessionStorage.setItem('smashly_last_recommendation', JSON.stringify({
-        result: res,
-        formType: 'advanced',
-        timestamp: Date.now()
-      }));
+      sessionStorage.setItem(
+        'smashly_last_recommendation',
+        JSON.stringify({
+          result: res,
+          formType: 'advanced',
+          timestamp: Date.now(),
+        })
+      );
 
       setTimeout(async () => {
         const notification = await NotificationService.createNotification(
@@ -325,16 +337,16 @@ export const BestRacketPage: React.FC = () => {
           'Tu recomendación avanzada está lista. ¡Descúbrela!',
           { formType: 'advanced' }
         );
-        
+
         if (notification) {
           addNotification(notification);
         }
-        
-        sileo.success({ 
-          title: '¡Recomendación lista!', 
-          description: 'Tu recomendación está lista. ¡Descúbrela!'
+
+        sileo.success({
+          title: '¡Recomendación lista!',
+          description: 'Tu recomendación está lista. ¡Descúbrela!',
         });
-        
+
         setStep('result');
       }, 2500);
     } catch (error) {
@@ -447,9 +459,19 @@ export const BestRacketPage: React.FC = () => {
           </ModeSelector>
 
           {formType === 'basic' ? (
-            <WizardForm mode="basic" onSubmit={(data) => handleBasicSubmit(data as BasicFormData)} isLoading={false} initialData={buildInitialData(user)} />
+            <WizardForm
+              mode='basic'
+              onSubmit={data => handleBasicSubmit(data as BasicFormData)}
+              isLoading={false}
+              initialData={buildInitialData(user)}
+            />
           ) : (
-            <WizardForm mode="advanced" onSubmit={(data) => handleAdvancedSubmit(data as AdvancedFormData)} isLoading={false} initialData={buildInitialData(user)} />
+            <WizardForm
+              mode='advanced'
+              onSubmit={data => handleAdvancedSubmit(data as AdvancedFormData)}
+              isLoading={false}
+              initialData={buildInitialData(user)}
+            />
           )}
         </>
       )}
@@ -463,7 +485,9 @@ export const BestRacketPage: React.FC = () => {
       {step === 'completing' && (
         <div style={{ textAlign: 'center', padding: '4rem' }}>
           <PalaRotatingScene isComplete={true} />
-          <h2 style={{ marginTop: '2rem', color: 'var(--primary-hover)' }}>¡Análisis completado!</h2>
+          <h2 style={{ marginTop: '2rem', color: 'var(--primary-hover)' }}>
+            ¡Análisis completado!
+          </h2>
         </div>
       )}
 

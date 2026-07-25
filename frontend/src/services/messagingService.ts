@@ -2,7 +2,9 @@ import { API_URL } from '../config/api';
 import { supabase } from '../lib/supabase';
 
 async function getToken(): Promise<string> {
-  const { data: { session } } = await supabase.auth.getSession();
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
   return session?.access_token || '';
 }
 

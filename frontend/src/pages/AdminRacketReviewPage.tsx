@@ -266,7 +266,9 @@ const AdminRacketReviewPage: React.FC = () => {
                 <RacketColumn type='new'>
                   <ColumnTitle>
                     Nueva / Entrante (ID: {conflict.id})
-                    <small style={{ fontWeight: 'normal', color: 'var(--accent)' }}>Conflicto</small>
+                    <small style={{ fontWeight: 'normal', color: 'var(--accent)' }}>
+                      Conflicto
+                    </small>
                   </ColumnTitle>
                   <DataList>
                     <DataRow>

@@ -19,7 +19,9 @@ const Card = styled(motion.div)`
   background: var(--surface);
   padding: 2.5rem;
   border-radius: 24px;
-  box-shadow: 0 10px 25px -5px var(--shadow-color), 0 8px 10px -6px var(--shadow-color);
+  box-shadow:
+    0 10px 25px -5px var(--shadow-color),
+    0 8px 10px -6px var(--shadow-color);
   width: 100%;
   max-width: 450px;
   border: 1px solid var(--border);
@@ -81,7 +83,7 @@ const InputWrapper = styled.div<{ $hasError?: boolean }>`
   svg {
     position: absolute;
     left: 1rem;
-    color: ${props => props.$hasError ? 'var(--error)' : 'var(--text-subtle)'};
+    color: ${props => (props.$hasError ? 'var(--error)' : 'var(--text-subtle)')};
     transition: color 0.2s ease;
   }
 `;
@@ -90,16 +92,17 @@ const Input = styled.input<{ $hasError?: boolean }>`
   width: 100%;
   padding: 0.75rem 1rem 0.75rem 2.75rem;
   border-radius: 12px;
-  border: 1.5px solid ${props => props.$hasError ? '#fca5a5' : 'var(--border)'};
-  background: ${props => props.$hasError ? 'var(--danger-subtle)' : 'var(--surface)'};
+  border: 1.5px solid ${props => (props.$hasError ? '#fca5a5' : 'var(--border)')};
+  background: ${props => (props.$hasError ? 'var(--danger-subtle)' : 'var(--surface)')};
   font-size: 1rem;
   transition: all 0.2s ease;
   color: var(--text);
 
   &:focus {
     outline: none;
-    border-color: ${props => props.$hasError ? 'var(--error)' : 'var(--primary)'};
-    box-shadow: 0 0 0 4px ${props => props.$hasError ? 'rgba(239, 68, 68, 0.1)' : 'rgba(var(--primary-rgb), 0.1)'};
+    border-color: ${props => (props.$hasError ? 'var(--error)' : 'var(--primary)')};
+    box-shadow: 0 0 0 4px
+      ${props => (props.$hasError ? 'rgba(239, 68, 68, 0.1)' : 'rgba(var(--primary-rgb), 0.1)')};
   }
 
   &::placeholder {
@@ -218,34 +221,35 @@ const ForgotPasswordPage: React.FC = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, ease: 'easeOut' }}
       >
-        <BackLink to="/">
+        <BackLink to='/'>
           <FiArrowLeft /> Volver al inicio
         </BackLink>
 
-        <AnimatePresence mode="wait">
+        <AnimatePresence mode='wait'>
           {!success ? (
             <motion.div
-              key="form"
+              key='form'
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: 20 }}
             >
               <Title>¿Olvidaste tu contraseña?</Title>
               <Description>
-                No te preocupes. Introduce tu correo electrónico y te enviaremos un enlace para que puedas recuperar el acceso a tu cuenta.
+                No te preocupes. Introduce tu correo electrónico y te enviaremos un enlace para que
+                puedas recuperar el acceso a tu cuenta.
               </Description>
 
               <Form onSubmit={handleSubmit}>
                 <FormGroup>
-                  <Label htmlFor="email">Correo Electrónico</Label>
+                  <Label htmlFor='email'>Correo Electrónico</Label>
                   <InputWrapper $hasError={!!error}>
                     <FiMail />
                     <Input
-                      id="email"
-                      type="email"
-                      placeholder="tu@email.com"
+                      id='email'
+                      type='email'
+                      placeholder='tu@email.com'
                       value={email}
-                      onChange={(e) => setEmail(e.target.value)}
+                      onChange={e => setEmail(e.target.value)}
                       $hasError={!!error}
                       disabled={loading}
                     />
@@ -257,7 +261,7 @@ const ForgotPasswordPage: React.FC = () => {
                   )}
                 </FormGroup>
 
-                <SubmitButton type="submit" disabled={loading}>
+                <SubmitButton type='submit' disabled={loading}>
                   {loading ? (
                     <>
                       <motion.div
@@ -276,7 +280,7 @@ const ForgotPasswordPage: React.FC = () => {
             </motion.div>
           ) : (
             <SuccessState
-              key="success"
+              key='success'
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
             >
@@ -285,16 +289,21 @@ const ForgotPasswordPage: React.FC = () => {
               </SuccessIcon>
               <Title>¡Revisa tu correo!</Title>
               <Description>
-                Hemos enviado un enlace de recuperación a <strong>{email}</strong>. 
-                Sigue las instrucciones del mensaje para restablecer tu contraseña.
+                Hemos enviado un enlace de recuperación a <strong>{email}</strong>. Sigue las
+                instrucciones del mensaje para restablecer tu contraseña.
               </Description>
               <Description style={{ fontSize: '0.875rem' }}>
-                ¿No has recibido nada? Revisa tu carpeta de spam o inténtalo de nuevo en unos minutos.
+                ¿No has recibido nada? Revisa tu carpeta de spam o inténtalo de nuevo en unos
+                minutos.
               </Description>
-              <SubmitButton 
-                as={Link} 
-                to="/" 
-                style={{ textDecoration: 'none', background: 'var(--surface-3)', color: 'var(--text)' }}
+              <SubmitButton
+                as={Link}
+                to='/'
+                style={{
+                  textDecoration: 'none',
+                  background: 'var(--surface-3)',
+                  color: 'var(--text)',
+                }}
               >
                 Volver a la página principal
               </SubmitButton>

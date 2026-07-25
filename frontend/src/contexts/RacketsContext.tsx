@@ -29,11 +29,16 @@ export const useRackets = (): RacketsContextType => {
 export const RacketsProvider: React.FC<RacketsProviderProps> = ({ children }) => {
   const queryClient = useQueryClient();
 
-  const { data: rackets = [], isLoading, error, refetch } = useQuery({
+  const {
+    data: rackets = [],
+    isLoading,
+    error,
+    refetch,
+  } = useQuery({
     queryKey: ['rackets', 'all'],
     queryFn: () => racketService.getAllRackets(),
     staleTime: 1000 * 60 * 30, // 30 min — replaces ETag/localStorage weekly expiry
-    gcTime: 1000 * 60 * 60,    // 1 hour in cache
+    gcTime: 1000 * 60 * 60, // 1 hour in cache
   });
 
   const fetchRackets = useCallback(async () => {
@@ -45,34 +50,56 @@ export const RacketsProvider: React.FC<RacketsProviderProps> = ({ children }) =>
     await refetch();
   }, [queryClient, refetch]);
 
-  const getRacketById = useCallback((id: string | number): Racket | undefined => {
-    const numericId = typeof id === 'string' ? parseInt(id) : id;
-    return rackets.find(r => r.id === numericId);
-  }, [rackets]);
+  const getRacketById = useCallback(
+    (id: string | number): Racket | undefined => {
+      const numericId = typeof id === 'string' ? parseInt(id) : id;
+      return rackets.find(r => r.id === numericId);
+    },
+    [rackets]
+  );
 
-  const getRacketsByCategory = useCallback((category: string): Racket[] => {
-    return rackets.filter(r => r.marca === category);
-  }, [rackets]);
+  const getRacketsByCategory = useCallback(
+    (category: string): Racket[] => {
+      return rackets.filter(r => r.marca === category);
+    },
+    [rackets]
+  );
 
-  const searchRackets = useCallback((query: string): Racket[] => {
-    const q = query.toLowerCase();
-    return rackets.filter(r =>
-      (r.nombre || '').toLowerCase().includes(q) ||
-      (r.marca || '').toLowerCase().includes(q) ||
-      (r.modelo || '').toLowerCase().includes(q)
-    );
-  }, [rackets]);
+  const searchRackets = useCallback(
+    (query: string): Racket[] => {
+      const q = query.toLowerCase();
+      return rackets.filter(
+        r =>
+          (r.nombre || '').toLowerCase().includes(q) ||
+          (r.marca || '').toLowerCase().includes(q) ||
+          (r.modelo || '').toLowerCase().includes(q)
+      );
+    },
+    [rackets]
+  );
 
-  const value = useMemo<RacketsContextType>(() => ({
-    rackets,
-    loading: isLoading,
-    error: error ? String(error) : null,
-    fetchRackets,
-    getRacketById,
-    getRacketsByCategory,
-    searchRackets,
-    refreshRackets,
-  }), [rackets, isLoading, error, fetchRackets, getRacketById, getRacketsByCategory, searchRackets, refreshRackets]);
+  const value = useMemo<RacketsContextType>(
+    () => ({
+      rackets,
+      loading: isLoading,
+      error: error ? String(error) : null,
+      fetchRackets,
+      getRacketById,
+      getRacketsByCategory,
+      searchRackets,
+      refreshRackets,
+    }),
+    [
+      rackets,
+      isLoading,
+      error,
+      fetchRackets,
+      getRacketById,
+      getRacketsByCategory,
+      searchRackets,
+      refreshRackets,
+    ]
+  );
 
   return <RacketsContext.Provider value={value}>{children}</RacketsContext.Provider>;
 };

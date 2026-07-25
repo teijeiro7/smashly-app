@@ -12,9 +12,6 @@ export function passwordChecklist(password: string) {
 }
 
 // Reusable zod field validators (validate a single string value)
-export const emailValidator = z
-  .string()
-  .min(1, 'Requerido')
-  .email('Email inválido');
+export const emailValidator = z.string().min(1, 'Requerido').email('Email inválido');
 
 export const requiredStringValidator = z.string().min(1, 'Requerido');

@@ -167,8 +167,18 @@ const RoleBadge = styled.span<{ role: 'Admin' | 'Player' | 'Store' }>`
   display: inline-flex;
   align-items: center;
   gap: 0.25rem;
-  background: ${props => (props.role === 'Admin' ? 'rgba(220, 38, 38, 0.10)' : props.role === 'Store' ? 'rgba(34, 197, 94, 0.10)' : 'rgba(37, 99, 235, 0.10)')};
-  color: ${props => (props.role === 'Admin' ? 'var(--danger)' : props.role === 'Store' ? 'var(--primary)' : 'var(--info)')};
+  background: ${props =>
+    props.role === 'Admin'
+      ? 'rgba(220, 38, 38, 0.10)'
+      : props.role === 'Store'
+        ? 'rgba(34, 197, 94, 0.10)'
+        : 'rgba(37, 99, 235, 0.10)'};
+  color: ${props =>
+    props.role === 'Admin'
+      ? 'var(--danger)'
+      : props.role === 'Store'
+        ? 'var(--primary)'
+        : 'var(--info)'};
 
   svg {
     font-size: 0.875rem;
@@ -431,7 +441,9 @@ const UsersManager: React.FC = () => {
               <ActionsCell>
                 <IconButton
                   color='var(--info)'
-                  onClick={() => handleToggleRole(user.id, user.role as 'Admin' | 'Player' | 'Store')}
+                  onClick={() =>
+                    handleToggleRole(user.id, user.role as 'Admin' | 'Player' | 'Store')
+                  }
                   title={`Cambiar a ${user.role === 'Admin' ? 'Jugador' : 'Admin'}`}
                 >
                   {user.role === 'Admin' ? <FiUser /> : <FiShield />}

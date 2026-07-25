@@ -255,7 +255,8 @@ interface PriceProps {
 
 const Price = styled.span<PriceProps>`
   font-weight: ${props => (props.isBest ? '700' : '600')};
-  color: ${props => (props.isBest ? 'var(--success)' : props.sale ? 'var(--error)' : 'var(--text)')};
+  color: ${props =>
+    props.isBest ? 'var(--success)' : props.sale ? 'var(--error)' : 'var(--text)'};
   font-size: ${props => (props.isBest ? '1rem' : '0.875rem')};
   background: ${props => (props.isBest ? 'var(--primary-subtle)' : 'transparent')};
   padding: ${props => (props.isBest ? '2px 6px' : '0')};
@@ -687,12 +688,12 @@ const AdminRacketsPage: React.FC = () => {
                     <Td>
                       <RacketInfo>
                         {racket.imagenes && racket.imagenes.length > 0 && racket.imagenes[0] ? (
-                          <RacketImage src={racketImageUrl(racket.imagenes[0])} alt={racket.modelo || 'Pala'} />
-                        ) : (
                           <RacketImage
-                            src='/placeholder-racket.svg'
-                            alt='Sin imagen'
+                            src={racketImageUrl(racket.imagenes[0])}
+                            alt={racket.modelo || 'Pala'}
                           />
+                        ) : (
+                          <RacketImage src='/placeholder-racket.svg' alt='Sin imagen' />
                         )}
                         <div>
                           <RacketName>{racket.nombre || racket.modelo || 'Sin nombre'}</RacketName>

@@ -1,8 +1,8 @@
-import React from "react";
-import { Heart, Envelope } from "@phosphor-icons/react";
-import { FaInstagram, FaTiktok } from "react-icons/fa";
-import { Link } from "@tanstack/react-router";
-import styled from "styled-components";
+import React from 'react';
+import { Heart, Envelope } from '@phosphor-icons/react';
+import { FaInstagram, FaTiktok } from 'react-icons/fa';
+import { Link } from '@tanstack/react-router';
+import styled from 'styled-components';
 
 const FooterContainer = styled.footer`
   background: var(--footer-bg);
@@ -55,7 +55,9 @@ const SocialLinks = styled.div`
   a {
     color: rgba(255, 255, 255, 0.75);
     font-size: 1.25rem;
-    transition: color 0.2s ease, background-color 0.2s ease;
+    transition:
+      color 0.2s ease,
+      background-color 0.2s ease;
     padding: 8px;
     border-radius: 8px;
 
@@ -67,7 +69,7 @@ const SocialLinks = styled.div`
 
   @media (max-width: 480px) {
     gap: 0.75rem;
-    
+
     a {
       font-size: 1.1rem;
       padding: 6px;
@@ -102,8 +104,7 @@ const Footer: React.FC = () => {
       <FooterContent>
         <FooterBottom>
           <Copyright>
-            © 2025 Smashly. Hecho con <Heart color="var(--error)" /> para los
-            amantes del pádel.
+            © 2025 Smashly. Hecho con <Heart color='var(--error)' /> para los amantes del pádel.
           </Copyright>
 
           <LegalLinks>
@@ -113,22 +114,22 @@ const Footer: React.FC = () => {
 
           <SocialLinks>
             <a
-              href="https://www.instagram.com/smashly.app/"
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="Instagram"
+              href='https://www.instagram.com/smashly.app/'
+              target='_blank'
+              rel='noopener noreferrer'
+              aria-label='Instagram'
             >
               <FaInstagram />
             </a>
             <a
-              href="https://www.tiktok.com/@smashlyapp"
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="TikTok"
+              href='https://www.tiktok.com/@smashlyapp'
+              target='_blank'
+              rel='noopener noreferrer'
+              aria-label='TikTok'
             >
               <FaTiktok />
             </a>
-            <a href="mailto:hello@smashly.app" aria-label="Enviar correo">
+            <a href='mailto:hello@smashly.app' aria-label='Enviar correo'>
               <Envelope />
             </a>
           </SocialLinks>

@@ -54,7 +54,7 @@ class PerformanceMonitor {
    */
   private observeLCP() {
     try {
-      const observer = new PerformanceObserver((list) => {
+      const observer = new PerformanceObserver(list => {
         const entries = list.getEntries();
         const lastEntry = entries[entries.length - 1] as any;
         this.metrics.lcp = lastEntry.renderTime || lastEntry.loadTime;
@@ -73,7 +73,7 @@ class PerformanceMonitor {
    */
   private observeFID() {
     try {
-      const observer = new PerformanceObserver((list) => {
+      const observer = new PerformanceObserver(list => {
         const entries = list.getEntries();
         const firstEntry = entries[0] as any;
         this.metrics.fid = firstEntry.processingStart - firstEntry.startTime;
@@ -93,7 +93,7 @@ class PerformanceMonitor {
   private observeCLS() {
     try {
       let clsValue = 0;
-      const observer = new PerformanceObserver((list) => {
+      const observer = new PerformanceObserver(list => {
         for (const entry of list.getEntries()) {
           if (!(entry as any).hadRecentInput) {
             clsValue += (entry as any).value;
@@ -197,19 +197,31 @@ class PerformanceMonitor {
     if (this.metrics.lcp) {
       console.log(
         `LCP: ${this.metrics.lcp.toFixed(0)}ms`,
-        this.metrics.lcp < 2500 ? '✅ Good' : this.metrics.lcp < 4000 ? '⚠️ Needs Improvement' : '❌ Poor'
+        this.metrics.lcp < 2500
+          ? '✅ Good'
+          : this.metrics.lcp < 4000
+            ? '⚠️ Needs Improvement'
+            : '❌ Poor'
       );
     }
     if (this.metrics.fid) {
       console.log(
         `FID: ${this.metrics.fid.toFixed(0)}ms`,
-        this.metrics.fid < 100 ? '✅ Good' : this.metrics.fid < 300 ? '⚠️ Needs Improvement' : '❌ Poor'
+        this.metrics.fid < 100
+          ? '✅ Good'
+          : this.metrics.fid < 300
+            ? '⚠️ Needs Improvement'
+            : '❌ Poor'
       );
     }
     if (this.metrics.cls) {
       console.log(
         `CLS: ${this.metrics.cls.toFixed(3)}`,
-        this.metrics.cls < 0.1 ? '✅ Good' : this.metrics.cls < 0.25 ? '⚠️ Needs Improvement' : '❌ Poor'
+        this.metrics.cls < 0.1
+          ? '✅ Good'
+          : this.metrics.cls < 0.25
+            ? '⚠️ Needs Improvement'
+            : '❌ Poor'
       );
     }
     console.groupEnd();

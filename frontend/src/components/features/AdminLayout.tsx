@@ -53,7 +53,7 @@ const Sidebar = styled.aside<{ $isOpen: boolean }>`
 
 const SidebarOverlay = styled.div<{ $isOpen: boolean }>`
   display: none;
-  
+
   @media (max-width: 768px) {
     display: block;
     position: fixed;
@@ -88,7 +88,7 @@ const CloseButton = styled.button`
   color: var(--text-muted);
   background: var(--surface-3);
   border: none;
-  
+
   &:hover {
     background: var(--border);
     color: var(--text);
@@ -211,7 +211,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
   return (
     <LayoutContainer>
       <SidebarOverlay $isOpen={mobileOpen} onClick={() => setMobileOpen(false)} />
-      
+
       <Sidebar $isOpen={mobileOpen}>
         <SidebarHeader>
           <span style={{ fontWeight: 600, color: 'var(--text)' }}>Menú</span>
@@ -236,7 +236,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
 
           <NavLabel style={{ marginTop: '1.5rem' }}>Sistema</NavLabel>
           <NavItem
-            to="/admin/users"
+            to='/admin/users'
             $active={location.pathname === '/admin/users'}
             onClick={handleNavClick}
           >
@@ -244,7 +244,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
             Usuarios
           </NavItem>
           <NavItem
-            to="/admin/stores"
+            to='/admin/stores'
             $active={location.pathname === '/admin/stores'}
             onClick={handleNavClick}
           >
@@ -252,7 +252,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
             Tiendas
           </NavItem>
           <NavItem
-            to="/admin/settings"
+            to='/admin/settings'
             $active={location.pathname === '/admin/settings'}
             onClick={handleNavClick}
           >

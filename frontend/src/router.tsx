@@ -47,7 +47,9 @@ const PrivacyPolicyPage = lazy(() => import('./pages/PrivacyPolicyPage'));
 const UserProfilePage = lazy(() => import('./pages/UserProfilePage'));
 const ListPage = lazy(() => import('./pages/ListPage'));
 const AdminPanelPage = lazy(() => import('./pages/AdminPanelPage'));
-const StoreDashboard = lazy(() => import('./pages/StoreDashboard').then(m => ({ default: m.StoreDashboard })));
+const StoreDashboard = lazy(() =>
+  import('./pages/StoreDashboard').then(m => ({ default: m.StoreDashboard }))
+);
 const AdminRacketReviewPage = lazy(() => import('./pages/AdminRacketReviewPage'));
 const AdminRacketsPage = lazy(() => import('./pages/AdminRacketsPage'));
 const AdminUsersPage = lazy(() => import('./pages/AdminUsersPage'));
@@ -84,10 +86,14 @@ class LazyChunkErrorBoundary extends React.Component<
 
   render() {
     if (this.state.hasError) {
-      return this.props.fallback ?? (
-        <div style={{ padding: '2rem', textAlign: 'center' }}>
-          <p>Error loading page. <button onClick={this.handleRetry}>Retry</button></p>
-        </div>
+      return (
+        this.props.fallback ?? (
+          <div style={{ padding: '2rem', textAlign: 'center' }}>
+            <p>
+              Error loading page. <button onClick={this.handleRetry}>Retry</button>
+            </p>
+          </div>
+        )
       );
     }
     return this.props.children;
@@ -107,7 +113,9 @@ const LazyRoute: React.FC<{ children: React.ReactNode; fallback?: React.ReactNod
 // Auth helpers for beforeLoad guards
 // ──────────────────────────────────────────────────────────────────────────────
 async function requireAuth() {
-  const { data: { session } } = await supabase.auth.getSession();
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
   if (!session) throw redirect({ to: '/' });
   return session;
 }
@@ -154,7 +162,9 @@ async function redirectStoreOwnerToDashboard() {
 const GoogleOnboardingHandler: React.FC = () => {
   const { pendingGoogleOnboarding, clearGoogleOnboarding, refreshUserProfile } = useAuth();
   const handleNicknameConfirm = async (nickname: string) => {
-    const { data: { session } } = await supabase.auth.getSession();
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
     if (!session) return;
     await supabase.from('user_profiles').upsert({ id: session.user.id, nickname });
     await refreshUserProfile();
@@ -174,14 +184,18 @@ const GoogleOnboardingHandler: React.FC = () => {
 // Auth modal redirects (legacy /login and /register URLs)
 const LoginRedirect: React.FC = () => {
   const { openLogin } = useAuthModal();
-  React.useEffect(() => { openLogin(); }, [openLogin]);
-  return <Navigate to="/" />;
+  React.useEffect(() => {
+    openLogin();
+  }, [openLogin]);
+  return <Navigate to='/' />;
 };
 
 const RegisterRedirect: React.FC = () => {
   const { openRegister } = useAuthModal();
-  React.useEffect(() => { openRegister(); }, [openRegister]);
-  return <Navigate to="/" />;
+  React.useEffect(() => {
+    openRegister();
+  }, [openRegister]);
+  return <Navigate to='/' />;
 };
 
 // ──────────────────────────────────────────────────────────────────────────────
@@ -212,13 +226,13 @@ const rootRoute = createRootRoute({
       <Layout>
         <FloatingCompareButton />
         <BackgroundTaskPopup />
-        <AnimatePresence mode="wait">
+        <AnimatePresence mode='wait'>
           <Outlet />
         </AnimatePresence>
       </Layout>
     </>
   ),
-  pendingComponent: () => <LoadingSpinner fullScreen text="Cargando..." />,
+  pendingComponent: () => <LoadingSpinner fullScreen text='Cargando...' />,
   errorComponent: ({ error }) => (
     <div style={{ padding: '2rem', textAlign: 'center' }}>
       <h2>Algo salió mal</h2>
@@ -233,79 +247,131 @@ const rootRoute = createRootRoute({
 const indexRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/',
-  component: () => <LazyRoute><HomePage /></LazyRoute>,
+  component: () => (
+    <LazyRoute>
+      <HomePage />
+    </LazyRoute>
+  ),
 });
 
 const catalogRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/catalog',
-  component: () => <LazyRoute fallback={<CatalogSkeleton />}><CatalogPage /></LazyRoute>,
+  component: () => (
+    <LazyRoute fallback={<CatalogSkeleton />}>
+      <CatalogPage />
+    </LazyRoute>
+  ),
 });
 
 const racketDetailRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/racket-detail',
-  component: () => <LazyRoute><RacketDetailPage /></LazyRoute>,
+  component: () => (
+    <LazyRoute>
+      <RacketDetailPage />
+    </LazyRoute>
+  ),
 });
 
 const bestRacketRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/best-racket',
-  component: () => <LazyRoute><BestRacketPage /></LazyRoute>,
+  component: () => (
+    <LazyRoute>
+      <BestRacketPage />
+    </LazyRoute>
+  ),
 });
 
 const compareRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/compare',
-  component: () => <LazyRoute><ComparePage /></LazyRoute>,
+  component: () => (
+    <LazyRoute>
+      <ComparePage />
+    </LazyRoute>
+  ),
 });
 
 const compareRacketsRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/compare-rackets',
-  component: () => <LazyRoute><CompareRacketsPage /></LazyRoute>,
+  component: () => (
+    <LazyRoute>
+      <CompareRacketsPage />
+    </LazyRoute>
+  ),
 });
 
 const savedComparisonRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/compare/$id',
-  component: () => <LazyRoute><SavedComparisonPage /></LazyRoute>,
+  component: () => (
+    <LazyRoute>
+      <SavedComparisonPage />
+    </LazyRoute>
+  ),
 });
 
 const sharedComparisonRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/shared/$token',
-  component: () => <LazyRoute><SharedComparisonPage /></LazyRoute>,
+  component: () => (
+    <LazyRoute>
+      <SharedComparisonPage />
+    </LazyRoute>
+  ),
 });
 
 const faqRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/faq',
-  component: () => <LazyRoute><FAQPage /></LazyRoute>,
+  component: () => (
+    <LazyRoute>
+      <FAQPage />
+    </LazyRoute>
+  ),
 });
 
 const termsRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/terms-and-conditions',
-  component: () => <LazyRoute><TermsAndConditionsPage /></LazyRoute>,
+  component: () => (
+    <LazyRoute>
+      <TermsAndConditionsPage />
+    </LazyRoute>
+  ),
 });
 
 const privacyRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/privacy-policy',
-  component: () => <LazyRoute><PrivacyPolicyPage /></LazyRoute>,
+  component: () => (
+    <LazyRoute>
+      <PrivacyPolicyPage />
+    </LazyRoute>
+  ),
 });
 
 const forgotPasswordRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/forgot-password',
-  component: () => <LazyRoute><ForgotPasswordPage /></LazyRoute>,
+  component: () => (
+    <LazyRoute>
+      <ForgotPasswordPage />
+    </LazyRoute>
+  ),
 });
 
 const updatePasswordRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/update-password',
-  component: () => <LazyRoute><UpdatePasswordPage /></LazyRoute>,
+  component: () => (
+    <LazyRoute>
+      <UpdatePasswordPage />
+    </LazyRoute>
+  ),
 });
 
 const loginRoute = createRoute({
@@ -317,7 +383,11 @@ const loginRoute = createRoute({
 const publicStoreRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/store/$slug',
-  component: () => <LazyRoute><PublicStorePage /></LazyRoute>,
+  component: () => (
+    <LazyRoute>
+      <PublicStorePage />
+    </LazyRoute>
+  ),
 });
 
 const registerRoute = createRoute({
@@ -333,42 +403,66 @@ const dashboardRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/dashboard',
   beforeLoad: redirectStoreOwnerToDashboard,
-  component: () => <LazyRoute><PlayerDashboard /></LazyRoute>,
+  component: () => (
+    <LazyRoute>
+      <PlayerDashboard />
+    </LazyRoute>
+  ),
 });
 
 const storeDashboardRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/store/dashboard',
   beforeLoad: requireStoreOwner,
-  component: () => <LazyRoute><StoreDashboard /></LazyRoute>,
+  component: () => (
+    <LazyRoute>
+      <StoreDashboard />
+    </LazyRoute>
+  ),
 });
 
 const messagingRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/messages',
   beforeLoad: requireAuth,
-  component: () => <LazyRoute><MessagingPage /></LazyRoute>,
+  component: () => (
+    <LazyRoute>
+      <MessagingPage />
+    </LazyRoute>
+  ),
 });
 
 const myComparisonsRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/comparisons',
   beforeLoad: requireAuth,
-  component: () => <LazyRoute><MyComparisonsPage /></LazyRoute>,
+  component: () => (
+    <LazyRoute>
+      <MyComparisonsPage />
+    </LazyRoute>
+  ),
 });
 
 const profileRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/profile',
   beforeLoad: requireAuth,
-  component: () => <LazyRoute><UserProfilePage /></LazyRoute>,
+  component: () => (
+    <LazyRoute>
+      <UserProfilePage />
+    </LazyRoute>
+  ),
 });
 
 const listRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/lists/$id',
   beforeLoad: requireAuth,
-  component: () => <LazyRoute><ListPage /></LazyRoute>,
+  component: () => (
+    <LazyRoute>
+      <ListPage />
+    </LazyRoute>
+  ),
 });
 
 // ──────────────────────────────────────────────────────────────────────────────
@@ -378,42 +472,66 @@ const adminRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/admin',
   beforeLoad: requireAdmin,
-  component: () => <LazyRoute><AdminPanelPage /></LazyRoute>,
+  component: () => (
+    <LazyRoute>
+      <AdminPanelPage />
+    </LazyRoute>
+  ),
 });
 
 const adminRacketReviewRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/admin/rackets/review',
   beforeLoad: requireAdmin,
-  component: () => <LazyRoute><AdminRacketReviewPage /></LazyRoute>,
+  component: () => (
+    <LazyRoute>
+      <AdminRacketReviewPage />
+    </LazyRoute>
+  ),
 });
 
 const adminRacketsRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/admin/rackets',
   beforeLoad: requireAdmin,
-  component: () => <LazyRoute><AdminRacketsPage /></LazyRoute>,
+  component: () => (
+    <LazyRoute>
+      <AdminRacketsPage />
+    </LazyRoute>
+  ),
 });
 
 const adminUsersRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/admin/users',
   beforeLoad: requireAdmin,
-  component: () => <LazyRoute><AdminUsersPage /></LazyRoute>,
+  component: () => (
+    <LazyRoute>
+      <AdminUsersPage />
+    </LazyRoute>
+  ),
 });
 
 const adminStoresRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/admin/stores',
   beforeLoad: requireAdmin,
-  component: () => <LazyRoute><AdminStoresPage /></LazyRoute>,
+  component: () => (
+    <LazyRoute>
+      <AdminStoresPage />
+    </LazyRoute>
+  ),
 });
 
 const adminSettingsRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/admin/settings',
   beforeLoad: requireAdmin,
-  component: () => <LazyRoute><AdminSettingsPage /></LazyRoute>,
+  component: () => (
+    <LazyRoute>
+      <AdminSettingsPage />
+    </LazyRoute>
+  ),
 });
 
 // ──────────────────────────────────────────────────────────────────────────────
@@ -422,13 +540,21 @@ const adminSettingsRoute = createRoute({
 const errorRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/error',
-  component: () => <LazyRoute><ErrorPage /></LazyRoute>,
+  component: () => (
+    <LazyRoute>
+      <ErrorPage />
+    </LazyRoute>
+  ),
 });
 
 const notFoundRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '*',
-  component: () => <LazyRoute><NotFoundPage /></LazyRoute>,
+  component: () => (
+    <LazyRoute>
+      <NotFoundPage />
+    </LazyRoute>
+  ),
 });
 
 // ──────────────────────────────────────────────────────────────────────────────

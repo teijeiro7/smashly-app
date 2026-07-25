@@ -18,13 +18,7 @@ import { useAuth } from '../../contexts/AuthContext.tsx';
 import storeService from '../../services/storeService';
 import OnboardingPromptModal from '../features/OnboardingPromptModal';
 import StoreRequestModal from '../features/StoreRequestModal';
-import {
-  Form,
-  SubmitButton,
-  Divider,
-  SocialButtons,
-  SocialButton,
-} from './AuthStyles';
+import { Form, SubmitButton, Divider, SocialButtons, SocialButton } from './AuthStyles';
 import { emailValidator, requiredStringValidator, passwordChecklist } from '../../schemas/auth';
 import TextField from '../form/TextField';
 import CheckboxField from '../form/CheckboxField';
@@ -575,7 +569,12 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess, onLoginClick }) 
         </SubmitButton>
 
         <div
-          style={{ marginTop: '1rem', textAlign: 'center', fontSize: '0.9rem', color: 'var(--text-muted)' }}
+          style={{
+            marginTop: '1rem',
+            textAlign: 'center',
+            fontSize: '0.9rem',
+            color: 'var(--text-muted)',
+          }}
         >
           ¿Ya tienes cuenta?{' '}
           <button

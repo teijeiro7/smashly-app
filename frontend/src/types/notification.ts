@@ -1,4 +1,4 @@
-export type NotificationType = 
+export type NotificationType =
   | 'price_drop'
   | 'comparison_complete'
   | 'recommendation_complete'

@@ -128,9 +128,7 @@ export const webPageSchema = (opts: {
 });
 
 /** BreadcrumbList for navigation chains in SERPs. */
-export const breadcrumbSchema = (
-  items: Array<{ name: string; url: string }>
-) => ({
+export const breadcrumbSchema = (items: Array<{ name: string; url: string }>) => ({
   '@type': 'BreadcrumbList',
   itemListElement: items.map((item, idx) => ({
     '@type': 'ListItem',
@@ -141,17 +139,12 @@ export const breadcrumbSchema = (
 });
 
 /** ItemList schema for the catalog page (top products). */
-export const catalogItemListSchema = (
-  rackets: Racket[],
-  catalogUrl: string
-) => {
+export const catalogItemListSchema = (rackets: Racket[], catalogUrl: string) => {
   const list = rackets
     .filter(r => r.id !== undefined)
     .slice(0, 25)
     .map((r, idx) => {
-      const url = buildUrl(
-        `/racket-detail?id=${r.id}&name=${encodeURIComponent(r.nombre)}`
-      );
+      const url = buildUrl(`/racket-detail?id=${r.id}&name=${encodeURIComponent(r.nombre)}`);
       return {
         '@type': 'ListItem',
         position: idx + 1,
@@ -201,12 +194,8 @@ export const productSchema = (racket: Racket, url: string) => {
     }
   }
 
-  const minPrice = offers.length
-    ? Math.min(...offers.map(o => parseFloat(o.price)))
-    : undefined;
-  const maxPrice = offers.length
-    ? Math.max(...offers.map(o => parseFloat(o.price)))
-    : undefined;
+  const minPrice = offers.length ? Math.min(...offers.map(o => parseFloat(o.price))) : undefined;
+  const maxPrice = offers.length ? Math.max(...offers.map(o => parseFloat(o.price))) : undefined;
 
   const product: any = {
     '@type': 'Product',

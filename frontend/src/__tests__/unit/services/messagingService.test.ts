@@ -33,7 +33,11 @@ describe('messagingService', () => {
           created_at: '2025-01-10T00:00:00.000Z',
           store: { store_name: 'Store 1', slug: 'store-1' },
           buyer: { nickname: 'Player1' },
-          last_message: { content: 'Hi!', created_at: '2025-01-15T00:00:00.000Z', sender_id: 'buyer-1' },
+          last_message: {
+            content: 'Hi!',
+            created_at: '2025-01-15T00:00:00.000Z',
+            sender_id: 'buyer-1',
+          },
           unread_count: 2,
         },
       ];
@@ -100,9 +104,9 @@ describe('messagingService', () => {
         json: async () => ({ error: 'Store not found' }),
       });
 
-      await expect(
-        messagingService.createConversation('store-1', 'Hello!')
-      ).rejects.toThrow('Store not found');
+      await expect(messagingService.createConversation('store-1', 'Hello!')).rejects.toThrow(
+        'Store not found'
+      );
     });
   });
 

@@ -48,7 +48,8 @@ export const API_ENDPOINTS = {
   STORES_MY_STORE: '/api/v1/stores/my-store',
   STORES_CATALOG: (storeId: string) => `/api/v1/stores/catalog/${storeId}`,
   STORES_CATALOG_SEARCH: (storeId: string) => `/api/v1/stores/catalog/${storeId}/search`,
-  STORES_CATALOG_ITEM: (storeId: string, priceId: string) => `/api/v1/stores/catalog/${storeId}/${priceId}`,
+  STORES_CATALOG_ITEM: (storeId: string, priceId: string) =>
+    `/api/v1/stores/catalog/${storeId}/${priceId}`,
 
   // Admin
   ADMIN: {
@@ -137,7 +138,9 @@ export const getAuthToken = (): string | null => {
   try {
     const legacy = localStorage.getItem('auth_token');
     if (legacy) return legacy;
-  } catch (_) { /* SSR or storage disabled */ }
+  } catch (_) {
+    /* SSR or storage disabled */
+  }
   return null;
 };
 
@@ -156,7 +159,11 @@ export const getCommonHeaders = (): HeadersInit => {
   if (legacyToken) {
     headers['Authorization'] = `Bearer ${legacyToken}`;
     // Clean it up so the user migrates to cookie auth on next login
-    try { localStorage.removeItem('auth_token'); } catch (_) { /* ignore */ }
+    try {
+      localStorage.removeItem('auth_token');
+    } catch (_) {
+      /* ignore */
+    }
   }
 
   return headers;

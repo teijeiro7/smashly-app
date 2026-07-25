@@ -5,7 +5,13 @@ import { FaStore, FaEdit, FaGlobe, FaBox, FaChartLine, FaPlus } from 'react-icon
 import { FiPackage } from 'react-icons/fi';
 import { motion } from 'framer-motion';
 import {
-  Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis,
+  Area,
+  AreaChart,
+  CartesianGrid,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
 } from 'recharts';
 import { supabase } from '../lib/supabase';
 import storeService, { Store, CreateStoreRequest } from '../services/storeService';
@@ -422,31 +428,61 @@ function formatChange(value: number): string {
   return `${sign}${value}% vs periodo anterior`;
 }
 
-function renderTimelineChart(timeline: TimelineResponse | null, loading: boolean, field: 'views' | 'clicks'): React.ReactNode {
+function renderTimelineChart(
+  timeline: TimelineResponse | null,
+  loading: boolean,
+  field: 'views' | 'clicks'
+): React.ReactNode {
   if (loading) {
-    return <div style={{ height: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)', fontSize: '0.875rem' }}>Cargando...</div>;
+    return (
+      <div
+        style={{
+          height: 200,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          color: 'var(--text-muted)',
+          fontSize: '0.875rem',
+        }}
+      >
+        Cargando...
+      </div>
+    );
   }
   if (!timeline || timeline.current.length === 0) {
-    return <div style={{ height: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)', fontSize: '0.875rem' }}>Sin datos aún</div>;
+    return (
+      <div
+        style={{
+          height: 200,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          color: 'var(--text-muted)',
+          fontSize: '0.875rem',
+        }}
+      >
+        Sin datos aún
+      </div>
+    );
   }
   return (
     <div style={{ width: '100%', height: 200 }}>
       <ResponsiveContainer>
         <AreaChart data={timeline.current} margin={{ top: 4, right: 4, bottom: 0, left: 0 }}>
           <defs>
-            <linearGradient id={`grad-${field}`} x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor="var(--primary)" stopOpacity={0.15} />
-              <stop offset="95%" stopColor="var(--primary)" stopOpacity={0} />
+            <linearGradient id={`grad-${field}`} x1='0' y1='0' x2='0' y2='1'>
+              <stop offset='5%' stopColor='var(--primary)' stopOpacity={0.15} />
+              <stop offset='95%' stopColor='var(--primary)' stopOpacity={0} />
             </linearGradient>
           </defs>
-          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--surface-3)" />
+          <CartesianGrid strokeDasharray='3 3' vertical={false} stroke='var(--surface-3)' />
           <XAxis
-            dataKey="date"
+            dataKey='date'
             axisLine={false}
             tickLine={false}
             tick={{ fontSize: 10, fill: 'var(--text-subtle)' }}
             tickFormatter={(val: string) => {
-              const d = new Date(val + 'T00:00:00');
+              const d = new Date(`${val}T00:00:00`);
               return d.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' });
             }}
             minTickGap={40}
@@ -460,15 +496,19 @@ function renderTimelineChart(timeline: TimelineResponse | null, loading: boolean
               fontSize: '0.8rem',
             }}
             labelFormatter={(label: any) => {
-              const d = new Date(String(label) + 'T00:00:00');
-              return d.toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' });
+              const d = new Date(`${String(label)}T00:00:00`);
+              return d.toLocaleDateString('es-ES', {
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric',
+              });
             }}
             formatter={(value: any) => [Number(value), field === 'views' ? 'Visitas' : 'Clics']}
           />
           <Area
-            type="monotone"
+            type='monotone'
             dataKey={field}
-            stroke="var(--primary)"
+            stroke='var(--primary)'
             strokeWidth={2}
             fill={`url(#grad-${field})`}
             fillOpacity={1}
@@ -505,7 +545,9 @@ export const StoreDashboard: React.FC = () => {
   const [period, setPeriod] = useState<'7d' | '30d' | '90d'>('30d');
 
   const getToken = useCallback(async () => {
-    const { data: { session } } = await supabase.auth.getSession();
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
     return session?.access_token || '';
   }, []);
 
@@ -521,18 +563,21 @@ export const StoreDashboard: React.FC = () => {
     }
   }, [getToken]);
 
-  const loadTimeline = useCallback(async (storeId: string) => {
-    setTimelineLoading(true);
-    try {
-      const token = await getToken();
-      const data = await analyticsService.fetchTimeline(storeId, token, period);
-      setTimeline(data);
-    } catch (err) {
-      console.error('Error loading timeline:', err);
-    } finally {
-      setTimelineLoading(false);
-    }
-  }, [getToken, period]);
+  const loadTimeline = useCallback(
+    async (storeId: string) => {
+      setTimelineLoading(true);
+      try {
+        const token = await getToken();
+        const data = await analyticsService.fetchTimeline(storeId, token, period);
+        setTimeline(data);
+      } catch (err) {
+        console.error('Error loading timeline:', err);
+      } finally {
+        setTimelineLoading(false);
+      }
+    },
+    [getToken, period]
+  );
 
   useEffect(() => {
     loadStore();
@@ -547,7 +592,10 @@ export const StoreDashboard: React.FC = () => {
     const token = await getToken();
     const updated = await storeService.updateStore(store.id, updates, token);
     setStore(updated);
-    sileo.success({ title: 'Perfil actualizado', description: 'Los cambios se han guardado correctamente.' });
+    sileo.success({
+      title: 'Perfil actualizado',
+      description: 'Los cambios se han guardado correctamente.',
+    });
   };
 
   const handleCreateStore = async (e: React.FormEvent) => {
@@ -558,7 +606,10 @@ export const StoreDashboard: React.FC = () => {
       const newStore = await storeService.createStoreRequest(createForm, token);
       setStore(newStore);
       setShowCreateForm(false);
-      sileo.success({ title: 'Solicitud enviada', description: 'Tu solicitud de tienda ha sido registrada.' });
+      sileo.success({
+        title: 'Solicitud enviada',
+        description: 'Tu solicitud de tienda ha sido registrada.',
+      });
     } catch (error: any) {
       sileo.error({ title: 'Error', description: error.message || 'Error al crear la tienda' });
     } finally {
@@ -587,27 +638,27 @@ export const StoreDashboard: React.FC = () => {
               </EmptyIcon>
               <EmptyTitle>Aún no tienes una tienda</EmptyTitle>
               <EmptyMessage>
-                No encontramos una tienda asociada a tu cuenta. Crea una para
-                empezar a gestionar tu catálogo y aparecer en Smashly.
+                No encontramos una tienda asociada a tu cuenta. Crea una para empezar a gestionar tu
+                catálogo y aparecer en Smashly.
               </EmptyMessage>
 
               {showCreateForm ? (
                 <CreateStoreForm onSubmit={handleCreateStore}>
                   <FormInput
-                    placeholder="Nombre de la tienda *"
+                    placeholder='Nombre de la tienda *'
                     value={createForm.store_name}
                     onChange={e => setCreateForm(p => ({ ...p, store_name: e.target.value }))}
                     required
                   />
                   <FormRow>
                     <FormInput
-                      placeholder="Razón social *"
+                      placeholder='Razón social *'
                       value={createForm.legal_name}
                       onChange={e => setCreateForm(p => ({ ...p, legal_name: e.target.value }))}
                       required
                     />
                     <FormInput
-                      placeholder="CIF/NIF *"
+                      placeholder='CIF/NIF *'
                       value={createForm.cif_nif}
                       onChange={e => setCreateForm(p => ({ ...p, cif_nif: e.target.value }))}
                       required
@@ -615,34 +666,34 @@ export const StoreDashboard: React.FC = () => {
                   </FormRow>
                   <FormRow>
                     <FormInput
-                      placeholder="Email de contacto *"
-                      type="email"
+                      placeholder='Email de contacto *'
+                      type='email'
                       value={createForm.contact_email}
                       onChange={e => setCreateForm(p => ({ ...p, contact_email: e.target.value }))}
                       required
                     />
                     <FormInput
-                      placeholder="Teléfono *"
+                      placeholder='Teléfono *'
                       value={createForm.phone_number}
                       onChange={e => setCreateForm(p => ({ ...p, phone_number: e.target.value }))}
                       required
                     />
                   </FormRow>
                   <FormInput
-                    placeholder="Ubicación *"
+                    placeholder='Ubicación *'
                     value={createForm.location}
                     onChange={e => setCreateForm(p => ({ ...p, location: e.target.value }))}
                     required
                   />
                   <FormInput
-                    placeholder="Sitio web (opcional)"
+                    placeholder='Sitio web (opcional)'
                     value={createForm.website_url || ''}
                     onChange={e => setCreateForm(p => ({ ...p, website_url: e.target.value }))}
                   />
                   <SubmitButton disabled={creating}>
                     {creating ? 'Enviando...' : 'Crear tienda'}
                   </SubmitButton>
-                  <ToggleCreateButton type="button" onClick={() => setShowCreateForm(false)}>
+                  <ToggleCreateButton type='button' onClick={() => setShowCreateForm(false)}>
                     Cancelar
                   </ToggleCreateButton>
                 </CreateStoreForm>
@@ -676,13 +727,15 @@ export const StoreDashboard: React.FC = () => {
       icon: FaBox,
       title: 'Catálogo de palas',
       description: 'Gestiona tu inventario',
-      onClick: () => sileo.info({ title: 'Próximamente', description: 'El catálogo estará disponible pronto.' }),
+      onClick: () =>
+        sileo.info({ title: 'Próximamente', description: 'El catálogo estará disponible pronto.' }),
     },
     {
       icon: FaChartLine,
       title: 'Analíticas',
       description: 'Visitas, clics y valoraciones',
-      onClick: () => document.getElementById('analytics-section')?.scrollIntoView({ behavior: 'smooth' }),
+      onClick: () =>
+        document.getElementById('analytics-section')?.scrollIntoView({ behavior: 'smooth' }),
     },
   ];
 
@@ -703,7 +756,9 @@ export const StoreDashboard: React.FC = () => {
         </Section>
 
         <Section>
-          <SectionTitle><FaStore /> Acciones rápidas</SectionTitle>
+          <SectionTitle>
+            <FaStore /> Acciones rápidas
+          </SectionTitle>
           <QuickActionsGrid>
             {quickActions.map((action, i) => (
               <motion.div
@@ -718,8 +773,10 @@ export const StoreDashboard: React.FC = () => {
           </QuickActionsGrid>
         </Section>
 
-        <Section id="analytics-section">
-          <SectionTitle><FaChartLine /> Analíticas</SectionTitle>
+        <Section id='analytics-section'>
+          <SectionTitle>
+            <FaChartLine /> Analíticas
+          </SectionTitle>
           <AnalyticsGrid>
             <AnalyticCard>
               <AnalyticValue>{store.views_count ?? 0}</AnalyticValue>
@@ -740,7 +797,9 @@ export const StoreDashboard: React.FC = () => {
               )}
             </AnalyticCard>
             <AnalyticCard>
-              <AnalyticValue>{store.rating_avg > 0 ? store.rating_avg.toFixed(1) : '—'}</AnalyticValue>
+              <AnalyticValue>
+                {store.rating_avg > 0 ? store.rating_avg.toFixed(1) : '—'}
+              </AnalyticValue>
               <AnalyticLabel>Valoración</AnalyticLabel>
             </AnalyticCard>
           </AnalyticsGrid>
@@ -820,7 +879,9 @@ export const StoreDashboard: React.FC = () => {
 
             {store.specialties && store.specialties.length > 0 && (
               <>
-                <InfoLabel style={{ marginTop: '1rem', display: 'block' }}>Especialidades</InfoLabel>
+                <InfoLabel style={{ marginTop: '1rem', display: 'block' }}>
+                  Especialidades
+                </InfoLabel>
                 <SpecialtyTags>
                   {store.specialties.map((s, i) => (
                     <SpecialtyTag key={i}>{s}</SpecialtyTag>
@@ -832,7 +893,9 @@ export const StoreDashboard: React.FC = () => {
         </Section>
 
         <Section>
-          <SectionTitle><FiPackage /> Catálogo</SectionTitle>
+          <SectionTitle>
+            <FiPackage /> Catálogo
+          </SectionTitle>
           <StoreCatalogManager storeId={store.id} />
         </Section>
       </MaxWidth>

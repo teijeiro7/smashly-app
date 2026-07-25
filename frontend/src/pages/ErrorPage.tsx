@@ -58,7 +58,9 @@ const Button = styled.button<{ variant?: 'primary' | 'secondary' }>`
   transition: all 0.3s ease;
   border: none;
 
-  ${props => props.variant === 'primary' ? `
+  ${props =>
+    props.variant === 'primary'
+      ? `
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
 
@@ -66,7 +68,8 @@ const Button = styled.button<{ variant?: 'primary' | 'secondary' }>`
       transform: translateY(-2px);
       box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
     }
-  ` : `
+  `
+      : `
     background: var(--border);
     color: var(--text);
 
@@ -86,24 +89,27 @@ const errorTypes: Record<string, ErrorInfo> = {
   '403': {
     code: '403',
     title: 'Acceso Denegado',
-    message: 'Lo sentimos, no tienes permisos para acceder a esta página. Si crees que esto es un error, contacta con el administrador.',
+    message:
+      'Lo sentimos, no tienes permisos para acceder a esta página. Si crees que esto es un error, contacta con el administrador.',
   },
   '404': {
     code: '404',
     title: 'Página No Encontrada',
-    message: 'La página que buscas no existe o ha sido movida. Verifica la URL o regresa a la página principal.',
+    message:
+      'La página que buscas no existe o ha sido movida. Verifica la URL o regresa a la página principal.',
   },
   '500': {
     code: '500',
     title: 'Error del Servidor',
-    message: 'Ha ocurrido un error en el servidor. Nuestro equipo ha sido notificado y está trabajando para solucionarlo.',
+    message:
+      'Ha ocurrido un error en el servidor. Nuestro equipo ha sido notificado y está trabajando para solucionarlo.',
   },
-  'unauthorized': {
+  unauthorized: {
     code: '401',
     title: 'No Autorizado',
     message: 'Debes iniciar sesión para acceder a esta página.',
   },
-  'default': {
+  default: {
     code: 'ERROR',
     title: 'Ha Ocurrido un Error',
     message: 'Algo salió mal. Por favor, intenta nuevamente más tarde.',
@@ -136,25 +142,23 @@ const ErrorPage: React.FC = () => {
       <ErrorCard>
         <ErrorCode>{error.code}</ErrorCode>
         <ErrorTitle>{error.title}</ErrorTitle>
-        <ErrorMessage>
-          {customMessage || error.message}
-        </ErrorMessage>
+        <ErrorMessage>{customMessage || error.message}</ErrorMessage>
         <ButtonGroup>
           {errorType === 'unauthorized' ? (
             <>
-              <Button variant="primary" onClick={handleLogin}>
+              <Button variant='primary' onClick={handleLogin}>
                 Iniciar Sesión
               </Button>
-              <Button variant="secondary" onClick={handleGoHome}>
+              <Button variant='secondary' onClick={handleGoHome}>
                 Ir a Inicio
               </Button>
             </>
           ) : (
             <>
-              <Button variant="primary" onClick={handleGoHome}>
+              <Button variant='primary' onClick={handleGoHome}>
                 Ir a Inicio
               </Button>
-              <Button variant="secondary" onClick={handleGoBack}>
+              <Button variant='secondary' onClick={handleGoBack}>
                 Volver Atrás
               </Button>
             </>

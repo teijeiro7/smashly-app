@@ -17,8 +17,12 @@ const Overlay = styled.div`
   animation: fadeIn 0.2s ease;
 
   @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
   }
 `;
 
@@ -33,8 +37,14 @@ const ModalContainer = styled.div`
   animation: slideUp 0.3s ease;
 
   @keyframes slideUp {
-    from { transform: translateY(20px); opacity: 0; }
-    to { transform: translateY(0); opacity: 1; }
+    from {
+      transform: translateY(20px);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
   }
 `;
 
@@ -411,7 +421,7 @@ const StoreProfileForm: React.FC<StoreProfileFormProps> = ({ store, isOpen, onCl
             <FieldGroup>
               <Label>Email de contacto</Label>
               <Input
-                type="email"
+                type='email'
                 value={form.contact_email}
                 onChange={e => setForm(p => ({ ...p, contact_email: e.target.value }))}
               />
@@ -438,7 +448,7 @@ const StoreProfileForm: React.FC<StoreProfileFormProps> = ({ store, isOpen, onCl
             <Input
               value={form.website_url}
               onChange={e => setForm(p => ({ ...p, website_url: e.target.value }))}
-              placeholder="https://..."
+              placeholder='https://...'
             />
           </FieldGroup>
 
@@ -447,7 +457,7 @@ const StoreProfileForm: React.FC<StoreProfileFormProps> = ({ store, isOpen, onCl
             <Input
               value={form.logo_url}
               onChange={e => setForm(p => ({ ...p, logo_url: e.target.value }))}
-              placeholder="https://..."
+              placeholder='https://...'
             />
           </FieldGroup>
 
@@ -456,7 +466,7 @@ const StoreProfileForm: React.FC<StoreProfileFormProps> = ({ store, isOpen, onCl
             <Input
               value={form.cover_image_url}
               onChange={e => setForm(p => ({ ...p, cover_image_url: e.target.value }))}
-              placeholder="https://..."
+              placeholder='https://...'
             />
           </FieldGroup>
 
@@ -511,8 +521,13 @@ const StoreProfileForm: React.FC<StoreProfileFormProps> = ({ store, isOpen, onCl
               <AddUrlInput
                 value={newGalleryUrl}
                 onChange={e => setNewGalleryUrl(e.target.value)}
-                placeholder="https://..."
-                onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); addGalleryUrl(); } }}
+                placeholder='https://...'
+                onKeyDown={e => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault();
+                    addGalleryUrl();
+                  }
+                }}
               />
               <AddUrlButton onClick={addGalleryUrl}>
                 <FiPlus /> Añadir

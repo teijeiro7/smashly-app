@@ -16,7 +16,7 @@ const AvatarWrapper = styled(motion.div)<{ $size?: number }>`
   border-radius: 50%;
   overflow: hidden;
   position: relative;
-  background: linear-gradient(135deg, rgba(var(--primary-rgb), 0.20), rgba(var(--primary-rgb), 0.10));
+  background: linear-gradient(135deg, rgba(var(--primary-rgb), 0.2), rgba(var(--primary-rgb), 0.1));
   border: 3px solid var(--surface);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
 `;
@@ -36,7 +36,11 @@ const AvatarFallback = styled.div<{ $size?: number }>`
   font-size: ${props => (props.$size || 120) / 2.5}px;
   font-weight: 700;
   color: var(--brand-on-surface);
-  background: linear-gradient(135deg, rgba(var(--primary-rgb), 0.20), rgba(var(--primary-rgb), 0.08));
+  background: linear-gradient(
+    135deg,
+    rgba(var(--primary-rgb), 0.2),
+    rgba(var(--primary-rgb), 0.08)
+  );
 `;
 
 const UploadButton = styled(motion.button)`
@@ -108,8 +112,6 @@ const ModalActions = styled.div`
   gap: 0.75rem;
   justify-content: flex-end;
 `;
-
-
 
 interface ProfileAvatarProps {
   currentAvatar?: string | null;
@@ -191,19 +193,14 @@ const ProfileAvatar: React.FC<ProfileAvatarProps> = ({
   return (
     <>
       <AvatarContainer>
-        <AvatarWrapper
-          $size={size}
-          whileHover={{ scale: 1.02 }}
-        >
+        <AvatarWrapper $size={size} whileHover={{ scale: 1.02 }}>
           {currentAvatar ? (
-            <AvatarImage src={currentAvatar} alt="Avatar" />
+            <AvatarImage src={currentAvatar} alt='Avatar' />
           ) : (
-            <AvatarFallback $size={size}>
-              {getInitials(name)}
-            </AvatarFallback>
+            <AvatarFallback $size={size}>{getInitials(name)}</AvatarFallback>
           )}
         </AvatarWrapper>
-        
+
         <UploadButton
           onClick={() => inputRef.current?.click()}
           whileHover={{ scale: 1.1 }}
@@ -212,12 +209,7 @@ const ProfileAvatar: React.FC<ProfileAvatarProps> = ({
           <FiCamera size={16} />
         </UploadButton>
 
-        <HiddenInput
-          ref={inputRef}
-          type="file"
-          accept="image/*"
-          onChange={handleFileSelect}
-        />
+        <HiddenInput ref={inputRef} type='file' accept='image/*' onChange={handleFileSelect} />
       </AvatarContainer>
 
       {showModal && (
@@ -235,9 +227,7 @@ const ProfileAvatar: React.FC<ProfileAvatarProps> = ({
           >
             <ModalTitle>Confirmar foto de perfil</ModalTitle>
             <ModalContent>
-              {preview && (
-                <PreviewImage src={preview} alt="Preview" />
-              )}
+              {preview && <PreviewImage src={preview} alt='Preview' />}
               <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem' }}>
                 ¿Quieres usar esta foto como imagen de perfil?
               </p>

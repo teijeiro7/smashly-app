@@ -30,7 +30,9 @@ export class ListService {
   }
 
   static async createList(listData: CreateListRequest): Promise<List> {
-    const { data: { session } } = await supabase.auth.getSession();
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
     if (!session) throw new Error('No hay sesión activa');
 
     const { data, error } = await supabase

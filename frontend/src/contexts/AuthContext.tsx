@@ -1,4 +1,12 @@
-import React, { createContext, ReactNode, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import React, {
+  createContext,
+  ReactNode,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 import { supabase } from '../lib/supabase';
 import { UserProfile } from '../services/userProfileService';
 import { logger } from '../utils/logger';
@@ -109,7 +117,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       }
     });
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (!mounted) return;
 
       if (event === 'SIGNED_OUT' || !session) {
@@ -145,95 +155,105 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     };
   }, [loadAndSetProfile, clearAuth]);
 
-  const signIn = useCallback(async (
-    email: string,
-    password: string
-  ): Promise<{ data: UserProfile | null; error: string | null; errorCode?: string }> => {
-    if (!email || !password) {
-      return { data: null, error: 'Email y contraseña son requeridos', errorCode: 'MISSING_CREDENTIALS' };
-    }
-
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email: email.trim().toLowerCase(),
-      password,
-    });
-
-    if (error) {
-      let friendly = error.message;
-      let errorCode = error.code ?? 'AUTH_ERROR';
-
-      if (error.message.includes('Invalid login credentials')) {
-        friendly = 'Credenciales inválidas. Verifica tu email y contraseña.';
-        errorCode = 'INVALID_PASSWORD';
-      } else if (error.message.includes('Email not confirmed')) {
-        friendly = 'Por favor confirma tu email antes de iniciar sesión.';
-        errorCode = 'EMAIL_NOT_CONFIRMED';
-      } else if (error.message.includes('too many')) {
-        friendly = 'Demasiados intentos. Espera un momento antes de intentar de nuevo.';
-        errorCode = 'TOO_MANY_REQUESTS';
-      } else if (error.message.includes('User not found')) {
-        friendly = 'No tienes una cuenta con este email. ¿Quieres registrarte?';
-        errorCode = 'USER_NOT_FOUND';
+  const signIn = useCallback(
+    async (
+      email: string,
+      password: string
+    ): Promise<{ data: UserProfile | null; error: string | null; errorCode?: string }> => {
+      if (!email || !password) {
+        return {
+          data: null,
+          error: 'Email y contraseña son requeridos',
+          errorCode: 'MISSING_CREDENTIALS',
+        };
       }
 
-      return { data: null, error: friendly, errorCode };
-    }
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: email.trim().toLowerCase(),
+        password,
+      });
 
-    if (!data.session) {
-      return { data: null, error: 'No se recibió sesión', errorCode: 'NO_SESSION' };
-    }
+      if (error) {
+        let friendly = error.message;
+        let errorCode = error.code ?? 'AUTH_ERROR';
 
-    setAuthToken(data.session.access_token);
-    const profile = await loadAndSetProfile(data.session.user.id);
-    return { data: profile, error: null };
-  }, [loadAndSetProfile]);
+        if (error.message.includes('Invalid login credentials')) {
+          friendly = 'Credenciales inválidas. Verifica tu email y contraseña.';
+          errorCode = 'INVALID_PASSWORD';
+        } else if (error.message.includes('Email not confirmed')) {
+          friendly = 'Por favor confirma tu email antes de iniciar sesión.';
+          errorCode = 'EMAIL_NOT_CONFIRMED';
+        } else if (error.message.includes('too many')) {
+          friendly = 'Demasiados intentos. Espera un momento antes de intentar de nuevo.';
+          errorCode = 'TOO_MANY_REQUESTS';
+        } else if (error.message.includes('User not found')) {
+          friendly = 'No tienes una cuenta con este email. ¿Quieres registrarte?';
+          errorCode = 'USER_NOT_FOUND';
+        }
 
-  const signUp = useCallback(async (
-    email: string,
-    password: string,
-    nickname: string,
-    fullName?: string,
-    _role?: 'Player' | 'Store'
-  ): Promise<{ data: UserProfile | null; error: string | null; token?: string }> => {
-    const { data, error } = await supabase.auth.signUp({
-      email: email.trim().toLowerCase(),
-      password,
-      options: {
-        data: { nickname, full_name: fullName },
-      },
-    });
+        return { data: null, error: friendly, errorCode };
+      }
 
-    if (error) {
-      return { data: null, error: error.message };
-    }
+      if (!data.session) {
+        return { data: null, error: 'No se recibió sesión', errorCode: 'NO_SESSION' };
+      }
 
-    if (!data.user) {
-      return { data: null, error: 'No se pudo crear el usuario' };
-    }
+      setAuthToken(data.session.access_token);
+      const profile = await loadAndSetProfile(data.session.user.id);
+      return { data: profile, error: null };
+    },
+    [loadAndSetProfile]
+  );
 
-    const { error: upsertError } = await supabase.from('user_profiles').upsert({
-      id: data.user.id,
-      email: data.user.email,
-      nickname,
-      full_name: fullName ?? null,
-      role: _role ?? 'Player',
-    });
+  const signUp = useCallback(
+    async (
+      email: string,
+      password: string,
+      nickname: string,
+      fullName?: string,
+      _role?: 'Player' | 'Store'
+    ): Promise<{ data: UserProfile | null; error: string | null; token?: string }> => {
+      const { data, error } = await supabase.auth.signUp({
+        email: email.trim().toLowerCase(),
+        password,
+        options: {
+          data: { nickname, full_name: fullName },
+        },
+      });
 
-    if (upsertError) {
-      return { data: null, error: `No se pudo actualizar el perfil: ${upsertError.message}` };
-    }
+      if (error) {
+        return { data: null, error: error.message };
+      }
 
-    if (!data.session) {
-      return { data: null, error: null };
-    }
+      if (!data.user) {
+        return { data: null, error: 'No se pudo crear el usuario' };
+      }
 
-    const profile = await loadAndSetProfile(data.user.id);
-    return {
-      data: profile,
-      error: null,
-      token: data.session.access_token,
-    };
-  }, [loadAndSetProfile]);
+      const { error: upsertError } = await supabase.from('user_profiles').upsert({
+        id: data.user.id,
+        email: data.user.email,
+        nickname,
+        full_name: fullName ?? null,
+        role: _role ?? 'Player',
+      });
+
+      if (upsertError) {
+        return { data: null, error: `No se pudo actualizar el perfil: ${upsertError.message}` };
+      }
+
+      if (!data.session) {
+        return { data: null, error: null };
+      }
+
+      const profile = await loadAndSetProfile(data.user.id);
+      return {
+        data: profile,
+        error: null,
+        token: data.session.access_token,
+      };
+    },
+    [loadAndSetProfile]
+  );
 
   const signInWithGoogle = useCallback(async (): Promise<{
     data: UserProfile | null;
@@ -261,40 +281,45 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   }, [clearAuth]);
 
   const refreshUserProfile = useCallback(async (): Promise<void> => {
-    const { data: { session } } = await supabase.auth.getSession();
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
     if (session?.user) {
       await loadAndSetProfile(session.user.id);
     }
   }, [loadAndSetProfile]);
 
-  const value = useMemo<AuthContextType>(() => ({
-    user,
-    userProfile,
-    loading,
-    pendingGoogleOnboarding,
-    googleBlockError,
-    signUp,
-    signIn,
-    signInWithGoogle,
-    signOut,
-    refreshUserProfile,
-    clearGoogleOnboarding,
-    clearGoogleBlockError,
-    isAuthenticated: !!user,
-  }), [
-    user,
-    userProfile,
-    loading,
-    pendingGoogleOnboarding,
-    googleBlockError,
-    signUp,
-    signIn,
-    signInWithGoogle,
-    signOut,
-    refreshUserProfile,
-    clearGoogleOnboarding,
-    clearGoogleBlockError,
-  ]);
+  const value = useMemo<AuthContextType>(
+    () => ({
+      user,
+      userProfile,
+      loading,
+      pendingGoogleOnboarding,
+      googleBlockError,
+      signUp,
+      signIn,
+      signInWithGoogle,
+      signOut,
+      refreshUserProfile,
+      clearGoogleOnboarding,
+      clearGoogleBlockError,
+      isAuthenticated: !!user,
+    }),
+    [
+      user,
+      userProfile,
+      loading,
+      pendingGoogleOnboarding,
+      googleBlockError,
+      signUp,
+      signIn,
+      signInWithGoogle,
+      signOut,
+      refreshUserProfile,
+      clearGoogleOnboarding,
+      clearGoogleBlockError,
+    ]
+  );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };

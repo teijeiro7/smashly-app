@@ -117,7 +117,10 @@ describe('ListsContext', () => {
       await result.current.updateList('1', 'Updated Name');
     });
 
-    expect(ListService.updateList).toHaveBeenCalledWith('1', { name: 'Updated Name', description: undefined });
+    expect(ListService.updateList).toHaveBeenCalledWith('1', {
+      name: 'Updated Name',
+      description: undefined,
+    });
     expect(sileo.success).toHaveBeenCalledWith(expect.objectContaining({ title: 'Éxito' }));
   });
 

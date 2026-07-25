@@ -2,15 +2,7 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
 import { useNavigate } from '@tanstack/react-router';
-import {
-  FiMail,
-  FiCalendar,
-  FiLock,
-  FiBell,
-  FiLogOut,
-  FiTrash2,
-  FiShield,
-} from 'react-icons/fi';
+import { FiMail, FiCalendar, FiLock, FiBell, FiLogOut, FiTrash2, FiShield } from 'react-icons/fi';
 import { useAuth } from '../../contexts/AuthContext';
 import { sileo } from 'sileo';
 
@@ -94,12 +86,12 @@ const ActionButton = styled(motion.button)<{ $danger?: boolean }>`
   cursor: pointer;
   border: none;
   transition: all 0.2s ease;
-  background: ${props => props.$danger ? 'var(--danger-subtle)' : 'var(--surface-3)'};
-  color: ${props => props.$danger ? 'var(--danger)' : 'var(--text-muted)'};
+  background: ${props => (props.$danger ? 'var(--danger-subtle)' : 'var(--surface-3)')};
+  color: ${props => (props.$danger ? 'var(--danger)' : 'var(--text-muted)')};
 
   &:hover {
-    background: ${props => props.$danger ? 'var(--danger)' : 'var(--border)'};
-    color: ${props => props.$danger ? 'var(--brand-on-surface)' : 'var(--primary)'};
+    background: ${props => (props.$danger ? 'var(--danger)' : 'var(--border)')};
+    color: ${props => (props.$danger ? 'var(--brand-on-surface)' : 'var(--primary)')};
   }
 `;
 
@@ -152,7 +144,7 @@ const AccountSettings: React.FC<AccountSettingsProps> = ({ user }) => {
 
   const handleLogout = async () => {
     if (!window.confirm('¿Cerrar sesión?')) return;
-    
+
     setIsLoggingOut(true);
     try {
       await signOut();
@@ -165,17 +157,30 @@ const AccountSettings: React.FC<AccountSettingsProps> = ({ user }) => {
   };
 
   const handleDeleteAccount = () => {
-    if (!window.confirm('¿Estás seguro de que quieres eliminar tu cuenta? Esta acción no se puede deshacer.')) return;
-    if (!window.confirm('¿REALMENTE quieres eliminar tu cuenta? Todos tus datos serán eliminados permanentemente.')) return;
-    
-    sileo.error({ title: 'Función no disponible', description: 'Contacta con soporte para eliminar tu cuenta' });
+    if (
+      !window.confirm(
+        '¿Estás seguro de que quieres eliminar tu cuenta? Esta acción no se puede deshacer.'
+      )
+    )
+      return;
+    if (
+      !window.confirm(
+        '¿REALMENTE quieres eliminar tu cuenta? Todos tus datos serán eliminados permanentemente.'
+      )
+    )
+      return;
+
+    sileo.error({
+      title: 'Función no disponible',
+      description: 'Contacta con soporte para eliminar tu cuenta',
+    });
   };
 
   return (
     <Container>
       <Section>
         <SectionHeader>
-          <SectionIcon color="var(--info)">
+          <SectionIcon color='var(--info)'>
             <FiMail size={20} />
           </SectionIcon>
           <SectionTitle>Datos de Cuenta</SectionTitle>
@@ -207,7 +212,7 @@ const AccountSettings: React.FC<AccountSettingsProps> = ({ user }) => {
 
       <Section>
         <SectionHeader>
-          <SectionIcon color="var(--accent)">
+          <SectionIcon color='var(--accent)'>
             <FiLock size={20} />
           </SectionIcon>
           <SectionTitle>Seguridad</SectionTitle>
@@ -215,20 +220,14 @@ const AccountSettings: React.FC<AccountSettingsProps> = ({ user }) => {
         <SectionContent>
           <InfoRow>
             <InfoLabel>Contraseña</InfoLabel>
-            <ActionButton
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-            >
+            <ActionButton whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
               <FiLock size={14} />
               Cambiar contraseña
             </ActionButton>
           </InfoRow>
           <InfoRow>
             <InfoLabel>Autenticación</InfoLabel>
-            <ActionButton
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-            >
+            <ActionButton whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
               <FiShield size={14} />
               2FA activada
             </ActionButton>
@@ -238,7 +237,7 @@ const AccountSettings: React.FC<AccountSettingsProps> = ({ user }) => {
 
       <Section>
         <SectionHeader>
-          <SectionIcon color="#8b5cf6">
+          <SectionIcon color='#8b5cf6'>
             <FiBell size={20} />
           </SectionIcon>
           <SectionTitle>Notificaciones</SectionTitle>
@@ -246,20 +245,14 @@ const AccountSettings: React.FC<AccountSettingsProps> = ({ user }) => {
         <SectionContent>
           <InfoRow>
             <InfoLabel>Notificaciones push</InfoLabel>
-            <ActionButton
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-            >
+            <ActionButton whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
               <FiBell size={14} />
               Configurar
             </ActionButton>
           </InfoRow>
           <InfoRow>
             <InfoLabel>Email sobre novedades</InfoLabel>
-            <ActionButton
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-            >
+            <ActionButton whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
               <FiMail size={14} />
               Preferencias
             </ActionButton>
@@ -269,7 +262,7 @@ const AccountSettings: React.FC<AccountSettingsProps> = ({ user }) => {
 
       <Section>
         <SectionHeader>
-          <SectionIcon color="var(--error)">
+          <SectionIcon color='var(--error)'>
             <FiLogOut size={20} />
           </SectionIcon>
           <SectionTitle>Sesión</SectionTitle>
@@ -287,15 +280,15 @@ const AccountSettings: React.FC<AccountSettingsProps> = ({ user }) => {
               {isLoggingOut ? 'Cerrando...' : 'Cerrar sesión'}
             </ActionButton>
           </InfoRow>
-          
+
           <DangerZone>
             <DangerTitle>
               <FiTrash2 size={16} />
               Zona de peligro
             </DangerTitle>
             <DangerText>
-              Eliminar tu cuenta es una acción permanente. Todos tus datos, listas, 
-              comparaciones y actividad serán eliminados irrevocablemente.
+              Eliminar tu cuenta es una acción permanente. Todos tus datos, listas, comparaciones y
+              actividad serán eliminados irrevocablemente.
             </DangerText>
             <ActionButton
               $danger

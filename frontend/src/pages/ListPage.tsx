@@ -122,11 +122,12 @@ const ListPage: React.FC = () => {
       setList(data);
     } catch (error: any) {
       console.error('Error loading list:', error);
-      sileo.error({ 
-        title: 'Error', 
-        description: 'No se pudo cargar la lista. Es posible que no tengas permisos o que ya no exista.' 
+      sileo.error({
+        title: 'Error',
+        description:
+          'No se pudo cargar la lista. Es posible que no tengas permisos o que ya no exista.',
       });
-      // Si es un error de no encontrado o permisos, redirigir al perfil podría ser buena idea, 
+      // Si es un error de no encontrado o permisos, redirigir al perfil podría ser buena idea,
       // pero el 404 del ruteador ya hará su trabajo si la ruta base es incorrecta.
     } finally {
       setLoading(false);
@@ -141,7 +142,7 @@ const ListPage: React.FC = () => {
             animate={{ rotate: 360 }}
             transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
           >
-            <FiLoader size={32} color="var(--primary)" />
+            <FiLoader size={32} color='var(--primary)' />
           </Spin>
           <p>Cargando tu colección...</p>
         </LoadingState>
@@ -153,7 +154,7 @@ const ListPage: React.FC = () => {
     return (
       <Container>
         <Content>
-          <BackLink to="/profile">
+          <BackLink to='/profile'>
             <FiArrowLeft /> Volver al perfil
           </BackLink>
           <EmptyState>
@@ -170,7 +171,7 @@ const ListPage: React.FC = () => {
     <Container>
       <Content>
         <Header>
-          <BackLink to="/profile">
+          <BackLink to='/profile'>
             <FiArrowLeft /> Volver al perfil
           </BackLink>
           <TitleSection>
@@ -181,24 +182,22 @@ const ListPage: React.FC = () => {
             </Badge>
           </TitleSection>
           {list.description && <ListMeta>{list.description}</ListMeta>}
-          <ListMeta>
-            {list.rackets?.length || 0} palas en esta colección
-          </ListMeta>
+          <ListMeta>{list.rackets?.length || 0} palas en esta colección</ListMeta>
         </Header>
 
-        {(!list.rackets || list.rackets.length === 0) ? (
+        {!list.rackets || list.rackets.length === 0 ? (
           <EmptyState>
             <FiList size={48} style={{ marginBottom: '1rem', opacity: 0.2 }} />
             <h3>Esta lista está vacía</h3>
             <p>Empieza a añadir palas desde el catálogo para verlas aquí.</p>
-            <Link 
-              to="/catalog" 
-              style={{ 
-                marginTop: '1.5rem', 
+            <Link
+              to='/catalog'
+              style={{
+                marginTop: '1.5rem',
                 display: 'inline-block',
                 color: 'var(--primary)',
                 fontWeight: 600,
-                textDecoration: 'none'
+                textDecoration: 'none',
               }}
             >
               Explorar Catálogo →
@@ -207,10 +206,10 @@ const ListPage: React.FC = () => {
         ) : (
           <RacketsGrid>
             {list.rackets.map((racket, index) => (
-              <RacketCard 
-                key={racket.id} 
-                racket={racket} 
-                view="grid"
+              <RacketCard
+                key={racket.id}
+                racket={racket}
+                view='grid'
                 index={index}
                 onClick={() => navigate({ to: '/racket-detail', search: { id: racket.id } })}
               />

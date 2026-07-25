@@ -188,7 +188,11 @@ export const ReviewItem: React.FC<ReviewItemProps> = ({
         <UserInfo>
           <Avatar>
             {review.user?.avatar_url ? (
-              <img src={review.user.avatar_url} alt={review.user?.nickname || 'User'} loading='lazy' />
+              <img
+                src={review.user.avatar_url}
+                alt={review.user?.nickname || 'User'}
+                loading='lazy'
+              />
             ) : (
               <DefaultAvatar>
                 {review.user?.nickname ? review.user.nickname[0].toUpperCase() : 'U'}

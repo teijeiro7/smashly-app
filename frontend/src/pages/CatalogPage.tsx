@@ -104,7 +104,9 @@ const FiltersSection = styled.div`
   border-radius: 12px;
   padding: clamp(1rem, 2vw, 1.5rem);
   margin-bottom: 1.5rem;
-  box-shadow: 0 1px 3px var(--shadow-color), 0 1px 2px var(--shadow-color);
+  box-shadow:
+    0 1px 3px var(--shadow-color),
+    0 1px 2px var(--shadow-color);
   border: 1px solid var(--border);
 `;
 
@@ -253,12 +255,14 @@ const QuickFiltersRow = styled.div`
 const AdvancedFiltersPanel = styled.div<{ $isOpen: boolean }>`
   overflow: hidden;
   margin-top: 1rem;
-  max-height: ${props => props.$isOpen ? '1200px' : '0'};
-  opacity: ${props => props.$isOpen ? 1 : 0};
-  transition: max-height 0.4s ease, opacity 0.3s ease;
+  max-height: ${props => (props.$isOpen ? '1200px' : '0')};
+  opacity: ${props => (props.$isOpen ? 1 : 0)};
+  transition:
+    max-height 0.4s ease,
+    opacity 0.3s ease;
 
   @media (prefers-reduced-motion: reduce) {
-    max-height: ${props => props.$isOpen ? '1200px' : '0'};
+    max-height: ${props => (props.$isOpen ? '1200px' : '0')};
     transition: none;
   }
 `;
@@ -454,7 +458,9 @@ const FloatingPanel = styled.div<{ $visible: boolean }>`
   transform: translateY(${props => (props.$visible ? '0' : '120px')});
   opacity: ${props => (props.$visible ? 1 : 0)};
   pointer-events: ${props => (props.$visible ? 'auto' : 'none')};
-  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
+  transition:
+    transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    opacity 0.3s ease;
   will-change: transform, opacity;
 
   @media (max-width: 768px) {
@@ -626,7 +632,7 @@ const CatalogPage: React.FC = () => {
       if (searchQuery.trim().length >= 2) {
         try {
           const filters: Record<string, string> = {};
-          
+
           if (selectedBrand !== 'Todas') filters.brand = selectedBrand;
           if (selectedShape !== 'Todas') filters.shape = selectedShape;
           if (selectedBalance !== 'Todos') filters.balance = selectedBalance;
@@ -640,7 +646,7 @@ const CatalogPage: React.FC = () => {
           if (showMostViewed) filters.most_viewed = 'true';
 
           const result = await racketService.searchRackets(searchQuery, filters);
-          
+
           if (result?.data) {
             // Apply local sorting since API returns sorted by relevance
             const sorted = [...result.data];
@@ -696,7 +702,9 @@ const CatalogPage: React.FC = () => {
 
       // Apply most viewed filter (top 20% by view count)
       if (showMostViewed) {
-        const sortedByViews = [...filtered].sort((a, b) => (b.view_count || 0) - (a.view_count || 0));
+        const sortedByViews = [...filtered].sort(
+          (a, b) => (b.view_count || 0) - (a.view_count || 0)
+        );
         const topCount = Math.ceil(sortedByViews.length * 0.2);
         const topViewedIds = new Set(sortedByViews.slice(0, topCount).map(r => r.id));
         filtered = filtered.filter(racket => topViewedIds.has(racket.id));
@@ -740,7 +748,8 @@ const CatalogPage: React.FC = () => {
       if (selectedLevel !== 'Todos') {
         filtered = filtered.filter(
           r =>
-            (r.caracteristicas_nivel_de_juego || r.especificaciones?.nivel_de_juego) === selectedLevel
+            (r.caracteristicas_nivel_de_juego || r.especificaciones?.nivel_de_juego) ===
+            selectedLevel
         );
       }
 
@@ -798,7 +807,7 @@ const CatalogPage: React.FC = () => {
     const debounceTimer = setTimeout(performSearch, 300);
     return () => clearTimeout(debounceTimer);
   }, [
-rackets,
+    rackets,
     searchQuery,
     selectedBrand,
     showMostViewed,
@@ -1003,14 +1012,18 @@ rackets,
             gap: '1rem',
           }}
         >
-          <div style={{
-            color: 'var(--primary-hover)',
-            animation: 'spin 1s linear infinite',
-          }}>
+          <div
+            style={{
+              color: 'var(--primary-hover)',
+              animation: 'spin 1s linear infinite',
+            }}
+          >
             <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
             <FiGrid size={48} />
           </div>
-          <div style={{ color: 'var(--text-muted)', fontSize: '1.125rem' }}>Cargando catálogo...</div>
+          <div style={{ color: 'var(--text-muted)', fontSize: '1.125rem' }}>
+            Cargando catálogo...
+          </div>
         </div>
       </Container>
     );
@@ -1097,106 +1110,99 @@ rackets,
 
           {/* Advanced Filters Panel */}
           <AdvancedFiltersPanel $isOpen={showAdvancedFilters}>
-                <FilterGroupLabel>Filtros generales</FilterGroupLabel>
-                <QuickFiltersRow>
-                  <FilterSelect value={selectedBrand} onChange={e => setSelectedBrand(e.target.value)}>
-                    {uniqueBrands.map(brand => (
-                      <option key={brand} value={brand}>
-                        {brand === 'Todas' ? 'Todas las marcas' : brand}
-                      </option>
-                    ))}
-                  </FilterSelect>
+            <FilterGroupLabel>Filtros generales</FilterGroupLabel>
+            <QuickFiltersRow>
+              <FilterSelect value={selectedBrand} onChange={e => setSelectedBrand(e.target.value)}>
+                {uniqueBrands.map(brand => (
+                  <option key={brand} value={brand}>
+                    {brand === 'Todas' ? 'Todas las marcas' : brand}
+                  </option>
+                ))}
+              </FilterSelect>
 
-                  <FilterButton $active={showOffers} onClick={() => setShowOffers(!showOffers)}>
-                    <FiTag />
-                    Ofertas
-                  </FilterButton>
+              <FilterButton $active={showOffers} onClick={() => setShowOffers(!showOffers)}>
+                <FiTag />
+                Ofertas
+              </FilterButton>
 
-                  <FilterButton $active={showAvailableOnly} onClick={() => setShowAvailableOnly(!showAvailableOnly)}>
-                    <FiFilter size={16} />
-                    En Stock
-                  </FilterButton>
-                </QuickFiltersRow>
+              <FilterButton
+                $active={showAvailableOnly}
+                onClick={() => setShowAvailableOnly(!showAvailableOnly)}
+              >
+                <FiFilter size={16} />
+                En Stock
+              </FilterButton>
+            </QuickFiltersRow>
 
-                <FilterGroupLabel style={{ marginTop: '1rem' }}>Características técnicas</FilterGroupLabel>
-                <AdvancedFiltersGrid>
-                  <FilterSelect
-                    value={selectedShape}
-                    onChange={e => setSelectedShape(e.target.value)}
-                  >
-                    {uniqueShapes.map(shape => (
-                      <option key={shape} value={shape}>
-                        {shape === 'Todas' ? 'Todas las formas' : shape}
-                      </option>
-                    ))}
-                  </FilterSelect>
+            <FilterGroupLabel style={{ marginTop: '1rem' }}>
+              Características técnicas
+            </FilterGroupLabel>
+            <AdvancedFiltersGrid>
+              <FilterSelect value={selectedShape} onChange={e => setSelectedShape(e.target.value)}>
+                {uniqueShapes.map(shape => (
+                  <option key={shape} value={shape}>
+                    {shape === 'Todas' ? 'Todas las formas' : shape}
+                  </option>
+                ))}
+              </FilterSelect>
 
-                  <FilterSelect
-                    value={selectedBalance}
-                    onChange={e => setSelectedBalance(e.target.value)}
-                  >
-                    {uniqueBalances.map(balance => (
-                      <option key={balance} value={balance}>
-                        {balance === 'Todos' ? 'Todos los balances' : balance}
-                      </option>
-                    ))}
-                  </FilterSelect>
+              <FilterSelect
+                value={selectedBalance}
+                onChange={e => setSelectedBalance(e.target.value)}
+              >
+                {uniqueBalances.map(balance => (
+                  <option key={balance} value={balance}>
+                    {balance === 'Todos' ? 'Todos los balances' : balance}
+                  </option>
+                ))}
+              </FilterSelect>
 
-                  <FilterSelect
-                    value={selectedCore}
-                    onChange={e => setSelectedCore(e.target.value)}
-                  >
-                    {uniqueCores.map(core => (
-                      <option key={core} value={core}>
-                        {core === 'Todos' ? 'Todos los núcleos' : core}
-                      </option>
-                    ))}
-                  </FilterSelect>
+              <FilterSelect value={selectedCore} onChange={e => setSelectedCore(e.target.value)}>
+                {uniqueCores.map(core => (
+                  <option key={core} value={core}>
+                    {core === 'Todos' ? 'Todos los núcleos' : core}
+                  </option>
+                ))}
+              </FilterSelect>
 
-                  <FilterSelect
-                    value={selectedFace}
-                    onChange={e => setSelectedFace(e.target.value)}
-                  >
-                    {uniqueFaces.map(face => (
-                      <option key={face} value={face}>
-                        {face === 'Todas' ? 'Todas las caras' : face}
-                      </option>
-                    ))}
-                  </FilterSelect>
+              <FilterSelect value={selectedFace} onChange={e => setSelectedFace(e.target.value)}>
+                {uniqueFaces.map(face => (
+                  <option key={face} value={face}>
+                    {face === 'Todas' ? 'Todas las caras' : face}
+                  </option>
+                ))}
+              </FilterSelect>
 
-                  <FilterSelect
-                    value={selectedLevel}
-                    onChange={e => setSelectedLevel(e.target.value)}
-                  >
-                    {uniqueLevels.map(level => (
-                      <option key={level} value={level}>
-                        {level === 'Todos' ? 'Todos los niveles' : level}
-                      </option>
-                    ))}
-                  </FilterSelect>
+              <FilterSelect value={selectedLevel} onChange={e => setSelectedLevel(e.target.value)}>
+                {uniqueLevels.map(level => (
+                  <option key={level} value={level}>
+                    {level === 'Todos' ? 'Todos los niveles' : level}
+                  </option>
+                ))}
+              </FilterSelect>
 
-                  <FilterSelect
-                    value={selectedGameType}
-                    onChange={e => setSelectedGameType(e.target.value)}
-                  >
-                    {uniqueGameTypes.map(type => (
-                      <option key={type} value={type}>
-                        {type === 'Todos' ? 'Todos los tipos' : type}
-                      </option>
-                    ))}
-                  </FilterSelect>
+              <FilterSelect
+                value={selectedGameType}
+                onChange={e => setSelectedGameType(e.target.value)}
+              >
+                {uniqueGameTypes.map(type => (
+                  <option key={type} value={type}>
+                    {type === 'Todos' ? 'Todos los tipos' : type}
+                  </option>
+                ))}
+              </FilterSelect>
 
-                  <FilterSelect
-                    value={selectedHardness}
-                    onChange={e => setSelectedHardness(e.target.value)}
-                  >
-                    {uniqueHardness.map(hardness => (
-                      <option key={hardness} value={hardness}>
-                        {hardness === 'Todas' ? 'Todas las durezas' : hardness}
-                      </option>
-                    ))}
-                  </FilterSelect>
-                </AdvancedFiltersGrid>
+              <FilterSelect
+                value={selectedHardness}
+                onChange={e => setSelectedHardness(e.target.value)}
+              >
+                {uniqueHardness.map(hardness => (
+                  <option key={hardness} value={hardness}>
+                    {hardness === 'Todas' ? 'Todas las durezas' : hardness}
+                  </option>
+                ))}
+              </FilterSelect>
+            </AdvancedFiltersGrid>
           </AdvancedFiltersPanel>
         </FiltersSection>
 

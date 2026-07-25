@@ -3,12 +3,12 @@
  * Componente para mostrar las reviews de un usuario en su perfil
  */
 
-import { useState, useEffect } from "react";
-import styled from "styled-components";
+import { useState, useEffect } from 'react';
+import styled from 'styled-components';
 import { reviewService } from '../../services/reviewService';
 import { racketImageUrl } from '../../utils/imageUrl';
-import type { ReviewWithDetails } from "../../types/review";
-import { ReviewItem } from "./ReviewItem";
+import type { ReviewWithDetails } from '../../types/review';
+import { ReviewItem } from './ReviewItem';
 
 interface UserReviewsProps {
   userId: string;
@@ -21,30 +21,27 @@ export const UserReviews: React.FC<UserReviewsProps> = ({ userId }) => {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [total, setTotal] = useState(0);
-  const [selectedReview, setSelectedReview] =
-    useState<ReviewWithDetails | null>(null);
+  const [selectedReview, setSelectedReview] = useState<ReviewWithDetails | null>(null);
 
-  console.log("🔍 UserReviews component mounted with userId:", userId);
+  console.log('🔍 UserReviews component mounted with userId:', userId);
 
   const loadReviews = async () => {
     try {
-      console.log("📥 Loading reviews for user:", userId);
+      console.log('📥 Loading reviews for user:', userId);
       setLoading(true);
       setError(null);
       const data = await reviewService.getReviewsByUser(userId, {
         page,
         limit: 12, // Cambiado a 12 para mejor distribución en galería
       });
-      console.log("✅ Reviews loaded:", data);
+      console.log('✅ Reviews loaded:', data);
       // El backend devuelve la información de la pala, hacemos cast al tipo correcto
       setReviews(data.reviews as ReviewWithDetails[]);
       setTotalPages(data.pagination.totalPages);
       setTotal(data.pagination.total);
     } catch (err) {
-      console.error("❌ Error loading reviews:", err);
-      setError(
-        err instanceof Error ? err.message : "Error al cargar las reviews"
-      );
+      console.error('❌ Error loading reviews:', err);
+      setError(err instanceof Error ? err.message : 'Error al cargar las reviews');
     } finally {
       setLoading(false);
     }
@@ -86,8 +83,7 @@ export const UserReviews: React.FC<UserReviewsProps> = ({ userId }) => {
           <EmptyIcon>📝</EmptyIcon>
           <EmptyTitle>Aún no has escrito ninguna opinión</EmptyTitle>
           <EmptyText>
-            Visita la página de una pala y comparte tu experiencia con la
-            comunidad
+            Visita la página de una pala y comparte tu experiencia con la comunidad
           </EmptyText>
         </EmptyMessage>
       )}
@@ -96,11 +92,8 @@ export const UserReviews: React.FC<UserReviewsProps> = ({ userId }) => {
         <>
           {/* Vista de galería compacta */}
           <GalleryGrid>
-            {reviews.map((review) => (
-              <ReviewCard
-                key={review.id}
-                onClick={() => setSelectedReview(review)}
-              >
+            {reviews.map(review => (
+              <ReviewCard key={review.id} onClick={() => setSelectedReview(review)}>
                 {/* Imagen de la pala */}
                 <RacketImageContainer>
                   {review.racket?.imagenes?.[0] ? (
@@ -116,8 +109,7 @@ export const UserReviews: React.FC<UserReviewsProps> = ({ userId }) => {
                 {/* Información compacta */}
                 <CardContent>
                   <RacketName>
-                    {review.racket?.marca}{" "}
-                    {review.racket?.modelo || review.racket?.nombre}
+                    {review.racket?.marca} {review.racket?.modelo || review.racket?.nombre}
                   </RacketName>
 
                   <Rating>
@@ -131,10 +123,10 @@ export const UserReviews: React.FC<UserReviewsProps> = ({ userId }) => {
                   <ReviewTitle>{review.title}</ReviewTitle>
 
                   <ReviewDate>
-                    {new Date(review.created_at).toLocaleDateString("es-ES", {
-                      day: "numeric",
-                      month: "short",
-                      year: "numeric",
+                    {new Date(review.created_at).toLocaleDateString('es-ES', {
+                      day: 'numeric',
+                      month: 'short',
+                      year: 'numeric',
                     })}
                   </ReviewDate>
                 </CardContent>
@@ -145,10 +137,7 @@ export const UserReviews: React.FC<UserReviewsProps> = ({ userId }) => {
           {/* Paginación */}
           {totalPages > 1 && (
             <Pagination>
-              <PaginationButton
-                onClick={() => setPage(page - 1)}
-                disabled={page === 1}
-              >
+              <PaginationButton onClick={() => setPage(page - 1)} disabled={page === 1}>
                 ← Anterior
               </PaginationButton>
 
@@ -156,10 +145,7 @@ export const UserReviews: React.FC<UserReviewsProps> = ({ userId }) => {
                 Página {page} de {totalPages}
               </PageInfo>
 
-              <PaginationButton
-                onClick={() => setPage(page + 1)}
-                disabled={page === totalPages}
-              >
+              <PaginationButton onClick={() => setPage(page + 1)} disabled={page === totalPages}>
                 Siguiente →
               </PaginationButton>
             </Pagination>
@@ -170,7 +156,7 @@ export const UserReviews: React.FC<UserReviewsProps> = ({ userId }) => {
       {/* Modal con detalles completos */}
       {selectedReview && (
         <ModalOverlay onClick={handleCloseModal}>
-          <ModalContent onClick={(e) => e.stopPropagation()}>
+          <ModalContent onClick={e => e.stopPropagation()}>
             <CloseButton onClick={handleCloseModal}>✕</CloseButton>
             <ReviewItem
               review={selectedReview}
@@ -291,7 +277,7 @@ const Rating = styled.div`
 `;
 
 const Star = styled.span<{ filled: boolean }>`
-  opacity: ${(props) => (props.filled ? 1 : 0.3)};
+  opacity: ${props => (props.filled ? 1 : 0.3)};
 `;
 
 const ReviewTitle = styled.h3`

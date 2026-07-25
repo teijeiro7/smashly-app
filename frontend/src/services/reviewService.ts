@@ -17,10 +17,7 @@ function mapRow(row: any): ReviewWithUser {
 }
 
 export const reviewService = {
-  async getReviewsByRacket(
-    racketId: number,
-    params?: ReviewFilters
-  ): Promise<ReviewsResponse> {
+  async getReviewsByRacket(racketId: number, params?: ReviewFilters): Promise<ReviewsResponse> {
     const page = params?.page ?? 1;
     const limit = params?.limit ?? 10;
     const offset = (page - 1) * limit;
@@ -64,7 +61,9 @@ export const reviewService = {
     const n = ratingDist?.length ?? 0;
 
     // Check if current user has liked the fetched reviews
-    const { data: { session } } = await supabase.auth.getSession();
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
     if (session) {
       const reviewIds = reviews.map(r => r.id);
       const { data: likes } = await supabase
@@ -74,7 +73,9 @@ export const reviewService = {
         .in('review_id', reviewIds);
 
       const likedSet = new Set((likes ?? []).map((l: any) => l.review_id));
-      reviews.forEach(r => { (r as any).user_has_liked = likedSet.has(r.id); });
+      reviews.forEach(r => {
+        (r as any).user_has_liked = likedSet.has(r.id);
+      });
     }
 
     return {
@@ -111,14 +112,20 @@ export const reviewService = {
     return {
       reviews,
       pagination: { total, page, limit, totalPages: Math.ceil(total / limit) },
-      stats: { averageRating: 0, totalReviews: total, ratingDistribution: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 } },
+      stats: {
+        averageRating: 0,
+        totalReviews: total,
+        ratingDistribution: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 },
+      },
     };
   },
 
   async getReviewById(reviewId: string): Promise<ReviewWithDetails> {
     const { data, error } = await supabase
       .from('reviews')
-      .select('*, user_profiles!inner(id, nickname, avatar_url), rackets(id, nombre, marca, modelo, imagenes)')
+      .select(
+        '*, user_profiles!inner(id, nickname, avatar_url), rackets(id, nombre, marca, modelo, imagenes)'
+      )
       .eq('id', reviewId)
       .single();
 
@@ -128,7 +135,9 @@ export const reviewService = {
   },
 
   async createReview(dto: CreateReviewDTO): Promise<Review> {
-    const { data: { session } } = await supabase.auth.getSession();
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
     if (!session) throw new Error('No autenticado');
 
     const { data, error } = await supabase
@@ -159,7 +168,9 @@ export const reviewService = {
   },
 
   async toggleLike(reviewId: string): Promise<{ liked: boolean; likes_count: number }> {
-    const { data: { session } } = await supabase.auth.getSession();
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
     if (!session) throw new Error('No autenticado');
 
     const { data: existing } = await supabase
@@ -202,7 +213,9 @@ export const reviewService = {
   },
 
   async addComment(reviewId: string, dto: CreateCommentDTO): Promise<ReviewComment> {
-    const { data: { session } } = await supabase.auth.getSession();
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
     if (!session) throw new Error('No autenticado');
 
     const { data, error } = await supabase

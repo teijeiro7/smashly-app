@@ -47,9 +47,17 @@ const Modal = styled(motion.div)`
   max-height: 90vh;
   overflow-y: auto;
 
-  &::-webkit-scrollbar { width: 6px; }
-  &::-webkit-scrollbar-track { background: var(--surface-3); border-radius: 3px; }
-  &::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 3px; }
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+  &::-webkit-scrollbar-track {
+    background: var(--surface-3);
+    border-radius: 3px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: var(--border-strong);
+    border-radius: 3px;
+  }
 `;
 
 const IconContainer = styled.div`
@@ -104,8 +112,13 @@ const PrimaryButton = styled.button`
   width: 100%;
   transition: opacity 0.15s ease;
 
-  &:hover { opacity: 0.9; }
-  &:disabled { opacity: 0.6; cursor: not-allowed; }
+  &:hover {
+    opacity: 0.9;
+  }
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
 `;
 
 const SecondaryButton = styled.button`
@@ -117,9 +130,14 @@ const SecondaryButton = styled.button`
   font-size: 0.9375rem;
   font-weight: 500;
   cursor: pointer;
-  transition: color 0.15s ease, background 0.15s ease;
+  transition:
+    color 0.15s ease,
+    background 0.15s ease;
 
-  &:hover { color: var(--text); background: var(--surface-2); }
+  &:hover {
+    color: var(--text);
+    background: var(--surface-2);
+  }
 `;
 
 const CloseButton = styled.button`
@@ -135,9 +153,14 @@ const CloseButton = styled.button`
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background 0.15s ease, color 0.15s ease;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease;
 
-  &:hover { background: var(--surface-3); color: var(--text); }
+  &:hover {
+    background: var(--surface-3);
+    color: var(--text);
+  }
 `;
 
 const Form = styled.form`
@@ -351,27 +374,65 @@ const OnboardingPromptModal: React.FC<OnboardingPromptModalProps> = ({ isOpen, o
               </>
             ) : (
               <Form onSubmit={handleSubmit}>
-                <Title style={{ textAlign: 'left', fontSize: '1.375rem' }}>Completa tu Perfil</Title>
+                <Title style={{ textAlign: 'left', fontSize: '1.375rem' }}>
+                  Completa tu Perfil
+                </Title>
 
                 {/* Físico */}
                 <div>
                   <SectionLabel>Datos físicos</SectionLabel>
                   <FormGrid>
                     <FormGroup>
-                      <Label htmlFor='weight'><FiActivity size={13} /> Peso (kg)</Label>
-                      <Input id='weight' name='weight' type='number' placeholder='Ej: 75' value={formData.weight} onChange={handleChange} min='20' max='200' step='0.1' />
+                      <Label htmlFor='weight'>
+                        <FiActivity size={13} /> Peso (kg)
+                      </Label>
+                      <Input
+                        id='weight'
+                        name='weight'
+                        type='number'
+                        placeholder='Ej: 75'
+                        value={formData.weight}
+                        onChange={handleChange}
+                        min='20'
+                        max='200'
+                        step='0.1'
+                      />
                     </FormGroup>
                     <FormGroup>
-                      <Label htmlFor='height'><FiActivity size={13} /> Altura (cm)</Label>
-                      <Input id='height' name='height' type='number' placeholder='Ej: 180' value={formData.height} onChange={handleChange} min='100' max='250' />
+                      <Label htmlFor='height'>
+                        <FiActivity size={13} /> Altura (cm)
+                      </Label>
+                      <Input
+                        id='height'
+                        name='height'
+                        type='number'
+                        placeholder='Ej: 180'
+                        value={formData.height}
+                        onChange={handleChange}
+                        min='100'
+                        max='250'
+                      />
                     </FormGroup>
                     <FormGroup>
-                      <Label htmlFor='birthdate'><FiCalendar size={13} /> Fecha de nacimiento</Label>
-                      <Input id='birthdate' name='birthdate' type='date' value={formData.birthdate} onChange={handleChange} />
+                      <Label htmlFor='birthdate'>
+                        <FiCalendar size={13} /> Fecha de nacimiento
+                      </Label>
+                      <Input
+                        id='birthdate'
+                        name='birthdate'
+                        type='date'
+                        value={formData.birthdate}
+                        onChange={handleChange}
+                      />
                     </FormGroup>
                     <FormGroup>
                       <Label htmlFor='gender'>Género</Label>
-                      <Select id='gender' name='gender' value={formData.gender} onChange={handleChange}>
+                      <Select
+                        id='gender'
+                        name='gender'
+                        value={formData.gender}
+                        onChange={handleChange}
+                      >
                         <option value=''>Selecciona</option>
                         <option value='masculino'>Masculino</option>
                         <option value='femenino'>Femenino</option>
@@ -385,8 +446,15 @@ const OnboardingPromptModal: React.FC<OnboardingPromptModalProps> = ({ isOpen, o
                   <SectionLabel>Tu juego</SectionLabel>
                   <FormGrid>
                     <FormGroup>
-                      <Label htmlFor='game_level'><FiTrendingUp size={13} /> Nivel</Label>
-                      <Select id='game_level' name='game_level' value={formData.game_level} onChange={handleChange}>
+                      <Label htmlFor='game_level'>
+                        <FiTrendingUp size={13} /> Nivel
+                      </Label>
+                      <Select
+                        id='game_level'
+                        name='game_level'
+                        value={formData.game_level}
+                        onChange={handleChange}
+                      >
                         <option value=''>Selecciona</option>
                         <option value='Principiante'>Principiante (1.0–2.5)</option>
                         <option value='Intermedio'>Intermedio (3.0–4.5)</option>
@@ -396,7 +464,12 @@ const OnboardingPromptModal: React.FC<OnboardingPromptModalProps> = ({ isOpen, o
                     </FormGroup>
                     <FormGroup>
                       <Label htmlFor='position'>Posición en pista</Label>
-                      <Select id='position' name='position' value={formData.position} onChange={handleChange}>
+                      <Select
+                        id='position'
+                        name='position'
+                        value={formData.position}
+                        onChange={handleChange}
+                      >
                         <option value=''>Selecciona</option>
                         <option value='reves'>Revés</option>
                         <option value='drive'>Drive</option>
@@ -405,7 +478,12 @@ const OnboardingPromptModal: React.FC<OnboardingPromptModalProps> = ({ isOpen, o
                     </FormGroup>
                     <FormGroup>
                       <Label htmlFor='frequency'>Frecuencia de juego</Label>
-                      <Select id='frequency' name='frequency' value={formData.frequency} onChange={handleChange}>
+                      <Select
+                        id='frequency'
+                        name='frequency'
+                        value={formData.frequency}
+                        onChange={handleChange}
+                      >
                         <option value=''>Selecciona</option>
                         <option value='1'>1 vez/semana o menos</option>
                         <option value='2-3'>2–3 veces/semana</option>
@@ -414,7 +492,12 @@ const OnboardingPromptModal: React.FC<OnboardingPromptModalProps> = ({ isOpen, o
                     </FormGroup>
                     <FormGroup>
                       <Label htmlFor='physical_condition'>Condición física</Label>
-                      <Select id='physical_condition' name='physical_condition' value={formData.physical_condition} onChange={handleChange}>
+                      <Select
+                        id='physical_condition'
+                        name='physical_condition'
+                        value={formData.physical_condition}
+                        onChange={handleChange}
+                      >
                         <option value=''>Selecciona</option>
                         <option value='asiduo'>Asiduo al deporte</option>
                         <option value='ocasional'>Ocasional</option>
@@ -429,7 +512,12 @@ const OnboardingPromptModal: React.FC<OnboardingPromptModalProps> = ({ isOpen, o
                   <FormGrid>
                     <FormGroup>
                       <Label htmlFor='touch_preference'>Tacto</Label>
-                      <Select id='touch_preference' name='touch_preference' value={formData.touch_preference} onChange={handleChange}>
+                      <Select
+                        id='touch_preference'
+                        name='touch_preference'
+                        value={formData.touch_preference}
+                        onChange={handleChange}
+                      >
                         <option value=''>No sé</option>
                         <option value='duro'>Duro</option>
                         <option value='medio'>Medio</option>
@@ -438,7 +526,12 @@ const OnboardingPromptModal: React.FC<OnboardingPromptModalProps> = ({ isOpen, o
                     </FormGroup>
                     <FormGroup>
                       <Label htmlFor='weight_preference'>Peso de pala</Label>
-                      <Select id='weight_preference' name='weight_preference' value={formData.weight_preference} onChange={handleChange}>
+                      <Select
+                        id='weight_preference'
+                        name='weight_preference'
+                        value={formData.weight_preference}
+                        onChange={handleChange}
+                      >
                         <option value=''>No sé</option>
                         <option value='ligera'>Ligera (&lt;360g)</option>
                         <option value='media'>Media (360–375g)</option>
@@ -447,7 +540,12 @@ const OnboardingPromptModal: React.FC<OnboardingPromptModalProps> = ({ isOpen, o
                     </FormGroup>
                     <FormGroup>
                       <Label htmlFor='balance_preference'>Balance</Label>
-                      <Select id='balance_preference' name='balance_preference' value={formData.balance_preference} onChange={handleChange}>
+                      <Select
+                        id='balance_preference'
+                        name='balance_preference'
+                        value={formData.balance_preference}
+                        onChange={handleChange}
+                      >
                         <option value=''>No sé</option>
                         <option value='bajo'>Bajo (manejable)</option>
                         <option value='medio'>Medio (equilibrado)</option>
@@ -456,7 +554,12 @@ const OnboardingPromptModal: React.FC<OnboardingPromptModalProps> = ({ isOpen, o
                     </FormGroup>
                     <FormGroup>
                       <Label htmlFor='shape_preference'>Forma</Label>
-                      <Select id='shape_preference' name='shape_preference' value={formData.shape_preference} onChange={handleChange}>
+                      <Select
+                        id='shape_preference'
+                        name='shape_preference'
+                        value={formData.shape_preference}
+                        onChange={handleChange}
+                      >
                         <option value=''>No sé</option>
                         <option value='redonda'>Redonda</option>
                         <option value='lagrima'>Lágrima</option>
@@ -470,17 +573,18 @@ const OnboardingPromptModal: React.FC<OnboardingPromptModalProps> = ({ isOpen, o
                 <div>
                   <SectionLabel>Tu equipamiento</SectionLabel>
                   <FormGroup style={{ marginBottom: '1rem' }}>
-                    <Label><GiTennisRacket size={14} /> Pala actual</Label>
+                    <Label>
+                      <GiTennisRacket size={14} /> Pala actual
+                    </Label>
                     <RacketSearchWrapper>
-                      <RacketSearchInput
-                        value={currentRacket}
-                        onChange={setCurrentRacket}
-                      />
+                      <RacketSearchInput value={currentRacket} onChange={setCurrentRacket} />
                     </RacketSearchWrapper>
                     <HelperText>Búscala por nombre o marca</HelperText>
                   </FormGroup>
                   <FormGroup>
-                    <Label htmlFor='limitations'><FiAlertCircle size={13} /> Limitaciones o lesiones</Label>
+                    <Label htmlFor='limitations'>
+                      <FiAlertCircle size={13} /> Limitaciones o lesiones
+                    </Label>
                     <TextArea
                       id='limitations'
                       name='limitations'
