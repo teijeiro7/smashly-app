@@ -346,31 +346,59 @@ export class AdminService {
   }
 
   /**
-   * Obtiene todas las marcas con el conteo de palas
+   * Obtiene todas las marcas con el conteo de palas.
+   * /api/v1/admin/brands no existe (backend/api fue retirado) — se agrega
+   * directamente sobre `rackets`, que tiene lectura pública por RLS.
    */
   static async getBrands(): Promise<Brand[]> {
-    const response = await fetch(buildApiUrl(API_ENDPOINTS.ADMIN.BRANDS), {
-      method: 'GET',
-      credentials: 'include',
-      headers: getCommonHeaders(),
+    const { data, error } = await supabase.from('rackets').select('marca');
+    if (error) throw error;
+
+    const counts = new Map<string, number>();
+    (data ?? []).forEach((r: any) => {
+      if (!r.marca) return;
+      counts.set(r.marca, (counts.get(r.marca) ?? 0) + 1);
     });
 
-    return handleApiResponse<Brand[]>(response);
+    return Array.from(counts.entries())
+      .map(([name, racketCount]) => ({ name, racketCount }))
+      .sort((a, b) => b.racketCount - a.racketCount);
   }
 
   /**
-   * Obtiene todas las categorías (formas) con el conteo de palas
+   * Obtiene todas las categorías (formas) con el conteo de palas.
+   * Same situation as getBrands — aggregated client-side over
+   * caracteristicas_forma instead of calling the dead REST endpoint.
+   * Descriptions reused from the domain rules already authored in
+   * api/comparison.ts's buildComparisonPrompt (REGLAS DE DOMINIO).
    */
   static async getCategories(): Promise<Category[]> {
-    const response = await fetch(buildApiUrl(API_ENDPOINTS.ADMIN.CATEGORIES), {
-      method: 'GET',
-      credentials: 'include',
-      headers: getCommonHeaders(),
+    const { data, error } = await supabase.from('rackets').select('caracteristicas_forma');
+    if (error) throw error;
+
+    const counts = new Map<string, number>();
+    (data ?? []).forEach((r: any) => {
+      const forma = (r.caracteristicas_forma || '').trim();
+      if (!forma) return;
+      counts.set(forma, (counts.get(forma) ?? 0) + 1);
     });
 
-    return handleApiResponse<Category[]>(response);
+    return Array.from(counts.entries())
+      .map(([name, racketCount]) => ({
+        name,
+        description: SHAPE_DESCRIPTIONS[name.toLowerCase()] || '',
+        racketCount,
+      }))
+      .sort((a, b) => b.racketCount - a.racketCount);
   }
 }
+
+const SHAPE_DESCRIPTIONS: Record<string, string> = {
+  diamante: 'Balance alto, máxima potencia. Mayor riesgo de epicondilitis.',
+  redonda: 'Balance bajo, máximo control y punto dulce amplio. Ideal con lesiones.',
+  'lágrima': 'Polivalente, balance medio. Equilibrio entre potencia y control.',
+  lagrima: 'Polivalente, balance medio. Equilibrio entre potencia y control.',
+};
 
 export interface Activity {
   id: string;
