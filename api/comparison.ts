@@ -3,6 +3,7 @@ import { generateContent } from './_lib/ai';
 import { getRacketsByIds } from './_lib/racket-service';
 import { getDbRadarValues } from './_lib/testea-metrics';
 import { parseAiJson } from './_lib/json-parse';
+import { checkRateLimit, tooManyRequests } from './_lib/rate-limit';
 
 function buildComparisonPrompt(rackets: any[], userProfile?: any): string {
   const racketsInfo = rackets
@@ -138,6 +139,16 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
   if (req.method !== 'POST') {
     res.writeHead(405, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify({ error: 'Method not allowed' }));
+    return;
+  }
+
+  const allowed = await checkRateLimit(req, {
+    keyPrefix: 'comparison',
+    limit: 10,
+    windowSeconds: 3600,
+  });
+  if (!allowed) {
+    tooManyRequests(res);
     return;
   }
 

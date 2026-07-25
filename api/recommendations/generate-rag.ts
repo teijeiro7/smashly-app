@@ -6,6 +6,7 @@ import { getTesteaMetrics } from '../_lib/testea-metrics';
 import { searchSimilarRackets, searchRelevantReviews, searchKnowledge } from '../_lib/vector-store';
 import { cacheGet, cacheSet, generateProfileHash } from '../_lib/cache';
 import { parseAiJson } from '../_lib/json-parse';
+import { checkRateLimit, tooManyRequests } from '../_lib/rate-limit';
 
 function buildHyDEQuery(data: any): string {
   const parts: string[] = [];
@@ -218,6 +219,16 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
   if (req.method !== 'POST') {
     res.writeHead(405, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify({ error: 'Method not allowed' }));
+    return;
+  }
+
+  const allowed = await checkRateLimit(req, {
+    keyPrefix: 'recommend-generate-rag',
+    limit: 5,
+    windowSeconds: 3600,
+  });
+  if (!allowed) {
+    tooManyRequests(res);
     return;
   }
 

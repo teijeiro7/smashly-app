@@ -1,4 +1,5 @@
 import type { IncomingMessage, ServerResponse } from 'http';
+import { checkRateLimit, tooManyRequests } from '../_lib/rate-limit';
 
 const ALLOWED_IMAGE_DOMAINS: string[] = [
   'www.padelnuestro.es',
@@ -46,6 +47,16 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
   if (req.method !== 'GET') {
     res.writeHead(405, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify({ error: 'Method not allowed' }));
+    return;
+  }
+
+  const allowed = await checkRateLimit(req, {
+    keyPrefix: 'proxy-image',
+    limit: 60,
+    windowSeconds: 60,
+  });
+  if (!allowed) {
+    tooManyRequests(res);
     return;
   }
 
