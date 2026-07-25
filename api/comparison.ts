@@ -92,17 +92,25 @@ function parseAndOverrideMetrics(text: string, rackets: any[]): any {
   const parsed = parseAiJson(text);
 
   if (!parsed.metrics || !Array.isArray(parsed.metrics)) {
-    parsed.metrics = rackets.map((r: any) => ({
-      racketId: r.id,
+    // racketId here is the racket's position in the request (matching the
+    // contract in metricsTemplate above), not its DB id.
+    parsed.metrics = rackets.map((r: any, i: number) => ({
+      racketId: i,
       racketName: r.nombre || r.name,
       isCertified: false,
       radarData: { potencia: 5, control: 5, manejabilidad: 5, puntoDulce: 5, salidaDeBola: 5 },
     }));
   }
 
-  // Override with certified DB radar values when available
+  // Override with certified DB radar values when available. The prompt
+  // defines metrics[].racketId as the racket's position in the request
+  // (0, 1, 2 — see metricsTemplate above), so look it up by that field
+  // rather than by the metric's position in the array: models don't
+  // reliably preserve array order, and a positional match would silently
+  // attach one racket's certified radar values to a different racket.
   parsed.metrics = parsed.metrics.map((metric: any, i: number) => {
-    const racket = rackets[i];
+    const index = Number.isInteger(metric?.racketId) ? metric.racketId : i;
+    const racket = rackets[index];
     if (!racket) return metric;
     const dbRadar = getDbRadarValues(racket);
     if (dbRadar) {
@@ -176,13 +184,21 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
   }
 
   try {
-    const rackets = await getRacketsByIds(racketIds);
+    const fetchedRackets = await getRacketsByIds(racketIds);
 
-    if (rackets.length !== racketIds.length) {
+    if (fetchedRackets.length !== racketIds.length) {
       res.writeHead(404, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ error: 'No se encontraron todas las palas solicitadas' }));
       return;
     }
+
+    // getRacketsByIds uses `.in('id', ids)`, which Postgres does not
+    // guarantee to return in the requested order. Re-sort to match
+    // racketIds so "PALA 1/2/3" in the prompt (and metrics[i].racketId,
+    // which the prompt defines as that same position) line up with what
+    // the caller actually asked to compare.
+    const racketsById = new Map(fetchedRackets.map((r: any) => [r.id, r]));
+    const rackets = racketIds.map((id: number) => racketsById.get(id));
 
     const prompt = buildComparisonPrompt(rackets, userProfile);
     const aiResponse = await generateContent(prompt);
