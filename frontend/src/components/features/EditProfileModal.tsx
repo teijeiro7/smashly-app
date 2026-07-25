@@ -573,7 +573,7 @@ export const EditProfileModal: React.FC<EditProfileModalProps> = ({
               <AvatarSection>
                 <AvatarPreview>
                   {avatarPreview ? (
-                    <img src={avatarPreview} alt="Avatar preview" />
+                    <img src={avatarPreview} alt="Avatar preview" loading='lazy' />
                   ) : (
                     <FiUser size={48} />
                   )}

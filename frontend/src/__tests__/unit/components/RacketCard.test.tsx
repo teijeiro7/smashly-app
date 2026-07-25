@@ -1,8 +1,6 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import { BrowserRouter } from 'react-router-dom';
 import RacketCard from '../../../components/features/RacketCard';
-import { ComparisonProvider } from '../../../contexts/ComparisonContext';
 
 const mockRacket = {
   id: 1,
@@ -15,14 +13,16 @@ const mockRacket = {
   caracteristicas_balance: 'Alto',
 };
 
+const defaultProps = {
+  view: 'grid' as const,
+  index: 0,
+  onClick: vi.fn(),
+};
+
 describe('RacketCard', () => {
   const renderRacketCard = (racket = mockRacket) => {
     return render(
-      <BrowserRouter>
-        <ComparisonProvider>
-          <RacketCard racket={racket as any} />
-        </ComparisonProvider>
-      </BrowserRouter>
+      <RacketCard racket={racket as any} {...defaultProps} />
     );
   };
 

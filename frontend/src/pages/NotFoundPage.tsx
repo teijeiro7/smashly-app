@@ -63,7 +63,7 @@ const PrimaryBtn = styled(Link)`
   border-radius: 10px;
   font-weight: 600;
   text-decoration: none;
-  transition: all 0.2s ease;
+  transition: background-color 0.2s ease, transform 0.2s ease, color 0.2s ease;
 
   &:hover {
     background: var(--primary-hover);
@@ -84,7 +84,7 @@ const SecondaryBtn = styled(Link)`
   font-weight: 600;
   text-decoration: none;
   border: 1px solid var(--border);
-  transition: all 0.2s ease;
+  transition: border-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
 
   &:hover {
     border-color: var(--primary);
@@ -103,6 +103,7 @@ export default function NotFoundPage() {
         canonical={buildUrl('/')}
         noindex
         nofollow
+        extraMeta={[{ name: 'prerender-status-code', content: '404' }]}
       />
       <Card>
         <Emoji>🎾</Emoji>

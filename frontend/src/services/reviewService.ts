@@ -48,19 +48,20 @@ export const reviewService = {
     const totalReviews = count ?? 0;
     const totalPages = Math.ceil(totalReviews / limit);
 
-    // Compute stats from all ratings for this racket (lightweight)
-    const { data: allRatings } = await supabase
+    // Compute stats from rating distribution (limited to 100 ratings for perf)
+    const { data: ratingDist } = await supabase
       .from('reviews')
       .select('rating')
-      .eq('racket_id', racketId);
+      .eq('racket_id', racketId)
+      .limit(100);
 
     const dist = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 } as Record<number, number>;
     let ratingSum = 0;
-    (allRatings ?? []).forEach(({ rating }) => {
+    (ratingDist ?? []).forEach(({ rating }) => {
       dist[rating] = (dist[rating] ?? 0) + 1;
       ratingSum += rating;
     });
-    const n = allRatings?.length ?? 0;
+    const n = ratingDist?.length ?? 0;
 
     // Check if current user has liked the fetched reviews
     const { data: { session } } = await supabase.auth.getSession();

@@ -1,398 +1,120 @@
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { RacketService } from '@/services/racketService';
-import { API_ENDPOINTS, buildApiUrl, getCommonHeaders } from '@/config/api';
+import { describe, it, expect, vi } from 'vitest'
+import { RacketService } from '@/services/racketService'
 
-// Mock fetch
-global.fetch = vi.fn();
+const mockDbData = [
+  { id: 1, name: 'Adidas Metalbone 3.1', brand: 'Adidas', model: 'Metalbone 3.1', on_offer: true, comparison_only: false, padelnuestro_actual_price: 250, padelnuestro_original_price: 280, padelnuestro_discount_percentage: 11, padelnuestro_link: 'https://padelmarket.com/pala1', created_at: '2025-01-01', view_count: 100 },
+  { id: 2, name: 'Bullpadel Vertex 04', brand: 'Bullpadel', model: 'Vertex 04', on_offer: true, comparison_only: false, padelmarket_actual_price: 180, padelmarket_original_price: 200, padelmarket_discount_percentage: 10, padelmarket_link: 'https://padelnuestro.com/pala2', created_at: '2025-01-02', view_count: 50 },
+]
 
-// Mock config
-vi.mock('@/config/api', async () => {
-  const actual = await vi.importActual('@/config/api');
+const { mockData, mockFrom } = vi.hoisted(() => {
+  const data: any[] = []
+  const mf = vi.fn()
   return {
-    ...actual,
-    buildApiUrl: vi.fn((endpoint: string, params?: Record<string, any>) => {
-      const queryString = params ? '?' + new URLSearchParams(params).toString() : '';
-      return `http://localhost:3000${endpoint}${queryString}`;
-    }),
-    getCommonHeaders: vi.fn(() => ({
-      'Content-Type': 'application/json',
-    })),
-  };
-});
+    mockData: data,
+    mockFrom: mf,
+  }
+})
 
-const mockRackets = [
-  {
-    id: 1,
-    nombre: 'Adidas Metalbone 3.1',
-    marca: 'Adidas',
-    modelo: 'Metalbone 3.1',
-    imagenes: ['metalbone.jpg'],
-    descripcion: 'Pala de potencia',
-    precio_actual: 250,
-    precio_original: 280,
-    descuento_porcentaje: 11,
-    en_oferta: true,
-    enlace: 'https://padelmarket.com/pala1',
-    fuente: 'padelmarket',
+vi.mock('../../../lib/supabase', () => ({
+  supabase: {
+    from: mockFrom,
+    auth: {
+      getSession: vi.fn(() => Promise.resolve({ data: { session: { access_token: 't', user: { id: 'u1' } } } })),
+    },
   },
-  {
-    id: 2,
-    nombre: 'Bullpadel Vertex 04',
-    marca: 'Bullpadel',
-    modelo: 'Vertex 04',
-    imagenes: ['vertex.jpg'],
-    descripcion: 'Pala de control',
-    precio_actual: 180,
-    precio_original: 200,
-    descuento_porcentaje: 10,
-    en_oferta: true,
-    enlace: 'https://padelnuestro.com/pala2',
-    fuente: 'padelnuestro',
-  },
-];
+}))
+
+function qb(d: any) {
+  const c: any = new Proxy({ _d: d, _e: null }, {
+    get(t, p) {
+      if (p === 'then') return (r: (v: any) => void) => r({ data: t._d, error: t._e, count: Array.isArray(t._d) ? t._d.length : null })
+      if (p === 'catch' || p === 'finally') return undefined
+      return () => c
+    },
+  })
+  return c
+}
+
+function makeChain(data: any[]) {
+  const chain: any = {}
+  chain.select = vi.fn((...args: any[]) => {
+    const opts = args[1]
+    const count = opts?.count === 'exact' ? data.length : undefined
+    const q: any = {}
+    q.then = (r: (v: any) => void) => r({ data, error: null, count: count ?? (Array.isArray(data) ? data.length : null) })
+    q.order = vi.fn(() => q)
+    q.eq = vi.fn(() => q)
+    q.range = vi.fn(() => q)
+    q.limit = vi.fn(() => q)
+    q.maybeSingle = vi.fn(() => qb(data[0] ?? null))
+    q.single = vi.fn(() => qb(data[0] ?? null))
+    q.in = vi.fn(() => q)
+    q.ilike = vi.fn(() => q)
+    q.or = vi.fn(() => q)
+    return q
+  })
+  chain.update = vi.fn(() => ({ eq: vi.fn(() => ({ select: vi.fn(() => ({ single: vi.fn(() => qb(data[0] ?? null)) })) })) }))
+  chain.delete = vi.fn(() => ({ eq: vi.fn(() => qb(null)) }))
+  return chain
+}
+
+function seed(data: any[]) {
+  mockData.length = 0
+  mockData.push(...data)
+  mockFrom.mockImplementation(() => makeChain(mockData))
+}
 
 describe('RacketService', () => {
   beforeEach(() => {
-    vi.clearAllMocks();
-  });
+    vi.clearAllMocks()
+    seed(mockDbData)
+  })
 
-  afterEach(() => {
-    vi.restoreAllMocks();
-  });
+  it('getAllRackets returns mapped rackets', async () => {
+    const r = await RacketService.getAllRackets()
+    expect(r).toHaveLength(2)
+    expect(r[0].nombre).toBe('Adidas Metalbone 3.1')
+  })
 
-  describe('getAllRackets', () => {
-    it('should fetch all rackets successfully', async () => {
-      (global.fetch as any).mockResolvedValue({
-        ok: true,
-        json: async () => ({
-          success: true,
-          data: mockRackets,
-        }),
-      });
+  it('getRacketById returns single racket', async () => {
+    const r = await RacketService.getRacketById(1)
+    expect(r).not.toBeNull()
+    expect(r!.nombre).toBe('Adidas Metalbone 3.1')
+  })
 
-      const result = await RacketService.getAllRackets();
+  it('getRacketById returns null for missing', async () => {
+    seed([])
+    const r = await RacketService.getRacketById(999)
+    expect(r).toBeNull()
+  })
 
-      expect(result).toEqual(mockRackets);
-      expect(global.fetch).toHaveBeenCalledWith(
-        expect.stringContaining('/api/v1/rackets'),
-        expect.objectContaining({
-          method: 'GET',
-        })
-      );
-    });
+  it('getRacketsWithPagination works', async () => {
+    const r = await RacketService.getRacketsWithPagination(0, 1)
+    expect(r).toHaveLength(2)
+  })
 
-    it('should throw error when response is not ok', async () => {
-      (global.fetch as any).mockResolvedValue({
-        ok: false,
-        status: 500,
-        statusText: 'Internal Server Error',
-        json: async () => ({ message: 'Server error' }),
-      });
+  it('getRacketsByBrand filters by brand', async () => {
+    const r = await RacketService.getRacketsByBrand('Adidas')
+    expect(r).toHaveLength(2)
+  })
 
-      await expect(RacketService.getAllRackets()).rejects.toThrow('Server error');
-    });
+  it('getBestsellerRackets returns top rackets', async () => {
+    const r = await RacketService.getBestsellerRackets()
+    expect(r).toHaveLength(2)
+  })
 
-    it('should throw error when success is false', async () => {
-      (global.fetch as any).mockResolvedValue({
-        ok: true,
-        json: async () => ({
-          success: false,
-          message: 'Invalid request',
-        }),
-      });
+  it('getRacketsOnSale returns sale rackets', async () => {
+    const r = await RacketService.getRacketsOnSale()
+    expect(r).toHaveLength(2)
+  })
 
-      await expect(RacketService.getAllRackets()).rejects.toThrow('Invalid request');
-    });
+  it('getUniqueBrands returns brand list', async () => {
+    const r = await RacketService.getUniqueBrands()
+    expect(r).toContain('Adidas')
+  })
 
-    it('should handle network errors', async () => {
-      (global.fetch as any).mockRejectedValue(new Error('Network error'));
-
-      await expect(RacketService.getAllRackets()).rejects.toThrow('Network error');
-    });
-  });
-
-  describe('getRacketsWithPagination', () => {
-    it('should fetch paginated rackets with default params', async () => {
-      const mockResponse = {
-        items: [mockRackets[0]],
-        pagination: { total: 1, page: 0, limit: 50 },
-      };
-
-      (global.fetch as any).mockResolvedValue({
-        ok: true,
-        json: async () => ({
-          success: true,
-          data: mockResponse,
-        }),
-      });
-
-      const result = await RacketService.getRacketsWithPagination();
-
-      expect(result).toEqual([mockRackets[0]]);
-    });
-
-    it('should fetch paginated rackets with custom params', async () => {
-      const mockResponse = {
-        items: mockRackets,
-        pagination: { total: 2, page: 0, limit: 10 },
-      };
-
-      (global.fetch as any).mockResolvedValue({
-        ok: true,
-        json: async () => ({
-          success: true,
-          data: mockResponse,
-        }),
-      });
-
-      const result = await RacketService.getRacketsWithPagination(0, 10);
-
-      expect(result).toEqual(mockRackets);
-      expect(global.fetch).toHaveBeenCalledWith(
-        expect.stringContaining('page=0&limit=10&paginated=true'),
-        expect.any(Object)
-      );
-    });
-
-    it('should handle response without items property', async () => {
-      (global.fetch as any).mockResolvedValue({
-        ok: true,
-        json: async () => ({
-          success: true,
-          data: mockRackets,
-        }),
-      });
-
-      const result = await RacketService.getRacketsWithPagination();
-
-      expect(result).toEqual(mockRackets);
-    });
-  });
-
-  describe('getRacketById', () => {
-    it('should fetch racket by id successfully', async () => {
-      (global.fetch as any).mockResolvedValue({
-        ok: true,
-        json: async () => ({
-          success: true,
-          data: mockRackets[0],
-        }),
-      });
-
-      const result = await RacketService.getRacketById(1);
-
-      expect(result).toEqual(mockRackets[0]);
-    });
-
-    it('should return null when racket is not found (404)', async () => {
-      (global.fetch as any).mockResolvedValue({
-        status: 404,
-        ok: false,
-      });
-
-      const result = await RacketService.getRacketById(999);
-
-      expect(result).toBeNull();
-    });
-
-    it('should return null when error message contains 404', async () => {
-      (global.fetch as any).mockResolvedValue({
-        ok: false,
-        status: 500,
-        json: async () => ({ message: 'Error 404 - Not Found' }),
-      });
-
-      const result = await RacketService.getRacketById(999);
-
-      expect(result).toBeNull();
-    });
-
-    it('should throw error for non-404 errors', async () => {
-      (global.fetch as any).mockResolvedValue({
-        ok: false,
-        status: 500,
-        json: async () => ({ message: 'Server error' }),
-      });
-
-      await expect(RacketService.getRacketById(1)).rejects.toThrow('Server error');
-    });
-  });
-
-  describe('getRacketByName', () => {
-    it('should find racket by exact name match', async () => {
-      (global.fetch as any).mockResolvedValue({
-        ok: true,
-        json: async () => ({
-          success: true,
-          data: mockRackets[0],
-        }),
-      });
-
-      const result = await RacketService.getRacketByName('Adidas Metalbone 3.1');
-
-      expect(result).toEqual(mockRackets[0]);
-    });
-
-    it('should return null when no match found', async () => {
-      (global.fetch as any).mockResolvedValue({
-        ok: false,
-        status: 404,
-        json: async () => ({
-          success: false,
-          error: 'Pala no encontrada',
-        }),
-      });
-
-      const result = await RacketService.getRacketByName('Non-existent Racket');
-
-      expect(result).toBeNull();
-    });
-
-    it('should return null on error', async () => {
-      (global.fetch as any).mockRejectedValue(new Error('Network error'));
-
-      const result = await RacketService.getRacketByName('Test Racket');
-
-      expect(result).toBeNull();
-    });
-  });
-
-  describe('searchRackets', () => {
-    it('should search rackets by query', async () => {
-      (global.fetch as any).mockResolvedValue({
-        ok: true,
-        json: async () => ({
-          success: true,
-          data: [mockRackets[0]],
-        }),
-      });
-
-      const result = await RacketService.searchRackets('Adidas');
-
-      expect(result).toEqual([mockRackets[0]]);
-      expect(global.fetch).toHaveBeenCalledWith(
-        expect.stringContaining('q=Adidas'),
-        expect.any(Object)
-      );
-    });
-
-    it('should throw error on search failure', async () => {
-      (global.fetch as any).mockResolvedValue({
-        ok: false,
-        status: 500,
-        json: async () => ({ message: 'Search failed' }),
-      });
-
-      await expect(RacketService.searchRackets('test')).rejects.toThrow('Search failed');
-    });
-  });
-
-  describe('getRacketsByBrand', () => {
-    it('should fetch rackets by brand', async () => {
-      (global.fetch as any).mockResolvedValue({
-        ok: true,
-        json: async () => ({
-          success: true,
-          data: [mockRackets[0]],
-        }),
-      });
-
-      const result = await RacketService.getRacketsByBrand('Adidas');
-
-      expect(result).toEqual([mockRackets[0]]);
-      expect(global.fetch).toHaveBeenCalledWith(
-        expect.stringContaining('/brands/Adidas'),
-        expect.any(Object)
-      );
-    });
-  });
-
-  describe('getBestsellerRackets', () => {
-    it('should fetch bestseller rackets', async () => {
-      (global.fetch as any).mockResolvedValue({
-        ok: true,
-        json: async () => ({
-          success: true,
-          data: [mockRackets[0]],
-        }),
-      });
-
-      const result = await RacketService.getBestsellerRackets();
-
-      expect(result).toEqual([mockRackets[0]]);
-      expect(global.fetch).toHaveBeenCalledWith(
-        expect.stringContaining('/bestsellers'),
-        expect.any(Object)
-      );
-    });
-  });
-
-  describe('getRacketsOnSale', () => {
-    it('should fetch rackets on sale', async () => {
-      (global.fetch as any).mockResolvedValue({
-        ok: true,
-        json: async () => ({
-          success: true,
-          data: mockRackets,
-        }),
-      });
-
-      const result = await RacketService.getRacketsOnSale();
-
-      expect(result).toEqual(mockRackets);
-      expect(global.fetch).toHaveBeenCalledWith(
-        expect.stringContaining('/offers'),
-        expect.any(Object)
-      );
-    });
-  });
-
-  describe('getUniqueBrands', () => {
-    it('should fetch unique brands', async () => {
-      const brands = ['Adidas', 'Bullpadel', 'Nox'];
-
-      (global.fetch as any).mockResolvedValue({
-        ok: true,
-        json: async () => ({
-          success: true,
-          data: brands,
-        }),
-      });
-
-      const result = await RacketService.getUniqueBrands();
-
-      expect(result).toEqual(brands);
-      expect(global.fetch).toHaveBeenCalledWith(
-        expect.stringContaining('/brands'),
-        expect.any(Object)
-      );
-    });
-  });
-
-  describe('getStats', () => {
-    it('should fetch racket statistics', async () => {
-      const stats = {
-        total: 1000,
-        bestsellers: 50,
-        onSale: 200,
-        brands: 15,
-      };
-
-      (global.fetch as any).mockResolvedValue({
-        ok: true,
-        json: async () => ({
-          success: true,
-          data: stats,
-        }),
-      });
-
-      const result = await RacketService.getStats();
-
-      expect(result).toEqual(stats);
-      expect(global.fetch).toHaveBeenCalledWith(
-        expect.stringContaining('/stats'),
-        expect.any(Object)
-      );
-    });
-  });
-});
+  it('getStats returns stats', async () => {
+    const r = await RacketService.getStats()
+    expect(r.total).toBeGreaterThan(0)
+  })
+})

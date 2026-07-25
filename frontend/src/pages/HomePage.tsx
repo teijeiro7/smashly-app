@@ -587,7 +587,7 @@ const HomePage: React.FC = () => {
           </Subtitle>
 
           <CTAButtons>
-            <Button as={Link} to='/compare' variant='primary' size='lg'>
+            <Button as={Link} to='/best-racket' variant='primary' size='lg'>
               <Crosshair size={20} />
               Encontrar mi pala ideal
             </Button>

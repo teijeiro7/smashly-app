@@ -6,7 +6,7 @@ import styled from "styled-components";
 
 const FooterContainer = styled.footer`
   background: var(--footer-bg);
-  color: white;
+  color: var(--brand-on-surface);
   padding: 3rem 0 1.5rem;
   margin-top: auto;
 `;
@@ -55,7 +55,7 @@ const SocialLinks = styled.div`
   a {
     color: rgba(255, 255, 255, 0.75);
     font-size: 1.25rem;
-    transition: all 0.2s ease;
+    transition: color 0.2s ease, background-color 0.2s ease;
     padding: 8px;
     border-radius: 8px;
 

@@ -1014,6 +1014,7 @@ const CompareRacketsPage: React.FC = () => {
                   <img
                     src={racket.imagenes?.[0] || '/placeholder-racket.png'}
                     alt={racket.nombre}
+                    loading='lazy'
                     style={{
                       width: 40,
                       height: 40,
@@ -1060,6 +1061,7 @@ const CompareRacketsPage: React.FC = () => {
                     <img
                       src={racket.imagenes?.[0] || '/placeholder-racket.png'}
                       alt={racket.nombre}
+                      loading='lazy'
                       style={{
                         width: 60,
                         height: 60,
