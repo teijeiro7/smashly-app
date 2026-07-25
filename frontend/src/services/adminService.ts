@@ -351,46 +351,56 @@ export class AdminService {
    * directamente sobre `rackets`, que tiene lectura pública por RLS.
    */
   static async getBrands(): Promise<Brand[]> {
-    const { data, error } = await supabase.from('rackets').select('marca');
+    // rackets uses English column names (brand, not marca — see
+    // api/_lib/racket-mapper.ts for the full story).
+    const { data, error } = await supabase.from('rackets').select('brand');
     if (error) throw error;
 
-    const counts = new Map<string, number>();
-    (data ?? []).forEach((r: any) => {
-      if (!r.marca) return;
-      counts.set(r.marca, (counts.get(r.marca) ?? 0) + 1);
-    });
+    // Grouped case-insensitively — the real data has casing variants of the
+    // same brand (e.g. "Lok" / "LOK") that would otherwise show up as two
+    // separate rows with split counts.
+    const groups = groupCaseInsensitive((data ?? []).map((r: any) => r.brand));
 
-    return Array.from(counts.entries())
-      .map(([name, racketCount]) => ({ name, racketCount }))
+    return Array.from(groups.values())
+      .map(({ display, count }) => ({ name: display, racketCount: count }))
       .sort((a, b) => b.racketCount - a.racketCount);
   }
 
   /**
    * Obtiene todas las categorías (formas) con el conteo de palas.
    * Same situation as getBrands — aggregated client-side over
-   * caracteristicas_forma instead of calling the dead REST endpoint.
+   * characteristics_shape instead of calling the dead REST endpoint.
    * Descriptions reused from the domain rules already authored in
    * api/comparison.ts's buildComparisonPrompt (REGLAS DE DOMINIO).
    */
   static async getCategories(): Promise<Category[]> {
-    const { data, error } = await supabase.from('rackets').select('caracteristicas_forma');
+    const { data, error } = await supabase.from('rackets').select('characteristics_shape');
     if (error) throw error;
 
-    const counts = new Map<string, number>();
-    (data ?? []).forEach((r: any) => {
-      const forma = (r.caracteristicas_forma || '').trim();
-      if (!forma) return;
-      counts.set(forma, (counts.get(forma) ?? 0) + 1);
-    });
+    const groups = groupCaseInsensitive((data ?? []).map((r: any) => r.characteristics_shape));
 
-    return Array.from(counts.entries())
-      .map(([name, racketCount]) => ({
-        name,
-        description: SHAPE_DESCRIPTIONS[name.toLowerCase()] || '',
-        racketCount,
+    return Array.from(groups.values())
+      .map(({ display, count }) => ({
+        name: display,
+        description: SHAPE_DESCRIPTIONS[display.toLowerCase()] || '',
+        racketCount: count,
       }))
       .sort((a, b) => b.racketCount - a.racketCount);
   }
+}
+
+/** Groups raw string values case-insensitively, keeping the first-seen casing for display. */
+function groupCaseInsensitive(values: unknown[]): Map<string, { display: string; count: number }> {
+  const groups = new Map<string, { display: string; count: number }>();
+  values.forEach(value => {
+    const raw = typeof value === 'string' ? value.trim() : '';
+    if (!raw) return;
+    const key = raw.toLowerCase();
+    const existing = groups.get(key);
+    if (existing) existing.count += 1;
+    else groups.set(key, { display: raw, count: 1 });
+  });
+  return groups;
 }
 
 const SHAPE_DESCRIPTIONS: Record<string, string> = {
