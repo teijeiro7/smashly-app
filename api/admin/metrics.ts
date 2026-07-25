@@ -21,7 +21,7 @@ async function getVerifiedStoresCount(): Promise<number> {
   const { count } = await supabaseAdmin
     .from('stores')
     .select('*', { count: 'exact', head: true })
-    .eq('verified', true);
+    .eq('status', 'verified');
   return count || 0;
 }
 
@@ -29,7 +29,7 @@ async function getPendingStoresCount(): Promise<number> {
   const { count } = await supabaseAdmin
     .from('stores')
     .select('*', { count: 'exact', head: true })
-    .eq('verified', false);
+    .eq('status', 'pending');
   return count || 0;
 }
 

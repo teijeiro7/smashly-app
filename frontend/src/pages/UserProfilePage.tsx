@@ -18,7 +18,7 @@ import { Link, useNavigate, useSearch } from '@tanstack/react-router';
 import { useAuth } from '../contexts/AuthContext';
 import { UserProfileService } from '../services/userProfileService';
 import { UploadService } from '../services/uploadService';
-import { RacketService } from '../services/racketService';
+import racketService from '../services/racketService';
 import { sileo } from 'sileo';
 import ProfileAvatar from '../components/features/ProfileAvatar';
 import ActivityStats from '../components/features/ActivityStats';
@@ -508,7 +508,7 @@ const UserProfilePage: React.FC = () => {
           await Promise.all(
             allRacketIds.map(async id => {
               try {
-                const racket = await RacketService.getRacketById(id as number);
+                const racket = await racketService.getRacketById(id as number);
                 racketsCache[id as number] = racket;
               } catch {
                 racketsCache[id as number] = { nombre: `Pala ${id}`, marca: '' };

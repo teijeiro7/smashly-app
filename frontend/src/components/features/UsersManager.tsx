@@ -159,7 +159,7 @@ const UserNickname = styled.div`
   color: var(--text-subtle);
 `;
 
-const RoleBadge = styled.span<{ role: 'admin' | 'player' }>`
+const RoleBadge = styled.span<{ role: 'Admin' | 'Player' | 'Store' }>`
   padding: 0.25rem 0.75rem;
   border-radius: 20px;
   font-size: 0.75rem;
@@ -167,8 +167,8 @@ const RoleBadge = styled.span<{ role: 'admin' | 'player' }>`
   display: inline-flex;
   align-items: center;
   gap: 0.25rem;
-  background: ${props => (props.role === 'admin' ? 'rgba(220, 38, 38, 0.10)' : 'rgba(37, 99, 235, 0.10)')};
-  color: ${props => (props.role === 'admin' ? 'var(--danger)' : 'var(--info)')};
+  background: ${props => (props.role === 'Admin' ? 'rgba(220, 38, 38, 0.10)' : props.role === 'Store' ? 'rgba(34, 197, 94, 0.10)' : 'rgba(37, 99, 235, 0.10)')};
+  color: ${props => (props.role === 'Admin' ? 'var(--danger)' : props.role === 'Store' ? 'var(--primary)' : 'var(--info)')};
 
   svg {
     font-size: 0.875rem;
@@ -278,7 +278,7 @@ const UsersManager: React.FC = () => {
 
     // Filtrar por rol
     if (filter !== 'all') {
-      filtered = filtered.filter(u => u.role === filter);
+      filtered = filtered.filter(u => u.role.toLowerCase() === filter);
     }
 
     // Filtrar por búsqueda
@@ -294,10 +294,10 @@ const UsersManager: React.FC = () => {
     setFilteredUsers(filtered);
   };
 
-  const handleToggleRole = async (userId: string, currentRole: 'admin' | 'player') => {
-    const newRole = currentRole === 'admin' ? 'player' : 'admin';
+  const handleToggleRole = async (userId: string, currentRole: 'Admin' | 'Player' | 'Store') => {
+    const newRole = currentRole === 'Admin' ? 'Player' : 'Admin';
     const confirmMessage = `¿Estás seguro de cambiar el rol a ${
-      newRole === 'admin' ? 'Administrador' : 'Jugador'
+      newRole === 'Admin' ? 'Administrador' : 'Jugador'
     }?`;
 
     if (!window.confirm(confirmMessage)) {
@@ -422,19 +422,19 @@ const UsersManager: React.FC = () => {
               </UserCell>
               <Cell>{user.email}</Cell>
               <Cell>
-                <RoleBadge role={user.role}>
-                  {user.role === 'admin' ? <FiShield /> : <FiUser />}
-                  {user.role === 'admin' ? 'Admin' : 'Jugador'}
+                <RoleBadge role={user.role as 'Admin' | 'Player' | 'Store'}>
+                  {user.role === 'Admin' ? <FiShield /> : <FiUser />}
+                  {user.role === 'Admin' ? 'Admin' : user.role === 'Store' ? 'Tienda' : 'Jugador'}
                 </RoleBadge>
               </Cell>
               <Cell>{new Date(user.created_at).toLocaleDateString()}</Cell>
               <ActionsCell>
                 <IconButton
                   color='var(--info)'
-                  onClick={() => handleToggleRole(user.id, user.role)}
-                  title={`Cambiar a ${user.role === 'admin' ? 'Jugador' : 'Admin'}`}
+                  onClick={() => handleToggleRole(user.id, user.role as 'Admin' | 'Player' | 'Store')}
+                  title={`Cambiar a ${user.role === 'Admin' ? 'Jugador' : 'Admin'}`}
                 >
-                  {user.role === 'admin' ? <FiUser /> : <FiShield />}
+                  {user.role === 'Admin' ? <FiUser /> : <FiShield />}
                 </IconButton>
                 <IconButton
                   color='var(--error)'

@@ -1,6 +1,6 @@
 import { supabase } from '../lib/supabase';
 import { Racket } from '../types/racket';
-import { API_ENDPOINTS, buildApiUrl, getCommonHeaders, ApiResponse } from '../config/api';
+import { API_ENDPOINTS, buildApiUrl, getCommonHeaders } from '../config/api';
 
 // ── Price history types ───────────────────────────────────────────────────────
 export interface PricePoint {
@@ -22,16 +22,6 @@ export interface PriceHistoryResult {
   days: number;
   stores: StorePriceHistory[];
   combined: PricePoint[];
-}
-
-async function handleApiResponse<T>(response: Response): Promise<T> {
-  if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}));
-    throw new Error(errorData.message || `Error: ${response.status} ${response.statusText}`);
-  }
-  const data: ApiResponse<T> = await response.json();
-  if (!data.success) throw new Error(data.message || data.error || 'Error desconocido');
-  return data.data as T;
 }
 
 // ── DB → Frontend mapper ──────────────────────────────────────────────────────
@@ -159,8 +149,8 @@ function mapDbToFrontend(raw: any): Racket {
 }
 
 // ── Service ───────────────────────────────────────────────────────────────────
-export class RacketService {
-  static async getAllRackets(): Promise<Racket[]> {
+const racketService = {
+  async getAllRackets(): Promise<Racket[]> {
     const { data, error } = await supabase
       .from('rackets')
       .select('*')
@@ -168,14 +158,14 @@ export class RacketService {
 
     if (error) throw new Error(error.message);
     return (data ?? []).map(mapDbToFrontend);
-  }
+  },
 
   // Alias used by RacketsContext — TanStack Query caches this
-  static async getAllRacketsCached(): Promise<Racket[]> {
-    return RacketService.getAllRackets();
-  }
+  async getAllRacketsCached(): Promise<Racket[]> {
+    return racketService.getAllRackets();
+  },
 
-  static async getRacketsWithPagination(page = 0, limit = 50): Promise<Racket[]> {
+  async getRacketsWithPagination(page = 0, limit = 50): Promise<Racket[]> {
     const from = page * limit;
     const { data, error } = await supabase
       .from('rackets')
@@ -185,9 +175,9 @@ export class RacketService {
 
     if (error) throw new Error(error.message);
     return (data ?? []).map(mapDbToFrontend);
-  }
+  },
 
-  static async getRacketById(id: number): Promise<Racket | null> {
+  async getRacketById(id: number): Promise<Racket | null> {
     const { data, error } = await supabase
       .from('rackets')
       .select('*')
@@ -196,9 +186,9 @@ export class RacketService {
 
     if (error) throw new Error(error.message);
     return data ? mapDbToFrontend(data) : null;
-  }
+  },
 
-  static async getRacketsByIds(ids: number[]): Promise<Racket[]> {
+  async getRacketsByIds(ids: number[]): Promise<Racket[]> {
     const { data, error } = await supabase
       .from('rackets')
       .select('*')
@@ -206,9 +196,9 @@ export class RacketService {
 
     if (error) throw new Error(error.message);
     return (data ?? []).map(mapDbToFrontend);
-  }
+  },
 
-  static async getRacketByName(nombre: string): Promise<Racket | null> {
+  async getRacketByName(nombre: string): Promise<Racket | null> {
     const { data, error } = await supabase
       .from('rackets')
       .select('*')
@@ -217,9 +207,9 @@ export class RacketService {
 
     if (error) throw new Error(error.message);
     return data ? mapDbToFrontend(data) : null;
-  }
+  },
 
-  static async searchRackets(
+  async searchRackets(
     query: string,
     filters?: Record<string, string>,
     pagination?: { page?: number; limit?: number }
@@ -269,9 +259,9 @@ export class RacketService {
       data: (data ?? []).map(mapDbToFrontend),
       pagination: { page, limit, total: count ?? 0, totalPages: Math.ceil((count ?? 0) / limit) },
     };
-  }
+  },
 
-  static async getRacketsByBrand(marca: string): Promise<Racket[]> {
+  async getRacketsByBrand(marca: string): Promise<Racket[]> {
     const { data, error } = await supabase
       .from('rackets')
       .select('*')
@@ -280,10 +270,10 @@ export class RacketService {
 
     if (error) throw new Error(error.message);
     return (data ?? []).map(mapDbToFrontend);
-  }
+  },
 
-  static async getBestsellerRackets(): Promise<Racket[]> {
-    // Return top rackets by name
+  async getBestsellerRackets(): Promise<Racket[]> {
+    // es_bestseller does not exist in DB — return top rackets by name
     const { data, error } = await supabase
       .from('rackets')
       .select('*')
@@ -292,9 +282,9 @@ export class RacketService {
 
     if (error) throw new Error(error.message);
     return (data ?? []).map(mapDbToFrontend);
-  }
+  },
 
-  static async getRacketsOnSale(): Promise<Racket[]> {
+  async getRacketsOnSale(): Promise<Racket[]> {
     const { data, error } = await supabase
       .from('rackets')
       .select('*')
@@ -303,9 +293,9 @@ export class RacketService {
 
     if (error) throw new Error(error.message);
     return (data ?? []).map(mapDbToFrontend);
-  }
+  },
 
-  static async getUniqueBrands(): Promise<string[]> {
+  async getUniqueBrands(): Promise<string[]> {
     const { data, error } = await supabase
       .from('rackets')
       .select('brand')
@@ -314,9 +304,9 @@ export class RacketService {
     if (error) throw new Error(error.message);
     const brands = [...new Set((data ?? []).map((r: any) => r.brand).filter(Boolean))];
     return brands as string[];
-  }
+  },
 
-  static async getStats(): Promise<{ total: number; bestsellers: number; onSale: number; brands: number }> {
+  async getStats(): Promise<{ total: number; bestsellers: number; onSale: number; brands: number }> {
     const [totalRes, onSaleRes, brandsRes] = await Promise.all([
       supabase.from('rackets').select('*', { count: 'exact', head: true }),
       supabase.from('rackets').select('*', { count: 'exact', head: true }).eq('on_offer', true),
@@ -331,10 +321,10 @@ export class RacketService {
       onSale: onSaleRes.count ?? 0,
       brands: uniqueBrands.size,
     };
-  }
+  },
 
   // ── Admin mutations ───────────────────────────────────────────────────────
-  static async updateRacket(id: number, updates: Partial<Racket>): Promise<Racket> {
+  async updateRacket(id: number, updates: Partial<Racket>): Promise<Racket> {
     const { data, error } = await supabase
       .from('rackets')
       .update(updates)
@@ -344,14 +334,14 @@ export class RacketService {
 
     if (error) throw new Error(error.message);
     return mapDbToFrontend(data);
-  }
+  },
 
-  static async deleteRacket(id: number): Promise<void> {
+  async deleteRacket(id: number): Promise<void> {
     const { error } = await supabase.from('rackets').delete().eq('id', id);
     if (error) throw new Error(error.message);
-  }
+  },
 
-  static async bulkUpdateRackets(
+  async bulkUpdateRackets(
     field: string,
     oldValue: any,
     newValue: any
@@ -364,10 +354,10 @@ export class RacketService {
 
     if (error) throw new Error(error.message);
     return { updatedCount: data?.length ?? 0 };
-  }
+  },
 
-  // ── Price history (Express legacy — remove after full decommission) ────────
-  static async getPriceHistory(
+  // ── Price history ──────────────────────────────────────────────────────────
+  async getPriceHistory(
     racketId: number,
     days = 90,
     store?: string
@@ -378,9 +368,74 @@ export class RacketService {
 
       const url = buildApiUrl(API_ENDPOINTS.RACKETS_PRICE_HISTORY(racketId), params);
       const response = await fetch(url, { method: 'GET', headers: getCommonHeaders() });
-      return await handleApiResponse<PriceHistoryResult>(response);
+      if (!response.ok) return null;
+
+      const rawData: any[] = await response.json();
+      if (!Array.isArray(rawData) || rawData.length === 0) return null;
+
+      const storeMap = new Map<string, { prices: { date: string; price: number }[] }>();
+
+      for (const row of rawData) {
+        const storeName = row.store?.store_name || 'Unknown Store';
+        const storeKey = normalizeStoreName(storeName);
+
+        if (!storeMap.has(storeKey)) {
+          storeMap.set(storeKey, { prices: [] });
+        }
+        storeMap.get(storeKey)!.prices.push({
+          date: row.created_at,
+          price: row.price,
+        });
+      }
+
+      const stores: StorePriceHistory[] = [];
+      const combined: PricePoint[] = [];
+
+      for (const [key, value] of storeMap) {
+        const sortedPrices = value.prices.sort(
+          (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
+        );
+        const prices = sortedPrices.map(p => p.price);
+        const currentPrice = prices[prices.length - 1] ?? null;
+        const minPrice = prices.length > 0 ? Math.min(...prices) : null;
+        const maxPrice = prices.length > 0 ? Math.max(...prices) : null;
+
+        stores.push({
+          store: key,
+          history: sortedPrices.map(p => ({ date: p.date, price: p.price, store: key })),
+          currentPrice,
+          minPrice,
+          maxPrice,
+        });
+
+        sortedPrices.forEach(p => {
+          combined.push({ date: p.date, price: p.price, store: key });
+        });
+      }
+
+      return {
+        racketId,
+        days,
+        stores,
+        combined: combined.sort(
+          (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
+        ),
+      };
     } catch {
       return null;
     }
-  }
+  },
+};
+
+/** Normalize store name to lowercase key for chart color/label mapping */
+function normalizeStoreName(name: string): string {
+  const map: Record<string, string> = {
+    'padel nuestro': 'padelnuestro',
+    'padel market': 'padelmarket',
+    'padel pro shop': 'padelproshop',
+  };
+  const lower = name.toLowerCase().trim();
+  return map[lower] || lower.replace(/\s+/g, '_');
 }
+
+export default racketService;

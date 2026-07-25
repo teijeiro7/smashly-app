@@ -4,7 +4,7 @@ import { Link } from '@tanstack/react-router';
 import { FiArrowLeft, FiEdit2, FiTrash2, FiSearch, FiPackage, FiTag, FiX } from 'react-icons/fi';
 import { Racket } from '@/types/racket';
 import { racketImageUrl } from '../utils/imageUrl';
-import { RacketService } from '@/services/racketService';
+import racketService from '@/services/racketService';
 import { EditRacketModal } from '@/components/admin/EditRacketModal';
 import { sileo } from 'sileo';
 
@@ -447,7 +447,7 @@ const AdminRacketsPage: React.FC = () => {
   const loadRackets = async () => {
     try {
       setLoading(true);
-      const data = await RacketService.getAllRackets();
+      const data = await racketService.getAllRackets();
       console.log('API Response:', data);
       const racketsArray = Array.isArray(data) ? data : [];
       console.log('Rackets array:', racketsArray);
@@ -480,7 +480,7 @@ const AdminRacketsPage: React.FC = () => {
     if (!confirmed) return;
 
     try {
-      await RacketService.deleteRacket(racket.id);
+      await racketService.deleteRacket(racket.id);
       setRackets(prev => prev.filter(r => r.id !== racket.id));
       setFilteredRackets(prev => prev.filter(r => r.id !== racket.id));
       sileo.success({ title: 'Éxito', description: 'Pala eliminada correctamente' });
@@ -511,7 +511,7 @@ const AdminRacketsPage: React.FC = () => {
       const backendField = fieldMapping[field];
       if (!backendField) return;
 
-      const result = await RacketService.bulkUpdateRackets(backendField, oldValue, newValue);
+      const result = await racketService.bulkUpdateRackets(backendField, oldValue, newValue);
       sileo.success({
         title: 'Éxito',
         description: `${result.updatedCount} palas actualizadas de "${oldValue}" a "${newValue}"`,

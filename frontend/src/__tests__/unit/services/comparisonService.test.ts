@@ -1,10 +1,59 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest'
-import { ComparisonService } from '@/services/comparisonService'
-import type { SavedComparison } from '@/services/comparisonService'
-import type { RacketComparisonData } from '@/types/racket'
+import { describe, it, expect, beforeEach, vi } from 'vitest';
+import comparisonService, { SavedComparison } from '@/services/comparisonService';
+import { RacketComparisonData } from '@/types/racket';
 
-const fetchMock = vi.fn()
-global.fetch = fetchMock
+const { mockConfig, supabase } = vi.hoisted(() => {
+  const mockConfig: any = { data: null, error: null, count: null };
+
+  function mockSelectReturn(resp: any) {
+    const chain: any = { data: resp.data, error: resp.error, count: resp.count };
+    chain.order = vi.fn(() => chain);
+    chain.range = vi.fn(() => chain);
+    chain.limit = vi.fn(() => chain);
+    chain.eq = vi.fn(() => chain);
+    chain.in = vi.fn(() => chain);
+    chain.or = vi.fn(() => chain);
+    chain.ilike = vi.fn(() => chain);
+    chain.neq = vi.fn(() => chain);
+    chain.gte = vi.fn(() => chain);
+    chain.single = vi.fn(async () => ({
+      data: Array.isArray(resp.data) ? (resp.data.length > 0 ? resp.data[0] : null) : resp.data,
+      error: resp.error,
+    }));
+    chain.maybeSingle = vi.fn(async () => ({
+      data: Array.isArray(resp.data) ? (resp.data.length > 0 ? resp.data[0] : null) : resp.data,
+      error: resp.error,
+    }));
+    chain.select = vi.fn(() => chain);
+    chain.insert = vi.fn(() => ({ ...chain, select: vi.fn(() => ({ ...chain, single: vi.fn(async () => resp) })) }));
+    chain.update = vi.fn(() => ({ ...chain, select: vi.fn(() => ({ ...chain, single: vi.fn(async () => resp) })) }));
+    chain.delete = vi.fn(() => chain);
+    chain.upsert = vi.fn(() => ({ ...chain, select: vi.fn(() => ({ ...chain, single: vi.fn(async () => resp) })) }));
+    chain.then = async (resolve: any) => resolve(resp);
+    return chain;
+  }
+
+  return {
+    mockConfig,
+    supabase: {
+      from: vi.fn(() => mockSelectReturn(mockConfig)),
+      auth: {
+        getSession: vi.fn(async () => ({
+          data: { session: { access_token: 'test-token', user: { id: 'test-user', email: 'test@test.com' } } },
+          error: null,
+        })),
+        signOut: vi.fn(async () => ({ error: null })),
+        signInWithPassword: vi.fn(),
+        signUp: vi.fn(),
+        onAuthStateChange: vi.fn(() => ({ data: { subscription: { unsubscribe: vi.fn() } } })),
+      },
+      rpc: vi.fn(),
+      storage: { from: vi.fn() },
+    },
+  };
+});
+
+vi.mock('@/lib/supabase', () => ({ supabase }));
 
 const mockComparisonResult = {
   executiveSummary: 'Test summary',
@@ -14,158 +63,239 @@ const mockComparisonResult = {
   biomechanicalConsiderations: 'Test considerations',
   conclusion: 'Test conclusion',
   metrics: [
-    { racketName: 'Racket 1', radarData: { potencia: 8, control: 7, salidaDeBola: 6, manejabilidad: 9, puntoDulce: 7 }, isCertified: false },
-    { racketName: 'Racket 2', radarData: { potencia: 9, control: 6, salidaDeBola: 5, manejabilidad: 7, puntoDulce: 6 }, isCertified: false },
+    {
+      racketName: 'Racket 1',
+      radarData: { potencia: 8, control: 7, salidaDeBola: 6, manejabilidad: 9, puntoDulce: 7 },
+      isCertified: false,
+    },
+    {
+      racketName: 'Racket 2',
+      radarData: { potencia: 9, control: 6, salidaDeBola: 5, manejabilidad: 7, puntoDulce: 6 },
+      isCertified: false,
+    },
   ] as RacketComparisonData[],
-}
+};
 
-const { mockData, mockFrom } = vi.hoisted(() => {
-  const data: any[] = []
-  const mf = vi.fn()
-  return { mockData: data, mockFrom: mf }
-})
-
-vi.mock('@/lib/supabase', () => ({
-  supabase: {
-    from: mockFrom,
-    auth: {
-      getSession: vi.fn(() => Promise.resolve({ data: { session: { access_token: 't', user: { id: 'user-123' } } } })),
-    },
-  },
-}))
-
-function makeChain(initialData: any): any {
-  return new Proxy({ _data: initialData }, {
-    get(target, prop) {
-      if (prop === 'then') {
-        return (resolve: (v: any) => void) => resolve({
-          data: target._data,
-          error: null,
-          count: Array.isArray(target._data) ? target._data.length : null,
-        })
-      }
-      if (prop === 'catch' || prop === 'finally') return undefined
-
-      return (...args: any[]) => {
-        let newData = target._data
-        if (prop === 'eq') {
-          const [col, val] = args
-          const arr = Array.isArray(target._data) ? target._data : (target._data ? [target._data] : [])
-          newData = arr.filter((d: any) => d[col] === val)
-        } else if (prop === 'single') {
-          const arr = Array.isArray(target._data) ? target._data : (target._data ? [target._data] : [])
-          const item = arr[0] ?? null
-          if (item === null) {
-            return { then: (resolve: (v: any) => void) => resolve({ data: null, error: new Error('Not found'), count: null }) }
-          }
-          return makeChain(item)
-        }
-        return makeChain(newData)
-      }
-    },
-  })
-}
-
-function seed(data: any[]) {
-  mockData.length = 0
-  mockData.push(...data)
-  mockFrom.mockImplementation(() => makeChain(mockData))
-}
-
-function makeSaved(id = 'comp-123', overrides = {}): SavedComparison {
-  return { id, user_id: 'user-123', racket_ids: [1, 2], comparison_text: JSON.stringify(mockComparisonResult), metrics: mockComparisonResult.metrics, created_at: '2025-01-15T00:00:00.000Z', updated_at: '2025-01-15T00:00:00.000Z', share_token: id, is_public: true, ...overrides } as SavedComparison
-}
+const mockSavedComparison: SavedComparison = {
+  id: 'comp-123',
+  user_id: 'user-123',
+  racket_ids: [1, 2],
+  comparison_text: JSON.stringify(mockComparisonResult),
+  metrics: mockComparisonResult.metrics,
+  created_at: '2025-01-15T00:00:00.000Z',
+  updated_at: '2025-01-15T00:00:00.000Z',
+};
 
 describe('ComparisonService', () => {
   beforeEach(() => {
-    vi.clearAllMocks()
-    seed([makeSaved()])
-  })
+    vi.clearAllMocks();
+    mockConfig.data = mockSavedComparison;
+    mockConfig.error = null;
+    mockConfig.count = null;
+  });
 
-  describe('compareRackets (fetch)', () => {
+  describe('compareRackets', () => {
+    beforeEach(() => {
+      global.fetch = vi.fn();
+    });
+
     it('should compare rackets successfully', async () => {
-      fetchMock.mockResolvedValue({ ok: true, json: async () => ({ comparison: mockComparisonResult }) })
-      const result = await ComparisonService.compareRackets([1, 2])
-      expect(result.comparison).toEqual(mockComparisonResult)
-      expect(fetchMock).toHaveBeenCalledWith('/api/comparison', expect.objectContaining({ method: 'POST', body: expect.stringContaining('"racketIds":[1,2]') }))
-    })
+      (global.fetch as any).mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          comparison: mockComparisonResult,
+        }),
+      });
 
-    it('should include user profile', async () => {
-      fetchMock.mockResolvedValue({ ok: true, json: async () => ({ comparison: mockComparisonResult }) })
-      await ComparisonService.compareRackets([1, 2], { gameLevel: 'Intermedio' })
-      const body = JSON.parse(fetchMock.mock.calls[0][1].body)
-      expect(body.userProfile).toEqual({ gameLevel: 'Intermedio' })
-    })
+      const result = await comparisonService.compareRackets([1, 2]);
 
-    it('should throw on error', async () => {
-      fetchMock.mockResolvedValue({ ok: false, status: 500, json: async () => ({ error: 'Comparison failed' }) })
-      await expect(ComparisonService.compareRackets([1, 2])).rejects.toThrow('Comparison failed')
-    })
-  })
+      expect(result.comparison).toEqual(mockComparisonResult);
+      expect(global.fetch).toHaveBeenCalledWith(
+        '/api/comparison',
+        expect.objectContaining({
+          method: 'POST',
+          body: expect.stringContaining('"racketIds":[1,2]'),
+        })
+      );
+    });
 
-  describe('saveComparison (supabase)', () => {
-    it('should save comparison', async () => {
-      const result = await ComparisonService.saveComparison([1, 2], mockComparisonResult)
-      expect(result).toBeDefined()
-      expect(result.id).toBe('comp-123')
-    })
-  })
+    it('should include user profile in request when provided', async () => {
+      const userProfile = {
+        gameLevel: 'Intermedio',
+        playingStyle: 'Polivalente',
+      };
+
+      (global.fetch as any).mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ comparison: mockComparisonResult }),
+      });
+
+      await comparisonService.compareRackets([1, 2], userProfile);
+
+      const callArgs = (global.fetch as any).mock.calls[0];
+      const body = JSON.parse(callArgs[1].body);
+
+      expect(body.userProfile).toEqual(userProfile);
+    });
+
+    it('should throw error when response is not ok', async () => {
+      (global.fetch as any).mockResolvedValueOnce({
+        ok: false,
+        status: 500,
+        json: async () => ({ error: 'Comparison failed' }),
+      });
+
+      await expect(comparisonService.compareRackets([1, 2])).rejects.toThrow('Comparison failed');
+    });
+
+    it('should throw error when error parsing fails', async () => {
+      (global.fetch as any).mockResolvedValueOnce({
+        ok: false,
+        status: 500,
+        json: async () => {
+          throw new Error('Invalid JSON');
+        },
+      });
+
+      await expect(comparisonService.compareRackets([1, 2])).rejects.toThrow(
+        'Error al comparar palas'
+      );
+    });
+
+    it('should handle network errors', async () => {
+      (global.fetch as any).mockRejectedValueOnce(new Error('Network error'));
+
+      await expect(comparisonService.compareRackets([1, 2])).rejects.toThrow('Network error');
+    });
+  });
+
+  describe('saveComparison', () => {
+    it('should save comparison successfully', async () => {
+      const result = await comparisonService.saveComparison([1, 2], mockComparisonResult);
+
+      expect(result).toEqual(mockSavedComparison);
+    });
+
+    it('should throw error when save fails', async () => {
+      mockConfig.error = new Error('Save failed');
+
+      await expect(comparisonService.saveComparison([1, 2], mockComparisonResult)).rejects.toThrow(
+        'Save failed'
+      );
+    });
+  });
 
   describe('getUserComparisons', () => {
-    it('should return comparisons', async () => {
-      const result = await ComparisonService.getUserComparisons()
-      expect(result).toHaveLength(1)
-    })
+    it('should get user comparisons successfully', async () => {
+      mockConfig.data = [mockSavedComparison];
 
-    it('should return empty when none exist', async () => {
-      seed([])
-      const result = await ComparisonService.getUserComparisons()
-      expect(result).toEqual([])
-    })
-  })
+      const result = await comparisonService.getUserComparisons();
+
+      expect(result).toEqual([mockSavedComparison]);
+    });
+
+    it('should return empty array when no comparisons exist', async () => {
+      mockConfig.data = [];
+
+      const result = await comparisonService.getUserComparisons();
+
+      expect(result).toEqual([]);
+    });
+
+    it('should throw error when fetch fails', async () => {
+      mockConfig.error = new Error('Fetch failed');
+
+      await expect(comparisonService.getUserComparisons()).rejects.toThrow('Fetch failed');
+    });
+  });
 
   describe('getComparisonById', () => {
-    it('should get by id', async () => {
-      const result = await ComparisonService.getComparisonById('comp-123')
-      expect(result.id).toBe('comp-123')
-    })
-  })
+    it('should get comparison by id successfully', async () => {
+      mockConfig.data = mockSavedComparison;
+
+      const result = await comparisonService.getComparisonById('comp-123');
+
+      expect(result).toEqual(mockSavedComparison);
+    });
+
+    it('should throw error when comparison not found', async () => {
+      mockConfig.error = new Error('Not found');
+
+      await expect(comparisonService.getComparisonById('nonexistent')).rejects.toThrow('Not found');
+    });
+  });
 
   describe('deleteComparison', () => {
-    it('should delete successfully', async () => {
-      await expect(ComparisonService.deleteComparison('comp-123')).resolves.not.toThrow()
-    })
-  })
+    it('should delete comparison successfully', async () => {
+      await expect(comparisonService.deleteComparison('comp-123')).resolves.not.toThrow();
+    });
+
+    it('should throw error when delete fails', async () => {
+      mockConfig.error = new Error('Delete failed');
+
+      await expect(comparisonService.deleteComparison('comp-123')).rejects.toThrow('Delete failed');
+    });
+  });
 
   describe('getComparisonCount', () => {
-    it('should return count', async () => {
-      const result = await ComparisonService.getComparisonCount()
-      expect(typeof result).toBe('number')
-    })
-  })
+    it('should get comparison count successfully', async () => {
+      mockConfig.count = 5;
+
+      const result = await comparisonService.getComparisonCount();
+
+      expect(result).toBe(5);
+    });
+
+    it('should return 0 on error', async () => {
+      mockConfig.error = new Error('Database error');
+
+      await expect(comparisonService.getComparisonCount()).resolves.toBe(0);
+    });
+  });
 
   describe('shareComparison', () => {
-    it('should share and return token', async () => {
-      const result = await ComparisonService.shareComparison('comp-123')
-      expect(typeof result).toBe('string')
-    })
-  })
+    it('should share comparison and return token', async () => {
+      mockConfig.data = { share_token: 'share-token-abc' };
+
+      const result = await comparisonService.shareComparison('comp-123');
+
+      expect(result).toBe('share-token-abc');
+    });
+
+    it('should throw error when share fails', async () => {
+      mockConfig.error = new Error('Share failed');
+
+      await expect(comparisonService.shareComparison('comp-123')).rejects.toThrow('Share failed');
+    });
+  });
 
   describe('unshareComparison', () => {
-    it('should unshare successfully', async () => {
-      await expect(ComparisonService.unshareComparison('comp-123')).resolves.not.toThrow()
-    })
-  })
+    it('should unshare comparison successfully', async () => {
+      await expect(comparisonService.unshareComparison('comp-123')).resolves.not.toThrow();
+    });
+
+    it('should throw error when unshare fails', async () => {
+      mockConfig.error = new Error('Unshare failed');
+
+      await expect(comparisonService.unshareComparison('comp-123')).rejects.toThrow('Unshare failed');
+    });
+  });
 
   describe('getSharedComparison', () => {
-    it('should get shared by token', async () => {
-      const result = await ComparisonService.getSharedComparison('comp-123')
-      expect(result.id).toBe('comp-123')
-    })
+    it('should get shared comparison by token', async () => {
+      mockConfig.data = mockSavedComparison;
 
-    it('should throw when not found', async () => {
-      seed([])
-      await expect(ComparisonService.getSharedComparison('bad-token')).rejects.toThrow()
-    })
-  })
-})
+      const result = await comparisonService.getSharedComparison('share-token-abc');
+
+      expect(result).toEqual(mockSavedComparison);
+    });
+
+    it('should throw error when shared comparison not found', async () => {
+      mockConfig.error = new Error('Not found');
+
+      await expect(comparisonService.getSharedComparison('invalid-token')).rejects.toThrow(
+        'Comparación compartida no encontrada'
+      );
+    });
+  });
+});

@@ -1,0 +1,11 @@
+packages:
+  - 'frontend'
+  - 'api'
+allowBuilds:
+  # @sentry/react is a plain runtime lib and needs no build step. The
+  # @sentry/cli binary download is only needed for build-time sourcemap
+  # upload via @sentry/vite-plugin, which vite.config.ts does not use.
+  # Flip to true if sourcemap upload is ever wired up.
+  '@sentry/cli': false
+  core-js: true
+  esbuild: true

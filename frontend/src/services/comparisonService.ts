@@ -26,7 +26,7 @@ async function getAuthHeader(): Promise<HeadersInit> {
   return headers;
 }
 
-export const ComparisonService = {
+const comparisonService = {
   /** AI comparison via Vercel serverless function */
   compareRackets: async (racketIds: number[], userProfile?: any): Promise<ComparisonResponse> => {
     const headers = await getAuthHeader();
@@ -144,3 +144,5 @@ export const ComparisonService = {
     return data as SavedComparison;
   },
 };
+
+export default comparisonService;

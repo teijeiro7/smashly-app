@@ -22,6 +22,7 @@ import { PWAInstallPrompt } from './components/pwa/PWAInstallPrompt';
 import { BackgroundTaskPopup } from './components/common/BackgroundTaskPopup';
 import LoadingSpinner from './components/common/LoadingSpinner';
 import { logger } from './utils/logger';
+import { sileo } from 'sileo';
 
 // ──────────────────────────────────────────────────────────────────────────────
 // Lazy page components
@@ -46,6 +47,7 @@ const PrivacyPolicyPage = lazy(() => import('./pages/PrivacyPolicyPage'));
 const UserProfilePage = lazy(() => import('./pages/UserProfilePage'));
 const ListPage = lazy(() => import('./pages/ListPage'));
 const AdminPanelPage = lazy(() => import('./pages/AdminPanelPage'));
+const StoreDashboard = lazy(() => import('./pages/StoreDashboard').then(m => ({ default: m.StoreDashboard })));
 const AdminRacketReviewPage = lazy(() => import('./pages/AdminRacketReviewPage'));
 const AdminRacketsPage = lazy(() => import('./pages/AdminRacketsPage'));
 const AdminUsersPage = lazy(() => import('./pages/AdminUsersPage'));
@@ -53,6 +55,8 @@ const AdminStoresPage = lazy(() => import('./pages/AdminStoresPage'));
 const AdminSettingsPage = lazy(() => import('./pages/AdminSettingsPage'));
 const ForgotPasswordPage = lazy(() => import('./pages/ForgotPasswordPage'));
 const UpdatePasswordPage = lazy(() => import('./pages/UpdatePasswordPage'));
+const PublicStorePage = lazy(() => import('./pages/PublicStorePage'));
+const MessagingPage = lazy(() => import('./pages/MessagingPage'));
 const NotFoundPage = lazy(() => import('./pages/NotFoundPage'));
 const ErrorPage = lazy(() => import('./pages/ErrorPage'));
 
@@ -120,6 +124,30 @@ async function requireAdmin() {
   }
 }
 
+async function requireStoreOwner() {
+  const session = await requireAuth();
+  const { data } = await supabase
+    .from('user_profiles')
+    .select('role')
+    .eq('id', session.user.id)
+    .single();
+  if (data?.role !== 'Store') {
+    throw redirect({ to: '/dashboard' });
+  }
+}
+
+async function redirectStoreOwnerToDashboard() {
+  const session = await requireAuth();
+  const { data } = await supabase
+    .from('user_profiles')
+    .select('role')
+    .eq('id', session.user.id)
+    .single();
+  if (data?.role === 'Store') {
+    throw redirect({ to: '/store/dashboard' });
+  }
+}
+
 // ──────────────────────────────────────────────────────────────────────────────
 // Global onboarding handler (Google OAuth nickname prompt)
 // ──────────────────────────────────────────────────────────────────────────────
@@ -157,6 +185,20 @@ const RegisterRedirect: React.FC = () => {
 };
 
 // ──────────────────────────────────────────────────────────────────────────────
+// Google block error handler (store_owner cannot use Google login)
+// ──────────────────────────────────────────────────────────────────────────────
+const GoogleBlockHandler: React.FC = () => {
+  const { googleBlockError, clearGoogleBlockError } = useAuth();
+  React.useEffect(() => {
+    if (googleBlockError) {
+      sileo.error({ title: 'Error', description: googleBlockError });
+      clearGoogleBlockError();
+    }
+  }, [googleBlockError, clearGoogleBlockError]);
+  return null;
+};
+
+// ──────────────────────────────────────────────────────────────────────────────
 // Root route — provides the main layout shell
 // ──────────────────────────────────────────────────────────────────────────────
 const rootRoute = createRootRoute({
@@ -165,6 +207,7 @@ const rootRoute = createRootRoute({
       <ScrollToTop />
       <AuthModal />
       <GoogleOnboardingHandler />
+      <GoogleBlockHandler />
       <PWAInstallPrompt />
       <Layout>
         <FloatingCompareButton />
@@ -271,6 +314,12 @@ const loginRoute = createRoute({
   component: LoginRedirect,
 });
 
+const publicStoreRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/store/$slug',
+  component: () => <LazyRoute><PublicStorePage /></LazyRoute>,
+});
+
 const registerRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/register',
@@ -283,8 +332,22 @@ const registerRoute = createRoute({
 const dashboardRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/dashboard',
-  beforeLoad: requireAuth,
+  beforeLoad: redirectStoreOwnerToDashboard,
   component: () => <LazyRoute><PlayerDashboard /></LazyRoute>,
+});
+
+const storeDashboardRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/store/dashboard',
+  beforeLoad: requireStoreOwner,
+  component: () => <LazyRoute><StoreDashboard /></LazyRoute>,
+});
+
+const messagingRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/messages',
+  beforeLoad: requireAuth,
+  component: () => <LazyRoute><MessagingPage /></LazyRoute>,
 });
 
 const myComparisonsRoute = createRoute({
@@ -389,6 +452,9 @@ const routeTree = rootRoute.addChildren([
   registerRoute,
   // Protected
   dashboardRoute,
+  storeDashboardRoute,
+  publicStoreRoute,
+  messagingRoute,
   myComparisonsRoute,
   profileRoute,
   listRoute,

@@ -4,7 +4,7 @@ import { FiX, FiTag, FiGrid, FiBox } from 'react-icons/fi';
 import { useNavigate } from '@tanstack/react-router';
 import styled from 'styled-components';
 import { useRackets } from '../../contexts/RacketsContext';
-import { RacketService } from '../../services/racketService';
+import racketService from '../../services/racketService';
 import { Racket } from '../../types/racket';
 import { toTitleCase } from '../../utils/textUtils';
 
@@ -435,7 +435,7 @@ export const GlobalSearch: React.FC<GlobalSearchProps> = ({
     const searchRackets = async () => {
       setIsLoading(true);
       try {
-        const result = await RacketService.searchRackets(query, {}, { limit: 6 });
+        const result = await racketService.searchRackets(query, {}, { limit: 6 });
         if (result?.data) {
           result.data.forEach((racket: Racket) => {
             results.push({ type: 'racket', data: racket });

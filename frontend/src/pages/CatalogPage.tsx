@@ -4,7 +4,7 @@ import { useNavigate, useSearch } from '@tanstack/react-router';
 import styled from 'styled-components';
 import { useComparison } from '../contexts/ComparisonContext';
 import { useRackets } from '../contexts/RacketsContext';
-import { RacketService } from '../services/racketService';
+import racketService from '../services/racketService';
 import { useAuth } from '../contexts/AuthContext';
 import { Racket } from '../types/racket';
 import { AddToListModal } from '../components/features/AddToListModal';
@@ -611,7 +611,7 @@ const CatalogPage: React.FC = () => {
   useEffect(() => {
     (async () => {
       try {
-        const stats = await RacketService.getStats();
+        const stats = await racketService.getStats();
         setServerTotal(stats.total);
       } catch (e) {
         // Ignorar errores; fallback al total del contexto
@@ -639,7 +639,7 @@ const CatalogPage: React.FC = () => {
           if (showAvailableOnly) filters.available_only = 'true';
           if (showMostViewed) filters.most_viewed = 'true';
 
-          const result = await RacketService.searchRackets(searchQuery, filters);
+          const result = await racketService.searchRackets(searchQuery, filters);
           
           if (result?.data) {
             // Apply local sorting since API returns sorted by relevance

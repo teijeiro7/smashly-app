@@ -4,8 +4,8 @@ import styled from 'styled-components';
 import { motion } from 'framer-motion';
 import { useParams, useNavigate } from '@tanstack/react-router';
 import { FiArrowLeft, FiShare2, FiLock, FiGlobe, FiDownload, FiCalendar } from 'react-icons/fi';
-import { ComparisonService, SavedComparison } from '../services/comparisonService';
-import { RacketService } from '../services/racketService';
+import comparisonService, { SavedComparison } from '../services/comparisonService';
+import racketService from '../services/racketService';
 import { Racket, ComparisonResult } from '../types/racket';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -294,14 +294,14 @@ const SavedComparisonPage: React.FC = () => {
         setLoading(true);
 
         // Cargar comparación
-        const comparisonData = await ComparisonService.getComparisonById(id);
+        const comparisonData = await comparisonService.getComparisonById(id);
         setComparison(comparisonData);
 
         // Cargar información de las palas
         const racketsData = await Promise.all(
           comparisonData.racket_ids.map(async (racketId: number) => {
             try {
-              return await RacketService.getRacketById(racketId);
+              return await racketService.getRacketById(racketId);
             } catch {
               return null;
             }
@@ -339,7 +339,7 @@ const SavedComparisonPage: React.FC = () => {
     if (!comparison) return;
 
     try {
-      const shareToken = await ComparisonService.shareComparison(comparison.id);
+      const shareToken = await comparisonService.shareComparison(comparison.id);
       const shareUrl = `${window.location.origin}/shared/${shareToken}`;
 
       await navigator.clipboard.writeText(shareUrl);

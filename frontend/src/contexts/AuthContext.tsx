@@ -9,12 +9,13 @@ interface AuthContextType {
   userProfile: UserProfile | null;
   loading: boolean;
   pendingGoogleOnboarding: { suggestedNickname: string } | null;
+  googleBlockError: string | null;
   signUp: (
     email: string,
     password: string,
     nickname: string,
     fullName?: string,
-    _role?: 'player' | 'store_owner'
+    _role?: 'Player' | 'Store'
   ) => Promise<{ data: UserProfile | null; error: string | null; token?: string }>;
   signIn: (
     email: string,
@@ -24,6 +25,7 @@ interface AuthContextType {
   signOut: () => Promise<{ error: string | null }>;
   refreshUserProfile: () => Promise<void>;
   clearGoogleOnboarding: () => void;
+  clearGoogleBlockError: () => void;
   isAuthenticated: boolean;
 }
 
@@ -69,6 +71,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [pendingGoogleOnboarding, setPendingGoogleOnboarding] = useState<{
     suggestedNickname: string;
   } | null>(null);
+  const [googleBlockError, setGoogleBlockError] = useState<string | null>(null);
 
   const loadAndSetProfile = useCallback(async (userId: string): Promise<UserProfile | null> => {
     const profile = await fetchProfile(userId);
@@ -85,6 +88,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const clearGoogleOnboarding = useCallback(() => {
     setPendingGoogleOnboarding(null);
+  }, []);
+
+  const clearGoogleBlockError = useCallback(() => {
+    setGoogleBlockError(null);
   }, []);
 
   useEffect(() => {
@@ -121,6 +128,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           setPendingGoogleOnboarding({
             suggestedNickname: deriveSuggestedNickname(session),
           });
+        }
+
+        // Block Google login for store_owner accounts
+        if (provider === 'google' && profile?.role === 'Store') {
+          supabase.auth.signOut();
+          clearAuth();
+          setGoogleBlockError('Las cuentas de tienda no pueden usar Google para iniciar sesión.');
         }
       }
     });
@@ -179,7 +193,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     password: string,
     nickname: string,
     fullName?: string,
-    _role?: 'player' | 'store_owner'
+    _role?: 'Player' | 'Store'
   ): Promise<{ data: UserProfile | null; error: string | null; token?: string }> => {
     const { data, error } = await supabase.auth.signUp({
       email: email.trim().toLowerCase(),
@@ -197,17 +211,19 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       return { data: null, error: 'No se pudo crear el usuario' };
     }
 
-    // Update profile with nickname/fullName (trigger creates the basic row)
-    await supabase.from('user_profiles').upsert({
+    const { error: upsertError } = await supabase.from('user_profiles').upsert({
       id: data.user.id,
       email: data.user.email,
       nickname,
       full_name: fullName ?? null,
-      role: 'player',
+      role: _role ?? 'Player',
     });
 
+    if (upsertError) {
+      return { data: null, error: `No se pudo actualizar el perfil: ${upsertError.message}` };
+    }
+
     if (!data.session) {
-      // Email confirmation required — return without a loaded profile
       return { data: null, error: null };
     }
 
@@ -256,24 +272,28 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     userProfile,
     loading,
     pendingGoogleOnboarding,
+    googleBlockError,
     signUp,
     signIn,
     signInWithGoogle,
     signOut,
     refreshUserProfile,
     clearGoogleOnboarding,
+    clearGoogleBlockError,
     isAuthenticated: !!user,
   }), [
     user,
     userProfile,
     loading,
     pendingGoogleOnboarding,
+    googleBlockError,
     signUp,
     signIn,
     signInWithGoogle,
     signOut,
     refreshUserProfile,
     clearGoogleOnboarding,
+    clearGoogleBlockError,
   ]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

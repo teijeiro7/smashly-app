@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { FiPlus, FiEdit2, FiTrash2, FiSearch, FiCheck, FiX } from 'react-icons/fi';
 import { sileo } from 'sileo';
 import RacketCRUDModal from './RacketCRUDModal';
-import { RacketService } from '../../services/racketService';
+import racketService from '../../services/racketService';
 import { AdminService } from '../../services/adminService';
 
 const Container = styled.div`
@@ -261,7 +261,7 @@ const RacketRequestsManager: React.FC = () => {
   const loadRackets = async () => {
     try {
       // Cargar palas reales desde la API
-      const racketsData = await RacketService.getAllRackets();
+      const racketsData = await racketService.getAllRackets();
 
       // Convertir a formato esperado con status "approved" por defecto
       const formattedRackets: Racket[] = racketsData.map((racket: any) => ({

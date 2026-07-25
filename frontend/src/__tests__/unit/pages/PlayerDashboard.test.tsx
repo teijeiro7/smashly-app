@@ -41,7 +41,7 @@ vi.mock('../../../services/listService', () => ({
 }));
 
 vi.mock('../../../services/racketService', () => ({
-  RacketService: {
+  default: {
     getAllRackets: vi.fn().mockResolvedValue([]),
   },
 }));

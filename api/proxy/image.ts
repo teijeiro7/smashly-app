@@ -87,9 +87,10 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
         Accept: 'image/avif,image/webp,image/apng,image/*,*/*;q=0.8',
       },
       signal: AbortSignal.timeout(10_000),
+      redirect: 'manual',
     });
 
-    if (!response.ok) {
+    if (!response.ok || response.status >= 300) {
       res.writeHead(response.status, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ error: 'Failed to fetch image from source' }));
       return;

@@ -1,0 +1,88 @@
+{
+  "buildCommand": "",
+  "outputDirectory": "frontend/dist",
+  "installCommand": "",
+  "framework": null,
+  "rewrites": [
+    {
+      "source": "/api/health",
+      "destination": "/api/health"
+    },
+    {
+      "source": "/api/proxy/image",
+      "destination": "/api/proxy/image"
+    },
+    {
+      "source": "/api/recommendations/generate-rag",
+      "destination": "/api/recommendations/generate-rag"
+    },
+    {
+      "source": "/api/recommendations/generate",
+      "destination": "/api/recommendations/generate"
+    },
+    {
+      "source": "/api/comparison",
+      "destination": "/api/comparison"
+    },
+    {
+      "source": "/api/admin/metrics",
+      "destination": "/api/admin/metrics"
+    },
+    {
+      "source": "/api/admin/users",
+      "destination": "/api/admin/users/index"
+    },
+    {
+      "source": "/api/admin/users/:id",
+      "destination": "/api/admin/users/[id]"
+    },
+    {
+      "source": "/api/admin/stores/:id",
+      "destination": "/api/admin/stores/[id]"
+    },
+    {
+      "source": "/api/v1/analytics/store",
+      "destination": "/api/v1/analytics/store"
+    },
+    {
+      "source": "/api/v1/messaging/conversations",
+      "destination": "/api/v1/messaging/conversations"
+    },
+    {
+      "source": "/api/v1/messaging/messages",
+      "destination": "/api/v1/messaging/messages"
+    },
+    {
+      "source": "/api/v1/stores",
+      "destination": "/api/v1/stores/index"
+    },
+    {
+      "source": "/api/v1/stores/my-store",
+      "destination": "/api/v1/stores/my-store"
+    },
+    {
+      "source": "/api/v1/stores/catalog/:storeId/search",
+      "destination": "/api/v1/stores/catalog/[storeId]/search"
+    },
+    {
+      "source": "/api/v1/stores/catalog/:storeId/:priceId",
+      "destination": "/api/v1/stores/catalog/[storeId]/[priceId]"
+    },
+    {
+      "source": "/api/v1/stores/catalog/:storeId",
+      "destination": "/api/v1/stores/catalog/[storeId]"
+    },
+    {
+      "source": "/api/v1/stores/:id",
+      "destination": "/api/v1/stores/[id]"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/api/(.*)",
+      "headers": [
+        { "key": "Access-Control-Allow-Credentials", "value": "true" }
+      ]
+    }
+  ]
+}
