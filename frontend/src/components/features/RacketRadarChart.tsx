@@ -54,6 +54,15 @@ const RadarWrapper = styled.div`
 // Colores para hasta 3 palas
 const COLORS = ['var(--primary)', 'var(--info)', 'var(--accent)'];
 
+// Etiqueta larga para los ejes abreviados del radar. Es un Map y no un objeto
+// literal porque las claves son texto de UI ('S. Bola'), que no pasa la regla
+// naming-convention de eslint.
+const METRIC_LABELS = new Map([
+  ['S. Bola', 'Salida de Bola'],
+  ['Manej.', 'Manejabilidad'],
+  ['P. Dulce', 'Punto Dulce'],
+]);
+
 // Tooltip personalizado
 const CustomTooltip = memo(({ active, payload, metrics }: any) => {
   if (!active || !payload?.length) {
@@ -71,13 +80,7 @@ const CustomTooltip = memo(({ active, payload, metrics }: any) => {
       }}
     >
       <p style={{ margin: 0, fontWeight: 600, marginBottom: '8px' }}>
-        {(
-          {
-            'S. Bola': 'Salida de Bola',
-            'Manej.': 'Manejabilidad',
-            'P. Dulce': 'Punto Dulce',
-          } as Record<string, string>
-        )[payload[0].payload.metric] ?? payload[0].payload.metric}
+        {METRIC_LABELS.get(payload[0].payload.metric) ?? payload[0].payload.metric}
       </p>
       {payload.map((entry: any, index: number) => {
         const racket = metrics[index];

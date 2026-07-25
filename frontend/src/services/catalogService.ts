@@ -24,6 +24,9 @@ export interface CatalogSearchResult {
   brand: string;
   model: string;
   images: string[];
+  // Nombre fijado por el productor: api/_v1/stores/catalog/[storeId]/search.ts
+  // devuelve `_score`, así que renombrarlo aquí rompería el mapeo.
+  // eslint-disable-next-line @typescript-eslint/naming-convention
   _score: number;
 }
 

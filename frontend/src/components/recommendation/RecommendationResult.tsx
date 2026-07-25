@@ -364,7 +364,7 @@ export const RecommendationResult: React.FC<Props> = ({
 }) => {
   // Parse analysis text into paragraphs
   const formatAnalysis = (text: string) => {
-    const cleanText = text.replace(/^[\"']|[\"']$/g, '');
+    const cleanText = text.replace(/^["']|["']$/g, '');
     const paragraphs = cleanText
       .split(/\n\n+/)
       .map(p => p.trim())

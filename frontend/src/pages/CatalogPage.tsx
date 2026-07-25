@@ -653,17 +653,19 @@ const CatalogPage: React.FC = () => {
             try {
               sorted.sort((a, b) => {
                 switch (sortBy) {
-                  case 'price-low':
+                  case 'price-low': {
                     const aComp = a.solo_comparacion ? 1 : 0;
                     const bComp = b.solo_comparacion ? 1 : 0;
                     if (aComp !== bComp) return aComp - bComp;
                     const priceA = getLowestPrice(a)?.price || a.precio_actual || 0;
                     const priceB = getLowestPrice(b)?.price || b.precio_actual || 0;
                     return priceA - priceB;
-                  case 'price-high':
+                  }
+                  case 'price-high': {
                     const priceHighA = getLowestPrice(a)?.price || a.precio_actual || 0;
                     const priceHighB = getLowestPrice(b)?.price || b.precio_actual || 0;
                     return priceHighB - priceHighA;
+                  }
                   case 'brand':
                     return (a.marca || '').localeCompare(b.marca || '');
                   case 'offer':
@@ -771,29 +773,33 @@ const CatalogPage: React.FC = () => {
       try {
         filtered.sort((a, b) => {
           switch (sortBy) {
-            case 'price-low':
+            case 'price-low': {
               const aIsComparison = a.solo_comparacion ? 1 : 0;
               const bIsComparison = b.solo_comparacion ? 1 : 0;
               if (aIsComparison !== bIsComparison) return aIsComparison - bIsComparison;
               const priceA = getLowestPrice(a)?.price || a.precio_actual || 0;
               const priceB = getLowestPrice(b)?.price || b.precio_actual || 0;
               return priceA - priceB;
-            case 'price-high':
+            }
+            case 'price-high': {
               const priceHighA = getLowestPrice(a)?.price || a.precio_actual || 0;
               const priceHighB = getLowestPrice(b)?.price || b.precio_actual || 0;
               return priceHighB - priceHighA;
-            case 'brand':
+            }
+            case 'brand': {
               const brandA = a.marca || '';
               const brandB = b.marca || '';
               return brandA.localeCompare(brandB);
+            }
             case 'offer':
               if (a.en_oferta && !b.en_oferta) return -1;
               if (!a.en_oferta && b.en_oferta) return 1;
               return 0;
-            default:
+            default: {
               const modelA = a.modelo || '';
               const modelB = b.modelo || '';
               return modelA.localeCompare(modelB);
+            }
           }
         });
       } catch (error) {

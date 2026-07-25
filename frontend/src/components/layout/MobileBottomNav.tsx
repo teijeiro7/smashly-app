@@ -307,4 +307,6 @@ const MobileBottomNav = React.memo(() => {
   );
 });
 
+MobileBottomNav.displayName = 'MobileBottomNav';
+
 export default MobileBottomNav;

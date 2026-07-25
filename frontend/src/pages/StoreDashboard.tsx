@@ -20,8 +20,7 @@ import StoreStatusCard from '../components/features/StoreStatusCard';
 import StoreProfileForm from '../components/features/StoreProfileForm';
 import StoreCatalogManager from '../components/features/StoreCatalogManager';
 import { sileo } from 'sileo';
-import analyticsService from '../services/analyticsService';
-import type { TimelineResponse } from '../services/analyticsService';
+import analyticsService, { type TimelineResponse } from '../services/analyticsService';
 
 const Container = styled.div`
   min-height: 100dvh;
