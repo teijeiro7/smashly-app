@@ -86,7 +86,9 @@ export const API_ENDPOINTS = {
 
 // Feature Flags
 export const FEATURE_FLAGS = {
-  USE_RAG_RECOMMENDATIONS: (import.meta as any).env?.VITE_USE_RAG === 'true' || true, // Enabling by default for testing
+  // Defaults to RAG on, but VITE_USE_RAG=false lets it be switched back to
+  // the deterministic recommender without a code change.
+  USE_RAG_RECOMMENDATIONS: (import.meta as any).env?.VITE_USE_RAG !== 'false',
 };
 
 /**
