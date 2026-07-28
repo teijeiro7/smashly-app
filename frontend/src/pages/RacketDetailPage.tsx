@@ -8,8 +8,6 @@ import {
   FiLoader,
   FiHeart,
   FiBarChart2,
-  FiChevronLeft,
-  FiChevronRight,
   FiTruck,
   FiLock,
   FiHome,
@@ -31,6 +29,7 @@ import { EditRacketModal } from '../components/admin/EditRacketModal';
 import { PriceHistoryChart } from '../components/features/PriceHistoryChart';
 import { RacketDetailSkeleton } from '../components/common/SkeletonLoader';
 import { ImageLightbox } from '../components/common/ImageLightbox';
+import RacketImageDeck from '../components/common/RacketImageDeck';
 import { useReviewStats } from '../hooks/useReviewStats';
 import { StarRating } from '../components/common/StarRating';
 import {
@@ -325,109 +324,6 @@ const MainImage = styled.img<{ $entering?: 'left' | 'right' }>`
   }
 `;
 
-const CarouselWrapper = styled.div`
-  position: relative;
-  width: 100%;
-  max-width: min(500px, 100%);
-  min-width: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  padding: 0 2.5rem;
-
-  @media (max-width: 768px) {
-    padding: 0;
-  }
-`;
-
-const CarouselTrack = styled.div`
-  display: flex;
-  gap: 1rem;
-  overflow-x: auto;
-  scroll-behavior: smooth;
-  padding: 0.5rem;
-  width: 100%;
-  min-width: 0;
-  scrollbar-width: none; // Hide scrollbar Firefox
-  -ms-overflow-style: none; // Hide scrollbar IE/Edge
-  -webkit-overflow-scrolling: touch; // Smooth touch scrolling iOS
-  scroll-snap-type: x mandatory; // Snap scrolling on mobile
-
-  &::-webkit-scrollbar {
-    display: none; // Hide scrollbar Chrome/Safari
-  }
-`;
-
-const ScrollButton = styled.button`
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  background: var(--surface);
-  border: 1px solid var(--color-gray-200);
-  border-radius: 50%;
-  width: 32px;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  color: var(--color-gray-700);
-  transition:
-    background-color 0.2s,
-    border-color 0.2s,
-    color 0.2s,
-    box-shadow 0.2s;
-  flex-shrink: 0;
-  box-shadow: var(--shadow-sm);
-
-  &:hover {
-    background: var(--color-gray-50);
-    border-color: var(--color-gray-300);
-    color: var(--color-gray-900);
-  }
-
-  &:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-
-  @media (max-width: 768px) {
-    display: none;
-  }
-`;
-
-const LeftScrollButton = styled(ScrollButton)`
-  left: 0;
-`;
-
-const RightScrollButton = styled(ScrollButton)`
-  right: 0;
-`;
-
-const Thumbnail = styled.img<{ $isActive: boolean }>`
-  width: 70px;
-  height: 70px;
-  object-fit: contain;
-  border-radius: 8px;
-  border: 2px solid ${props => (props.$isActive ? 'var(--color-primary)' : 'var(--color-gray-200)')};
-  background: var(--racket-image-bg);
-  box-shadow: var(--racket-image-shadow);
-  cursor: pointer;
-  transition:
-    border-color 0.2s,
-    background-color 0.2s,
-    transform 0.2s;
-  padding: 0.25rem;
-  flex-shrink: 0;
-  scroll-snap-align: center; // Snap to center on mobile
-
-  &:hover {
-    border-color: var(--color-primary);
-    transform: scale(1.05);
-  }
-`;
-
 const WishlistButton = styled.button`
   position: absolute;
   top: 1.5rem;
@@ -450,34 +346,6 @@ const WishlistButton = styled.button`
   &:hover {
     transform: scale(1.1);
     background: var(--danger-subtle);
-  }
-`;
-
-// Dots indicator for carousel
-const DotsContainer = styled.div`
-  display: flex;
-  gap: 0.5rem;
-  justify-content: center;
-  align-items: center;
-  margin-top: 1rem;
-`;
-
-const Dot = styled.button<{ $isActive: boolean }>`
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  border: none;
-  background: ${props => (props.$isActive ? 'var(--color-primary)' : 'var(--color-gray-300)')};
-  cursor: pointer;
-  transition:
-    background-color 0.2s,
-    transform 0.2s;
-  padding: 0;
-
-  &:hover {
-    background: ${props =>
-      props.$isActive ? 'var(--color-primary-dark)' : 'var(--color-gray-400)'};
-    transform: scale(1.2);
   }
 `;
 
@@ -1343,7 +1211,6 @@ const RacketDetailPage: React.FC = () => {
   const [creatingWatch, setCreatingWatch] = useState(false);
   const [watchError, setWatchError] = useState<string | null>(null);
   const [watchSaveMessage, setWatchSaveMessage] = useState<string | null>(null);
-  const carouselRef = useRef<HTMLDivElement>(null);
   const touchStartX = useRef<number | null>(null);
   const slideDirectionRef = useRef<'left' | 'right'>('left');
   const racketId = searchParams['id'];
@@ -1521,13 +1388,6 @@ const RacketDetailPage: React.FC = () => {
     touchStartX.current = null;
   };
 
-  const scrollCarousel = (direction: 'left' | 'right') => {
-    if (carouselRef.current) {
-      const scrollAmount = direction === 'left' ? -100 : 100;
-      carouselRef.current.scrollLeft += scrollAmount;
-    }
-  };
-
   const radarData = React.useMemo(() => {
     if (!racket?.radar_potencia) return null;
     return [
@@ -1701,58 +1561,13 @@ const RacketDetailPage: React.FC = () => {
             width={450}
             height={450}
           />
-          {racket.imagenes && racket.imagenes.length > 1 && (
-            <>
-              <div
-                style={{
-                  position: 'relative',
-                  width: '100%',
-                  display: 'flex',
-                  justifyContent: 'center',
-                }}
-              >
-                <CarouselWrapper>
-                  <LeftScrollButton onClick={() => scrollCarousel('left')}>
-                    <FiChevronLeft size={20} />
-                  </LeftScrollButton>
-
-                  <CarouselTrack ref={carouselRef}>
-                    {racket.imagenes.map((img, index) => (
-                      <Thumbnail
-                        key={index}
-                        src={racketImageUrl(img)}
-                        alt={`${racket.modelo} - imagen ${index + 1}`}
-                        $isActive={index === selectedImageIndex}
-                        onClick={() => setSelectedImageIndex(index)}
-                        onError={handleImageError}
-                        loading='lazy'
-                        width={70}
-                        height={70}
-                      />
-                    ))}
-                  </CarouselTrack>
-
-                  <RightScrollButton onClick={() => scrollCarousel('right')}>
-                    <FiChevronRight size={20} />
-                  </RightScrollButton>
-                </CarouselWrapper>
-              </div>
-
-              {/* Dots indicator */}
-              {racket.imagenes.length > 1 && racket.imagenes.length <= 10 && (
-                <DotsContainer>
-                  {racket.imagenes.map((_, index) => (
-                    <Dot
-                      key={index}
-                      $isActive={index === selectedImageIndex}
-                      onClick={() => setSelectedImageIndex(index)}
-                      aria-label={`Ver imagen ${index + 1}`}
-                    />
-                  ))}
-                </DotsContainer>
-              )}
-            </>
-          )}
+          <RacketImageDeck
+            images={racket.imagenes ?? []}
+            activeIndex={selectedImageIndex}
+            onSelect={setSelectedImageIndex}
+            onOverflow={() => setShowLightbox(true)}
+            alt={racket.modelo}
+          />
         </GallerySection>
 
         {/* Right: Info */}
