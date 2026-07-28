@@ -238,7 +238,9 @@ const UpdatePasswordPage: React.FC = () => {
     }
 
     if (!Object.values(passwordChecklist(newPassword)).every(Boolean)) {
-      setError('La contraseña no cumple los requisitos de seguridad (8+ caracteres, mayúscula, minúscula, número y símbolo).');
+      setError(
+        'La contraseña no cumple los requisitos de seguridad (8+ caracteres, mayúscula, minúscula, número y símbolo).'
+      );
       return;
     }
 

@@ -49,7 +49,6 @@ describe('UserService', () => {
     });
 
     it('should handle error', async () => {
-
       (global.fetch as any).mockResolvedValueOnce({
         ok: false,
         status: 404,
@@ -64,7 +63,6 @@ describe('UserService', () => {
 
   describe('createUserProfile', () => {
     it('should create user profile', async () => {
-
       const profileData = {
         nickname: 'newuser',
         full_name: 'New User',
@@ -93,7 +91,6 @@ describe('UserService', () => {
 
   describe('updateUserProfile', () => {
     it('should update user profile', async () => {
-
       const updates = { full_name: 'Updated Name' };
       const updatedProfile = { id: 'user-1', ...updates };
 
@@ -110,7 +107,6 @@ describe('UserService', () => {
 
   describe('getFavorites', () => {
     it('should fetch user favorites', async () => {
-
       const mockFavorites = [1, 2, 3, 4, 5];
 
       (global.fetch as any).mockResolvedValueOnce({
@@ -126,7 +122,6 @@ describe('UserService', () => {
 
   describe('addFavorite', () => {
     it('should add racket to favorites', async () => {
-
       (global.fetch as any).mockResolvedValueOnce({
         ok: true,
         json: async () => ({ success: true }),
@@ -149,7 +144,6 @@ describe('UserService', () => {
 
   describe('removeFavorite', () => {
     it('should remove racket from favorites', async () => {
-
       (global.fetch as any).mockResolvedValueOnce({
         ok: true,
         json: async () => ({ success: true }),

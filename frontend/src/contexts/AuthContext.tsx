@@ -130,7 +130,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           setLoading(false);
         }
       })
-      .catch((error) => {
+      .catch(error => {
         // A rejected getSession() must not leave `loading` stuck forever —
         // fail as "no session" rather than hang the whole app on a spinner.
         logger.warn('Could not restore session:', error);
