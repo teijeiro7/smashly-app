@@ -12,20 +12,25 @@ interface RacketImageDeckProps {
 }
 
 const MAX_VISIBLE = 5;
+const PEEK_SPREAD = 20;
+const OPEN_SPREAD = 92;
 
 const Deck = styled.div`
   position: relative;
-  width: 100%;
-  max-width: min(420px, 100%);
+  width: 88px;
   height: 130px;
-  margin-top: 1rem;
+  margin-top: 1.5rem;
+
+  @media (max-width: 768px) {
+    width: 68px;
+  }
 `;
 
 const Card = styled(motion.button)<{ $isActive: boolean }>`
   position: absolute;
   top: 0;
   left: 0;
-  width: min(110px, 18%);
+  width: 88px;
   aspect-ratio: 3 / 4;
   padding: 0;
   border-radius: var(--radius-lg);
@@ -38,6 +43,10 @@ const Card = styled(motion.button)<{ $isActive: boolean }>`
   &:focus-visible {
     outline: 2px solid var(--color-primary);
     outline-offset: 2px;
+  }
+
+  @media (max-width: 768px) {
+    width: 68px;
   }
 `;
 
@@ -72,9 +81,10 @@ const RacketImageDeck: React.FC<RacketImageDeckProps> = ({
   onOverflow,
   alt,
 }) => {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
   const prefersReducedMotion = useReducedMotion();
-  const open = prefersReducedMotion || isOpen;
+  const open = prefersReducedMotion || isHovered;
+  const spread = open ? OPEN_SPREAD : PEEK_SPREAD;
 
   if (images.length <= 1) return null;
 
@@ -83,7 +93,7 @@ const RacketImageDeck: React.FC<RacketImageDeckProps> = ({
   const center = Math.floor(visible.length / 2);
 
   const handleCardClick = (index: number, isLast: boolean) => {
-    setIsOpen(true);
+    setIsHovered(true);
     if (isLast && overflowCount > 0) {
       onOverflow();
       return;
@@ -93,10 +103,10 @@ const RacketImageDeck: React.FC<RacketImageDeckProps> = ({
 
   return (
     <Deck
-      onMouseEnter={() => setIsOpen(true)}
-      onMouseLeave={() => setIsOpen(false)}
-      onFocus={() => setIsOpen(true)}
-      onBlur={() => setIsOpen(false)}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      onFocus={() => setIsHovered(true)}
+      onBlur={() => setIsHovered(false)}
     >
       {visible.map((img, index) => {
         const dist = index - center;
@@ -111,7 +121,7 @@ const RacketImageDeck: React.FC<RacketImageDeckProps> = ({
             aria-label={`Ver imagen ${index + 1}`}
             aria-pressed={isActive}
             animate={{
-              x: open ? `${dist * 92}%` : 0,
+              x: `${dist * spread}%`,
               scale: open && isActive ? 1.06 : 1,
             }}
             transition={
