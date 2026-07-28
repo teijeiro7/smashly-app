@@ -16,6 +16,7 @@ import {
 import { GiTennisRacket } from 'react-icons/gi';
 import { Link, useNavigate, useSearch } from '@tanstack/react-router';
 import { useAuth } from '../contexts/AuthContext';
+import { getAuthHeaders } from '../config/api';
 import { UserProfileService } from '../services/userProfileService';
 import { UploadService } from '../services/uploadService';
 import racketService from '../services/racketService';
@@ -494,9 +495,7 @@ const UserProfilePage: React.FC = () => {
   const loadActivity = async () => {
     try {
       const response = await fetch('/api/v1/users/me/activity', {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('auth_token')}`,
-        },
+        headers: await getAuthHeaders(),
       });
       if (response.ok) {
         const data = await response.json();

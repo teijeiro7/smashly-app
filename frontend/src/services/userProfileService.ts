@@ -1,4 +1,4 @@
-import { API_ENDPOINTS, buildApiUrl, getCommonHeaders, ApiResponse } from '../config/api';
+import { API_ENDPOINTS, buildApiUrl, getAuthHeaders, ApiResponse } from '../config/api';
 import { supabase } from '../lib/supabase';
 import { logger } from '../utils/logger';
 
@@ -61,9 +61,8 @@ export class UserProfileService {
     try {
       const url = buildApiUrl(API_ENDPOINTS.USERS_PROFILE);
       const response = await fetch(url, {
-        credentials: 'include', // send httpOnly auth cookie
         method: 'POST',
-        headers: getCommonHeaders(),
+        headers: await getAuthHeaders(),
         body: JSON.stringify({
           nickname,
           full_name: fullName || '',
@@ -91,9 +90,8 @@ export class UserProfileService {
     try {
       const url = buildApiUrl(API_ENDPOINTS.USERS_PROFILE);
       const response = await fetch(url, {
-        credentials: 'include', // send httpOnly auth cookie
         method: 'GET',
-        headers: getCommonHeaders(),
+        headers: await getAuthHeaders(),
       });
 
       if (response.status === 404) {
@@ -129,7 +127,7 @@ export class UserProfileService {
    * endpoint REST que sustituye.
    */
   static async updateUserProfile(
-    updates: Partial<Omit<UserProfile, 'id' | 'created_at'>>
+    updates: Partial<Omit<UserProfile, 'id' | 'email' | 'role' | 'created_at' | 'updated_at'>>
   ): Promise<UserProfile> {
     try {
       const {
@@ -178,9 +176,8 @@ export class UserProfileService {
     try {
       const url = buildApiUrl(API_ENDPOINTS.USERS_PROFILE);
       const response = await fetch(url, {
-        credentials: 'include', // send httpOnly auth cookie
         method: 'DELETE',
-        headers: getCommonHeaders(),
+        headers: await getAuthHeaders(),
       });
 
       await handleApiResponse<void>(response);

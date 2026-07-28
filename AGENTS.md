@@ -38,4 +38,4 @@ Monorepo: frontend (Vite/React) + API (Vercel serverless) + Supabase.
 ## Key decisions
 - Admin client (`supabaseAdmin`) bypasses RLS — used server-side only
 - Frontend uses Vite proxy for Supabase in dev (same-origin, avoids CORS)
-- Auth lives in httpOnly cookies; legacy localStorage fallback being deprecated
+- Auth is client-side via `@supabase/supabase-js`, which persists the session in browser `localStorage`; `api/` verifies bearer tokens per-request via `getAuthUser()` (no cookies involved)

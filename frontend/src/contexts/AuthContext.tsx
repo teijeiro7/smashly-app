@@ -8,9 +8,9 @@ import React, {
   useState,
 } from 'react';
 import { supabase } from '../lib/supabase';
+import { queryClient } from '../lib/queryClient';
 import { UserProfile } from '../services/userProfileService';
 import { logger } from '../utils/logger';
-import { setAuthToken, removeAuthToken } from '../utils/authUtils';
 
 interface AuthContextType {
   user: UserProfile | null;
@@ -35,6 +35,11 @@ interface AuthContextType {
   clearGoogleOnboarding: () => void;
   clearGoogleBlockError: () => void;
   isAuthenticated: boolean;
+  /** True once Supabase has parsed a password-recovery link from the URL and
+   * established a recovery session — UpdatePasswordPage uses this instead of
+   * parsing the URL hash itself, since by the time that (lazy-loaded) page
+   * mounts, supabase-js has usually already consumed and stripped the hash. */
+  isPasswordRecovery: boolean;
 }
 
 interface AuthProviderProps {
@@ -75,6 +80,13 @@ function deriveSuggestedNickname(session: any): string {
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<UserProfile | null>(null);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+  // Tracks whether a Supabase session exists, independent of whether the
+  // user_profiles row could be loaded. `isAuthenticated` must key off this,
+  // not off `user` — a profile fetch failing (network blip, RLS hiccup, a
+  // signup whose profile insert didn't land) must not make a session holder
+  // look logged out.
+  const [hasSession, setHasSession] = useState<boolean>(false);
+  const [isPasswordRecovery, setIsPasswordRecovery] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
   const [pendingGoogleOnboarding, setPendingGoogleOnboarding] = useState<{
     suggestedNickname: string;
@@ -91,7 +103,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const clearAuth = useCallback(() => {
     setUser(null);
     setUserProfile(null);
-    removeAuthToken();
+    setHasSession(false);
   }, []);
 
   const clearGoogleOnboarding = useCallback(() => {
@@ -105,17 +117,25 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   useEffect(() => {
     let mounted = true;
 
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (!mounted) return;
-      if (session?.user) {
-        setAuthToken(session.access_token);
-        loadAndSetProfile(session.user.id).finally(() => {
-          if (mounted) setLoading(false);
-        });
-      } else {
-        setLoading(false);
-      }
-    });
+    supabase.auth
+      .getSession()
+      .then(({ data: { session } }) => {
+        if (!mounted) return;
+        if (session?.user) {
+          setHasSession(true);
+          loadAndSetProfile(session.user.id).finally(() => {
+            if (mounted) setLoading(false);
+          });
+        } else {
+          setLoading(false);
+        }
+      })
+      .catch(error => {
+        // A rejected getSession() must not leave `loading` stuck forever —
+        // fail as "no session" rather than hang the whole app on a spinner.
+        logger.warn('Could not restore session:', error);
+        if (mounted) setLoading(false);
+      });
 
     const {
       data: { subscription },
@@ -128,7 +148,19 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         return;
       }
 
+      if (event === 'PASSWORD_RECOVERY') {
+        // A recovery link was just parsed from the URL: there is now a
+        // session that can call supabase.auth.updateUser({ password }), but
+        // this is NOT a normal login — don't route the user anywhere else,
+        // just flag it so UpdatePasswordPage can render its form.
+        setHasSession(true);
+        setIsPasswordRecovery(true);
+        setLoading(false);
+        return;
+      }
+
       if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'USER_UPDATED') {
+        setHasSession(true);
         const profile = await loadAndSetProfile(session.user.id);
         setLoading(false);
 
@@ -142,7 +174,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
         // Block Google login for store_owner accounts
         if (provider === 'google' && profile?.role === 'Store') {
-          supabase.auth.signOut();
+          supabase.auth.signOut({ scope: 'local' });
           clearAuth();
           setGoogleBlockError('Las cuentas de tienda no pueden usar Google para iniciar sesión.');
         }
@@ -174,10 +206,16 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       });
 
       if (error) {
-        let friendly = error.message;
+        let friendly = 'No se pudo iniciar sesión. Inténtalo de nuevo.';
         let errorCode = error.code ?? 'AUTH_ERROR';
 
-        if (error.message.includes('Invalid login credentials')) {
+        // Deliberately generic for credential/existence failures: mapping
+        // "Invalid login credentials" and "User not found" to different
+        // messages lets an attacker enumerate which emails have accounts.
+        if (
+          error.message.includes('Invalid login credentials') ||
+          error.message.includes('User not found')
+        ) {
           friendly = 'Credenciales inválidas. Verifica tu email y contraseña.';
           errorCode = 'INVALID_PASSWORD';
         } else if (error.message.includes('Email not confirmed')) {
@@ -186,9 +224,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         } else if (error.message.includes('too many')) {
           friendly = 'Demasiados intentos. Espera un momento antes de intentar de nuevo.';
           errorCode = 'TOO_MANY_REQUESTS';
-        } else if (error.message.includes('User not found')) {
-          friendly = 'No tienes una cuenta con este email. ¿Quieres registrarte?';
-          errorCode = 'USER_NOT_FOUND';
         }
 
         return { data: null, error: friendly, errorCode };
@@ -198,7 +233,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         return { data: null, error: 'No se recibió sesión', errorCode: 'NO_SESSION' };
       }
 
-      setAuthToken(data.session.access_token);
+      setHasSession(true);
       const profile = await loadAndSetProfile(data.session.user.id);
       return { data: profile, error: null };
     },
@@ -229,16 +264,22 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         return { data: null, error: 'No se pudo crear el usuario' };
       }
 
+      // `role` is intentionally NOT sent here: it's set server-side by the
+      // handle_new_user trigger (always 'Player') and, for store accounts,
+      // promoted to 'Store' via service-role once the store request is
+      // approved (api/_v1/stores/index.ts). `authenticated` no longer has
+      // UPDATE privilege on this column — sending it here would make this
+      // upsert fail outright.
       const { error: upsertError } = await supabase.from('user_profiles').upsert({
         id: data.user.id,
         email: data.user.email,
         nickname,
         full_name: fullName ?? null,
-        role: _role ?? 'Player',
       });
 
       if (upsertError) {
-        return { data: null, error: `No se pudo actualizar el perfil: ${upsertError.message}` };
+        logger.error('Could not upsert profile after signup:', upsertError.message);
+        return { data: null, error: 'No se pudo completar el registro. Inténtalo de nuevo.' };
       }
 
       if (!data.session) {
@@ -275,8 +316,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   }, []);
 
   const signOut = useCallback(async (): Promise<{ error: string | null }> => {
-    const { error } = await supabase.auth.signOut();
+    // scope: 'local' — sign out of THIS browser only. The default ('global')
+    // revokes every session for the user, so logging out on your phone would
+    // also kick you out on your laptop.
+    const { error } = await supabase.auth.signOut({ scope: 'local' });
     clearAuth();
+    // Drop any cached React Query data (profile, lists, conversations, ...)
+    // so a different account signing in on the same device/tab never sees
+    // a flash of the previous user's data before it refetches.
+    queryClient.clear();
     return { error: error?.message ?? null };
   }, [clearAuth]);
 
@@ -303,11 +351,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       refreshUserProfile,
       clearGoogleOnboarding,
       clearGoogleBlockError,
-      isAuthenticated: !!user,
+      isAuthenticated: hasSession,
+      isPasswordRecovery,
     }),
     [
       user,
       userProfile,
+      hasSession,
+      isPasswordRecovery,
       loading,
       pendingGoogleOnboarding,
       googleBlockError,

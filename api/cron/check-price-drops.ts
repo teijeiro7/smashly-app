@@ -14,9 +14,14 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
   }
 
   const CRON_SECRET = process.env.CRON_SECRET;
-  const authHeader = req.headers['authorization'] || '';
+  if (!CRON_SECRET) {
+    res.writeHead(500, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ error: 'CRON_SECRET not configured' }));
+    return;
+  }
 
-  if (CRON_SECRET && authHeader !== `Bearer ${CRON_SECRET}`) {
+  const authHeader = req.headers['authorization'] || '';
+  if (authHeader !== `Bearer ${CRON_SECRET}`) {
     res.writeHead(401, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify({ error: 'Unauthorized' }));
     return;

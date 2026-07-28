@@ -76,7 +76,7 @@ describe('UserProfileService', () => {
         expect.stringContaining('/api/v1/users/profile'),
         expect.objectContaining({
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 'Content-Type': 'application/json', Authorization: 'Bearer t' },
           body: JSON.stringify({
             nickname: 'TestUser',
             full_name: 'Test User',

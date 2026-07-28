@@ -2,9 +2,11 @@ import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
 import { FiLock, FiEye, FiEyeOff, FiAlertCircle, FiLoader, FiShield } from 'react-icons/fi';
-import { useNavigate, useRouterState } from '@tanstack/react-router';
+import { useNavigate } from '@tanstack/react-router';
 import { sileo } from 'sileo';
-import { buildApiUrl, API_ENDPOINTS } from '../config/api';
+import { supabase } from '../lib/supabase';
+import { useAuth } from '../contexts/AuthContext';
+import { passwordChecklist } from '../schemas/auth';
 
 const PageContainer = styled.div`
   min-height: 100vh;
@@ -197,31 +199,25 @@ const PasswordStrength = styled.div<{ $strength: number }>`
 
 const UpdatePasswordPage: React.FC = () => {
   const navigate = useNavigate();
-  const { location } = useRouterState();
+  const { isPasswordRecovery, loading: authLoading } = useAuth();
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [token, setToken] = useState<string | null>(null);
 
   useEffect(() => {
-    // Supabase redirects with token in hash: #access_token=...&type=recovery
-    const hash = location.hash;
-    if (hash) {
-      const params = new URLSearchParams(hash.substring(1));
-      const accessToken = params.get('access_token');
-      const type = params.get('type');
-
-      if (accessToken && type === 'recovery') {
-        setToken(accessToken);
-      } else if (!accessToken) {
-        setError('El enlace de recuperación es inválido o ha expirado.');
-      }
-    } else {
-      setError('No se ha encontrado un token de recuperación válido.');
+    // AuthContext's onAuthStateChange listener is subscribed at app boot
+    // (long before this lazy-loaded route mounts) and sets
+    // isPasswordRecovery when it catches the PASSWORD_RECOVERY event fired
+    // by supabase-js after it parses the recovery link's URL fragment. By
+    // the time this effect runs, that parsing has normally already
+    // happened — give it one tick past the initial auth-loading phase
+    // before deciding the link is invalid.
+    if (!authLoading && !isPasswordRecovery) {
+      setError('El enlace de recuperación es inválido o ha expirado.');
     }
-  }, [location]);
+  }, [authLoading, isPasswordRecovery]);
 
   const calculateStrength = (pass: string) => {
     let score = 0;
@@ -236,13 +232,15 @@ const UpdatePasswordPage: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!token) {
-      setError('No tienes un token válido para realizar esta acción.');
+    if (!isPasswordRecovery) {
+      setError('El enlace de recuperación es inválido o ha expirado.');
       return;
     }
 
-    if (newPassword.length < 8) {
-      setError('La contraseña debe tener al menos 8 caracteres');
+    if (!Object.values(passwordChecklist(newPassword)).every(Boolean)) {
+      setError(
+        'La contraseña no cumple los requisitos de seguridad (8+ caracteres, mayúscula, minúscula, número y símbolo).'
+      );
       return;
     }
 
@@ -255,19 +253,10 @@ const UpdatePasswordPage: React.FC = () => {
     setError(null);
 
     try {
-      const response = await fetch(buildApiUrl(API_ENDPOINTS.AUTH_UPDATE_PASSWORD), {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ newPassword }),
-      });
+      const { error: updateError } = await supabase.auth.updateUser({ password: newPassword });
 
-      const result = await response.json();
-
-      if (!response.ok || !result.success) {
-        throw new Error(result.message || 'Error al actualizar la contraseña');
+      if (updateError) {
+        throw new Error(updateError.message || 'Error al actualizar la contraseña');
       }
 
       sileo.success({
@@ -275,7 +264,6 @@ const UpdatePasswordPage: React.FC = () => {
         description: 'Tu contraseña se ha cambiado correctamente. Ya puedes iniciar sesión.',
       });
 
-      // Redirigir al inicio (el modal de login se puede abrir allí)
       navigate({ to: '/' });
     } catch (err: any) {
       setError(err.message);
@@ -313,11 +301,11 @@ const UpdatePasswordPage: React.FC = () => {
               <Input
                 id='new-password'
                 type={showPassword ? 'text' : 'password'}
-                placeholder='Mínimo 8 caracteres'
+                placeholder='8+ caracteres, mayúscula, número y símbolo'
                 value={newPassword}
                 onChange={e => setNewPassword(e.target.value)}
                 $hasError={!!error && error.includes('contraseña')}
-                disabled={loading || !token}
+                disabled={loading || !isPasswordRecovery}
               />
               <PasswordToggle type='button' onClick={() => setShowPassword(!showPassword)}>
                 {showPassword ? <FiEyeOff /> : <FiEye />}
@@ -337,7 +325,7 @@ const UpdatePasswordPage: React.FC = () => {
                 value={confirmPassword}
                 onChange={e => setConfirmPassword(e.target.value)}
                 $hasError={!!error && error.includes('coinciden')}
-                disabled={loading || !token}
+                disabled={loading || !isPasswordRecovery}
               />
             </InputWrapper>
             {error && (
@@ -347,7 +335,7 @@ const UpdatePasswordPage: React.FC = () => {
             )}
           </FormGroup>
 
-          <SubmitButton type='submit' disabled={loading || !token}>
+          <SubmitButton type='submit' disabled={loading || !isPasswordRecovery}>
             {loading ? (
               <>
                 <motion.div

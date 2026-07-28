@@ -2,6 +2,7 @@
  * API Configuration
  * Configuración centralizada para las llamadas a la API REST
  */
+import { supabase } from '../lib/supabase';
 
 // URL base de la API
 // Por defecto, usa el mismo origen que sirve la SPA (evita CSP y mixed content)
@@ -32,15 +33,6 @@ export const API_ENDPOINTS = {
   USERS_PROFILE: '/api/v1/users/profile',
   USERS_FAVORITES: '/api/v1/users/favorites',
   USERS_FAVORITE_BY_ID: (id: number) => `/api/v1/users/favorites/${id}`,
-
-  // Auth
-  AUTH_LOGIN: '/api/v1/auth/login',
-  AUTH_REGISTER: '/api/v1/auth/register',
-  AUTH_LOGOUT: '/api/v1/auth/logout',
-  AUTH_ME: '/api/v1/auth/me',
-  AUTH_GOOGLE: '/api/v1/auth/google',
-  AUTH_RESET_PASSWORD: '/api/v1/auth/reset-password',
-  AUTH_UPDATE_PASSWORD: '/api/v1/auth/update-password',
 
   // Stores
   STORES: '/api/v1/stores',
@@ -129,58 +121,23 @@ export const buildApiUrl = (endpoint: string, params?: Record<string, any>): str
 };
 
 /**
- * Helper para obtener el token de autenticación.
- * @deprecated El token vive en una cookie httpOnly inaccessible desde JS.
- * Usa getCommonHeaders() + credentials:'include' en las llamadas fetch.
+ * Headers de autenticación para llamadas a la API propia.
+ * No hay backend de auth ni cookie httpOnly: la sesión de Supabase vive en
+ * localStorage (ver frontend/src/lib/supabase.ts) y el access token viaja
+ * como `Authorization: Bearer <token>`, que es lo que `api/_lib/auth.ts`
+ * (`getAuthUser`) espera en el servidor.
  */
-export const getAuthToken = (): string | null => {
-  // Legacy support during migration: check localStorage first
-  try {
-    const legacy = localStorage.getItem('auth_token');
-    if (legacy) return legacy;
-  } catch (_) {
-    /* SSR or storage disabled */
+export const getAuthHeaders = async (): Promise<HeadersInit> => {
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+
+  const headers: HeadersInit = { 'Content-Type': 'application/json' };
+  if (session?.access_token) {
+    headers['Authorization'] = `Bearer ${session.access_token}`;
   }
-  return null;
-};
-
-/**
- * Helper para configurar headers comunes.
- * SECURITY: El JWT viaja en una cookie httpOnly (invisible a JS, enviada automáticamente).
- * El header Authorization solo se usa como fallback si hay un token legacy en localStorage.
- */
-export const getCommonHeaders = (): HeadersInit => {
-  const headers: HeadersInit = {
-    'Content-Type': 'application/json',
-  };
-
-  // Legacy fallback: if there's a token in localStorage (pre-migration users), send it
-  const legacyToken = getAuthToken();
-  if (legacyToken) {
-    headers['Authorization'] = `Bearer ${legacyToken}`;
-    // Clean it up so the user migrates to cookie auth on next login
-    try {
-      localStorage.removeItem('auth_token');
-    } catch (_) {
-      /* ignore */
-    }
-  }
-
   return headers;
 };
-
-/**
- * Fetch options que incluyen credentials para enviar cookies httpOnly al backend.
- * Úsalas en todos los fetch() que necesiten autenticación.
- */
-export const getAuthFetchOptions = (options: RequestInit = {}): RequestInit => ({
-  ...options,
-  credentials: 'include',
-  headers: {
-    'Content-Type': 'application/json',
-    ...options.headers,
-  },
-});
 
 /**
  * Tipo para respuestas de la API

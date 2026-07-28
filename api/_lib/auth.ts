@@ -1,5 +1,5 @@
 import type { IncomingMessage, ServerResponse } from 'http';
-import { supabaseAdmin } from './supabase';
+import { supabaseAdmin, supabaseAnon } from './supabase';
 
 export interface AuthUser {
   id: string;
@@ -24,7 +24,7 @@ export async function getAuthUser(req: IncomingMessage): Promise<AuthUser | null
   const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : null;
   if (!token) return null;
 
-  const { data: { user }, error } = await supabaseAdmin.auth.getUser(token);
+  const { data: { user }, error } = await supabaseAnon.auth.getUser(token);
   if (error || !user) return null;
 
   return { id: user.id, email: user.email };

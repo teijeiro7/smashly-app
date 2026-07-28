@@ -103,6 +103,9 @@ importers:
       '@sentry/vite-plugin':
         specifier: ^5.4.0
         version: 5.4.0(rollup@4.62.2)
+      '@supabase/auth-js':
+        specifier: ^2.105.4
+        version: 2.110.2
       '@supabase/supabase-js':
         specifier: ^2.75.0
         version: 2.110.2
