@@ -1,4 +1,4 @@
-import { API_ENDPOINTS, buildApiUrl, getCommonHeaders } from '../config/api';
+import { API_ENDPOINTS, buildApiUrl, getAuthHeaders } from '../config/api';
 
 export interface PriceWatch {
   id: string;
@@ -14,8 +14,7 @@ const priceWatchService = {
       ? `${buildApiUrl(API_ENDPOINTS.PRICE_WATCH)}?racket_id=${racketId}`
       : buildApiUrl(API_ENDPOINTS.PRICE_WATCH);
     const response = await fetch(url, {
-      credentials: 'include',
-      headers: getCommonHeaders(),
+      headers: await getAuthHeaders(),
     });
     if (!response.ok) {
       const err = await response.json().catch(() => ({}));
@@ -27,8 +26,7 @@ const priceWatchService = {
   async createWatch(racketId: number, targetPrice: number): Promise<PriceWatch> {
     const response = await fetch(buildApiUrl(API_ENDPOINTS.PRICE_WATCH), {
       method: 'POST',
-      credentials: 'include',
-      headers: getCommonHeaders(),
+      headers: await getAuthHeaders(),
       body: JSON.stringify({ racket_id: racketId, target_price: targetPrice }),
     });
     if (!response.ok) {
@@ -41,8 +39,7 @@ const priceWatchService = {
   async deleteWatch(watchId: string): Promise<void> {
     const response = await fetch(buildApiUrl(API_ENDPOINTS.PRICE_WATCH_BY_ID(watchId)), {
       method: 'DELETE',
-      credentials: 'include',
-      headers: getCommonHeaders(),
+      headers: await getAuthHeaders(),
     });
     if (!response.ok) {
       const err = await response.json().catch(() => ({}));

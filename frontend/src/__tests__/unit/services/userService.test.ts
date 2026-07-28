@@ -4,8 +4,17 @@ import { UserService } from '../../../services/userService';
 // Mock fetch
 global.fetch = vi.fn();
 
-// Mock localStorage
-Storage.prototype.getItem = vi.fn();
+// getAuthHeaders() (frontend/src/config/api.ts) reads the real Supabase
+// session, not localStorage — mock the client it calls.
+vi.mock('../../../lib/supabase', () => ({
+  supabase: {
+    auth: {
+      getSession: vi.fn(() =>
+        Promise.resolve({ data: { session: { access_token: 'test-token' } } })
+      ),
+    },
+  },
+}));
 
 describe('UserService', () => {
   beforeEach(() => {
@@ -14,8 +23,6 @@ describe('UserService', () => {
 
   describe('getUserProfile', () => {
     it('should fetch user profile', async () => {
-      vi.mocked(localStorage.getItem).mockReturnValue('test-token');
-
       const mockProfile = {
         id: 'user-1',
         email: 'test@test.com',
@@ -42,7 +49,6 @@ describe('UserService', () => {
     });
 
     it('should handle error', async () => {
-      vi.mocked(localStorage.getItem).mockReturnValue('test-token');
 
       (global.fetch as any).mockResolvedValueOnce({
         ok: false,
@@ -58,7 +64,6 @@ describe('UserService', () => {
 
   describe('createUserProfile', () => {
     it('should create user profile', async () => {
-      vi.mocked(localStorage.getItem).mockReturnValue('test-token');
 
       const profileData = {
         nickname: 'newuser',
@@ -88,7 +93,6 @@ describe('UserService', () => {
 
   describe('updateUserProfile', () => {
     it('should update user profile', async () => {
-      vi.mocked(localStorage.getItem).mockReturnValue('test-token');
 
       const updates = { full_name: 'Updated Name' };
       const updatedProfile = { id: 'user-1', ...updates };
@@ -106,7 +110,6 @@ describe('UserService', () => {
 
   describe('getFavorites', () => {
     it('should fetch user favorites', async () => {
-      vi.mocked(localStorage.getItem).mockReturnValue('test-token');
 
       const mockFavorites = [1, 2, 3, 4, 5];
 
@@ -123,7 +126,6 @@ describe('UserService', () => {
 
   describe('addFavorite', () => {
     it('should add racket to favorites', async () => {
-      vi.mocked(localStorage.getItem).mockReturnValue('test-token');
 
       (global.fetch as any).mockResolvedValueOnce({
         ok: true,
@@ -147,7 +149,6 @@ describe('UserService', () => {
 
   describe('removeFavorite', () => {
     it('should remove racket from favorites', async () => {
-      vi.mocked(localStorage.getItem).mockReturnValue('test-token');
 
       (global.fetch as any).mockResolvedValueOnce({
         ok: true,

@@ -1,4 +1,4 @@
-import { API_ENDPOINTS, buildApiUrl, getCommonHeaders, ApiResponse } from '../config/api';
+import { API_ENDPOINTS, buildApiUrl, getAuthHeaders, ApiResponse } from '../config/api';
 import { logger } from '../utils/logger';
 
 // Interfaz para el perfil de usuario
@@ -68,7 +68,7 @@ export class UserService {
       const url = buildApiUrl(API_ENDPOINTS.USERS_PROFILE);
       const response = await fetch(url, {
         method: 'GET',
-        headers: getCommonHeaders(),
+        headers: await getAuthHeaders(),
       });
 
       if (response.status === 404) {
@@ -93,7 +93,7 @@ export class UserService {
       const url = buildApiUrl(API_ENDPOINTS.USERS_PROFILE);
       const response = await fetch(url, {
         method: 'POST',
-        headers: getCommonHeaders(),
+        headers: await getAuthHeaders(),
         body: JSON.stringify(profileData),
       });
 
@@ -112,7 +112,7 @@ export class UserService {
       const url = buildApiUrl(API_ENDPOINTS.USERS_PROFILE);
       const response = await fetch(url, {
         method: 'PUT',
-        headers: getCommonHeaders(),
+        headers: await getAuthHeaders(),
         body: JSON.stringify(updates),
       });
 
@@ -131,7 +131,7 @@ export class UserService {
       const url = buildApiUrl(API_ENDPOINTS.USERS_FAVORITES);
       const response = await fetch(url, {
         method: 'GET',
-        headers: getCommonHeaders(),
+        headers: await getAuthHeaders(),
       });
 
       return await handleApiResponse<number[]>(response);
@@ -149,7 +149,7 @@ export class UserService {
       const url = buildApiUrl(API_ENDPOINTS.USERS_FAVORITES);
       const response = await fetch(url, {
         method: 'POST',
-        headers: getCommonHeaders(),
+        headers: await getAuthHeaders(),
         body: JSON.stringify({ racket_id: racketId }),
       });
 
@@ -168,7 +168,7 @@ export class UserService {
       const url = buildApiUrl(API_ENDPOINTS.USERS_FAVORITE_BY_ID(racketId));
       const response = await fetch(url, {
         method: 'DELETE',
-        headers: getCommonHeaders(),
+        headers: await getAuthHeaders(),
       });
 
       await handleApiResponse<void>(response);

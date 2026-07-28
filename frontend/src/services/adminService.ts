@@ -1,14 +1,5 @@
-import { API_ENDPOINTS, buildApiUrl, getCommonHeaders, ApiResponse } from '../config/api';
+import { API_ENDPOINTS, buildApiUrl, getAuthHeaders, ApiResponse } from '../config/api';
 import { supabase } from '../lib/supabase';
-
-async function getAuthHeaders(): Promise<HeadersInit> {
-  const {
-    data: { session },
-  } = await supabase.auth.getSession();
-  const headers: HeadersInit = { 'Content-Type': 'application/json' };
-  if (session?.access_token) headers['Authorization'] = `Bearer ${session.access_token}`;
-  return headers;
-}
 
 /**
  * Helper para manejar respuestas de la API
@@ -167,8 +158,7 @@ export class AdminService {
       buildApiUrl(`${API_ENDPOINTS.ADMIN.STORE_REQUESTS}/${requestId}/approve`),
       {
         method: 'POST',
-        credentials: 'include',
-        headers: getCommonHeaders(),
+        headers: await getAuthHeaders(),
       }
     );
 
@@ -183,8 +173,7 @@ export class AdminService {
       buildApiUrl(`${API_ENDPOINTS.ADMIN.STORE_REQUESTS}/${requestId}/reject`),
       {
         method: 'POST',
-        credentials: 'include',
-        headers: getCommonHeaders(),
+        headers: await getAuthHeaders(),
       }
     );
 
@@ -197,8 +186,7 @@ export class AdminService {
   static async getRacketRequests(): Promise<RacketRequest[]> {
     const response = await fetch(buildApiUrl(API_ENDPOINTS.ADMIN.RACKET_REQUESTS), {
       method: 'GET',
-      credentials: 'include',
-      headers: getCommonHeaders(),
+      headers: await getAuthHeaders(),
     });
 
     return handleApiResponse<RacketRequest[]>(response);
@@ -212,8 +200,7 @@ export class AdminService {
       buildApiUrl(`${API_ENDPOINTS.ADMIN.RACKET_REQUESTS}/${requestId}/approve`),
       {
         method: 'POST',
-        credentials: 'include',
-        headers: getCommonHeaders(),
+        headers: await getAuthHeaders(),
       }
     );
 
@@ -228,8 +215,7 @@ export class AdminService {
       buildApiUrl(`${API_ENDPOINTS.ADMIN.RACKET_REQUESTS}/${requestId}/reject`),
       {
         method: 'POST',
-        credentials: 'include',
-        headers: getCommonHeaders(),
+        headers: await getAuthHeaders(),
       }
     );
 
@@ -242,8 +228,7 @@ export class AdminService {
   static async createRacket(racketData: any): Promise<any> {
     const response = await fetch(buildApiUrl(API_ENDPOINTS.RACKETS), {
       method: 'POST',
-      credentials: 'include',
-      headers: getCommonHeaders(),
+      headers: await getAuthHeaders(),
       body: JSON.stringify(racketData),
     });
 
@@ -256,8 +241,7 @@ export class AdminService {
   static async updateRacket(racketId: number, racketData: any): Promise<any> {
     const response = await fetch(buildApiUrl(`${API_ENDPOINTS.RACKETS}/${racketId}`), {
       method: 'PUT',
-      credentials: 'include',
-      headers: getCommonHeaders(),
+      headers: await getAuthHeaders(),
       body: JSON.stringify(racketData),
     });
 
@@ -270,8 +254,7 @@ export class AdminService {
   static async deleteRacket(racketId: number): Promise<void> {
     const response = await fetch(buildApiUrl(`${API_ENDPOINTS.RACKETS}/${racketId}`), {
       method: 'DELETE',
-      credentials: 'include',
-      headers: getCommonHeaders(),
+      headers: await getAuthHeaders(),
     });
 
     await handleApiResponse<void>(response);
@@ -311,7 +294,6 @@ export class AdminService {
   static async getRecentActivity(limit: number = 10): Promise<Activity[]> {
     const response = await fetch(buildApiUrl(API_ENDPOINTS.ADMIN.RECENT_ACTIVITY, { limit }), {
       method: 'GET',
-      credentials: 'include',
       headers: await getAuthHeaders(),
     });
 
@@ -324,7 +306,6 @@ export class AdminService {
   static async getRacketConflicts(): Promise<any[]> {
     const response = await fetch(buildApiUrl(API_ENDPOINTS.ADMIN.CONFLICTS), {
       method: 'GET',
-      credentials: 'include',
       headers: await getAuthHeaders(),
     });
 
@@ -340,8 +321,7 @@ export class AdminService {
   ): Promise<void> {
     const response = await fetch(buildApiUrl(API_ENDPOINTS.ADMIN.RESOLVE_CONFLICT(racketId)), {
       method: 'POST',
-      credentials: 'include',
-      headers: getCommonHeaders(),
+      headers: await getAuthHeaders(),
       body: JSON.stringify({ action }),
     });
 

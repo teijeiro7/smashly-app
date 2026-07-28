@@ -3,7 +3,6 @@ import { render, screen, waitFor } from '@testing-library/react';
 import { act } from 'react';
 import userEvent from '@testing-library/user-event';
 import { AuthProvider, useAuth } from '../../contexts/AuthContext';
-import { getAuthToken, removeAuthToken } from '../../utils/authUtils';
 import { vi } from 'vitest';
 
 const mockUser = { id: 'u1', email: 'user@test.com', user_metadata: { nickname: 'user' } };
@@ -28,6 +27,7 @@ const mock = vi.hoisted(() => {
     signInResult: { data: { user, session }, error: null },
     sessionResult: { data: { session } },
     signOutError: null as any,
+    signOutScope: null as string | null,
     profileData: [profile] as any[],
     onAuthCallbacks: [] as Array<(event: string, session: any) => void>,
   };
@@ -52,7 +52,10 @@ vi.mock('../../lib/supabase', () => ({
   supabase: {
     auth: {
       signInWithPassword: vi.fn(() => Promise.resolve(mock.signInResult)),
-      signOut: vi.fn(() => Promise.resolve({ error: mock.signOutError })),
+      signOut: vi.fn((options?: { scope?: string }) => {
+        mock.signOutScope = options?.scope ?? null;
+        return Promise.resolve({ error: mock.signOutError });
+      }),
       getSession: vi.fn(() => Promise.resolve(mock.sessionResult)),
       onAuthStateChange: vi.fn((cb: any) => {
         mock.onAuthCallbacks.push(cb);
@@ -89,11 +92,11 @@ beforeEach(() => {
   vi.clearAllMocks();
   mock.onAuthCallbacks.length = 0;
   mock.signOutError = null;
+  mock.signOutScope = null;
   mock.signInResult = { data: { user: mockUser, session: mockSession }, error: null };
   mock.profileData = [mockProfile];
   mock.sessionResult = { data: { session: mockSession } };
   localStorage.clear();
-  removeAuthToken();
 });
 
 afterEach(() => {
@@ -114,13 +117,18 @@ test('signIn stores token, loads profile and sets authenticated state', async ()
   });
 
   await waitFor(() => {
-    expect(getAuthToken()).toBe('__cookie_auth__');
     expect(screen.getByTestId('status').textContent).toBe('yes');
     expect(screen.getByTestId('nickname').textContent).toBe('user');
   });
 });
 
-test('signOut clears token and resets authenticated state', async () => {
+test('isAuthenticated stays true even when the profile row cannot be loaded', async () => {
+  // Simulates an orphaned auth.users row with no user_profiles row (or an
+  // RLS/network hiccup): a valid session exists but the profile fetch
+  // resolves to null. isAuthenticated must track the session, not the
+  // profile — otherwise a real session holder gets treated as logged out.
+  mock.profileData = [];
+
   render(
     <AuthProvider>
       <AuthActionsProbe />
@@ -130,14 +138,31 @@ test('signOut clears token and resets authenticated state', async () => {
   await act(async () => {
     await userEvent.click(screen.getByTestId('login'));
   });
-  await waitFor(() => expect(getAuthToken()).toBe('__cookie_auth__'));
+
+  await waitFor(() => {
+    expect(screen.getByTestId('status').textContent).toBe('yes');
+    expect(screen.getByTestId('nickname').textContent).toBe('');
+  });
+});
+
+test('signOut clears session and resets authenticated state', async () => {
+  render(
+    <AuthProvider>
+      <AuthActionsProbe />
+    </AuthProvider>
+  );
+
+  await act(async () => {
+    await userEvent.click(screen.getByTestId('login'));
+  });
+  await waitFor(() => expect(screen.getByTestId('status').textContent).toBe('yes'));
 
   await act(async () => {
     await userEvent.click(screen.getByTestId('logout'));
   });
 
   await waitFor(() => {
-    expect(getAuthToken()).toBeNull();
+    expect(mock.signOutScope).toBe('local');
     expect(screen.getByTestId('status').textContent).toBe('no');
     expect(screen.getByTestId('nickname').textContent).toBe('');
   });
@@ -181,6 +206,5 @@ test('signIn returns friendly error on invalid credentials', async () => {
 
   await waitFor(() => {
     expect(screen.getByTestId('error').textContent).toMatch('Credenciales inválidas');
-    expect(getAuthToken()).toBeNull();
   });
 });

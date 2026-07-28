@@ -48,15 +48,9 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, onRegisterClick }) => 
   const form = useForm({
     defaultValues: { email: '', password: '' },
     onSubmit: async ({ value }) => {
-      const { error, errorCode } = await signIn(value.email, value.password);
+      const { error } = await signIn(value.email, value.password);
       if (error) {
-        if (errorCode === 'USER_NOT_FOUND') {
-          sileo.warning({ title: 'Cuenta no encontrada', description: error });
-        } else if (errorCode === 'INVALID_PASSWORD') {
-          sileo.error({ title: 'Error', description: error });
-        } else {
-          sileo.error({ title: 'Error', description: error });
-        }
+        sileo.error({ title: 'Error', description: error });
         return;
       }
       sileo.success({ title: 'Éxito', description: '¡Bienvenido de nuevo!' });

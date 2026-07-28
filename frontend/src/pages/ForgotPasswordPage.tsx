@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { FiMail, FiArrowLeft, FiCheckCircle, FiAlertCircle, FiLoader } from 'react-icons/fi';
 import { Link } from '@tanstack/react-router';
 import { sileo } from 'sileo';
-import { buildApiUrl, API_ENDPOINTS } from '../config/api';
+import { supabase } from '../lib/supabase';
 
 const PageContainer = styled.div`
   min-height: 100vh;
@@ -186,16 +186,17 @@ const ForgotPasswordPage: React.FC = () => {
     setError(null);
 
     try {
-      const response = await fetch(buildApiUrl(API_ENDPOINTS.AUTH_RESET_PASSWORD), {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email }),
+      // No handler for this ever existed under /api/v1/auth — Supabase Auth
+      // handles password reset directly from the client. resetPasswordForEmail
+      // resolves without error whether or not the address has an account
+      // (Supabase's own anti-enumeration behavior), so `success` here never
+      // discloses account existence.
+      const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/update-password`,
       });
 
-      const result = await response.json();
-
-      if (!response.ok || !result.success) {
-        throw new Error(result.message || 'No pudimos procesar tu solicitud');
+      if (resetError) {
+        throw new Error('No pudimos procesar tu solicitud');
       }
 
       setSuccess(true);
