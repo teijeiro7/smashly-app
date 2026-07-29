@@ -30,16 +30,15 @@ Uso:
 import argparse
 import asyncio
 import os
-import ssl
 import sys
 from datetime import datetime, timedelta, timezone
 from typing import Dict, Set
 
-# ── SSL fix para macOS ─────────────────────────────────────────────────────
-# Python en macOS no usa los certificados del sistema. Este parche afecta a
-# todas las llamadas urllib del proceso. No es un riesgo real en un script
-# de scraping que solo lee catálogos públicos.
-ssl._create_default_https_context = ssl._create_unverified_context
+# El parche global `ssl._create_default_https_context = _create_unverified_context`
+# que había aquí desactivaba la verificación TLS para TODO el proceso, no solo
+# para los scrapers. Los scrapers pasan su propio contexto explícito
+# (base_scraper.ssl_ctx, que ahora verifica contra el bundle de certifi), así
+# que el parche era innecesario además de peligroso.
 
 # ── Path setup (permite `python src/scrapers/sync_catalog.py` además de -m) ─
 if __name__ == "__main__" and __package__ is None:

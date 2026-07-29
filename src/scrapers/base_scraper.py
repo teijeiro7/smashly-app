@@ -10,6 +10,8 @@ import ssl
 import time
 import asyncio
 
+import certifi
+
 # ============================================================================
 # Fetch outcome contract
 # ============================================================================
@@ -109,10 +111,17 @@ def _retry_wait(e: "urllib.error.HTTPError", attempt: int, base_delay: float) ->
 
 
 def ssl_ctx() -> ssl.SSLContext:
-    ctx = ssl.create_default_context()
-    ctx.check_hostname = False
-    ctx.verify_mode = ssl.CERT_NONE
-    return ctx
+    """Verifying TLS context for every scraper fetch.
+
+    This used to set `check_hostname = False` / `verify_mode = CERT_NONE`,
+    which silently accepted any certificate. Scraped prices get written
+    straight into Supabase, so an unverified connection is a data-integrity
+    hole, not just a privacy one. The reason verification was off is that
+    python.org's macOS build ships without the system trust store — point it
+    at certifi's bundle instead of disabling the check. Verified to handshake
+    cleanly against all three stores.
+    """
+    return ssl.create_default_context(cafile=certifi.where())
 
 
 # ============================================================================

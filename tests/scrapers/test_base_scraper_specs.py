@@ -44,3 +44,18 @@ class TestNormalizeSpecsKeyCollisions:
 
         assert "Marca" not in specs
         assert specs["Forma"] == "Diamante"
+
+
+class TestSslContext:
+    def test_ssl_ctx_verifies_certificates(self):
+        # Regression: this used to return a context with check_hostname=False
+        # and verify_mode=CERT_NONE, silently accepting any certificate —
+        # scraped prices land in Supabase, so an unverified fetch is a
+        # data-integrity hole. Verified to handshake against all 3 stores.
+        import ssl as _ssl
+
+        from src.scrapers.base_scraper import ssl_ctx
+
+        ctx = ssl_ctx()
+        assert ctx.check_hostname is True
+        assert ctx.verify_mode is _ssl.CERT_REQUIRED
