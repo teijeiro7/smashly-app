@@ -1,24 +1,20 @@
 import html as _html
 import json
 import re
-import ssl
 import time
 import random
 import urllib.request
-import urllib.error
 import asyncio
 from typing import Dict, List, Optional
-from .base_scraper import BaseScraper, Product, clean_price, normalize_specs, normalize_spec_name, is_junior_racket
+from .base_scraper import (
+    BaseScraper, Product, normalize_specs, normalize_spec_name, is_junior_racket,
+    FetchOutcome, FetchResult, ScraperGone, sync_fetch_with_retry, ssl_ctx,
+)
 
-def _ssl_ctx() -> ssl.SSLContext:
-    ctx = ssl.create_default_context()
-    ctx.check_hostname = False
-    ctx.verify_mode = ssl.CERT_NONE
-    return ctx
 
 class PadelProShopScraper(BaseScraper):
     """Scraper for PadelProShop online store.
-    
+
     Uses the Shopify JSON API for both category and product scraping,
     eliminating the need for Playwright browser automation entirely.
     """
@@ -32,19 +28,16 @@ class PadelProShopScraper(BaseScraper):
             'Accept': 'application/json',
             'Accept-Language': 'es-ES,es;q=0.9',
         })
-        for attempt in range(3):
-            try:
-                with urllib.request.urlopen(req, timeout=30, context=_ssl_ctx()) as resp:
-                    data = json.loads(resp.read().decode('utf-8'))
-                return data.get('products', [])
-            except urllib.error.HTTPError as e:
-                if e.code == 403 and attempt < 2:
-                    wait = 30 * (attempt + 1)
-                    print(f"[PadelProShop] 403 on category page {page_num}, retrying in {wait}s...")
-                    time.sleep(wait)
-                    continue
-                raise
-        return []
+
+        def _once():
+            with urllib.request.urlopen(req, timeout=30, context=ssl_ctx()) as resp:
+                return json.loads(resp.read().decode('utf-8'))
+
+        try:
+            data = sync_fetch_with_retry(_once, label=f"PadelProShop:page{page_num}", max_retries=4, base_delay=10.0)
+        except ScraperGone:
+            return []
+        return data.get('products', [])
 
     def _fetch_product_json(self, handle: str) -> dict:
         """Fetch a single product's full data from the Shopify JSON API (sync)."""
@@ -55,27 +48,13 @@ class PadelProShopScraper(BaseScraper):
             'Accept': 'application/json',
             'Accept-Language': 'es-ES,es;q=0.9',
         })
-        for attempt in range(3):
-            try:
-                with urllib.request.urlopen(req, timeout=30, context=_ssl_ctx()) as resp:
-                    data = json.loads(resp.read().decode('utf-8'))
-                return data.get('product', {})
-            except urllib.error.HTTPError as e:
-                if e.code == 404:
-                    return {}  # product removed from store
-                if e.code == 403 and attempt < 2:
-                    wait = 30 * (attempt + 1)
-                    print(f"[PadelProShop] 403 on {handle}, retrying in {wait}s...")
-                    time.sleep(wait)
-                    continue
-                raise
-            except urllib.error.URLError as e:
-                if attempt < 2:
-                    time.sleep(5 * (attempt + 1))
-                    continue
-                print(f"[PadelProShop] Network error for {handle}: {e.reason}")
-                return {}
-        return {}
+
+        def _once():
+            with urllib.request.urlopen(req, timeout=30, context=ssl_ctx()) as resp:
+                return json.loads(resp.read().decode('utf-8'))
+
+        data = sync_fetch_with_retry(_once, label=f"PadelProShop:{handle}", max_retries=4, base_delay=10.0)
+        return data.get('product', {})
 
     # Palabras clave de forma y su valor normalizado
     _SHAPE_KEYWORDS = [
@@ -204,44 +183,46 @@ class PadelProShopScraper(BaseScraper):
 
         return specs
 
-    async def scrape_product(self, url: str) -> Optional[Product]:
+    async def scrape_product(self, url: str) -> FetchResult:
         """Scrape product data from PadelProShop using Shopify JSON API only."""
-        
+
         # Extract handle from URL: /products/pala-xyz -> pala-xyz
         handle = url.rstrip('/').split('/products/')[-1].split('?')[0]
         if not handle:
-            return None
-        
+            return FetchResult(FetchOutcome.FAILED, error="could not extract handle from URL")
+
         try:
             loop = asyncio.get_running_loop()
             product_data = await loop.run_in_executor(
                 None, self._fetch_product_json, handle
             )
+        except ScraperGone:
+            return FetchResult(FetchOutcome.GONE)
         except Exception as e:
             print(f"[PadelProShop] API error for {handle}: {e}")
-            return None
+            return FetchResult(FetchOutcome.FAILED, error=str(e))
 
-        if not product_data:
-            return None
-        if not isinstance(product_data, dict):
-            return None
-        
+        if not product_data or not isinstance(product_data, dict):
+            return FetchResult(FetchOutcome.FAILED, error="empty or invalid API response")
+
         # Name
         name = product_data.get('title')
         if not name:
-            return None
+            return FetchResult(FetchOutcome.FAILED, error="product JSON missing title")
         if is_junior_racket(name):
             print(f"[PadelProShop] Skipping junior racket: {name}")
-            return None
+            return FetchResult(FetchOutcome.FAILED, error="junior racket, excluded from catalog")
 
         # Price
         variants = product_data.get('variants') if isinstance(product_data.get('variants'), list) else []
         first_variant = variants[0] if variants and isinstance(variants[0], dict) else {}
 
-        price = 0.0
+        price: Optional[float] = None
         if first_variant:
             try:
-                price = float(first_variant.get('price'))
+                raw_price = first_variant.get('price')
+                if raw_price is not None:
+                    price = float(raw_price)
             except (ValueError, TypeError):
                 pass
 
@@ -266,7 +247,7 @@ class PadelProShopScraper(BaseScraper):
                 src = img.get('src') if isinstance(img, dict) else img
                 if src:
                     images.append(src)
-        
+
         image = images[0] if images else ''
 
         # Specs from body_html
@@ -275,12 +256,13 @@ class PadelProShopScraper(BaseScraper):
         # Si no se encontró Forma en el JSON (body_html), intentamos descargar el HTML completo
         if 'Forma' not in specs:
             try:
-                loop = asyncio.get_running_loop()
                 req = urllib.request.Request(url, headers={'User-Agent': self.user_agent})
-                with urllib.request.urlopen(req, timeout=15, context=_ssl_ctx()) as resp:
-                    full_html = resp.read().decode('utf-8')
-                
-                # Parse metadata/theme specific specs from HTML
+
+                def _fetch_full_html():
+                    with urllib.request.urlopen(req, timeout=15, context=ssl_ctx()) as resp:
+                        return resp.read().decode('utf-8')
+
+                full_html = await loop.run_in_executor(None, _fetch_full_html)
                 more_specs = self._parse_specs_from_html(full_html)
                 specs.update(more_specs)
             except Exception as e:
@@ -300,24 +282,28 @@ class PadelProShopScraper(BaseScraper):
 
         specs = normalize_specs(specs)
 
-        return Product(
+        product = Product(
             url=url,
             name=name,
-            price=price,
+            price=price or 0.0,
             original_price=original_price,
             brand=brand,
             image=image,
             images=images,
-            specs=specs
+            specs=specs,
         )
+
+        if price is None or price <= 0:
+            return FetchResult(FetchOutcome.NO_PRICE, product=product)
+        return FetchResult(FetchOutcome.OK, product=product)
 
     async def scrape_category(self, url: str) -> List[str]:
         """Scrape product URLs using the Shopify products.json API.
-        
+
         Uses the public Shopify JSON API instead of Playwright-based
         infinite scroll, which was unreliable.
         """
-        
+
         # Determine the collection path from the URL
         if '/collections/' in url:
             from urllib.parse import urlparse
@@ -325,19 +311,19 @@ class PadelProShopScraper(BaseScraper):
             collection_path = parsed.path.rstrip('/')
         else:
             collection_path = '/collections/palas-padel'
-        
+
         product_urls = []
         page_num = 1
-        
+
         print(f"[PadelProShop] Using Shopify API for product discovery...")
-        
+
         while True:
             if page_num > 20:
                 print(f"[PadelProShop] Reached page limit (20). Stopping.")
                 break
-            
+
             print(f"[PadelProShop] Fetching API page {page_num}...")
-            
+
             try:
                 loop = asyncio.get_event_loop()
                 products = await loop.run_in_executor(
@@ -346,20 +332,20 @@ class PadelProShopScraper(BaseScraper):
             except Exception as e:
                 print(f"[PadelProShop] API error on page {page_num}: {e}")
                 break
-            
+
             if not products:
                 print(f"[PadelProShop] No more products on page {page_num}. Done.")
                 break
-            
+
             for product in products:
                 handle = product.get('handle')
                 if handle:
                     product_url = f"https://padelproshop.com/products/{handle}"
                     if product_url not in product_urls:
                         product_urls.append(product_url)
-            
+
             print(f"[PadelProShop] Page {page_num}: {len(products)} products fetched. Total: {len(product_urls)}")
             page_num += 1
-        
+
         print(f"[PadelProShop] Final count: {len(product_urls)} products from API")
         return product_urls

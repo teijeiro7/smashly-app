@@ -18,16 +18,26 @@ Usage:
 
 import re
 import os
+import sys
 import argparse
 import unicodedata
+from typing import Optional
 
 from dotenv import load_dotenv
 from supabase import create_client, Client
 
 load_dotenv()
 
-SUPABASE_URL = os.environ["SUPABASE_URL"]
-SUPABASE_KEY = os.environ["SUPABASE_SERVICE_ROLE_KEY"]
+
+def _get_client() -> Client:
+    """Lazy client construction — reading env vars at import time meant a
+    missing SUPABASE_SERVICE_ROLE_KEY crashed the whole sync_catalog import,
+    before it ever got a chance to scrape anything."""
+    url = os.getenv("SUPABASE_URL")
+    key = os.getenv("SUPABASE_SERVICE_ROLE_KEY")
+    if not url or not key:
+        raise RuntimeError("Missing SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY")
+    return create_client(url, key)
 
 _JUNIOR_PATTERN = re.compile(
     r'\b(junior|jr|kid|kids|ni[ñn]o|ni[ñn]a|infantil|bambini|bambino)\b',
@@ -269,8 +279,15 @@ def _clean_pala_names(client: Client, rows: list, dry_run: bool) -> int:
     return fixed
 
 
-def run(dry_run: bool):
-    client = create_client(SUPABASE_URL, SUPABASE_KEY)
+def run(dry_run: bool, delete_cap: Optional[int] = 15) -> dict:
+    """
+    Deduplicate the catalog. `delete_cap` is a safety ceiling: if the plan
+    would delete more rows than that (junior rackets + duplicate merges
+    combined), nothing is deleted — the plan is printed for manual review
+    instead. This runs unattended every week; a store changing its HTML
+    template must not be able to trigger a mass deletion.
+    """
+    client = _get_client()
     print("Fetching rackets...")
     rows = fetch_all_rackets(client)
     print(f"Total: {len(rows)}")
@@ -289,17 +306,33 @@ def run(dry_run: bool):
     # Remove junior/kid rackets from DB and exclude from dedup
     junior_rows = [r for r in rows if is_junior_racket(r.get("name") or r.get("model") or "")]
     adult_rows = [r for r in rows if not is_junior_racket(r.get("name") or r.get("model") or "")]
+    rows = adult_rows
+
+    groups = find_duplicate_groups(rows)
+    for group in groups:
+        group.sort(key=score_entry, reverse=True)
+
+    total_planned_deletes = len(junior_rows) + sum(len(g) - 1 for g in groups)
+    print(f"Duplicate groups: {len(groups)} | junior rackets: {len(junior_rows)} | total a borrar: {total_planned_deletes}\n")
+
+    if not dry_run and delete_cap is not None and total_planned_deletes > delete_cap:
+        print(f"⚠️  ABORTADO: el plan borraría {total_planned_deletes} filas, por encima del techo de {delete_cap}.")
+        print("Nada se ha borrado. Revisa con --dry-run y ejecuta manualmente si el plan es correcto.\n")
+        for r in junior_rows:
+            print(f"  [ABORTADO] borraría (junior) id={r['id']} name={r.get('name') or r.get('model')}")
+        for group in groups:
+            canonical, duplicates = group[0], group[1:]
+            for dup in duplicates:
+                print(f"  [ABORTADO] borraría id={dup['id']} slug={dup['slug']} (canonical id={canonical['id']} slug={canonical['slug']})")
+        return {"aborted": True, "planned_deletes": total_planned_deletes, "cap": delete_cap, "merged": 0, "deleted": 0}
+
     if junior_rows:
-        print(f"\nJunior rackets to delete: {len(junior_rows)}")
+        print(f"Junior rackets to delete: {len(junior_rows)}")
         for r in junior_rows:
             print(f"  delete id={r['id']} name={r.get('name') or r.get('model')}")
             if not dry_run:
                 client.table("rackets").delete().eq("id", r["id"]).execute()
         print()
-    rows = adult_rows
-
-    groups = find_duplicate_groups(rows)
-    print(f"Duplicate groups: {len(groups)}\n")
 
     merged = 0
     deleted = 0
@@ -371,9 +404,14 @@ def run(dry_run: bool):
     if dry_run:
         print("(DRY-RUN — no changes written)")
 
+    return {"aborted": False, "planned_deletes": total_planned_deletes, "cap": delete_cap, "merged": merged, "deleted": deleted}
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--dry-run", action="store_true", help="Preview without writing")
+    parser.add_argument("--delete-cap", type=int, default=15, help="Máximo de filas a borrar antes de abortar (default 15)")
+    parser.add_argument("--no-cap", action="store_true", help="Desactiva el techo de borrado")
     args = parser.parse_args()
-    run(dry_run=args.dry_run)
+    result = run(dry_run=args.dry_run, delete_cap=None if args.no_cap else args.delete_cap)
+    sys.exit(1 if result.get("aborted") else 0)

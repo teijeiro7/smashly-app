@@ -2,11 +2,13 @@ import html as _html
 import json
 import re
 import urllib.request
-import ssl
+import urllib.error
 import asyncio
 from typing import Dict, List, Optional
-from urllib.parse import urlparse
-from .base_scraper import BaseScraper, Product, clean_price, normalize_specs, is_junior_racket
+from .base_scraper import (
+    BaseScraper, Product, normalize_specs, is_junior_racket,
+    FetchOutcome, FetchResult, ScraperGone, sync_fetch_with_retry, ssl_ctx,
+)
 
 
 class PadelNuestroScraper(BaseScraper):
@@ -113,7 +115,14 @@ class PadelNuestroScraper(BaseScraper):
         return options.get(str(raw_value))
 
     def _fetch_graphql(self, query: str) -> dict:
-        """Execute a GraphQL query against PadelNuestro API (sync)."""
+        """Execute a GraphQL query against PadelNuestro API (sync).
+
+        Specs enrichment only — never raises. A failure here just means the
+        product keeps whatever specs the HTML page already gave it.
+        """
+        if PadelNuestroScraper._graphql_blocked:
+            return {}
+
         data = json.dumps({"query": query}).encode("utf-8")
         req = urllib.request.Request(
             "https://www.padelnuestro.com/graphql",
@@ -138,14 +147,9 @@ class PadelNuestroScraper(BaseScraper):
             },
         )
 
-        ctx = ssl.create_default_context()
-        ctx.check_hostname = False
-        ctx.verify_mode = ssl.CERT_NONE
-
-        try:
-            with urllib.request.urlopen(req, timeout=30, context=ctx) as resp:
+        def _once():
+            with urllib.request.urlopen(req, timeout=30, context=ssl_ctx()) as resp:
                 raw = resp.read()
-                # Descomprimir gzip si el servidor lo devuelve comprimido
                 encoding = resp.headers.get("Content-Encoding", "")
                 if encoding == "gzip":
                     import gzip
@@ -156,8 +160,13 @@ class PadelNuestroScraper(BaseScraper):
                         raw = brotli.decompress(raw)
                     except ImportError:
                         pass
-                data = json.loads(raw.decode("utf-8"))
-                return data if data is not None else {}
+                parsed = json.loads(raw.decode("utf-8"))
+                return parsed if parsed is not None else {}
+
+        try:
+            return sync_fetch_with_retry(_once, label="PadelNuestro:graphql", max_retries=2, base_delay=5.0)
+        except ScraperGone:
+            return {}
         except urllib.error.HTTPError as e:
             if e.code == 403:
                 if not PadelNuestroScraper._graphql_blocked:
@@ -275,97 +284,6 @@ class PadelNuestroScraper(BaseScraper):
 
         return specs
 
-    def _scrape_price_from_html(self, url: str) -> Optional[tuple]:
-        """
-        Fallback: extrae el precio directamente del HTML de la página del producto.
-        Se usa cuando la API GraphQL devuelve 403.
-        Devuelve (price, original_price) o None si no se encuentra.
-
-        Estrategias (en orden de prioridad):
-          1. JSON-LD schema.org (@type=Product → offers.price)
-          2. Atributo data-price-amount de Magento 2
-          3. Span con clase 'price' (texto con €)
-        """
-        req = urllib.request.Request(
-            url,
-            headers={
-                "User-Agent": (
-                    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
-                    "AppleWebKit/537.36 (KHTML, like Gecko) "
-                    "Chrome/122.0.0.0 Safari/537.36"
-                ),
-                "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-                "Accept-Language": "es-ES,es;q=0.9",
-                "Referer": "https://www.padelnuestro.com/palas-padel",
-            },
-        )
-        ctx = ssl.create_default_context()
-        ctx.check_hostname = False
-        ctx.verify_mode = ssl.CERT_NONE
-
-        try:
-            with urllib.request.urlopen(req, timeout=20, context=ctx) as resp:
-                raw = resp.read()
-                encoding = resp.headers.get("Content-Encoding", "")
-                if encoding == "gzip":
-                    import gzip as _gzip
-                    raw = _gzip.decompress(raw)
-                html = raw.decode("utf-8", errors="replace")
-        except Exception as e:
-            print(f"[PadelNuestro] HTML fetch error for {url}: {e}")
-            return None
-
-        price: Optional[float] = None
-        original_price: Optional[float] = None
-
-        # ── Estrategia 1: JSON-LD ──────────────────────────────────────────
-        for match in re.finditer(
-            r'<script[^>]+type=["\']application/ld\+json["\'][^>]*>(.*?)</script>',
-            html,
-            re.DOTALL | re.IGNORECASE,
-        ):
-            try:
-                data = json.loads(match.group(1))
-                items = data if isinstance(data, list) else [data]
-                for item in items:
-                    if item.get("@type") == "Product":
-                        offers = item.get("offers", {})
-                        if isinstance(offers, list):
-                            offers = offers[0]
-                        raw_price = offers.get("price")
-                        if raw_price:
-                            price = float(str(raw_price).replace(",", "."))
-                        break
-            except Exception:
-                continue
-            if price:
-                break
-
-        # ── Estrategia 2: atributo data-price-amount de Magento 2 ─────────
-        if not price:
-            m = re.search(
-                r'data-price-amount=["\']([0-9]+(?:[.,][0-9]+)?)["\']',
-                html,
-            )
-            if m:
-                price = float(m.group(1).replace(",", "."))
-
-        # ── Estrategia 3: span.price con símbolo € ─────────────────────────
-        if not price:
-            m = re.search(
-                r'<span[^>]*class="[^"]*\bprice\b[^"]*"[^>]*>\s*'
-                r'([0-9]+(?:[.,][0-9]+)?)\s*(?:€|EUR)',
-                html,
-                re.IGNORECASE,
-            )
-            if m:
-                price = float(m.group(1).replace(",", "."))
-
-        if price is None:
-            return None
-
-        return price, original_price
-
     _COMMON_BRANDS = [
         "Nox", "Bullpadel", "Adidas", "Siux", "Head", "Babolat",
         "StarVie", "Varlion", "Kuikma", "Wilson", "Drop Shot",
@@ -375,8 +293,13 @@ class PadelNuestroScraper(BaseScraper):
         "Softee", "Akkeron", "Eme", "Cartri",
     ]
 
-    def _fetch_html(self, url: str) -> Optional[str]:
-        """Fetch page HTML via plain HTTP (sync)."""
+    def _fetch_html(self, url: str) -> str:
+        """Fetch page HTML via plain HTTP (sync).
+
+        Raises ScraperGone if the store redirects to another page (product
+        retired). Raises the underlying exception on network failure once
+        retries are exhausted — callers must NOT treat that as "no price".
+        """
         req = urllib.request.Request(
             url,
             headers={
@@ -389,25 +312,22 @@ class PadelNuestroScraper(BaseScraper):
                 "Accept-Language": "es-ES,es;q=0.9",
             },
         )
-        ctx = ssl.create_default_context()
-        ctx.check_hostname = False
-        ctx.verify_mode = ssl.CERT_NONE
-        try:
-            with urllib.request.urlopen(req, timeout=20, context=ctx) as resp:
+
+        def _once():
+            with urllib.request.urlopen(req, timeout=20, context=ssl_ctx()) as resp:
                 # Detect redirect to category page (discontinued product)
                 final_url = resp.url.split("?")[0].rstrip("/")
                 req_url = url.split("?")[0].rstrip("/")
                 if final_url != req_url:
-                    return None  # redirected → discontinued, skip silently
+                    raise ScraperGone(f"redirected: {url} -> {resp.url}")
                 raw = resp.read()
                 enc = resp.headers.get("Content-Encoding", "")
                 if enc == "gzip":
                     import gzip
                     raw = gzip.decompress(raw)
                 return raw.decode("utf-8", errors="replace")
-        except Exception as e:
-            print(f"[PadelNuestro] HTTP error for {url}: {e}")
-            return None
+
+        return sync_fetch_with_retry(_once, label=f"PadelNuestro:{url}", max_retries=4, base_delay=6.0)
 
     def _extract_product_from_html(self, html: str, url: str) -> Optional[Product]:
         """Extract product data from page HTML using JSON-LD + data attributes."""
@@ -539,23 +459,32 @@ class PadelNuestroScraper(BaseScraper):
             print(f"[PadelNuestro] GraphQL spec parse error for {url_key}: {e}")
         return specs
 
-    async def scrape_product(self, url: str) -> Optional[Product]:
+    async def scrape_product(self, url: str) -> FetchResult:
         """Scrape product data from HTML page using JSON-LD, enriched with GraphQL specs."""
+        # Normalise URL (strip .html suffix)
+        if url.endswith(".html"):
+            url = url[:-5]
+
+        loop = asyncio.get_running_loop()
         try:
-            # Normalise URL (strip .html suffix)
-            if url.endswith(".html"):
-                url = url[:-5]
-
-            loop = asyncio.get_running_loop()
             html = await loop.run_in_executor(None, self._fetch_html, url)
-            if not html:
-                return None  # redirect (discontinued) or fetch error — already logged
+        except ScraperGone:
+            return FetchResult(FetchOutcome.GONE)
+        except Exception as e:
+            print(f"[PadelNuestro] HTTP error for {url}: {e}")
+            return FetchResult(FetchOutcome.FAILED, error=str(e))
 
+        try:
             product = self._extract_product_from_html(html, url)
-            if not product:
-                return None
+        except Exception as e:
+            print(f"[PadelNuestro] Error parsing product {url}: {e}")
+            return FetchResult(FetchOutcome.FAILED, error=str(e))
 
-            # Enrich with GraphQL structured spec attributes (option-ID → label)
+        if not product:
+            return FetchResult(FetchOutcome.FAILED, error="could not extract product from HTML (page loaded, parse failed)")
+
+        # Enrich with GraphQL structured spec attributes (option-ID → label)
+        try:
             url_key = url.rstrip("/").split("/")[-1]
             graphql_specs = await loop.run_in_executor(
                 None, self._scrape_specs_via_graphql, url_key
@@ -565,18 +494,20 @@ class PadelNuestroScraper(BaseScraper):
                     product.specs[k] = v
             if graphql_specs:
                 product.specs = normalize_specs(product.specs)
-
-            return product
-
         except Exception as e:
-            print(f"[PadelNuestro] Error scraping product {url}: {e}")
-            return None
+            print(f"[PadelNuestro] GraphQL enrichment error for {url}: {e}")
+
+        if product.price is None or product.price <= 0:
+            return FetchResult(FetchOutcome.NO_PRICE, product=product)
+        return FetchResult(FetchOutcome.OK, product=product)
 
     def _fetch_category_page(self, page_num: int) -> List[str]:
         """Fetch one category page and return product URLs (sync)."""
         page_url = f"https://www.padelnuestro.com/palas-padel?p={page_num}"
-        html = self._fetch_html(page_url)
-        if not html:
+        try:
+            html = self._fetch_html(page_url)
+        except Exception as e:
+            print(f"[PadelNuestro] Category page {page_num} fetch failed: {e}")
             return []
         # product-item-link hrefs appear in initial HTML (server-rendered)
         links = re.findall(r'class="product-item-link"[^>]*href="([^"]+)"', html)
