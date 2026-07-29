@@ -106,20 +106,20 @@ function mapDbToFrontend(raw: any): Racket {
     scrapeado_en: raw.created_at,
     descripcion: raw.description ?? null,
 
-    caracteristicas_marca: raw.characteristics_brand ?? specs.marca ?? raw.brand ?? null,
-    caracteristicas_color: raw.characteristics_color ?? specs.color ?? null,
+    caracteristicas_marca: raw.characteristics_brand ?? raw.brand ?? null,
+    caracteristicas_color: raw.characteristics_color ?? null,
     caracteristicas_color_2: raw.characteristics_color_2 ?? null,
-    caracteristicas_producto: raw.characteristics_product ?? specs.producto ?? 'Palas',
-    caracteristicas_balance: raw.characteristics_balance ?? specs.balance ?? null,
-    caracteristicas_nucleo: raw.characteristics_core ?? specs.nucleo ?? null,
-    caracteristicas_cara: raw.characteristics_face ?? specs.cara ?? null,
-    caracteristicas_formato: raw.characteristics_format ?? specs.formato ?? specs.forma ?? null,
-    caracteristicas_dureza: raw.characteristics_hardness ?? specs.dureza ?? null,
-    caracteristicas_nivel_de_juego: raw.characteristics_game_level ?? specs.nivel_de_juego ?? null,
-    caracteristicas_acabado: raw.characteristics_finish ?? specs.acabado ?? null,
-    caracteristicas_forma: raw.characteristics_shape ?? specs.forma ?? null,
-    caracteristicas_superficie: raw.characteristics_surface ?? specs.superficie ?? null,
-    caracteristicas_tipo_de_juego: raw.characteristics_game_type ?? specs.tipo_de_juego ?? null,
+    caracteristicas_producto: raw.characteristics_product ?? 'Palas',
+    caracteristicas_balance: raw.characteristics_balance ?? null,
+    caracteristicas_nucleo: raw.characteristics_core ?? null,
+    caracteristicas_cara: raw.characteristics_face ?? null,
+    caracteristicas_formato: raw.characteristics_format ?? null,
+    caracteristicas_dureza: raw.characteristics_hardness ?? null,
+    caracteristicas_nivel_de_juego: raw.characteristics_game_level ?? null,
+    caracteristicas_acabado: raw.characteristics_finish ?? null,
+    caracteristicas_forma: raw.characteristics_shape ?? null,
+    caracteristicas_superficie: raw.characteristics_surface ?? null,
+    caracteristicas_tipo_de_juego: raw.characteristics_game_type ?? null,
     caracteristicas_coleccion_jugadores: raw.characteristics_player_collection ?? null,
     caracteristicas_jugador: raw.characteristics_player ?? specs.jugador ?? null,
 
@@ -168,7 +168,14 @@ function mapDbToFrontend(raw: any): Racket {
 // ── Service ───────────────────────────────────────────────────────────────────
 const racketService = {
   async getAllRackets(): Promise<Racket[]> {
-    const { data, error } = await supabase.from('rackets').select('*').order('name');
+    const { data, error } = await supabase
+      .from('rackets')
+      .select('*')
+      // not.is.true rather than eq.false: `discontinued = false` evaluates to
+      // NULL for a NULL column and would drop the row from the catalog
+      // silently. NULL means "not known to be discontinued" — it must show.
+      .not('discontinued', 'is', true)
+      .order('name');
 
     if (error) throw new Error(error.message);
     return (data ?? []).map(mapDbToFrontend);

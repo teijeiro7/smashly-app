@@ -1,35 +1,192 @@
-import json
-import os
 import re
 import unicodedata
-from datetime import datetime
+from datetime import datetime, timezone
 from urllib.parse import urlparse, parse_qs, urlencode, urlunparse
-from typing import Dict, List, Optional, Any
+from typing import Dict, List, Optional, Any, Set
+
+from supabase import Client
 from thefuzz import fuzz
+
 from .paddle_normalizer import normalize_paddle_name, normalize_for_comparison, slugify_paddle
+from .pricing import STORES
+
+
+def _now_utc() -> str:
+    return datetime.now(timezone.utc).isoformat()
+
+
+# Claves de `specs` -> columna `characteristics_*`. IMPORTANTE: estas claves
+# son las que llegan DESPUÉS de `base_scraper.normalize_specs` (todo scraper
+# pasa specs por ahí antes de guardarlos) — no las claves crudas de cada
+# tienda. Ej.: "Nivel de Juego" y "Superficie" ya se canonicalizan a "Nivel"
+# y "Rugosidad" antes de llegar aquí (ver SPEC_NAME_MAP), así que mapear
+# "nivel de juego" o "superficie" directamente sería código muerto.
+#
+# Las primeras 7 están validadas contra las filas que ya tenían
+# `characteristics_*` rellena por el pipeline antiguo (mapeo 1:1 confirmado).
+# `formato`/`acabado`/`rugosidad`/`colores`/`producto`/`jugador`/`coleccion
+# jugadores` vienen de la tabla de atributos de PadelNuestro (ver
+# padelnuestro_scraper._parse_attribute_table): son columnas dedicadas que
+# ya existen en el esquema (characteristics_format/finish/surface/color/...),
+# confirmadas 1:1 contra los valores reales de esa tabla. `marca` no se
+# incluye — normalize_specs la descarta siempre (nunca llega hasta aquí).
+SPECS_TO_CHARACTERISTICS = {
+    "forma": "characteristics_shape",
+    "balance": "characteristics_balance",
+    "nucleo": "characteristics_core",
+    "cara": "characteristics_face",
+    "nivel": "characteristics_game_level",
+    "dureza": "characteristics_hardness",
+    "tipo de juego": "characteristics_game_type",
+    "formato": "characteristics_format",
+    "acabado": "characteristics_finish",
+    "rugosidad": "characteristics_surface",
+    "colores": "characteristics_color",
+    "color 2": "characteristics_color_2",
+    "producto": "characteristics_product",
+    "coleccion jugadores": "characteristics_player_collection",
+    "jugador": "characteristics_player",
+}
+
+
+def _normalize_spec_key(key: str) -> str:
+    """minúsculas + sin acentos, para que 'Tipo de Juego' y 'Tipo de juego' mapeen igual."""
+    ascii_key = unicodedata.normalize("NFKD", key).encode("ascii", "ignore").decode("ascii")
+    return ascii_key.strip().lower()
+
 
 class RacketManager:
-    """Manages the centralized rackets database with rigorous deduplication."""
+    """
+    Manages the catalog with rigorous cross-store deduplication.
 
-    def __init__(self, db_path: str = "rackets.json"):
-        self.db_path = db_path
-        self.data: Dict[str, Any] = self._load_db()
+    Supabase is the source of truth: the constructor takes rows already
+    fetched from the `rackets` table (see db.get_all_rackets_for_manager),
+    and `save()` writes touched entries back — no rackets.json anywhere.
+    """
+
+    def __init__(self, client: Client, rows: List[Dict[str, Any]]):
+        self.client = client
+        self.data: Dict[str, Any] = {}
+        for row in rows:
+            if not isinstance(row, dict):
+                continue
+            slug = row.get("slug")
+            if not slug:
+                continue
+            self.data[slug] = self._row_to_entry(row)
         self._sanitize_loaded_data()
         self.url_map: Dict[str, str] = self._build_url_map()
+        self._touched: Set[str] = set()
+
+    # =========================================================================
+    # Row <-> in-memory entry conversion
+    # =========================================================================
+
+    @staticmethod
+    def _row_to_entry(row: Dict[str, Any]) -> Dict[str, Any]:
+        prices = []
+        for store in STORES:
+            link = row.get(f"{store}_link")
+            if not link:
+                continue
+            prices.append({
+                "store": store,
+                "price": row.get(f"{store}_actual_price"),
+                "original_price": row.get(f"{store}_original_price"),
+                "url": link,
+                "currency": "EUR",
+            })
+        return {
+            "id": row.get("id"),
+            "brand": row.get("brand") or "Unknown",
+            "model": row.get("model") or row.get("name") or "",
+            "description": row.get("description") or "",
+            "specs": row.get("specs") or {},
+            "images": row.get("images") or [],
+            "prices": prices,
+        }
+
+    def _entry_to_row(self, slug: str, entry: Dict[str, Any]) -> Dict[str, Any]:
+        row: Dict[str, Any] = {
+            "slug": slug,
+            "name": entry["model"],
+            "brand": entry["brand"],
+            "model": entry["model"],
+            "description": entry.get("description", ""),
+            "specs": entry.get("specs", {}),
+            "images": entry.get("images", []),
+            "updated_at": _now_utc(),
+        }
+        for raw_key, value in row["specs"].items():
+            if not value:
+                continue
+            col = SPECS_TO_CHARACTERISTICS.get(_normalize_spec_key(raw_key))
+            if col:
+                row[col] = value
+        any_price = False
+        for p in entry.get("prices", []):
+            store = p.get("store")
+            if store not in STORES:
+                continue
+            # A scraped Product always carries a float price (never None) —
+            # normalize the "no confirmed price" case (0 / 0.0) to NULL here,
+            # otherwise a brand-new out-of-stock product would be stored with
+            # an actual_price of 0.0 instead of comparison_only.
+            price = p.get("price") or None
+            original = p.get("original_price") or None
+            discount = 0
+            if price and original and original > price:
+                discount = round((1 - price / original) * 100)
+                any_price = True
+            elif price:
+                any_price = True
+            row[f"{store}_actual_price"] = price
+            row[f"{store}_original_price"] = original
+            row[f"{store}_discount_percentage"] = discount
+            row[f"{store}_link"] = p.get("url")
+        if any_price:
+            row["comparison_only"] = False
+        if entry.get("id"):
+            row["id"] = entry["id"]
+        return row
+
+    def save(self, dry_run: bool = False) -> int:
+        """Persist every touched slug. Existing rackets update by id; brand-new ones insert."""
+        written = 0
+        for slug in self._touched:
+            entry = self.data[slug]
+            row = self._entry_to_row(slug, entry)
+            if dry_run:
+                written += 1
+                continue
+            if entry.get("id"):
+                row_id = row.pop("id")
+                self.client.table("rackets").update(row).eq("id", row_id).execute()
+            else:
+                row["created_at"] = _now_utc()
+                result = self.client.table("rackets").insert(row).execute()
+                if result.data:
+                    entry["id"] = result.data[0]["id"]
+            written += 1
+        self.url_map = self._build_url_map()
+        return written
+
+    # =========================================================================
+    # Sanitation / URL map
+    # =========================================================================
 
     def _coerce_specs(self, raw_specs: Any) -> Dict[str, str]:
-        """Normalize specs to dict format (legacy DB can store JSON strings)."""
+        """Normalize specs to dict format (legacy rows may store JSON strings)."""
         if isinstance(raw_specs, dict):
             return raw_specs
-
         if isinstance(raw_specs, str):
+            import json
             try:
                 parsed = json.loads(raw_specs)
                 if isinstance(parsed, dict):
                     return parsed
             except Exception:
                 return {}
-
         return {}
 
     @staticmethod
@@ -54,9 +211,8 @@ class RacketManager:
         return text in invalid_tokens
 
     def _sanitize_loaded_data(self):
-        """Defensively normalize legacy/malformed records loaded from JSON."""
+        """Defensively normalize legacy/malformed records loaded from the DB."""
         cleaned: Dict[str, Any] = {}
-
         for slug, racket in self.data.items():
             if not isinstance(racket, dict):
                 continue
@@ -76,18 +232,8 @@ class RacketManager:
             racket["prices"] = [p for p in prices if isinstance(p, dict)]
 
             cleaned[slug] = racket
-
         self.data = cleaned
 
-    def _load_db(self) -> Dict[str, Any]:
-        if os.path.exists(self.db_path):
-            try:
-                with open(self.db_path, "r", encoding="utf-8") as f:
-                    return json.load(f)
-            except json.JSONDecodeError:
-                return {}
-        return {}
-    
     def _build_url_map(self) -> Dict[str, str]:
         mapping = {}
         for slug, racket in self.data.items():
@@ -95,42 +241,29 @@ class RacketManager:
                 continue
             for price_entry in racket.get("prices", []):
                 if isinstance(price_entry, dict) and "url" in price_entry:
-                     mapping[price_entry["url"]] = slug
+                    mapping[price_entry["url"]] = slug
         return mapping
-
-    def save_db(self):
-        with open(self.db_path, "w", encoding="utf-8") as f:
-            json.dump(self.data, f, indent=4, ensure_ascii=False)
-        self.url_map = self._build_url_map()
-
-    def _slugify(self, text: str) -> str:
-        """Delegado en paddle_normalizer.slugify_paddle para consistencia."""
-        # Compatibilidad: el texto ya viene como "brand-model", lo pasamos tal cual
-        import unicodedata as _ud
-        t = str(text).lower()
-        t = _ud.normalize('NFKD', t).encode('ascii', 'ignore').decode('utf-8')
-        t = re.sub(r'[^\w\s-]', '', t)
-        t = re.sub(r'[-\s]+', '-', t).strip('-')
-        return t
 
     @staticmethod
     def _optimize_image_url(url: str) -> str:
         """Optimize image URL for maximum quality."""
-        if not url: return url
-        if url.startswith('//'): url = f'https:{url}'
+        if not url:
+            return url
+        if url.startswith('//'):
+            url = f'https:{url}'
         parsed = urlparse(url)
-        
+
         # Shopify cleanup
         if 'shopify.com' in parsed.netloc or 'cdn.shopify.com' in parsed.netloc:
             path = re.sub(r'_(\d+x\d*|\d*x\d+)(?:_crop_center)?(?=\.)', '', parsed.path)
             params = parse_qs(parsed.query)
             clean_params = {'v': params['v'][0]} if 'v' in params else {}
             return urlunparse((parsed.scheme, parsed.netloc, path, parsed.params, urlencode(clean_params), parsed.fragment))
-        
+
         # Magento cleanup
         if 'padelnuestro.com' in parsed.netloc:
             return urlunparse((parsed.scheme, parsed.netloc, parsed.path, parsed.params, '', parsed.fragment))
-        
+
         return url
 
     def _detect_brand_from_name(self, name: str) -> str:
@@ -138,20 +271,17 @@ class RacketManager:
         name_upper = name.upper()
         # Lista de marcas prioritarias (primero las compuestas)
         brands = [
-            'DROP SHOT', 'BLACK CROWN', 'ROYAL PADEL', 'STAR VIE', 'ADIDAS', 
+            'DROP SHOT', 'BLACK CROWN', 'ROYAL PADEL', 'STAR VIE', 'ADIDAS',
             'BULLPADEL', 'NOX', 'HEAD', 'BABOLAT', 'SIUX', 'WILSON', 'VARLION',
             'KUIKMA', 'OXYDOG', 'VIBOR-A', 'LOK', 'ENEBE', 'JOMA'
         ]
         for brand in brands:
             if brand in name_upper:
-                return brand.title() if brand != 'ADIDAS' else 'Adidas' # Case specific
+                return brand.title() if brand != 'ADIDAS' else 'Adidas'  # Case specific
         return "Unknown"
 
     def _normalize_name_for_comparison(self, name: str) -> str:
-        """
-        Delega en paddle_normalizer.normalize_for_comparison.
-        Se mantiene el método para compatibilidad con el código existente.
-        """
+        """Delega en paddle_normalizer.normalize_for_comparison."""
         return normalize_for_comparison(name)
 
     # =========================================================================
@@ -189,17 +319,15 @@ class RacketManager:
         # Conflict 1: Years
         if f_a['year'] and f_b['year'] and f_a['year'] != f_b['year']:
             return False
-        
+
         # Conflict 2: Suffixes (Must match exactly if present)
-        # Exception: If one set is empty and the other isn't, careful.
-        # But for "Woman" vs "Normal", we want them separate.
         if f_a['suffixes'] != f_b['suffixes']:
             return False
 
         return True
 
-    def merge_product(self, product: Any, store_name: str):
-        """Merge product with rigorous checks and auto-correction."""
+    def merge_product(self, product: Any, store_name: str) -> Optional[str]:
+        """Merge product with rigorous checks and auto-correction. Returns the slug it was merged into."""
         p_dict = product.model_dump() if hasattr(product, 'model_dump') else product.to_dict()
         p_name_raw = p_dict.get('name', '')
         # ── NORMALIZACIÓN EN IMPORT TIME ──────────────────────────────────────
@@ -223,33 +351,33 @@ class RacketManager:
         # 1. STRICT FILTER: Exclude Packs
         forbidden = ['pack', 'duo', 'conjunto', 'oferta', '+', 'mochila', 'paletero', 'zapatillas']
         if any(term in p_name.lower() for term in forbidden):
-            return
+            return None
 
         slug = None
-        
+
         # 2. Exact URL Match
         if p_url in self.url_map:
             slug = self.url_map[p_url]
-        
+
         # 3. Hybrid Fingerprint Match
         if not slug:
             input_features = self._extract_features(p_name)
             best_score = 0
             best_match_slug = None
-            
+
             for existing_slug, data in self.data.items():
                 if not isinstance(data, dict):
                     continue
                 # Filter A: Brand must match (normalized)
                 existing_brand = data.get('brand', 'Unknown')
-                
+
                 # Fix for existing bad data in DB (e.g. "Unknown" in DB but real brand now)
                 if existing_brand == "Unknown":
                     existing_brand = self._detect_brand_from_name(data['model'])
-                
+
                 if existing_brand.lower() != p_brand.lower():
                     continue
-                
+
                 existing_model = data.get('model', '')
                 if not isinstance(existing_model, str) or not existing_model:
                     continue
@@ -262,7 +390,7 @@ class RacketManager:
 
                 # Filter C: Fuzzy Match
                 score = fuzz.token_sort_ratio(input_features['clean_name'], existing_features['clean_name'])
-                
+
                 if input_features['year'] and input_features['year'] == existing_features['year']:
                     score += 5
 
@@ -271,21 +399,18 @@ class RacketManager:
                     if score > best_score:
                         best_score = score
                         best_match_slug = existing_slug
-            
+
             if best_match_slug:
                 slug = best_match_slug
-                # Update Master Model Name if incoming is cleaner (heuristic: shorter is usually cleaner for masters)
-                # But we prefer names with Year.
                 existing_entry = self.data[slug]
 
                 # Logic: If current has no year, but new one does, take new name.
                 existing_feats = self._extract_features(existing_entry['model'])
                 if not existing_feats['year'] and input_features['year']:
-                     existing_entry['model'] = p_name
+                    existing_entry['model'] = p_name
                 # Logic: If both have year (or neither), prefer the one WITHOUT player name (cleaner)
                 elif len(p_name) < len(existing_entry['model']):
-                     # Simple heuristic: shorter often means less marketing fluff
-                     pass
+                    pass  # Simple heuristic: shorter often means less marketing fluff
 
             else:
                 # No match found — create new entry
@@ -307,7 +432,7 @@ class RacketManager:
 
                 print(f"New Racket: {p_name} [{slug}]")
                 self.data[slug] = {
-                    "id": slug,
+                    "id": None,
                     "brand": p_brand,
                     "model": p_name,
                     "description": p_dict.get('description', ''),
@@ -315,7 +440,7 @@ class RacketManager:
                     "images": [],
                     "prices": []
                 }
-        
+
         racket_entry = self.data[slug]
         self.url_map[p_url] = slug
 
@@ -330,7 +455,6 @@ class RacketManager:
         for key, value in p_dict.get('specs', {}).items():
             curr_val = racket_entry["specs"].get(key)
 
-            # Replace placeholder/garbage values with a valid incoming value.
             should_replace = False
             if key == "Forma":
                 should_replace = self._is_invalid_shape_value(curr_val) and not self._is_invalid_shape_value(value)
@@ -344,7 +468,7 @@ class RacketManager:
         new_imgs = p_dict.get('images') or []
         if p_dict.get('image') and p_dict.get('image') not in new_imgs:
             new_imgs.insert(0, p_dict.get('image'))
-        
+
         current_imgs = set(racket_entry["images"])
         for img in new_imgs:
             opt_img = self._optimize_image_url(img)
@@ -354,14 +478,12 @@ class RacketManager:
 
         # 7. Update Price
         store_entry = next((item for item in racket_entry["prices"] if item["store"] == store_name), None)
-        now = datetime.now().isoformat()
-        
+
         if store_entry:
             store_entry["price"] = p_dict.get('price')
             store_entry["url"] = p_url
-            store_entry["last_updated"] = now
             if p_dict.get('original_price'):
-                 store_entry["original_price"] = p_dict.get('original_price')
+                store_entry["original_price"] = p_dict.get('original_price')
         else:
             racket_entry["prices"].append({
                 "store": store_name,
@@ -369,8 +491,7 @@ class RacketManager:
                 "original_price": p_dict.get('original_price'),
                 "url": p_url,
                 "currency": "EUR",
-                "last_updated": now
             })
 
-        # NOT calling save_db() here - it's called externally after batch processing
+        self._touched.add(slug)
         return slug

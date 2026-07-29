@@ -10,6 +10,7 @@ const { mockConfig, supabase } = vi.hoisted(() => {
     chain.range = vi.fn(() => chain);
     chain.limit = vi.fn(() => chain);
     chain.eq = vi.fn(() => chain);
+    chain.not = vi.fn(() => chain);
     chain.in = vi.fn(() => chain);
     chain.or = vi.fn(() => chain);
     chain.ilike = vi.fn(() => chain);
@@ -129,6 +130,18 @@ describe('RacketService', () => {
       mockConfig.error = new Error('Server error');
 
       await expect(racketService.getAllRackets()).rejects.toThrow('Server error');
+    });
+
+    it('excludes discontinued rackets without dropping NULL ones', async () => {
+      // Must be not.is.true, never eq.false: `discontinued = false` is NULL
+      // for a NULL column, so eq.false would silently drop those rows from
+      // the whole catalog instead of showing them.
+      await racketService.getAllRackets();
+
+      // `from()` builds a fresh chain per call — grab the one it just returned.
+      const chain = supabase.from.mock.results[0].value;
+      expect(chain.not).toHaveBeenCalledWith('discontinued', 'is', true);
+      expect(chain.eq).not.toHaveBeenCalledWith('discontinued', false);
     });
   });
 

@@ -2,173 +2,45 @@ import html as _html
 import json
 import re
 import urllib.request
-import ssl
 import asyncio
 from typing import Dict, List, Optional
-from urllib.parse import urlparse
-from .base_scraper import BaseScraper, Product, clean_price, normalize_specs, is_junior_racket
+from .base_scraper import (
+    BaseScraper, Product, normalize_specs, is_junior_racket,
+    FetchOutcome, FetchResult, ScraperGone, sync_fetch_with_retry, ssl_ctx,
+)
 
 
 class PadelNuestroScraper(BaseScraper):
-    """Scraper for PadelNuestro online store using GraphQL API."""
+    """Scraper for PadelNuestro online store."""
 
-    _graphql_blocked: bool = False  # class-level flag: skip GraphQL after first 403
-
-    # ── Magento option‑ID → human‑readable label mappings ──────────────
-    _ATTR_OPTIONS: Dict[str, Dict[str, str]] = {
-        "padelracket_balance": {
-            "2181": "Alto", "2183": "Medio", "2182": "Bajo",
-        },
-        "padelracket_core": {
-            "2651": "Black Eva HR3", "2652": "Black Eva HR9",
-            "2184": "Black EVA", "2836": "Cloud EVA", "2785": "Comfort FOAM",
-            "3267": "Custom EVA", "2657": "Dual Density",
-            "3263": "EV25 Black Soft", "2654": "EVA",
-            "2810": "EVA Pro High Density", "2807": "EVA Soft Performance",
-            "3233": "Evalastic", "2760": "EVA 3XPly",
-            "2761": "Eva High Memory", "2762": "EVA HR3",
-            "3977": "EVA Mid Hard", "2789": "EVA PRO",
-            "2780": "EVA PRO 50", "2781": "EVA Pro Touch",
-            "2187": "EVA", "2782": "EVA SOFT 30",
-            "2821": "EVA Soft Low Density", "2191": "Foam",
-            "2185": "Hard EVA", "3128": "HR3",
-            "3125": "HR3 Black EVA", "3122": "HR3 Core",
-            "3260": "HR3 White EVA", "3200": "Koridion",
-            "2186": "Medium EVA", "2649": "Mega Flex Core",
-            "2577": "Multieva", "3236": "Polyglass",
-            "2192": "Polietileno", "2769": "Power Blast EVA",
-            "2786": "SC White EVA", "2188": "Soft EVA",
-            "3971": "Soft Poly", "2189": "Supersoft EVA",
-            "2763": "Super Flex", "2190": "Ultrasoft EVA",
-            "2839": "X-EVA", "2771": "Xtend Carbon 3K",
-        },
-        "padelracket_face": {
-            "2194": "Carbono", "2203": "Carbono + Grafeno",
-            "2201": "Carbono 3K", "2195": "Carbono 12K",
-            "2197": "Carbono 18K", "2199": "Carbono 21K",
-            "2200": "Carbono 24K", "2193": "Aluminio + Carbono",
-            "2204": "Fibra de Vidrio", "2206": "Grafeno",
-            "2196": "Carbono 15K", "2198": "Carbono 1K",
-            "2205": "Fibra de Lino", "2207": "Policarbonato",
-            "2202": "Carbono 6K", "2578": "Fibrix",
-            "2598": "Polietileno", "2623": "Carbono 16K",
-            "2655": "Fibra de carbono", "2765": "Tricarbon",
-            "2764": "Glaphite", "2783": "Basalto",
-            "2813": "Carbon Flex", "2787": "Fiberflex",
-            "2816": "White EVA", "2824": "Carbono 18K Textreme",
-            "2833": "ElasticFiber", "2845": "Carbon Plain",
-            "3058": "X Tend Carbon 3K", "3131": "Fiber Glass 3K",
-            "3239": "Polyglass", "3270": "Amplitex 3K",
-            "3974": "Fibertech", "3980": "X Tend Carbon 12K",
-            "3983": "Soft Carbon",
-        },
-        "padelracket_format": {
-            "2208": "Normal", "2209": "Oversize",
-        },
-        "padelracket_hardness": {
-            "2210": "Dura", "2211": "Media", "2212": "Blanda",
-        },
-        "padelracket_level": {
-            "2213": "Avanzado / Competición",
-            "2214": "Principiante / Intermedio",
-            "2215": "Profesional",
-        },
-        "padelracket_relief": {
-            "2217": "Brillo", "2218": "Mate", "2216": "Relieve 3D",
-            "2766": "Rugosa", "2219": "Arenoso",
-        },
-        "padelracket_shape": {
-            "2220": "Beach Tennis", "2221": "Diamante",
-            "2222": "Híbrida", "2223": "Pickleball",
-            "2224": "Redonda", "2225": "Lágrima",
-        },
-        "padelracket_surface": {
-            "2227": "Gomosa", "2226": "Lisa",
-            "2228": "Rugosa", "2767": "Arenosa",
-        },
-        "padelrakect_player_type": {          # Note: typo in Magento schema
-            "2230": "Control", "2229": "Polivalente", "2231": "Potencia",
-        },
+    # Label -> spec key for the server-rendered "description-attributes"
+    # table on the product page (Magento's additional-attributes-wrapper).
+    # This is the SAME structured data the GraphQL API used to expose
+    # (option IDs already resolved to labels by the store) — GraphQL itself
+    # is permanently blocked by the store's WAF (403, Fastly error 54113,
+    # confirmed with every header/cookie combination tried), and the
+    # current storefront bundle doesn't call it either, so there is nothing
+    # left to enrich from there. This table comes for free in the same
+    # HTML fetch already used for price/name.
+    _ATTRIBUTE_TABLE_LABELS = {
+        "marca", "color", "color 2", "producto", "balance", "núcleo",
+        "cara", "formato", "dureza", "nivel de juego", "acabado", "forma",
+        "superfície", "superficie", "tipo de juego", "colección jugadores", "jugador",
     }
 
-    # Maps GraphQL field name → normalised spec key used in the Product
-    _FIELD_TO_SPEC: Dict[str, str] = {
-        "padelracket_balance": "Balance",
-        "padelracket_core": "Núcleo",
-        "padelracket_face": "Cara",
-        "padelracket_format": "Formato",
-        "padelracket_hardness": "Dureza",
-        "padelracket_level": "Nivel",
-        "padelracket_relief": "Acabado",
-        "padelracket_shape": "Forma",
-        "padelracket_surface": "Rugosidad",
-        "padelrakect_player_type": "Tipo de Juego",
-    }
-
-    def _resolve_option(self, field: str, raw_value) -> Optional[str]:
-        """Resolve a Magento numeric option‑ID to its label."""
-        if raw_value is None:
-            return None
-        options = self._ATTR_OPTIONS.get(field, {})
-        return options.get(str(raw_value))
-
-    def _fetch_graphql(self, query: str) -> dict:
-        """Execute a GraphQL query against PadelNuestro API (sync)."""
-        data = json.dumps({"query": query}).encode("utf-8")
-        req = urllib.request.Request(
-            "https://www.padelnuestro.com/graphql",
-            data=data,
-            headers={
-                "Content-Type": "application/json",
-                "Accept": "application/json, text/plain, */*",
-                "Accept-Language": "es-ES,es;q=0.9,en;q=0.8",
-                "Accept-Encoding": "gzip, deflate",
-                "Store": "es",
-                "Origin": "https://www.padelnuestro.com",
-                "Referer": "https://www.padelnuestro.com/palas-padel",
-                "Connection": "keep-alive",
-                "Sec-Fetch-Site": "same-origin",
-                "Sec-Fetch-Mode": "cors",
-                "Sec-Fetch-Dest": "empty",
-                "User-Agent": (
-                    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
-                    "AppleWebKit/537.36 (KHTML, like Gecko) "
-                    "Chrome/124.0.0.0 Safari/537.36"
-                ),
-            },
-        )
-
-        ctx = ssl.create_default_context()
-        ctx.check_hostname = False
-        ctx.verify_mode = ssl.CERT_NONE
-
-        try:
-            with urllib.request.urlopen(req, timeout=30, context=ctx) as resp:
-                raw = resp.read()
-                # Descomprimir gzip si el servidor lo devuelve comprimido
-                encoding = resp.headers.get("Content-Encoding", "")
-                if encoding == "gzip":
-                    import gzip
-                    raw = gzip.decompress(raw)
-                elif encoding == "br":
-                    try:
-                        import brotli
-                        raw = brotli.decompress(raw)
-                    except ImportError:
-                        pass
-                data = json.loads(raw.decode("utf-8"))
-                return data if data is not None else {}
-        except urllib.error.HTTPError as e:
-            if e.code == 403:
-                if not PadelNuestroScraper._graphql_blocked:
-                    print("[PadelNuestro] GraphQL blocked (403) — falling back to HTML-only parsing")
-                    PadelNuestroScraper._graphql_blocked = True
-            else:
-                print(f"[PadelNuestro] GraphQL Error: {e}")
-            return {}
-        except Exception as e:
-            print(f"[PadelNuestro] GraphQL Error: {e}")
-            return {}
+    def _parse_attribute_table(self, html: str) -> Dict[str, str]:
+        """Extract the description-attributes label/value pairs from the page."""
+        specs: Dict[str, str] = {}
+        for label, value in re.findall(
+            r'description-attributes-label">([^<]+)</span>\s*'
+            r'<span class="description-attributes-value">\s*([^<]+?)\s*</span>',
+            html,
+        ):
+            label = _html.unescape(label).strip()
+            value = _html.unescape(value).strip()
+            if label.lower() in self._ATTRIBUTE_TABLE_LABELS and value:
+                specs[label] = value
+        return specs
 
     def _parse_specs_from_html(self, body_html: str) -> Dict[str, str]:
         """Parse specs from description HTML using regex."""
@@ -275,97 +147,6 @@ class PadelNuestroScraper(BaseScraper):
 
         return specs
 
-    def _scrape_price_from_html(self, url: str) -> Optional[tuple]:
-        """
-        Fallback: extrae el precio directamente del HTML de la página del producto.
-        Se usa cuando la API GraphQL devuelve 403.
-        Devuelve (price, original_price) o None si no se encuentra.
-
-        Estrategias (en orden de prioridad):
-          1. JSON-LD schema.org (@type=Product → offers.price)
-          2. Atributo data-price-amount de Magento 2
-          3. Span con clase 'price' (texto con €)
-        """
-        req = urllib.request.Request(
-            url,
-            headers={
-                "User-Agent": (
-                    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
-                    "AppleWebKit/537.36 (KHTML, like Gecko) "
-                    "Chrome/122.0.0.0 Safari/537.36"
-                ),
-                "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-                "Accept-Language": "es-ES,es;q=0.9",
-                "Referer": "https://www.padelnuestro.com/palas-padel",
-            },
-        )
-        ctx = ssl.create_default_context()
-        ctx.check_hostname = False
-        ctx.verify_mode = ssl.CERT_NONE
-
-        try:
-            with urllib.request.urlopen(req, timeout=20, context=ctx) as resp:
-                raw = resp.read()
-                encoding = resp.headers.get("Content-Encoding", "")
-                if encoding == "gzip":
-                    import gzip as _gzip
-                    raw = _gzip.decompress(raw)
-                html = raw.decode("utf-8", errors="replace")
-        except Exception as e:
-            print(f"[PadelNuestro] HTML fetch error for {url}: {e}")
-            return None
-
-        price: Optional[float] = None
-        original_price: Optional[float] = None
-
-        # ── Estrategia 1: JSON-LD ──────────────────────────────────────────
-        for match in re.finditer(
-            r'<script[^>]+type=["\']application/ld\+json["\'][^>]*>(.*?)</script>',
-            html,
-            re.DOTALL | re.IGNORECASE,
-        ):
-            try:
-                data = json.loads(match.group(1))
-                items = data if isinstance(data, list) else [data]
-                for item in items:
-                    if item.get("@type") == "Product":
-                        offers = item.get("offers", {})
-                        if isinstance(offers, list):
-                            offers = offers[0]
-                        raw_price = offers.get("price")
-                        if raw_price:
-                            price = float(str(raw_price).replace(",", "."))
-                        break
-            except Exception:
-                continue
-            if price:
-                break
-
-        # ── Estrategia 2: atributo data-price-amount de Magento 2 ─────────
-        if not price:
-            m = re.search(
-                r'data-price-amount=["\']([0-9]+(?:[.,][0-9]+)?)["\']',
-                html,
-            )
-            if m:
-                price = float(m.group(1).replace(",", "."))
-
-        # ── Estrategia 3: span.price con símbolo € ─────────────────────────
-        if not price:
-            m = re.search(
-                r'<span[^>]*class="[^"]*\bprice\b[^"]*"[^>]*>\s*'
-                r'([0-9]+(?:[.,][0-9]+)?)\s*(?:€|EUR)',
-                html,
-                re.IGNORECASE,
-            )
-            if m:
-                price = float(m.group(1).replace(",", "."))
-
-        if price is None:
-            return None
-
-        return price, original_price
-
     _COMMON_BRANDS = [
         "Nox", "Bullpadel", "Adidas", "Siux", "Head", "Babolat",
         "StarVie", "Varlion", "Kuikma", "Wilson", "Drop Shot",
@@ -375,8 +156,13 @@ class PadelNuestroScraper(BaseScraper):
         "Softee", "Akkeron", "Eme", "Cartri",
     ]
 
-    def _fetch_html(self, url: str) -> Optional[str]:
-        """Fetch page HTML via plain HTTP (sync)."""
+    def _fetch_html(self, url: str) -> str:
+        """Fetch page HTML via plain HTTP (sync).
+
+        Raises ScraperGone if the store redirects to another page (product
+        retired). Raises the underlying exception on network failure once
+        retries are exhausted — callers must NOT treat that as "no price".
+        """
         req = urllib.request.Request(
             url,
             headers={
@@ -389,25 +175,22 @@ class PadelNuestroScraper(BaseScraper):
                 "Accept-Language": "es-ES,es;q=0.9",
             },
         )
-        ctx = ssl.create_default_context()
-        ctx.check_hostname = False
-        ctx.verify_mode = ssl.CERT_NONE
-        try:
-            with urllib.request.urlopen(req, timeout=20, context=ctx) as resp:
+
+        def _once():
+            with urllib.request.urlopen(req, timeout=20, context=ssl_ctx()) as resp:
                 # Detect redirect to category page (discontinued product)
                 final_url = resp.url.split("?")[0].rstrip("/")
                 req_url = url.split("?")[0].rstrip("/")
                 if final_url != req_url:
-                    return None  # redirected → discontinued, skip silently
+                    raise ScraperGone(f"redirected: {url} -> {resp.url}")
                 raw = resp.read()
                 enc = resp.headers.get("Content-Encoding", "")
                 if enc == "gzip":
                     import gzip
                     raw = gzip.decompress(raw)
                 return raw.decode("utf-8", errors="replace")
-        except Exception as e:
-            print(f"[PadelNuestro] HTTP error for {url}: {e}")
-            return None
+
+        return sync_fetch_with_retry(_once, label=f"PadelNuestro:{url}", max_retries=4, base_delay=6.0)
 
     def _extract_product_from_html(self, html: str, url: str) -> Optional[Product]:
         """Extract product data from page HTML using JSON-LD + data attributes."""
@@ -486,8 +269,11 @@ class PadelNuestroScraper(BaseScraper):
         elif images:
             image = images[0]
 
-        # ── Specs from description HTML ───────────────────────────────
+        # ── Specs: attribute table (structured, reliable) + regex fallback
+        # on the marketing description (catches Peso/Perfil, which aren't
+        # in the table) ────────────────────────────────────────────────
         specs = self._parse_specs_from_html(description_html)
+        specs.update(self._parse_attribute_table(html))
         specs = normalize_specs(specs)
 
         # Fallback brand from name
@@ -512,71 +298,41 @@ class PadelNuestroScraper(BaseScraper):
             description=description_html,
         )
 
-    def _scrape_specs_via_graphql(self, url_key: str) -> Dict[str, str]:
-        """Fetch structured padel spec attributes via Magento GraphQL API."""
-        if PadelNuestroScraper._graphql_blocked:
-            return {}
-        fields = " ".join(self._FIELD_TO_SPEC.keys())
-        query = (
-            '{ products(filter: {url_key: {eq: "%s"}}) { items { %s } } }'
-            % (url_key, fields)
-        )
-        data = self._fetch_graphql(query)
-        specs: Dict[str, str] = {}
-        try:
-            items = data.get("data", {}).get("products", {}).get("items", [])
-            if not items:
-                return specs
-            item = items[0]
-            for field, spec_key in self._FIELD_TO_SPEC.items():
-                raw_val = item.get(field)
-                if raw_val is None:
-                    continue
-                label = self._resolve_option(field, raw_val)
-                if label:
-                    specs[spec_key] = label
-        except Exception as e:
-            print(f"[PadelNuestro] GraphQL spec parse error for {url_key}: {e}")
-        return specs
+    async def scrape_product(self, url: str) -> FetchResult:
+        """Scrape product data from HTML page using JSON-LD + the attribute table."""
+        # Normalise URL (strip .html suffix)
+        if url.endswith(".html"):
+            url = url[:-5]
 
-    async def scrape_product(self, url: str) -> Optional[Product]:
-        """Scrape product data from HTML page using JSON-LD, enriched with GraphQL specs."""
+        loop = asyncio.get_running_loop()
         try:
-            # Normalise URL (strip .html suffix)
-            if url.endswith(".html"):
-                url = url[:-5]
-
-            loop = asyncio.get_running_loop()
             html = await loop.run_in_executor(None, self._fetch_html, url)
-            if not html:
-                return None  # redirect (discontinued) or fetch error — already logged
-
-            product = self._extract_product_from_html(html, url)
-            if not product:
-                return None
-
-            # Enrich with GraphQL structured spec attributes (option-ID → label)
-            url_key = url.rstrip("/").split("/")[-1]
-            graphql_specs = await loop.run_in_executor(
-                None, self._scrape_specs_via_graphql, url_key
-            )
-            for k, v in graphql_specs.items():
-                if v and k not in product.specs:
-                    product.specs[k] = v
-            if graphql_specs:
-                product.specs = normalize_specs(product.specs)
-
-            return product
-
+        except ScraperGone:
+            return FetchResult(FetchOutcome.GONE)
         except Exception as e:
-            print(f"[PadelNuestro] Error scraping product {url}: {e}")
-            return None
+            print(f"[PadelNuestro] HTTP error for {url}: {e}")
+            return FetchResult(FetchOutcome.FAILED, error=str(e))
+
+        try:
+            product = self._extract_product_from_html(html, url)
+        except Exception as e:
+            print(f"[PadelNuestro] Error parsing product {url}: {e}")
+            return FetchResult(FetchOutcome.FAILED, error=str(e))
+
+        if not product:
+            return FetchResult(FetchOutcome.FAILED, error="could not extract product from HTML (page loaded, parse failed)")
+
+        if product.price is None or product.price <= 0:
+            return FetchResult(FetchOutcome.NO_PRICE, product=product)
+        return FetchResult(FetchOutcome.OK, product=product)
 
     def _fetch_category_page(self, page_num: int) -> List[str]:
         """Fetch one category page and return product URLs (sync)."""
         page_url = f"https://www.padelnuestro.com/palas-padel?p={page_num}"
-        html = self._fetch_html(page_url)
-        if not html:
+        try:
+            html = self._fetch_html(page_url)
+        except Exception as e:
+            print(f"[PadelNuestro] Category page {page_num} fetch failed: {e}")
             return []
         # product-item-link hrefs appear in initial HTML (server-rendered)
         links = re.findall(r'class="product-item-link"[^>]*href="([^"]+)"', html)

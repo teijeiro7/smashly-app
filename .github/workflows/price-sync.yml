@@ -2,37 +2,51 @@ name: Catalog & Price Sync
 
 on:
   schedule:
-    # Full sync: candidatos a 1er domingo del mes (cada domingo 04:00 UTC; guard interno filtra día 1-7)
-    - cron: '0 4 * * 0'
-    # Prices sync: Todos los domingos a las 05:00 UTC
-    - cron: '0 5 * * 0'
+    - cron: '0 5 * * 0' # Cada domingo 05:00 UTC
   workflow_dispatch:
     inputs:
-      mode:
-        description: 'Sync mode'
-        required: true
-        default: 'prices'
-        type: choice
-        options:
-          - prices
-          - full
       limit:
-        description: 'Limit products (for testing)'
+        description: 'Limit products/URLs per store (testing)'
         required: false
         default: ''
+      dry_run:
+        description: 'Dry run (no writes to Supabase)'
+        required: false
+        default: false
+        type: boolean
 
 env:
   SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
   SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
-  EMAIL_TO: info@smashly-app.es
+
+permissions:
+  contents: read
+
+concurrency:
+  group: catalog-sync
+  cancel-in-progress: false
 
 jobs:
-  prices-sync:
+  check-secrets:
+    runs-on: ubuntu-latest
+    timeout-minutes: 1
+    steps:
+      - name: Verify required secrets are present
+        run: |
+          if [ -z "$SUPABASE_URL" ] || [ -z "$SUPABASE_SERVICE_ROLE_KEY" ]; then
+            echo "::error::Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY secret. Configure them under Settings > Secrets and variables > Actions before this workflow can do anything."
+            exit 1
+          fi
+          echo "Secrets present."
+
+  refresh:
+    needs: check-secrets
     runs-on: ubuntu-latest
     timeout-minutes: 30
-    if: >
-      (github.event_name == 'schedule' && github.event.schedule == '0 5 * * 0') ||
-      (github.event_name == 'workflow_dispatch' && github.event.inputs.mode == 'prices')
+    strategy:
+      fail-fast: false
+      matrix:
+        store: [padelmarket, padelnuestro, padelproshop]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -46,85 +60,28 @@ jobs:
         with:
           python-version: '3.10'
           cache: pip
+          cache-dependency-path: src/scrapers/requirements.txt
 
       - name: Install dependencies
         run: pip install -r src/scrapers/requirements.txt
 
-      - name: Run Prices Sync
+      - name: Refresh prices — ${{ matrix.store }}
         env:
           SYNC_LIMIT: ${{ github.event.inputs.limit }}
+          DRY_RUN: ${{ github.event.inputs.dry_run }}
         run: |
-          LIMIT_ARG=""
-          if [ -n "$SYNC_LIMIT" ]; then
-            LIMIT_ARG="--limit $SYNC_LIMIT"
-          fi
-          echo "Running prices sync..."
-          set +e
-          python3 -m src.scrapers.sync_catalog --mode prices $LIMIT_ARG > sync.log 2>&1
-          EXIT_CODE=$?
-          set -e
-          cat sync.log
-          if [ $EXIT_CODE -ne 0 ]; then
-            echo "sync_failed=true" >> $GITHUB_ENV
-          fi
-          exit $EXIT_CODE
+          ARGS="refresh --store ${{ matrix.store }}"
+          if [ -n "$SYNC_LIMIT" ]; then ARGS="$ARGS --limit $SYNC_LIMIT"; fi
+          if [ "$DRY_RUN" = "true" ]; then ARGS="$ARGS --dry-run"; fi
+          python3 -m src.scrapers.sync_catalog $ARGS
 
-      - name: Deduplicate rackets
-        run: |
-          cd src/scrapers
-          set +e
-          python3 deduplicate_rackets.py >> dedupe.log 2>&1
-          EXIT_CODE=$?
-          set -e
-          cat dedupe.log
-          if [ $EXIT_CODE -ne 0 ]; then
-            echo "dedupe_failed=true" >> $GITHUB_ENV
-          fi
-
-      - name: Commit and push changes
-        run: |
-          git config --local user.email "github-actions[bot]@users.noreply.github.com"
-          git config --local user.name "github-actions[bot]"
-          git add src/scrapers/rackets.json
-          git commit -m "chore: weekly prices update" || echo "No changes to commit"
-          git push || echo "Push failed"
-
-      - name: Send failure notification
-        if: env.sync_failed == 'true' || env.dedupe_failed == 'true'
-        run: |
-          echo "📧 Enviando notificación de fallo a ${{ env.EMAIL_TO }}"
-          curl -s -X POST https://api.resend.com/emails \
-            -H "Authorization: Bearer ${{ secrets.RESEND_API_KEY }}" \
-            -H "Content-Type: application/json" \
-            -d '{
-              "from": "Smashly <onboarding@resend.dev>",
-              "to": ["${{ env.EMAIL_TO }}"],
-              "subject": "[Smashly] Weekly Prices Sync - FALLO",
-              "text": "El sync semanal de precios ha fallado (catalog o deduplicación). Por favor revisa los logs en GitHub Actions."
-            }' || echo "Notification failed"
-
-  full-sync:
+  discover:
+    needs: refresh
+    if: ${{ !cancelled() }} # keep discovering/deduping even if one store's refresh guardrail tripped
     runs-on: ubuntu-latest
-    timeout-minutes: 60
-    if: >
-      (github.event_name == 'schedule' && github.event.schedule == '0 4 * * 0') ||
-      (github.event_name == 'workflow_dispatch' && github.event.inputs.mode == 'full')
+    timeout-minutes: 45
     steps:
-      - name: First-Sunday guard
-        id: first_sunday
-        run: |
-          DOM=$(date +%d)
-          echo "DOM=$DOM"
-          if [ "$DOM" -gt 7 ]; then
-            echo "Today is day $DOM (>7). Not first week of month — skipping full-sync."
-            echo "run=false" >> "$GITHUB_OUTPUT"
-          else
-            echo "Today is day $DOM (<=7). First week of month — proceeding with full-sync."
-            echo "run=true" >> "$GITHUB_OUTPUT"
-          fi
-
       - name: Checkout repository
-        if: steps.first_sunday.outputs.run == 'true' || github.event_name == 'workflow_dispatch'
         uses: actions/checkout@v4
         with:
           sparse-checkout: |
@@ -132,92 +89,24 @@ jobs:
           sparse-checkout-cone-mode: false
 
       - name: Set up Python
-        if: steps.first_sunday.outputs.run == 'true' || github.event_name == 'workflow_dispatch'
         uses: actions/setup-python@v5
         with:
           python-version: '3.10'
           cache: pip
+          cache-dependency-path: src/scrapers/requirements.txt
 
-      - name: Install Python dependencies
-        if: steps.first_sunday.outputs.run == 'true' || github.event_name == 'workflow_dispatch'
+      - name: Install dependencies
         run: pip install -r src/scrapers/requirements.txt
 
-      - name: Run Full Sync
-        if: steps.first_sunday.outputs.run == 'true' || github.event_name == 'workflow_dispatch'
+      - name: Discover new rackets, mark discontinued, dedupe
         env:
           SYNC_LIMIT: ${{ github.event.inputs.limit }}
+          DRY_RUN: ${{ github.event.inputs.dry_run }}
         run: |
-          LIMIT_ARG=""
-          if [ -n "$SYNC_LIMIT" ]; then
-            LIMIT_ARG="--limit $SYNC_LIMIT"
-          fi
-          echo "Running full sync (new + discontinued + prices)..."
-          set +e
-          python3 -m src.scrapers.sync_catalog --mode full $LIMIT_ARG > sync.log 2>&1
-          EXIT_CODE=$?
-          set -e
-          cat sync.log
-          if [ $EXIT_CODE -ne 0 ]; then
-            echo "sync_failed=true" >> $GITHUB_ENV
-          fi
-          exit $EXIT_CODE
+          ARGS="discover"
+          if [ -n "$SYNC_LIMIT" ]; then ARGS="$ARGS --limit $SYNC_LIMIT"; fi
+          if [ "$DRY_RUN" = "true" ]; then ARGS="$ARGS --dry-run"; fi
+          python3 -m src.scrapers.sync_catalog $ARGS
 
-      - name: Deduplicate rackets
-        if: steps.first_sunday.outputs.run == 'true' || github.event_name == 'workflow_dispatch'
-        run: |
-          cd src/scrapers
-          set +e
-          python3 deduplicate_rackets.py >> dedupe.log 2>&1
-          EXIT_CODE=$?
-          set -e
-          cat dedupe.log
-          if [ $EXIT_CODE -ne 0 ]; then
-            echo "dedupe_failed=true" >> $GITHUB_ENV
-          fi
-
-      - name: Sync Radar Metrics (External Sources)
-        if: steps.first_sunday.outputs.run == 'true' || github.event_name == 'workflow_dispatch'
-        run: |
-          echo "Scraping radar metrics from PadelZoom/TuMejorPala..."
-          set +e
-          python3 -m src.scrapers.sync_radar_metrics >> radar-metrics.log 2>&1
-          EXIT_CODE=$?
-          set -e
-          cat radar-metrics.log
-          if [ $EXIT_CODE -ne 0 ]; then
-            echo "metrics_failed=true" >> $GITHUB_ENV
-          fi
-
-      # NOTE: this job used to run a deterministic fallback pass here
-      # (backend/api/src/scripts/populate-radar-metrics.ts) for rackets that
-      # PadelZoom/TuMejorPala scraping above couldn't cover. That script
-      # lived in backend/api, which no longer exists, so the step was
-      # removed rather than left silently failing every month. A fallback
-      # formula does exist in api/_lib/testea-metrics.ts
-      # (calculateFallbackMetrics), but it computes metrics on the fly for
-      # API responses — it isn't wired up to persist radar_* columns back
-      # to the DB, so porting it here needs a deliberate decision, not a
-      # quick copy-paste.
-
-      - name: Commit and push changes
-        if: steps.first_sunday.outputs.run == 'true' || github.event_name == 'workflow_dispatch'
-        run: |
-          git config --local user.email "github-actions[bot]@users.noreply.github.com"
-          git config --local user.name "github-actions[bot]"
-          git add src/scrapers/rackets.json
-          git commit -m "chore: monthly full sync update" || echo "No changes to commit"
-          git push || echo "Push failed"
-
-      - name: Send failure notification
-        if: (steps.first_sunday.outputs.run == 'true' || github.event_name == 'workflow_dispatch') && (env.sync_failed == 'true' || env.dedupe_failed == 'true' || env.metrics_failed == 'true')
-        run: |
-          echo "📧 Enviando notificación de fallo a ${{ env.EMAIL_TO }}"
-          curl -s -X POST https://api.resend.com/emails \
-            -H "Authorization: Bearer ${{ secrets.RESEND_API_KEY }}" \
-            -H "Content-Type: application/json" \
-            -d '{
-              "from": "Smashly <onboarding@resend.dev>",
-              "to": ["${{ env.EMAIL_TO }}"],
-              "subject": "[Smashly] Monthly Sync - FALLO",
-              "text": "El sync mensual ha fallado (catalog, deduplicación, radar metrics externo o fallback). Por favor revisa los logs."
-            }' || echo "Notification failed"
+      - name: Sync radar metrics (missing only)
+        run: python3 -m src.scrapers.sync_radar_metrics
