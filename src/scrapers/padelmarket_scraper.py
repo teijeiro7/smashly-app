@@ -46,7 +46,10 @@ class PadelMarketScraper(BaseScraper):
         )
         for m in matches:
             key = m.group(1).strip().rstrip(':')
-            val = m.group(2).strip()
+            # The separator colon can land outside <strong>...</strong> (e.g.
+            # "<strong>Tipo de juego</strong>: Polivalente") and leak into the
+            # value — strip it, or it ends up stored as ": Polivalente".
+            val = re.sub(r'^\s*:\s*', '', m.group(2).strip())
             if key and val:
                 specs[key] = val
 

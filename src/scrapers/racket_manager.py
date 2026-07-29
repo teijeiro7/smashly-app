@@ -1,4 +1,5 @@
 import re
+import unicodedata
 from datetime import datetime, timezone
 from urllib.parse import urlparse, parse_qs, urlencode, urlunparse
 from typing import Dict, List, Optional, Any, Set
@@ -12,6 +13,46 @@ from .pricing import STORES
 
 def _now_utc() -> str:
     return datetime.now(timezone.utc).isoformat()
+
+
+# Claves de `specs` -> columna `characteristics_*`. IMPORTANTE: estas claves
+# son las que llegan DESPUÉS de `base_scraper.normalize_specs` (todo scraper
+# pasa specs por ahí antes de guardarlos) — no las claves crudas de cada
+# tienda. Ej.: "Nivel de Juego" y "Superficie" ya se canonicalizan a "Nivel"
+# y "Rugosidad" antes de llegar aquí (ver SPEC_NAME_MAP), así que mapear
+# "nivel de juego" o "superficie" directamente sería código muerto.
+#
+# Las primeras 7 están validadas contra las filas que ya tenían
+# `characteristics_*` rellena por el pipeline antiguo (mapeo 1:1 confirmado).
+# `formato`/`acabado`/`rugosidad`/`colores`/`producto`/`jugador`/`coleccion
+# jugadores` vienen de la tabla de atributos de PadelNuestro (ver
+# padelnuestro_scraper._parse_attribute_table): son columnas dedicadas que
+# ya existen en el esquema (characteristics_format/finish/surface/color/...),
+# confirmadas 1:1 contra los valores reales de esa tabla. `marca` no se
+# incluye — normalize_specs la descarta siempre (nunca llega hasta aquí).
+SPECS_TO_CHARACTERISTICS = {
+    "forma": "characteristics_shape",
+    "balance": "characteristics_balance",
+    "nucleo": "characteristics_core",
+    "cara": "characteristics_face",
+    "nivel": "characteristics_game_level",
+    "dureza": "characteristics_hardness",
+    "tipo de juego": "characteristics_game_type",
+    "formato": "characteristics_format",
+    "acabado": "characteristics_finish",
+    "rugosidad": "characteristics_surface",
+    "colores": "characteristics_color",
+    "color 2": "characteristics_color_2",
+    "producto": "characteristics_product",
+    "coleccion jugadores": "characteristics_player_collection",
+    "jugador": "characteristics_player",
+}
+
+
+def _normalize_spec_key(key: str) -> str:
+    """minúsculas + sin acentos, para que 'Tipo de Juego' y 'Tipo de juego' mapeen igual."""
+    ascii_key = unicodedata.normalize("NFKD", key).encode("ascii", "ignore").decode("ascii")
+    return ascii_key.strip().lower()
 
 
 class RacketManager:
@@ -76,6 +117,12 @@ class RacketManager:
             "images": entry.get("images", []),
             "updated_at": _now_utc(),
         }
+        for raw_key, value in row["specs"].items():
+            if not value:
+                continue
+            col = SPECS_TO_CHARACTERISTICS.get(_normalize_spec_key(raw_key))
+            if col:
+                row[col] = value
         any_price = False
         for p in entry.get("prices", []):
             store = p.get("store")

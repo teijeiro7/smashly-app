@@ -63,6 +63,23 @@ class TestDecidePriceUpdate:
         assert decision.updates["padelproshop_actual_price"] is None
         assert decision.price_changed is True
 
+    def test_gone_also_clears_the_link(self):
+        # A GONE (301/404) is a confirmed removal — keeping the dead link
+        # around means discover keeps bumping last_seen for a URL that no
+        # longer exists in the store, and the racket never gets flagged.
+        result = FetchResult(FetchOutcome.GONE)
+        decision = decide_price_update("padelnuestro", result, old_price=80.0, now_iso=NOW, url="https://store.example/p")
+
+        assert decision.updates["padelnuestro_link"] is None
+
+    def test_no_price_keeps_the_link(self):
+        # NO_PRICE means the page loaded and confirmed no sellable price —
+        # the product still exists at that URL, unlike GONE.
+        result = FetchResult(FetchOutcome.NO_PRICE, product=_product(price=0.0))
+        decision = decide_price_update("padelnuestro", result, old_price=80.0, now_iso=NOW, url="https://store.example/p")
+
+        assert decision.updates["padelnuestro_link"] == "https://store.example/p"
+
     def test_ok_writes_new_price_and_marks_checked(self):
         # The link column always echoes the caller-supplied `url` (the
         # racket's known URL for this store), not the scraped product's own

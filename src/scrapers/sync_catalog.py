@@ -83,7 +83,7 @@ def _require_env_or_die() -> None:
 
 # ── refresh ──────────────────────────────────────────────────────────────
 
-async def refresh(store: str, limit: int, dry_run: bool) -> None:
+async def refresh(store: str, limit: int, dry_run: bool, gone_cap: int) -> None:
     _require_env_or_die()
     client = db.get_client()
 
@@ -117,6 +117,8 @@ async def refresh(store: str, limit: int, dry_run: bool) -> None:
 
     rows_to_upsert = []
     price_history_entries = []
+    newly_gone = 0  # GONE this run for a link that still had a price stored — a real transition,
+                     # not one of the already-dead links every run reconfirms as GONE.
 
     for row, result, decision in results:
         if row.get(f"{store}_actual_price") is not None:
@@ -128,6 +130,9 @@ async def refresh(store: str, limit: int, dry_run: bool) -> None:
 
         if decision.price_changed:
             stats.price_changed += 1
+
+        if result.outcome is FetchOutcome.GONE and decision.price_changed:
+            newly_gone += 1
 
         if decision.updates:
             rows_to_upsert.append({"id": row["id"], **decision.updates})
@@ -141,6 +146,20 @@ async def refresh(store: str, limit: int, dry_run: bool) -> None:
                 "discount_percentage": decision.updates.get(f"{store}_discount_percentage", 0),
                 "recorded_at": now_iso,
             })
+
+    if newly_gone > gone_cap:
+        print(
+            f"  ❌ {newly_gone} URLs de {store} pasaron a 'gone' (301/404) en este run (de "
+            f"{stats.gone} 'gone' totales, el resto ya lo eran), por encima del tope de "
+            f"seguridad ({gone_cap}). Posible cambio de esquema de URLs en la tienda — "
+            f"abortando sin escribir nada para evitar vaciar el catálogo."
+        )
+        report.write_step_summary(
+            f"## Catalog sync — {store}\n\n"
+            f"### ❌ gone_cap superado: {newly_gone} nuevos > {gone_cap} "
+            f"(gone totales: {stats.gone}). Nada escrito.\n"
+        )
+        sys.exit(1)
 
     if dry_run:
         print(f"  [dry-run] {len(rows_to_upsert)} filas se actualizarían, {len(price_history_entries)} price_history.")
@@ -247,6 +266,7 @@ if __name__ == "__main__":
     p_refresh.add_argument("--store", required=True, choices=list(STORE_CONFIGS.keys()))
     p_refresh.add_argument("--limit", type=int, default=None, help="Limitar nº de productos (testing).")
     p_refresh.add_argument("--dry-run", action="store_true")
+    p_refresh.add_argument("--gone-cap", type=int, default=40, help="Máximo de 'gone' (301/404) antes de abortar sin escribir.")
 
     p_discover = sub.add_parser("discover", help="Descubre palas nuevas, marca descatalogadas y dedupea.")
     p_discover.add_argument("--limit", type=int, default=None, help="Limitar URLs de categoría por tienda (testing).")
@@ -256,6 +276,6 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     if args.command == "refresh":
-        asyncio.run(refresh(args.store, args.limit, args.dry_run))
+        asyncio.run(refresh(args.store, args.limit, args.dry_run, args.gone_cap))
     else:
         asyncio.run(discover(args.limit, args.dry_run, args.dedupe_cap))

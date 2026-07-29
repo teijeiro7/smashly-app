@@ -67,12 +67,12 @@ def decide_price_update(
     checked_col = f"{store}_price_checked_at"
     link_col = f"{store}_link"
 
-    def _cleared() -> PriceDecision:
+    def _cleared(drop_link: bool = False) -> PriceDecision:
         updates = {
             f"{store}_actual_price": None,
             f"{store}_original_price": None,
             f"{store}_discount_percentage": 0,
-            link_col: url,
+            link_col: None if drop_link else url,
             checked_col: now_iso,
         }
         return PriceDecision(
@@ -83,7 +83,10 @@ def decide_price_update(
         )
 
     if result.outcome in (FetchOutcome.NO_PRICE, FetchOutcome.GONE):
-        return _cleared()
+        # GONE = la URL está confirmada muerta (301/404): también se retira el
+        # link, así deja de entrar en url_map y discover no vuelve a bombear
+        # last_seen para una fila que ya no existe en la tienda.
+        return _cleared(drop_link=result.outcome is FetchOutcome.GONE)
 
     # OK — but defend against a scraper reporting OK with no real price.
     product = result.product

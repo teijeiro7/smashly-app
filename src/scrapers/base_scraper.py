@@ -145,7 +145,8 @@ def clean_price(text: str) -> float:
         return 0.0
 
 SPEC_NAME_MAP = {
-    'forma': 'Forma', 'format': 'Forma', 'shape': 'Forma', 'formato': 'Forma',
+    'forma': 'Forma', 'format': 'Forma', 'shape': 'Forma',
+    'formato': 'Formato',  # tamaño de pala (Normal/Oversize) — NO es Forma (Redonda/Diamante/Lágrima)
     'peso': 'Peso', 'weight': 'Peso', 'talla-peso': 'Peso',
     'balance': 'Balance', 'balanceo': 'Balance',
     'núcleo': 'Núcleo', 'nucleo': 'Núcleo', 'goma': 'Núcleo', 'foam': 'Núcleo', 'core': 'Núcleo',
@@ -153,7 +154,9 @@ SPEC_NAME_MAP = {
     'marco': 'Marco', 'frame': 'Marco',
     'nivel': 'Nivel', 'level': 'Nivel', 'nivel de juego': 'Nivel',
     'perfil': 'Perfil', 'grosor': 'Perfil', 'espesor': 'Perfil',
-    'rugosidad': 'Rugosidad', 'superficie': 'Rugosidad', 'acabado': 'Rugosidad',
+    'rugosidad': 'Rugosidad', 'superficie': 'Rugosidad',
+    'superfície': 'Rugosidad',  # PadelNuestro renderiza el label con tilde en la í (typo de su sitio)
+    'acabado': 'Acabado',  # relieve/brillo (Mate/Brillo) — NO es lo mismo que Rugosidad (textura de la superficie)
     'colores': 'Colores', 'color': 'Colores',
     'género': 'Género', 'genero': 'Género', 'sexo': 'Género',
 }

@@ -178,18 +178,21 @@ def mark_discontinued(client: Client, threshold_iso: str) -> List[int]:
     """
     Mark discontinued every racket that has been scanned at least once but
     has no `last_seen` newer than `threshold_iso` in any of the three
-    stores. Paginated (see module docstring) — the un-paginated original
-    silently ignored everything past row 1000.
+    stores. Skips `comparison_only` rows — those are permanent reference
+    entries, not a discontinued signal. Paginated (see module docstring) —
+    the un-paginated original silently ignored everything past row 1000.
     """
     from .pricing import STORES
 
-    cols = "id, slug, discontinued, " + ", ".join(f"{s}_last_seen" for s in STORES)
+    cols = "id, slug, discontinued, comparison_only, " + ", ".join(f"{s}_last_seen" for s in STORES)
     rows = paginate(client, "rackets", cols)
 
     to_mark: List[int] = []
     for row in rows:
         if row.get("discontinued"):
             continue
+        if row.get("comparison_only"):
+            continue  # ficha de consulta permanente — nunca se descataloga
         last_seens = [row.get(f"{s}_last_seen") for s in STORES]
         if all(ls is None for ls in last_seens):
             continue  # never scanned yet — absence of data isn't a discontinued signal
