@@ -171,7 +171,10 @@ const racketService = {
     const { data, error } = await supabase
       .from('rackets')
       .select('*')
-      .eq('discontinued', false)
+      // not.is.true rather than eq.false: `discontinued = false` evaluates to
+      // NULL for a NULL column and would drop the row from the catalog
+      // silently. NULL means "not known to be discontinued" — it must show.
+      .not('discontinued', 'is', true)
       .order('name');
 
     if (error) throw new Error(error.message);
