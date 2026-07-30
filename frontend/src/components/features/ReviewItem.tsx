@@ -11,6 +11,7 @@ import type { ReviewComment, ReviewWithDetails } from '../../types/review';
 import { useAuth } from '../../contexts/AuthContext';
 import { ReviewForm } from './ReviewForm';
 import { FiHeart, FiMessageSquare } from 'react-icons/fi';
+import { formatBrandName, formatModelName, formatRacketName } from '../../utils/textUtils';
 
 interface ReviewItemProps {
   review: ReviewWithDetails;
@@ -175,10 +176,10 @@ export const ReviewItem: React.FC<ReviewItemProps> = ({
       {/* Sección de la pala (si está disponible y activo) */}
       {showProductInfo && review.racket && (
         <RacketInfo to={`/racket-detail?id=${review.racket.id}`}>
-          {racketImage && <RacketImage src={racketImage} alt={review.racket.nombre} />}
+          {racketImage && <RacketImage src={racketImage} alt={formatRacketName(review.racket)} />}
           <RacketDetails>
-            <RacketBrand>{review.racket.marca}</RacketBrand>
-            <RacketName>{review.racket.modelo || review.racket.nombre}</RacketName>
+            <RacketBrand>{formatBrandName(review.racket.marca)}</RacketBrand>
+            <RacketName>{formatModelName(review.racket.modelo || review.racket.nombre)}</RacketName>
           </RacketDetails>
         </RacketInfo>
       )}

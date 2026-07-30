@@ -11,9 +11,7 @@ import {
 } from 'recharts';
 import { RacketComparisonData } from '../../types/racket';
 import { FiCheckCircle } from 'react-icons/fi';
-
-const toTitleCase = (str: string): string =>
-  str.replace(/\w\S*/g, word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase());
+import { toTitleCase } from '../../utils/textUtils';
 
 interface RacketRadarChartProps {
   metrics: RacketComparisonData[];

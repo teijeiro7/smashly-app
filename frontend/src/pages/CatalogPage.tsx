@@ -10,6 +10,7 @@ import { Racket } from '../types/racket';
 import { AddToListModal } from '../components/features/AddToListModal';
 import RacketCard from '../components/features/RacketCard';
 import { getLowestPrice } from '../utils/priceUtils';
+import { formatBrandName, formatRacketName } from '../utils/textUtils';
 import SEO from '../components/seo/SEO';
 import {
   organizationSchema,
@@ -1121,7 +1122,7 @@ const CatalogPage: React.FC = () => {
               <FilterSelect value={selectedBrand} onChange={e => setSelectedBrand(e.target.value)}>
                 {uniqueBrands.map(brand => (
                   <option key={brand} value={brand}>
-                    {brand === 'Todas' ? 'Todas las marcas' : brand}
+                    {brand === 'Todas' ? 'Todas las marcas' : formatBrandName(brand)}
                   </option>
                 ))}
               </FilterSelect>
@@ -1337,7 +1338,7 @@ const CatalogPage: React.FC = () => {
             setSelectedRacket(null);
           }}
           racketId={selectedRacket.id || 0}
-          racketName={`${selectedRacket.marca} ${selectedRacket.modelo}`}
+          racketName={formatRacketName(selectedRacket)}
         />
       )}
     </Container>

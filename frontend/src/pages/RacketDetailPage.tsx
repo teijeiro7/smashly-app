@@ -26,7 +26,12 @@ import racketService from '../services/racketService';
 import { RacketViewService } from '../services/racketViewService';
 import priceWatchService, { PriceWatch } from '../services/priceWatchService';
 import { getLowestPrice, getAllStorePrices } from '../utils/priceUtils';
-import { toTitleCase } from '../utils/textUtils';
+import {
+  toTitleCase,
+  formatBrandName,
+  formatModelName,
+  formatRacketName,
+} from '../utils/textUtils';
 import { EditRacketModal } from '../components/admin/EditRacketModal';
 import { PriceHistoryChart } from '../components/features/PriceHistoryChart';
 import { RacketDetailSkeleton } from '../components/common/SkeletonLoader';
@@ -1282,30 +1287,30 @@ const RacketDetailSeo: React.FC<RacketDetailSeoProps> = ({
   const productImage = racket.imagenes?.[0] ?? '';
   return (
     <SEO
-      title={`${racket.nombre} — ${toTitleCase(racket.marca)} ${toTitleCase(racket.modelo)} | Smashly`}
+      title={`${formatRacketName(racket)} | Smashly`}
       description={
         racket.descripcion ||
-        `Descubre la ${racket.nombre}: pala de pádel ${racket.marca} ${racket.modelo}. Compara precios en tiempo real, especificaciones técnicas, opiniones y disponibilidad.`
+        `Descubre la ${formatRacketName(racket)}: pala de pádel ${formatBrandName(racket.marca)} ${formatModelName(racket.modelo)}. Compara precios en tiempo real, especificaciones técnicas, opiniones y disponibilidad.`
       }
       canonical={productUrl}
       type='product'
       image={productImage}
-      imageAlt={`${racket.nombre} - Pala de pádel ${racket.marca}`}
+      imageAlt={`${formatRacketName(racket)} - Pala de pádel ${formatBrandName(racket.marca)}`}
       extraMeta={[
         { property: 'product:price:amount', content: productPrice ? String(productPrice) : '' },
         { property: 'product:price:currency', content: 'EUR' },
         { property: 'product:availability', content: hasOffers ? 'in stock' : 'out of stock' },
-        { property: 'product:brand', content: racket.marca },
+        { property: 'product:brand', content: formatBrandName(racket.marca) },
         { property: 'product:category', content: 'Palas de pádel' },
       ]}
       schema={[
         organizationSchema(),
         productSchema(racket, productUrl),
         webPageSchema({
-          name: `${racket.nombre} — Smashly`,
+          name: `${formatRacketName(racket)} — Smashly`,
           description:
             racket.descripcion ||
-            `Pala de pádel ${racket.marca} ${racket.modelo} analizada en Smashly.`,
+            `Pala de pádel ${formatBrandName(racket.marca)} ${formatModelName(racket.modelo)} analizada en Smashly.`,
           url: productUrl,
           image: productImage,
         }),
@@ -1679,8 +1684,9 @@ const RacketDetailPage: React.FC = () => {
         hasOffers={availablePrices.length > 0}
       />
       <Breadcrumbs>
-        <Link to='/'>Home</Link> / <Link to='/catalog'>Palas</Link> / {toTitleCase(racket.marca)} /{' '}
-        <CurrentBreadcrumb>{toTitleCase(racket.modelo)}</CurrentBreadcrumb>
+        <Link to='/'>Home</Link> / <Link to='/catalog'>Palas</Link> /{' '}
+        {formatBrandName(racket.marca)} /{' '}
+        <CurrentBreadcrumb>{formatModelName(racket.modelo || racket.nombre)}</CurrentBreadcrumb>
       </Breadcrumbs>
 
       <MainGrid>
@@ -1693,7 +1699,7 @@ const RacketDetailPage: React.FC = () => {
             key={selectedImageIndex}
             $entering={slideDirectionRef.current}
             src={racketImageUrl(racket.imagenes?.[selectedImageIndex] || racket.imagenes?.[0])}
-            alt={racket.modelo}
+            alt={formatRacketName(racket)}
             onError={handleImageError}
             onClick={() => setShowLightbox(true)}
             loading='eager'
@@ -1721,7 +1727,7 @@ const RacketDetailPage: React.FC = () => {
                       <Thumbnail
                         key={index}
                         src={racketImageUrl(img)}
-                        alt={`${racket.modelo} - imagen ${index + 1}`}
+                        alt={`${formatRacketName(racket)} - imagen ${index + 1}`}
                         $isActive={index === selectedImageIndex}
                         onClick={() => setSelectedImageIndex(index)}
                         onError={handleImageError}
@@ -1757,8 +1763,8 @@ const RacketDetailPage: React.FC = () => {
 
         {/* Right: Info */}
         <InfoSection>
-          <ProductTag>{toTitleCase(racket.marca)}</ProductTag>
-          <ProductTitle>{toTitleCase(racket.modelo)}</ProductTitle>
+          <ProductTag>{formatBrandName(racket.marca)}</ProductTag>
+          <ProductTitle>{formatModelName(racket.modelo || racket.nombre)}</ProductTitle>
 
           <RatingRow>
             {reviewStatsLoading ? (

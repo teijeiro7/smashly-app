@@ -15,7 +15,7 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { sileo } from 'sileo';
 import Fuse from 'fuse.js';
-import { toTitleCase } from '../utils/textUtils';
+import { formatBrandName, formatRacketName } from '../utils/textUtils';
 import RacketRadarChart from '../components/features/RacketRadarChart';
 import ComparisonTable from '../components/features/ComparisonTable';
 import SEO from '../components/seo/SEO';
@@ -1049,9 +1049,9 @@ const CompareRacketsPage: React.FC = () => {
                     }}
                   />
                   <div>
-                    <div style={{ fontWeight: 600 }}>{toTitleCase(racket.nombre)}</div>
+                    <div style={{ fontWeight: 600 }}>{formatRacketName(racket)}</div>
                     <div style={{ fontSize: '0.875rem', color: 'var(--text-muted)' }}>
-                      {racket.marca}
+                      {formatBrandName(racket.marca)}
                     </div>
                   </div>
                 </SearchResultItem>
@@ -1084,7 +1084,7 @@ const CompareRacketsPage: React.FC = () => {
                   >
                     <img
                       src={racket.imagenes?.[0] || '/placeholder-racket.png'}
-                      alt={racket.nombre}
+                      alt={formatRacketName(racket)}
                       loading='lazy'
                       style={{
                         width: 60,
@@ -1098,8 +1098,8 @@ const CompareRacketsPage: React.FC = () => {
                       }}
                     />
                     <FavoriteRacketInfo>
-                      <FavoriteRacketName>{toTitleCase(racket.nombre)}</FavoriteRacketName>
-                      <FavoriteRacketBrand>{racket.marca}</FavoriteRacketBrand>
+                      <FavoriteRacketName>{formatRacketName(racket)}</FavoriteRacketName>
+                      <FavoriteRacketBrand>{formatBrandName(racket.marca)}</FavoriteRacketBrand>
                     </FavoriteRacketInfo>
                   </FavoriteRacketCard>
                 );
@@ -1133,10 +1133,10 @@ const CompareRacketsPage: React.FC = () => {
               </RemoveButton>
               <RacketImage
                 src={racket.imagenes?.[0] || '/placeholder-racket.png'}
-                alt={racket.nombre}
+                alt={formatRacketName(racket)}
               />
-              <RacketName>{toTitleCase(racket.nombre)}</RacketName>
-              <RacketBrand>{racket.marca}</RacketBrand>
+              <RacketName>{formatRacketName(racket)}</RacketName>
+              <RacketBrand>{formatBrandName(racket.marca)}</RacketBrand>
             </SelectedRacketCard>
           ))}
           {[...Array(3 - selectedRackets.length)].map((_, i) => (

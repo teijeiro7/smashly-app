@@ -13,6 +13,7 @@ import styled from 'styled-components';
 import { Racket } from '../../types/racket';
 import { getLowestPrice } from '../../utils/priceUtils';
 import { racketImageUrl } from '../../utils/imageUrl';
+import { formatBrandName, formatModelName } from '../../utils/textUtils';
 
 // Styled Components
 const RacketCardContainer = styled.li<{ $view: 'grid' | 'list'; $index: number }>`
@@ -230,15 +231,6 @@ const MetricValue = styled.span`
   color: var(--text);
 `;
 
-// Helper function to capitalize first letter of each word
-const toTitleCase = (str: string): string => {
-  return str
-    .toLowerCase()
-    .split(' ')
-    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(' ');
-};
-
 interface RacketCardProps {
   racket: Racket;
   view: 'grid' | 'list';
@@ -332,8 +324,8 @@ const RacketCardComponent: React.FC<RacketCardProps> = memo(
 
         <RacketInfo $view={view}>
           <div>
-            <RacketBrand>{racket.marca}</RacketBrand>
-            <RacketName $view={view}>{toTitleCase(racket.modelo)}</RacketName>
+            <RacketBrand>{formatBrandName(racket.marca)}</RacketBrand>
+            <RacketName $view={view}>{formatModelName(racket.modelo || racket.nombre)}</RacketName>
           </div>
 
           <PriceContainer $view={view}>
