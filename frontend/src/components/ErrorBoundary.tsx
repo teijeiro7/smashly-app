@@ -53,32 +53,33 @@ class ErrorBoundary extends Component<Props, State> {
             padding: '2rem',
             textAlign: 'center',
             background:
-              'linear-gradient(135deg, var(--primary-subtle) 0%, var(--primary-faint) 100%)',
+              'radial-gradient(circle at 50% 30%, var(--bg-glow-primary), transparent 60%), radial-gradient(circle at 10% 80%, var(--bg-glow-secondary), transparent 40%), var(--bg)',
           }}
         >
           <div
             style={{
               background: 'var(--surface)',
-              borderRadius: '16px',
+              borderRadius: '24px',
               padding: '3rem 2rem',
               maxWidth: '500px',
               width: '100%',
-              boxShadow: '0 10px 40px rgba(var(--primary-rgb), 0.12)',
+              boxShadow: 'var(--shadow-xl)',
+              border: '1px solid var(--border)',
             }}
           >
             <h1
-              style={{ fontSize: '3rem', margin: '0', color: 'var(--danger)', fontWeight: '700' }}
+              style={{ fontSize: '3rem', margin: '0', color: 'var(--danger)', fontWeight: '800' }}
             >
               ¡Ups!
             </h1>
-            <h2 style={{ fontSize: '1.5rem', margin: '1rem 0', color: 'var(--text)' }}>
+            <h2 style={{ fontSize: '1.5rem', margin: '0.75rem 0', color: 'var(--text)' }}>
               Algo salió mal
             </h2>
             <p
               style={{
                 fontSize: '1rem',
                 color: 'var(--text-muted)',
-                margin: '1.5rem 0',
+                margin: '1rem 0 1.5rem',
                 lineHeight: '1.6',
               }}
             >
@@ -86,20 +87,21 @@ class ErrorBoundary extends Component<Props, State> {
               inicio.
             </p>
             <div
-              style={{ display: 'flex', gap: '1rem', justifyContent: 'center', marginTop: '2rem' }}
+              style={{ display: 'flex', gap: '0.75rem', justifyContent: 'center', marginTop: '1.5rem', flexWrap: 'wrap' }}
             >
               <button
                 onClick={this.handleRetry}
                 style={{
                   padding: '0.75rem 1.5rem',
                   borderRadius: '8px',
-                  fontSize: '1rem',
+                  fontSize: '0.95rem',
                   fontWeight: '600',
                   cursor: 'pointer',
                   transition: 'all 0.2s ease',
                   border: 'none',
-                  background: 'var(--primary)',
+                  background: 'var(--brand-surface)',
                   color: 'var(--brand-on-surface)',
+                  boxShadow: '0 4px 14px var(--shadow-color)',
                 }}
               >
                 Reintentar
@@ -109,7 +111,7 @@ class ErrorBoundary extends Component<Props, State> {
                 style={{
                   padding: '0.75rem 1.5rem',
                   borderRadius: '8px',
-                  fontSize: '1rem',
+                  fontSize: '0.95rem',
                   fontWeight: '600',
                   cursor: 'pointer',
                   transition: 'all 0.2s ease',
