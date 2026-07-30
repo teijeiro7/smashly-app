@@ -83,7 +83,9 @@ const RacketImage = styled.img`
   aspect-ratio: 1 / 1;
   width: 100%;
   height: 100%;
-  transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
+  transition:
+    transform 0.3s ease-in-out,
+    opacity 0.3s ease-in-out;
 
   ${RacketCardContainer}:hover & {
     transform: scale(1.05);
