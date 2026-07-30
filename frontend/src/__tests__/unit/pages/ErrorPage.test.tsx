@@ -9,7 +9,15 @@ let mockSearchState = { type: 'default', message: undefined as string | undefine
 vi.mock('@tanstack/react-router', () => ({
   useNavigate: () => mockNavigate,
   useSearch: () => mockSearchState,
-  Link: ({ children, to, className }: { children: React.ReactNode; to: string; className?: string }) => (
+  Link: ({
+    children,
+    to,
+    className,
+  }: {
+    children: React.ReactNode;
+    to: string;
+    className?: string;
+  }) => (
     <a href={to} className={className}>
       {children}
     </a>
@@ -31,7 +39,9 @@ describe('ErrorPage Component', () => {
 
     expect(screen.getByText('ERROR')).toBeInTheDocument();
     expect(screen.getByText('Ha ocurrido un error inesperado')).toBeInTheDocument();
-    expect(screen.getByText('Algo no salió como esperábamos. Por favor, intenta nuevamente más tarde.')).toBeInTheDocument();
+    expect(
+      screen.getByText('Algo no salió como esperábamos. Por favor, intenta nuevamente más tarde.')
+    ).toBeInTheDocument();
     expect(screen.getByText('Ir a Inicio')).toBeInTheDocument();
     expect(screen.getByText('Volver Atrás')).toBeInTheDocument();
   });

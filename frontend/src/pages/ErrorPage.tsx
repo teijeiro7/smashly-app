@@ -26,8 +26,7 @@ const ErrorContainer = styled.div`
   overflow: hidden;
   background:
     radial-gradient(circle at 50% 30%, var(--bg-glow-primary), transparent 60%),
-    radial-gradient(circle at 10% 80%, var(--bg-glow-secondary), transparent 40%),
-    var(--bg);
+    radial-gradient(circle at 10% 80%, var(--bg-glow-secondary), transparent 40%), var(--bg);
 `;
 
 const MotionCard = styled(motion.div)`
@@ -284,12 +283,7 @@ const ErrorPage: React.FC = () => {
 
   return (
     <ErrorContainer>
-      <SEO
-        title={`${error.title} | Smashly`}
-        description={error.message}
-        noindex
-        nofollow
-      />
+      <SEO title={`${error.title} | Smashly`} description={error.message} noindex nofollow />
       <MotionCard
         initial={{ opacity: 0, y: 16, scale: 0.98 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -346,4 +340,3 @@ const ErrorPage: React.FC = () => {
 };
 
 export default ErrorPage;
-
