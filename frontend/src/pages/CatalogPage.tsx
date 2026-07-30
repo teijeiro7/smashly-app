@@ -153,6 +153,53 @@ const SearchIcon = styled(FiSearch)`
   color: var(--text-muted);
 `;
 
+const ClearSearchIconButton = styled.button`
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: var(--text-subtle);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: var(--surface-3);
+    color: var(--text);
+  }
+`;
+
+const QuickSearchChipsRow = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+  flex-wrap: wrap;
+`;
+
+const QuickSearchChip = styled.button<{ $active?: boolean }>`
+  font-size: 0.75rem;
+  font-weight: 500;
+  padding: 0.25rem 0.625rem;
+  border-radius: 20px;
+  border: 1px solid ${props => (props.$active ? 'var(--primary-hover)' : 'var(--border)')};
+  background: ${props => (props.$active ? 'var(--primary-subtle)' : 'var(--surface-2)')};
+  color: ${props => (props.$active ? 'var(--primary-hover)' : 'var(--text-muted)')};
+  cursor: pointer;
+  transition: all 0.15s ease;
+
+  &:hover {
+    border-color: var(--primary-hover);
+    color: var(--primary-hover);
+  }
+`;
+
 const FilterButton = styled.button<{ $active?: boolean }>`
   display: flex;
   align-items: center;
@@ -1093,10 +1140,15 @@ const CatalogPage: React.FC = () => {
               <SearchIcon />
               <SearchInput
                 type='text'
-                placeholder='Buscar por nombre, marca o modelo...'
+                placeholder='Buscar por nombre, marca o modelo... (⌘K)'
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
               />
+              {searchQuery && (
+                <ClearSearchIconButton onClick={() => setSearchQuery('')}>
+                  <FiX size={16} />
+                </ClearSearchIconButton>
+              )}
             </SearchContainer>
 
             <ClearFiltersIconButton onClick={clearFilters}>
@@ -1104,6 +1156,37 @@ const CatalogPage: React.FC = () => {
               Limpiar
             </ClearFiltersIconButton>
           </FiltersRow>
+
+          <QuickSearchChipsRow>
+            <span style={{ fontSize: '0.75rem', color: 'var(--text-subtle)', fontWeight: 600 }}>Sugeridos:</span>
+            {['Bullpadel', 'Babolat', 'Nox', 'Forma Diamante', 'Ofertas'].map(chip => (
+              <QuickSearchChip
+                key={chip}
+                $active={
+                  chip === 'Ofertas'
+                    ? showOffers
+                    : chip === 'Forma Diamante'
+                    ? selectedShape === 'Diamante'
+                    : selectedBrand === chip || searchQuery === chip
+                }
+                onClick={() => {
+                  if (chip === 'Ofertas') {
+                    setShowOffers(!showOffers);
+                  } else if (chip === 'Forma Diamante') {
+                    setSelectedShape(selectedShape === 'Diamante' ? 'Todas' : 'Diamante');
+                  } else {
+                    if (selectedBrand === chip) {
+                      setSelectedBrand('Todas');
+                    } else {
+                      setSelectedBrand(chip);
+                    }
+                  }
+                }}
+              >
+                {chip}
+              </QuickSearchChip>
+            ))}
+          </QuickSearchChipsRow>
 
           {/* Advanced Filters Toggle */}
           <AdvancedFiltersToggle

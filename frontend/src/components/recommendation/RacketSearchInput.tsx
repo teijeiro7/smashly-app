@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import styled from 'styled-components';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FiSearch, FiX } from 'react-icons/fi';
+import { FiSearch, FiX, FiCheck, FiPlus } from 'react-icons/fi';
 import { useRackets } from '../../contexts/RacketsContext';
 import { racketImageUrl } from '../../utils/imageUrl';
 import { formatBrandName, formatRacketName } from '../../utils/textUtils';
@@ -17,7 +17,7 @@ const SearchInputWrapper = styled.div<{ $isFocused: boolean }>`
   border: 2px solid ${props => (props.$isFocused ? 'var(--primary)' : 'var(--border)')};
   border-radius: 12px;
   background: var(--surface);
-  transition: all 0.2s;
+  transition: all 0.2s ease;
   overflow: hidden;
 
   &:hover {
@@ -34,10 +34,10 @@ const SearchIcon = styled.div`
 
 const Input = styled.input`
   flex: 1;
-  padding: 1rem;
+  padding: 0.875rem 1rem;
   border: none;
   outline: none;
-  font-size: 1rem;
+  font-size: 0.95rem;
   color: var(--text);
   background: transparent;
 
@@ -61,6 +61,82 @@ const ClearButton = styled.button`
   }
 `;
 
+const SelectedCard = styled(motion.div)`
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.625rem 0.875rem;
+  border-radius: 12px;
+  background: var(--surface);
+  border: 2px solid var(--primary);
+  box-shadow: 0 2px 8px rgba(var(--primary-rgb), 0.12);
+`;
+
+const SelectedImage = styled.img`
+  width: 42px;
+  height: 42px;
+  border-radius: 8px;
+  object-fit: contain;
+  background: var(--racket-image-bg);
+  border: var(--racket-image-border);
+  padding: 0.125rem;
+  flex-shrink: 0;
+`;
+
+const SelectedPlaceholder = styled.div`
+  width: 42px;
+  height: 42px;
+  border-radius: 8px;
+  background: var(--primary-subtle);
+  color: var(--primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.9rem;
+  flex-shrink: 0;
+`;
+
+const SelectedInfo = styled.div`
+  flex: 1;
+  min-width: 0;
+`;
+
+const SelectedTitle = styled.div`
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+`;
+
+const SelectedBrand = styled.div`
+  font-size: 0.8rem;
+  color: var(--primary);
+  font-weight: 500;
+`;
+
+const SelectedClearBtn = styled.button`
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  font-weight: 500;
+  padding: 0.35rem 0.65rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.15s ease;
+
+  &:hover {
+    background: var(--surface-3);
+    color: var(--text);
+  }
+`;
+
 const ResultsDropdown = styled(motion.div)`
   position: absolute;
   top: calc(100% + 8px);
@@ -75,12 +151,13 @@ const ResultsDropdown = styled(motion.div)`
   z-index: 100;
 `;
 
-const ResultItem = styled.div`
+const ResultItem = styled.div<{ $isFocused?: boolean }>`
   display: flex;
   align-items: center;
   gap: 0.75rem;
   padding: 0.75rem 1rem;
   cursor: pointer;
+  background: ${props => (props.$isFocused ? 'var(--surface-3)' : 'transparent')};
   transition: background 0.15s;
   border-bottom: 1px solid var(--surface-3);
 
@@ -102,6 +179,7 @@ const ResultImage = styled.img`
   border: var(--racket-image-border);
   box-shadow: var(--racket-image-shadow);
   padding: 0.125rem;
+  flex-shrink: 0;
 `;
 
 const ResultPlaceholder = styled.div`
@@ -114,6 +192,7 @@ const ResultPlaceholder = styled.div`
   justify-content: center;
   color: var(--text-subtle);
   font-size: 0.75rem;
+  flex-shrink: 0;
 `;
 
 const ResultInfo = styled.div`
@@ -130,23 +209,35 @@ const ResultName = styled.div`
 `;
 
 const ResultBrand = styled.div`
-  font-size: 0.85rem;
+  font-size: 0.825rem;
   color: var(--text-muted);
 `;
 
 const NoResults = styled.div`
-  padding: 1.5rem;
+  padding: 1.25rem;
   text-align: center;
   color: var(--text-muted);
+  font-size: 0.9rem;
 `;
 
 const ManualEntryHint = styled.div`
   padding: 0.75rem 1rem;
   font-size: 0.85rem;
-  color: var(--text-muted);
-  background: var(--surface-2);
+  font-weight: 600;
+  color: var(--primary);
+  background: var(--primary-subtle);
   border-top: 1px solid var(--border);
   text-align: center;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  transition: background 0.15s;
+
+  &:hover {
+    opacity: 0.9;
+  }
 `;
 
 export interface RacketSearchResult {
@@ -170,8 +261,10 @@ export const RacketSearchInput: React.FC<RacketSearchInputProps> = ({
   const { searchRackets } = useRackets();
   const [query, setQuery] = useState(value ? formatRacketName(value) : '');
   const [isFocused, setIsFocused] = useState(false);
+  const [selectedIndex, setSelectedIndex] = useState(-1);
   const [results, setResults] = useState<RacketSearchResult[]>([]);
   const containerRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -188,8 +281,7 @@ export const RacketSearchInput: React.FC<RacketSearchInputProps> = ({
     if (!isFocused) {
       setQuery(value ? formatRacketName(value) : '');
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [value?.name, value?.marca]);
+  }, [value?.name, value?.marca, isFocused]);
 
   useEffect(() => {
     if (query.trim().length >= 2) {
@@ -201,8 +293,10 @@ export const RacketSearchInput: React.FC<RacketSearchInputProps> = ({
         imagenes: r.imagenes,
       }));
       setResults(mappedResults);
+      setSelectedIndex(-1);
     } else {
       setResults([]);
+      setSelectedIndex(-1);
     }
   }, [query, searchRackets]);
 
@@ -216,6 +310,7 @@ export const RacketSearchInput: React.FC<RacketSearchInputProps> = ({
     onChange(null);
     setQuery('');
     setResults([]);
+    setTimeout(() => inputRef.current?.focus(), 50);
   };
 
   const handleManualEntry = () => {
@@ -229,25 +324,78 @@ export const RacketSearchInput: React.FC<RacketSearchInputProps> = ({
     }
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      if (results.length > 0) {
+        setSelectedIndex(prev => (prev < results.length - 1 ? prev + 1 : 0));
+      }
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      if (results.length > 0) {
+        setSelectedIndex(prev => (prev > 0 ? prev - 1 : results.length - 1));
+      }
+    } else if (e.key === 'Escape') {
+      setIsFocused(false);
+    } else if (e.key === 'Enter') {
+      if (selectedIndex >= 0 && selectedIndex < results.length) {
+        e.preventDefault();
+        handleSelect(results[selectedIndex]);
+      } else if (query.trim() && results.length === 0) {
+        e.preventDefault();
+        handleManualEntry();
+      }
+    }
+  };
+
   return (
     <SearchContainer ref={containerRef}>
-      <SearchInputWrapper $isFocused={isFocused}>
-        <SearchIcon>
-          <FiSearch size={18} />
-        </SearchIcon>
-        <Input
-          type='text'
-          value={query}
-          onChange={e => setQuery(e.target.value)}
-          onFocus={() => setIsFocused(true)}
-          placeholder={placeholder}
-        />
-        {query && (
-          <ClearButton onClick={handleClear}>
-            <FiX size={18} />
-          </ClearButton>
-        )}
-      </SearchInputWrapper>
+      {value && !isFocused ? (
+        <SelectedCard
+          initial={{ opacity: 0, scale: 0.98 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.15 }}
+        >
+          {value.imagenes?.[0] ? (
+            <SelectedImage
+              src={racketImageUrl(value.imagenes[0])}
+              alt={formatRacketName(value)}
+            />
+          ) : (
+            <SelectedPlaceholder>
+              <FiCheck size={18} />
+            </SelectedPlaceholder>
+          )}
+          <SelectedInfo>
+            <SelectedTitle>{formatRacketName(value)}</SelectedTitle>
+            <SelectedBrand>{formatBrandName(value.marca || 'Pala seleccionada')}</SelectedBrand>
+          </SelectedInfo>
+
+          <SelectedClearBtn onClick={handleClear}>
+            <FiX size={14} /> Cambiar
+          </SelectedClearBtn>
+        </SelectedCard>
+      ) : (
+        <SearchInputWrapper $isFocused={isFocused}>
+          <SearchIcon>
+            <FiSearch size={18} />
+          </SearchIcon>
+          <Input
+            ref={inputRef}
+            type='text'
+            value={query}
+            onChange={e => setQuery(e.target.value)}
+            onFocus={() => setIsFocused(true)}
+            onKeyDown={handleKeyDown}
+            placeholder={placeholder}
+          />
+          {query && (
+            <ClearButton onClick={handleClear}>
+              <FiX size={18} />
+            </ClearButton>
+          )}
+        </SearchInputWrapper>
+      )}
 
       <AnimatePresence>
         {isFocused && results.length > 0 && (
@@ -257,8 +405,12 @@ export const RacketSearchInput: React.FC<RacketSearchInputProps> = ({
             exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.15 }}
           >
-            {results.map(racket => (
-              <ResultItem key={racket.id} onClick={() => handleSelect(racket)}>
+            {results.map((racket, idx) => (
+              <ResultItem
+                key={racket.id || idx}
+                $isFocused={idx === selectedIndex}
+                onClick={() => handleSelect(racket)}
+              >
                 {racket.imagenes?.[0] ? (
                   <ResultImage
                     src={racketImageUrl(racket.imagenes[0])}
@@ -283,9 +435,9 @@ export const RacketSearchInput: React.FC<RacketSearchInputProps> = ({
             exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.15 }}
           >
-            <NoResults>No se encontraron palas</NoResults>
-            <ManualEntryHint onClick={handleManualEntry} style={{ cursor: 'pointer' }}>
-              + Añadir "{query}" manualmente
+            <NoResults>No se encontraron palas con "{query}"</NoResults>
+            <ManualEntryHint onClick={handleManualEntry}>
+              <FiPlus size={14} /> Añadir "{query}" manualmente
             </ManualEntryHint>
           </ResultsDropdown>
         )}

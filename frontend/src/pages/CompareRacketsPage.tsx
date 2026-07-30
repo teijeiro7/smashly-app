@@ -686,7 +686,6 @@ const CompareRacketsPage: React.FC = () => {
     ? fuse
         .search(searchQuery)
         .map(result => result.item)
-        .filter(r => !selectedRackets.find(sr => sr.id === r.id))
         .slice(0, 8)
     : [];
 
@@ -1029,33 +1028,96 @@ const CompareRacketsPage: React.FC = () => {
             onFocus={() => setShowSearchResults(true)}
             disabled={selectedRackets.length >= 3}
           />
+          {searchQuery && (
+            <button
+              onClick={() => {
+                setSearchQuery('');
+                setShowSearchResults(false);
+              }}
+              style={{
+                position: 'absolute',
+                right: '1rem',
+                top: '50%',
+                transform: 'translateY(-50%)',
+                background: 'none',
+                border: 'none',
+                color: 'var(--text-subtle)',
+                cursor: 'pointer',
+                padding: 4,
+              }}
+            >
+              <FiX size={16} />
+            </button>
+          )}
           {showSearchResults && searchQuery && (
             <SearchResults>
-              {filteredRackets.map(racket => (
-                <SearchResultItem key={racket.id} onClick={() => handleAddRacket(racket)}>
-                  <img
-                    src={racket.imagenes?.[0] || '/placeholder-racket.png'}
-                    alt={racket.nombre}
-                    loading='lazy'
-                    style={{
-                      width: 40,
-                      height: 40,
-                      objectFit: 'contain',
-                      borderRadius: 8,
-                      background: 'var(--racket-image-bg)',
-                      border: 'var(--racket-image-border)',
-                      boxShadow: 'var(--racket-image-shadow)',
-                      padding: 4,
+              {filteredRackets.map(racket => {
+                const isAlreadySelected = selectedRackets.some(sr => sr.id === racket.id || sr.nombre === racket.nombre);
+                return (
+                  <SearchResultItem
+                    key={racket.id}
+                    onClick={() => {
+                      if (!isAlreadySelected) handleAddRacket(racket);
                     }}
-                  />
-                  <div>
-                    <div style={{ fontWeight: 600 }}>{formatRacketName(racket)}</div>
-                    <div style={{ fontSize: '0.875rem', color: 'var(--text-muted)' }}>
-                      {formatBrandName(racket.marca)}
+                    style={{
+                      opacity: isAlreadySelected ? 0.6 : 1,
+                      cursor: isAlreadySelected ? 'default' : 'pointer',
+                      justifyContent: 'space-between',
+                    }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flex: 1, minWidth: 0 }}>
+                      <img
+                        src={racket.imagenes?.[0] || '/placeholder-racket.png'}
+                        alt={racket.nombre}
+                        loading='lazy'
+                        style={{
+                          width: 40,
+                          height: 40,
+                          objectFit: 'contain',
+                          borderRadius: 8,
+                          background: 'var(--racket-image-bg)',
+                          border: 'var(--racket-image-border)',
+                          boxShadow: 'var(--racket-image-shadow)',
+                          padding: 4,
+                        }}
+                      />
+                      <div style={{ minWidth: 0, flex: 1 }}>
+                        <div style={{ fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                          {formatRacketName(racket)}
+                        </div>
+                        <div style={{ fontSize: '0.875rem', color: 'var(--text-muted)' }}>
+                          {formatBrandName(racket.marca)}
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                </SearchResultItem>
-              ))}
+
+                    <span
+                      style={{
+                        fontSize: '0.75rem',
+                        fontWeight: 600,
+                        padding: '4px 8px',
+                        borderRadius: '6px',
+                        background: isAlreadySelected ? 'var(--surface-3)' : 'var(--primary-subtle)',
+                        color: isAlreadySelected ? 'var(--text-muted)' : 'var(--primary)',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '4px',
+                        whiteSpace: 'nowrap',
+                      }}
+                    >
+                      {isAlreadySelected ? (
+                        <>
+                          <FiCheck size={12} /> En comparación
+                        </>
+                      ) : (
+                        <>
+                          <FiPlus size={12} /> Añadir
+                        </>
+                      )}
+                    </span>
+                  </SearchResultItem>
+                );
+              })}
               {filteredRackets.length === 0 && (
                 <div style={{ padding: '1rem', textAlign: 'center', color: 'var(--text-muted)' }}>
                   No se encontraron palas
