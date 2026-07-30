@@ -250,6 +250,20 @@ async def discover(limit: int, dry_run: bool, dedupe_cap: int) -> None:
     print(f"\n{'─' * 50}\n🔁 Deduplicando catálogo...\n{'─' * 50}")
     run_deduplication(dry_run=False, delete_cap=dedupe_cap)
 
+    print(f"\n{'─' * 50}\n📊 Sincronizando métricas radar de palas...\n{'─' * 50}")
+    try:
+        from .sync_radar_metrics import fetch_rackets_needing_metrics, process_racket
+        needing_radar = fetch_rackets_needing_metrics()
+        if needing_radar:
+            print(f"  Encontradas {len(needing_radar)} palas sin métricas radar. Sincronizando...")
+            for racket in needing_radar:
+                res = process_racket(racket, apply_fallback=True, dry_run=False)
+                print(f"  ✓ [{res.get('source', 'fallback')}]: {res.get('name')}")
+        else:
+            print("  ✓ Todas las palas del catálogo tienen métricas radar completas.")
+    except Exception as e:
+        print(f"  ⚠️ Error en sincronización de métricas radar: {e}")
+
 
 # ── Main ───────────────────────────────────────────────────────────────
 
