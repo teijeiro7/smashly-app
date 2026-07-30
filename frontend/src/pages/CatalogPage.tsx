@@ -695,7 +695,7 @@ const CatalogPage: React.FC = () => {
 
           const result = await racketService.searchRackets(searchQuery, filters);
 
-          if (result?.data) {
+          if (result?.data && result.data.length > 0) {
             // Apply local sorting since API returns sorted by relevance
             const sorted = [...result.data];
             try {
@@ -729,7 +729,8 @@ const CatalogPage: React.FC = () => {
             }
             setFilteredRackets(sorted);
           } else {
-            setFilteredRackets([]);
+            // API returned empty results, fall back to robust local token matching
+            filterLocally();
           }
         } catch (error) {
           console.error('Fuzzy search error, falling back to local:', error);
@@ -744,6 +745,15 @@ const CatalogPage: React.FC = () => {
 
     const filterLocally = () => {
       let filtered = [...rackets];
+
+      // Apply search query token filter
+      if (searchQuery.trim()) {
+        const tokens = searchQuery.toLowerCase().trim().split(/\s+/).filter(Boolean);
+        filtered = filtered.filter(racket => {
+          const haystack = `${racket.nombre || ''} ${racket.marca || ''} ${racket.modelo || ''} ${racket.caracteristicas_forma || ''} ${racket.caracteristicas_balance || ''}`.toLowerCase();
+          return tokens.every(token => haystack.includes(token));
+        });
+      }
 
       // Apply brand filter
       if (selectedBrand !== 'Todas') {

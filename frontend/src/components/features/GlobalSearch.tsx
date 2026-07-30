@@ -599,8 +599,23 @@ export const GlobalSearch: React.FC<GlobalSearchProps> = ({
       setIsLoading(true);
       try {
         const result = await racketService.searchRackets(query, {}, { limit: 6 });
-        if (result?.data) {
+        if (result?.data && result.data.length > 0) {
           result.data.forEach((racket: Racket) => {
+            results.push({ type: 'racket', data: racket });
+          });
+        } else {
+          const racketResults = searchReadyRackets
+            .filter(racket => {
+              const queryWords = query.split(/\s+/);
+              return queryWords.every(
+                word =>
+                  racket._lowName.includes(word) ||
+                  racket._lowBrand.includes(word) ||
+                  racket._lowModel.includes(word)
+              );
+            })
+            .slice(0, 6);
+          racketResults.forEach(racket => {
             results.push({ type: 'racket', data: racket });
           });
         }
