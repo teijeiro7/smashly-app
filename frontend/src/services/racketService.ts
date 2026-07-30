@@ -235,7 +235,10 @@ const racketService = {
     let q = supabase.from('rackets').select('*', { count: 'exact' });
 
     if (query) {
-      q = q.or(`name.ilike.%${query}%,brand.ilike.%${query}%,model.ilike.%${query}%`);
+      const words = query.trim().split(/\s+/).filter(Boolean);
+      words.forEach(word => {
+        q = q.or(`name.ilike.%${word}%,brand.ilike.%${word}%,model.ilike.%${word}%`);
+      });
     }
 
     if (filters) {

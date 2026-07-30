@@ -1,9 +1,10 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import React, { useEffect, useRef, useState, useMemo, useDeferredValue } from 'react';
-import { FiX, FiTag, FiGrid, FiBox } from 'react-icons/fi';
+import { FiX, FiTag, FiGrid, FiBox, FiClock, FiTrendingUp, FiPlus, FiCheck } from 'react-icons/fi';
 import { useNavigate } from '@tanstack/react-router';
 import styled from 'styled-components';
 import { useRackets } from '../../contexts/RacketsContext';
+import { useComparison } from '../../contexts/ComparisonContext';
 import racketService from '../../services/racketService';
 import { Racket } from '../../types/racket';
 import { toTitleCase, formatBrandName, formatRacketName } from '../../utils/textUtils';
@@ -76,7 +77,7 @@ const SearchInputContainer = styled(motion.div)<{
 
 const SearchInput = styled.input<{ $isInHeader?: boolean; $isMobileContext?: boolean }>`
   width: 100%;
-  padding: 10px 44px 10px 16px;
+  padding: 10px 70px 10px 16px;
   border: none;
   outline: none;
   font-size: 14px;
@@ -99,6 +100,26 @@ const SearchInput = styled.input<{ $isInHeader?: boolean; $isMobileContext?: boo
   @media (max-width: 480px) {
     font-size: 15px;
     padding: 12px 40px 12px 14px;
+  }
+`;
+
+const KbdBadge = styled.span<{ $isInHeader?: boolean }>`
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 4px;
+  pointer-events: none;
+  background: ${props => (props.$isInHeader ? 'rgba(255, 255, 255, 0.2)' : 'var(--surface-3)')};
+  color: ${props => (props.$isInHeader ? 'rgba(255, 255, 255, 0.85)' : 'var(--text-subtle)')};
+  border: 1px solid ${props => (props.$isInHeader ? 'rgba(255, 255, 255, 0.25)' : 'var(--border)')};
+  font-family: inherit;
+
+  @media (max-width: 600px) {
+    display: none;
   }
 `;
 
@@ -148,9 +169,9 @@ const SearchResultsDropdown = styled(motion.div)`
   right: 0;
   background: var(--surface);
   border-radius: 16px;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.14);
   border: 1px solid var(--border);
-  max-height: 420px;
+  max-height: 440px;
   overflow: hidden;
   z-index: 1001;
 
@@ -198,12 +219,16 @@ const SearchResultsList = styled.div`
   overflow-y: auto;
 `;
 
-const SearchResultItem = styled.div<{ $variant?: 'racket' | 'brand' | 'category' }>`
+const SearchResultItem = styled.div<{
+  $variant?: 'racket' | 'brand' | 'category';
+  $isFocused?: boolean;
+}>`
   display: flex;
   align-items: center;
   gap: 12px;
   padding: 10px 16px;
   cursor: pointer;
+  background: ${props => (props.$isFocused ? 'var(--surface-3)' : 'transparent')};
   transition: background-color 0.15s ease;
 
   &:hover {
@@ -307,7 +332,28 @@ const ResultPrice = styled.span`
   font-weight: 600;
   color: var(--primary);
   white-space: nowrap;
-  margin-left: auto;
+`;
+
+const CompareButton = styled.button<{ $inComparison?: boolean }>`
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  border: 1px solid ${props => (props.$inComparison ? 'var(--primary)' : 'var(--border)')};
+  background: ${props => (props.$inComparison ? 'var(--primary-subtle)' : 'var(--surface-2)')};
+  color: ${props => (props.$inComparison ? 'var(--primary)' : 'var(--text-muted)')};
+  cursor: pointer;
+  transition: all 0.15s ease;
+  margin-left: 8px;
+
+  &:hover {
+    background: var(--primary-subtle);
+    border-color: var(--primary);
+    color: var(--primary);
+  }
 `;
 
 const NoResults = styled.div`
@@ -346,6 +392,64 @@ const ViewAllLink = styled.span`
   }
 `;
 
+const PreSearchContainer = styled.div`
+  padding: 12px 16px;
+`;
+
+const PreSearchTitle = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-subtle);
+  margin-bottom: 8px;
+`;
+
+const TagChipGrid = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 12px;
+`;
+
+const TagChip = styled.button`
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: 20px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+
+  &:hover {
+    background: var(--primary-subtle);
+    border-color: var(--primary);
+    color: var(--primary);
+  }
+`;
+
+const RecentSearchItem = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 0;
+  font-size: 13px;
+  color: var(--text);
+  cursor: pointer;
+
+  &:hover {
+    color: var(--primary);
+  }
+`;
+
 interface SearchResult {
   type: 'racket' | 'brand' | 'category';
   data: Racket | string;
@@ -356,6 +460,14 @@ interface GlobalSearchProps {
   isInHeader?: boolean;
   isMobileContext?: boolean;
 }
+
+const POPULAR_SEARCHES = [
+  'Babolat Technical Viper',
+  'Bullpadel Vertex',
+  'Nox AT10',
+  'Forma Diamante',
+  'Palas de Control',
+];
 
 export const GlobalSearch: React.FC<GlobalSearchProps> = ({
   onSearchToggle,
@@ -368,11 +480,47 @@ export const GlobalSearch: React.FC<GlobalSearchProps> = ({
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
-  const containerRef = useRef<HTMLDivElement>(null);
+  const [selectedIndex, setSelectedIndex] = useState(-1);
+  const [recentSearches, setRecentSearches] = useState<string[]>(() => {
+    try {
+      const stored = localStorage.getItem('smashly_recent_searches');
+      return stored ? JSON.parse(stored) : [];
+    } catch {
+      return [];
+    }
+  });
 
+  const containerRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
   const { rackets } = useRackets();
+  const comparison = useComparison();
+
+  const addRecentSearch = (query: string) => {
+    if (!query.trim()) return;
+    const clean = query.trim();
+    const updated = [
+      clean,
+      ...recentSearches.filter(q => q.toLowerCase() !== clean.toLowerCase()),
+    ].slice(0, 5);
+    setRecentSearches(updated);
+    try {
+      localStorage.setItem('smashly_recent_searches', JSON.stringify(updated));
+    } catch {
+      // ignore
+    }
+  };
+
+  const removeRecentSearch = (e: React.MouseEvent, queryToRemove: string) => {
+    e.stopPropagation();
+    const updated = recentSearches.filter(q => q !== queryToRemove);
+    setRecentSearches(updated);
+    try {
+      localStorage.setItem('smashly_recent_searches', JSON.stringify(updated));
+    } catch {
+      // ignore
+    }
+  };
 
   const uniqueBrands = useMemo(
     () => Array.from(new Set(rackets.map(r => r.marca).filter(Boolean))).sort(),
@@ -389,7 +537,6 @@ export const GlobalSearch: React.FC<GlobalSearchProps> = ({
     [rackets]
   );
 
-  // Pre-process rackets for faster searching
   const searchReadyRackets = useMemo(() => {
     return rackets.map(r => ({
       ...r,
@@ -398,6 +545,31 @@ export const GlobalSearch: React.FC<GlobalSearchProps> = ({
       _lowModel: (r.modelo || '').toLowerCase(),
     }));
   }, [rackets]);
+
+  // Global hotkey Cmd+K / Ctrl+K / /
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement;
+      const isInput =
+        target &&
+        (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable);
+
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        setIsSearchOpen(true);
+        onSearchToggle?.(true);
+        setTimeout(() => searchInputRef.current?.focus(), 50);
+      } else if (e.key === '/' && !isInput) {
+        e.preventDefault();
+        setIsSearchOpen(true);
+        onSearchToggle?.(true);
+        setTimeout(() => searchInputRef.current?.focus(), 50);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [onSearchToggle]);
 
   useEffect(() => {
     if (isInHeader && searchInputRef.current) {
@@ -410,40 +582,53 @@ export const GlobalSearch: React.FC<GlobalSearchProps> = ({
   useEffect(() => {
     if (deferredQuery.trim() === '') {
       setSearchResults([]);
+      setSelectedIndex(-1);
       return;
     }
 
     const query = deferredQuery.toLowerCase().trim();
     const results: SearchResult[] = [];
 
-    // Search brands and categories locally (fast)
     const brandResults = uniqueBrands
       .filter(brand => brand.toLowerCase().includes(query))
-      .slice(0, 4);
+      .slice(0, 3);
     brandResults.forEach(brand => {
       results.push({ type: 'brand', data: brand });
     });
 
     const categoryResults = uniqueShapes
       .filter(shape => shape.toLowerCase().includes(query))
-      .slice(0, 4);
+      .slice(0, 3);
     categoryResults.forEach(shape => {
       results.push({ type: 'category', data: shape });
     });
 
-    // Search rackets via API (fuzzy search)
     const searchRackets = async () => {
       setIsLoading(true);
       try {
         const result = await racketService.searchRackets(query, {}, { limit: 6 });
-        if (result?.data) {
+        if (result?.data && result.data.length > 0) {
           result.data.forEach((racket: Racket) => {
+            results.push({ type: 'racket', data: racket });
+          });
+        } else {
+          const racketResults = searchReadyRackets
+            .filter(racket => {
+              const queryWords = query.split(/\s+/);
+              return queryWords.every(
+                word =>
+                  racket._lowName.includes(word) ||
+                  racket._lowBrand.includes(word) ||
+                  racket._lowModel.includes(word)
+              );
+            })
+            .slice(0, 6);
+          racketResults.forEach(racket => {
             results.push({ type: 'racket', data: racket });
           });
         }
       } catch (error) {
         console.error('Error in global search:', error);
-        // Fallback to local search
         const racketResults = searchReadyRackets
           .filter(racket => {
             const queryWords = query.split(/\s+/);
@@ -461,6 +646,7 @@ export const GlobalSearch: React.FC<GlobalSearchProps> = ({
       } finally {
         setSearchResults(results);
         setIsLoading(false);
+        setSelectedIndex(-1);
       }
     };
 
@@ -469,8 +655,9 @@ export const GlobalSearch: React.FC<GlobalSearchProps> = ({
     } else {
       setSearchResults(results);
       setIsLoading(false);
+      setSelectedIndex(-1);
     }
-  }, [deferredQuery, rackets, uniqueBrands, uniqueShapes]);
+  }, [deferredQuery, rackets, uniqueBrands, uniqueShapes, searchReadyRackets]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -506,6 +693,7 @@ export const GlobalSearch: React.FC<GlobalSearchProps> = ({
   };
 
   const handleRacketSelect = (racket: Racket) => {
+    addRecentSearch(racket.nombre);
     if (isInHeader) {
       setSearchQuery('');
       setSearchResults([]);
@@ -517,6 +705,7 @@ export const GlobalSearch: React.FC<GlobalSearchProps> = ({
   };
 
   const handleBrandSelect = (brand: string) => {
+    addRecentSearch(brand);
     if (isInHeader) {
       setSearchQuery('');
       setSearchResults([]);
@@ -528,6 +717,7 @@ export const GlobalSearch: React.FC<GlobalSearchProps> = ({
   };
 
   const handleCategorySelect = (shape: string) => {
+    addRecentSearch(shape);
     if (isInHeader) {
       setSearchQuery('');
       setSearchResults([]);
@@ -538,29 +728,58 @@ export const GlobalSearch: React.FC<GlobalSearchProps> = ({
     navigate({ to: '/catalog', search: { shape: encodeURIComponent(shape) } });
   };
 
+  const handleQuickTagSelect = (text: string) => {
+    setSearchQuery(text);
+    addRecentSearch(text);
+    setShowDropdown(true);
+    searchInputRef.current?.focus();
+  };
+
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value);
     setShowDropdown(true);
   };
 
+  const flattenedResults = useMemo(() => searchResults, [searchResults]);
+
   const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Escape') {
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      if (flattenedResults.length > 0) {
+        setSelectedIndex(prev => (prev < flattenedResults.length - 1 ? prev + 1 : 0));
+      }
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      if (flattenedResults.length > 0) {
+        setSelectedIndex(prev => (prev > 0 ? prev - 1 : flattenedResults.length - 1));
+      }
+    } else if (e.key === 'Escape') {
       setShowDropdown(false);
       if (isInHeader) {
         onSearchToggle?.(false);
       } else {
         toggleSearch();
       }
-    } else if (e.key === 'Enter' && searchQuery.trim()) {
-      setShowDropdown(false);
-      if (isInHeader) {
-        onSearchToggle?.(false);
-      } else {
-        toggleSearch();
+    } else if (e.key === 'Enter') {
+      if (selectedIndex >= 0 && selectedIndex < flattenedResults.length) {
+        e.preventDefault();
+        const selected = flattenedResults[selectedIndex];
+        if (selected.type === 'racket') handleRacketSelect(selected.data as Racket);
+        else if (selected.type === 'brand') handleBrandSelect(selected.data as string);
+        else if (selected.type === 'category') handleCategorySelect(selected.data as string);
+      } else if (searchQuery.trim()) {
+        e.preventDefault();
+        addRecentSearch(searchQuery);
+        setShowDropdown(false);
+        if (isInHeader) {
+          onSearchToggle?.(false);
+        } else {
+          toggleSearch();
+        }
+        navigate({ to: '/catalog', search: { search: encodeURIComponent(searchQuery.trim()) } });
+        setSearchQuery('');
+        setSearchResults([]);
       }
-      navigate({ to: '/catalog', search: { search: encodeURIComponent(searchQuery.trim()) } });
-      setSearchQuery('');
-      setSearchResults([]);
     }
   };
 
@@ -571,6 +790,9 @@ export const GlobalSearch: React.FC<GlobalSearchProps> = ({
   };
 
   const handleViewAll = () => {
+    if (searchQuery.trim()) {
+      addRecentSearch(searchQuery);
+    }
     if (isInHeader) {
       onSearchToggle?.(false);
     } else {
@@ -583,9 +805,9 @@ export const GlobalSearch: React.FC<GlobalSearchProps> = ({
 
   const groupResults = () => {
     const groups: { [key: string]: SearchResult[] } = {
-      racket: [],
       brand: [],
       category: [],
+      racket: [],
     };
 
     searchResults.forEach(result => {
@@ -597,6 +819,8 @@ export const GlobalSearch: React.FC<GlobalSearchProps> = ({
 
   const groupedResults = groupResults();
   const hasResults = searchResults.length > 0;
+
+  let currentIndexTracker = 0;
 
   return (
     <SearchContainer ref={containerRef}>
@@ -617,13 +841,13 @@ export const GlobalSearch: React.FC<GlobalSearchProps> = ({
                 value={searchQuery}
                 onChange={handleSearchChange}
                 onKeyDown={handleKeyPress}
-                onFocus={() => {
-                  if (searchQuery.trim().length > 0) setShowDropdown(true);
-                }}
+                onFocus={() => setShowDropdown(true)}
                 $isInHeader={isInHeader}
                 $isMobileContext={isMobileContext}
               />
-              {searchQuery && (
+              {!searchQuery ? (
+                <KbdBadge $isInHeader={isInHeader}>⌘K</KbdBadge>
+              ) : (
                 <ClearButton
                   onClick={clearSearch}
                   $isInHeader={isInHeader}
@@ -638,23 +862,58 @@ export const GlobalSearch: React.FC<GlobalSearchProps> = ({
       </SearchWrapper>
 
       <AnimatePresence>
-        {(isSearchOpen || isInHeader) && showDropdown && searchQuery.trim().length > 0 && (
+        {(isSearchOpen || isInHeader) && showDropdown && (
           <SearchResultsDropdown
             initial={{ opacity: 0, y: -8 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.15 }}
           >
-            {!isLoading && !hasResults && (
+            {/* Pre-search view: Recent & Popular */}
+            {!searchQuery.trim() && (
+              <PreSearchContainer>
+                {recentSearches.length > 0 && (
+                  <>
+                    <PreSearchTitle>
+                      <FiClock size={12} /> Búsquedas recientes
+                    </PreSearchTitle>
+                    {recentSearches.map(q => (
+                      <RecentSearchItem key={q} onClick={() => handleQuickTagSelect(q)}>
+                        <span>{q}</span>
+                        <FiX
+                          size={12}
+                          style={{ cursor: 'pointer', opacity: 0.6 }}
+                          onClick={e => removeRecentSearch(e, q)}
+                        />
+                      </RecentSearchItem>
+                    ))}
+                  </>
+                )}
+
+                <PreSearchTitle style={{ marginTop: recentSearches.length > 0 ? 12 : 0 }}>
+                  <FiTrendingUp size={12} /> Búsquedas populares
+                </PreSearchTitle>
+                <TagChipGrid>
+                  {POPULAR_SEARCHES.map(tag => (
+                    <TagChip key={tag} onClick={() => handleQuickTagSelect(tag)}>
+                      {tag}
+                    </TagChip>
+                  ))}
+                </TagChipGrid>
+              </PreSearchContainer>
+            )}
+
+            {/* Results view */}
+            {searchQuery.trim().length > 0 && !isLoading && !hasResults && (
               <NoResults>
-                <NoResultsText>No encontrado</NoResultsText>
+                <NoResultsText>No se encontraron resultados para "{searchQuery}"</NoResultsText>
                 <NoResultsHint>
-                  Presiona <strong>Enter</strong> para buscar en el catálogo
+                  Presiona <strong>Enter</strong> para buscar en el catálogo completo
                 </NoResultsHint>
               </NoResults>
             )}
 
-            {hasResults && (
+            {searchQuery.trim().length > 0 && hasResults && (
               <>
                 {groupedResults.brand.length > 0 && (
                   <ResultsGroup>
@@ -664,22 +923,27 @@ export const GlobalSearch: React.FC<GlobalSearchProps> = ({
                       <ResultsGroupCount>{groupedResults.brand.length}</ResultsGroupCount>
                     </ResultsGroupHeader>
                     <SearchResultsList>
-                      {groupedResults.brand.map((result, index) => (
-                        <SearchResultItem
-                          key={`brand-${result.data}-${index}`}
-                          $variant='brand'
-                          onClick={() => handleBrandSelect(result.data as string)}
-                        >
-                          <ResultIcon $variant='brand'>
-                            <FiTag size={16} />
-                          </ResultIcon>
-                          <ResultInfo>
-                            <ResultName $variant='brand'>
-                              {formatBrandName(result.data as string)}
-                            </ResultName>
-                          </ResultInfo>
-                        </SearchResultItem>
-                      ))}
+                      {groupedResults.brand.map(result => {
+                        const itemIdx = currentIndexTracker++;
+                        const isFocused = selectedIndex === itemIdx;
+                        return (
+                          <SearchResultItem
+                            key={`brand-${result.data}`}
+                            $variant='brand'
+                            $isFocused={isFocused}
+                            onClick={() => handleBrandSelect(result.data as string)}
+                          >
+                            <ResultIcon $variant='brand'>
+                              <FiTag size={16} />
+                            </ResultIcon>
+                            <ResultInfo>
+                              <ResultName $variant='brand'>
+                                {formatBrandName(result.data as string)}
+                              </ResultName>
+                            </ResultInfo>
+                          </SearchResultItem>
+                        );
+                      })}
                     </SearchResultsList>
                   </ResultsGroup>
                 )}
@@ -692,23 +956,28 @@ export const GlobalSearch: React.FC<GlobalSearchProps> = ({
                       <ResultsGroupCount>{groupedResults.category.length}</ResultsGroupCount>
                     </ResultsGroupHeader>
                     <SearchResultsList>
-                      {groupedResults.category.map((result, index) => (
-                        <SearchResultItem
-                          key={`category-${result.data}-${index}`}
-                          $variant='category'
-                          onClick={() => handleCategorySelect(result.data as string)}
-                        >
-                          <ResultIcon $variant='category'>
-                            <FiGrid size={16} />
-                          </ResultIcon>
-                          <ResultInfo>
-                            <ResultName $variant='category'>
-                              {toTitleCase(result.data as string)}
-                            </ResultName>
-                            <ResultSubtext>Forma de pala</ResultSubtext>
-                          </ResultInfo>
-                        </SearchResultItem>
-                      ))}
+                      {groupedResults.category.map(result => {
+                        const itemIdx = currentIndexTracker++;
+                        const isFocused = selectedIndex === itemIdx;
+                        return (
+                          <SearchResultItem
+                            key={`category-${result.data}`}
+                            $variant='category'
+                            $isFocused={isFocused}
+                            onClick={() => handleCategorySelect(result.data as string)}
+                          >
+                            <ResultIcon $variant='category'>
+                              <FiGrid size={16} />
+                            </ResultIcon>
+                            <ResultInfo>
+                              <ResultName $variant='category'>
+                                {toTitleCase(result.data as string)}
+                              </ResultName>
+                              <ResultSubtext>Forma de pala</ResultSubtext>
+                            </ResultInfo>
+                          </SearchResultItem>
+                        );
+                      })}
                     </SearchResultsList>
                   </ResultsGroup>
                 )}
@@ -721,12 +990,17 @@ export const GlobalSearch: React.FC<GlobalSearchProps> = ({
                       <ResultsGroupCount>{groupedResults.racket.length}</ResultsGroupCount>
                     </ResultsGroupHeader>
                     <SearchResultsList>
-                      {groupedResults.racket.map((result, index) => {
+                      {groupedResults.racket.map(result => {
                         const racket = result.data as Racket;
+                        const itemIdx = currentIndexTracker++;
+                        const isFocused = selectedIndex === itemIdx;
+                        const inComp = comparison?.isRacketInComparison?.(racket.nombre) || false;
+
                         return (
                           <SearchResultItem
-                            key={`racket-${racket.nombre}-${index}`}
+                            key={`racket-${racket.nombre}-${racket.id}`}
                             $variant='racket'
+                            $isFocused={isFocused}
                             onClick={() => handleRacketSelect(racket)}
                           >
                             <ResultImage
@@ -741,11 +1015,31 @@ export const GlobalSearch: React.FC<GlobalSearchProps> = ({
                               <ResultName $variant='racket'>{formatRacketName(racket)}</ResultName>
                               <ResultSubtext>
                                 {formatBrandName(racket.marca)} •{' '}
-                                {racket.caracteristicas_forma || 'forma'}
+                                {racket.caracteristicas_forma ||
+                                  racket.especificaciones?.forma ||
+                                  'Forma no especificada'}
                               </ResultSubtext>
                             </ResultInfo>
+
                             {racket.precio_actual && (
                               <ResultPrice>€{racket.precio_actual}</ResultPrice>
+                            )}
+
+                            {comparison && (
+                              <CompareButton
+                                $inComparison={inComp}
+                                onClick={e => {
+                                  e.stopPropagation();
+                                  if (inComp) {
+                                    comparison.removeRacket(racket.nombre);
+                                  } else {
+                                    comparison.addRacket(racket);
+                                  }
+                                }}
+                              >
+                                {inComp ? <FiCheck size={12} /> : <FiPlus size={12} />}
+                                {inComp ? 'Añadida' : 'Comparar'}
+                              </CompareButton>
                             )}
                           </SearchResultItem>
                         );
