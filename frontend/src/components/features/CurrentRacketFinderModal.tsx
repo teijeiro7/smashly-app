@@ -9,6 +9,7 @@ import { useBackgroundTasks } from '../../contexts/BackgroundTasksContext';
 import { PriceRangeSlider } from '../recommendation/PriceRangeSlider';
 import { RecommendationService } from '../../services/recommendationService';
 import { NotificationService } from '../../services/notificationService';
+import { formatRacketName } from '../../utils/textUtils';
 import { sileo } from 'sileo';
 
 interface CurrentRacketFinderModalProps {
@@ -464,7 +465,7 @@ const CurrentRacketFinderModal: React.FC<CurrentRacketFinderModalProps> = ({
 
   const racketOptions = useMemo(() => {
     return rackets.map(racket => {
-      const displayName = `${racket.marca} ${racket.modelo || racket.nombre}`.trim();
+      const displayName = formatRacketName(racket);
       return (
         <option key={racket.id} value={displayName}>
           {displayName}

@@ -7,6 +7,7 @@ import { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { reviewService } from '../../services/reviewService';
 import { racketImageUrl } from '../../utils/imageUrl';
+import { formatRacketName } from '../../utils/textUtils';
 import type { ReviewWithDetails } from '../../types/review';
 import { ReviewItem } from './ReviewItem';
 
@@ -99,7 +100,7 @@ export const UserReviews: React.FC<UserReviewsProps> = ({ userId }) => {
                   {review.racket?.imagenes?.[0] ? (
                     <RacketImage
                       src={racketImageUrl(review.racket.imagenes[0])}
-                      alt={review.racket.nombre}
+                      alt={formatRacketName(review.racket)}
                     />
                   ) : (
                     <PlaceholderImage>🎾</PlaceholderImage>
@@ -109,7 +110,7 @@ export const UserReviews: React.FC<UserReviewsProps> = ({ userId }) => {
                 {/* Información compacta */}
                 <CardContent>
                   <RacketName>
-                    {review.racket?.marca} {review.racket?.modelo || review.racket?.nombre}
+                    {formatRacketName(review.racket)}
                   </RacketName>
 
                   <Rating>

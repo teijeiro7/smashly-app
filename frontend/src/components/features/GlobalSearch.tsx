@@ -6,7 +6,7 @@ import styled from 'styled-components';
 import { useRackets } from '../../contexts/RacketsContext';
 import racketService from '../../services/racketService';
 import { Racket } from '../../types/racket';
-import { toTitleCase } from '../../utils/textUtils';
+import { toTitleCase, formatBrandName, formatRacketName } from '../../utils/textUtils';
 
 const SearchContainer = styled.div`
   position: relative;
@@ -675,7 +675,7 @@ export const GlobalSearch: React.FC<GlobalSearchProps> = ({
                           </ResultIcon>
                           <ResultInfo>
                             <ResultName $variant='brand'>
-                              {toTitleCase(result.data as string)}
+                              {formatBrandName(result.data as string)}
                             </ResultName>
                           </ResultInfo>
                         </SearchResultItem>
@@ -702,7 +702,7 @@ export const GlobalSearch: React.FC<GlobalSearchProps> = ({
                             <FiGrid size={16} />
                           </ResultIcon>
                           <ResultInfo>
-                            <ResultName $variant='category'>{result.data as string}</ResultName>
+                            <ResultName $variant='category'>{toTitleCase(result.data as string)}</ResultName>
                             <ResultSubtext>Forma de pala</ResultSubtext>
                           </ResultInfo>
                         </SearchResultItem>
@@ -729,7 +729,7 @@ export const GlobalSearch: React.FC<GlobalSearchProps> = ({
                           >
                             <ResultImage
                               src={racket.imagenes?.[0] || ''}
-                              alt={racket.modelo || racket.nombre}
+                              alt={formatRacketName(racket)}
                               onError={e => {
                                 const target = e.target as HTMLImageElement;
                                 target.style.display = 'none';
@@ -737,10 +737,10 @@ export const GlobalSearch: React.FC<GlobalSearchProps> = ({
                             />
                             <ResultInfo>
                               <ResultName $variant='racket'>
-                                {toTitleCase(racket.modelo || racket.nombre)}
+                                {formatRacketName(racket)}
                               </ResultName>
                               <ResultSubtext>
-                                {toTitleCase(racket.marca)} •{' '}
+                                {formatBrandName(racket.marca)} •{' '}
                                 {racket.caracteristicas_forma || 'forma'}
                               </ResultSubtext>
                             </ResultInfo>

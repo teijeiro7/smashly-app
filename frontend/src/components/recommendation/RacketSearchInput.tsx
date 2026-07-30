@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { FiSearch, FiX } from 'react-icons/fi';
 import { useRackets } from '../../contexts/RacketsContext';
 import { racketImageUrl } from '../../utils/imageUrl';
+import { formatBrandName, formatRacketName } from '../../utils/textUtils';
 
 const SearchContainer = styled.div`
   position: relative;
@@ -167,7 +168,7 @@ export const RacketSearchInput: React.FC<RacketSearchInputProps> = ({
   placeholder = 'Buscar una pala...',
 }) => {
   const { searchRackets } = useRackets();
-  const [query, setQuery] = useState(value ? `${value.marca} ${value.name}` : '');
+  const [query, setQuery] = useState(value ? formatRacketName(value) : '');
   const [isFocused, setIsFocused] = useState(false);
   const [results, setResults] = useState<RacketSearchResult[]>([]);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -185,7 +186,7 @@ export const RacketSearchInput: React.FC<RacketSearchInputProps> = ({
 
   useEffect(() => {
     if (!isFocused) {
-      setQuery(value ? `${value.marca} ${value.name}`.trim() : '');
+      setQuery(value ? formatRacketName(value) : '');
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value?.name, value?.marca]);
@@ -207,7 +208,7 @@ export const RacketSearchInput: React.FC<RacketSearchInputProps> = ({
 
   const handleSelect = (racket: RacketSearchResult) => {
     onChange(racket);
-    setQuery(`${racket.marca} ${racket.name}`);
+    setQuery(formatRacketName(racket));
     setIsFocused(false);
   };
 
@@ -259,13 +260,13 @@ export const RacketSearchInput: React.FC<RacketSearchInputProps> = ({
             {results.map(racket => (
               <ResultItem key={racket.id} onClick={() => handleSelect(racket)}>
                 {racket.imagenes?.[0] ? (
-                  <ResultImage src={racketImageUrl(racket.imagenes[0])} alt={racket.name} />
+                  <ResultImage src={racketImageUrl(racket.imagenes[0])} alt={formatRacketName(racket)} />
                 ) : (
                   <ResultPlaceholder>🎾</ResultPlaceholder>
                 )}
                 <ResultInfo>
-                  <ResultName>{racket.name}</ResultName>
-                  <ResultBrand>{racket.marca}</ResultBrand>
+                  <ResultName>{formatRacketName(racket)}</ResultName>
+                  <ResultBrand>{formatBrandName(racket.marca)}</ResultBrand>
                 </ResultInfo>
               </ResultItem>
             ))}

@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { motion } from 'framer-motion';
 import { FiStar, FiList, FiGitBranch, FiClock } from 'react-icons/fi';
 import { Link } from '@tanstack/react-router';
+import { formatRacketName } from '../../utils/textUtils';
 
 const Container = styled.div`
   display: flex;
@@ -241,7 +242,7 @@ const ActivityStats: React.FC<ActivityStatsProps> = ({
                   </RecentItemIcon>
                   <RecentItemText>
                     <RecentItemTitle>
-                      {review.rackets?.marca} {review.rackets?.nombre}
+                      {formatRacketName(review.rackets)}
                     </RecentItemTitle>
                     <RecentItemMeta>
                       {review.rating} estrellas • {formatDate(review.created_at)}

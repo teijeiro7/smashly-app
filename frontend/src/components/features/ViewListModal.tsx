@@ -4,6 +4,7 @@ import { FiX, FiTrash2, FiExternalLink } from 'react-icons/fi';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ListWithRackets } from '../../types/list';
 import { useNavigate } from '@tanstack/react-router';
+import { formatBrandName, formatModelName, formatRacketName } from '../../utils/textUtils';
 
 interface ViewListModalProps {
   isOpen: boolean;
@@ -312,14 +313,14 @@ export const ViewListModal: React.FC<ViewListModalProps> = ({
                       <RacketCard key={racket.id}>
                         <RacketImage
                           src={racket.imagenes?.[0] || '/placeholder-racket.png'}
-                          alt={racket.modelo || racket.nombre}
+                          alt={formatRacketName(racket)}
                           onError={e => {
                             (e.target as HTMLImageElement).src = '/placeholder-racket.png';
                           }}
                         />
                         <RacketInfo>
-                          <RacketBrand>{racket.marca || 'Marca desconocida'}</RacketBrand>
-                          <RacketName>{racket.modelo || racket.nombre}</RacketName>
+                          <RacketBrand>{formatBrandName(racket.marca) || 'Marca desconocida'}</RacketBrand>
+                          <RacketName>{formatModelName(racket.modelo || racket.nombre)}</RacketName>
                           <RacketPrice>
                             {racket.precio_actual
                               ? `${racket.precio_actual}€`
