@@ -374,7 +374,7 @@ const SmallDefaultAvatar = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #e0e7ff;
+  background: var(--primary-subtle);
   color: var(--primary);
   font-size: 0.75rem;
   font-weight: 700;

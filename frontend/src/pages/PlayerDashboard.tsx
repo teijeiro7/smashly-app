@@ -72,7 +72,7 @@ const HeroSection = styled.div`
 `;
 
 const Greeting = styled.h1`
-  font-size: 2.5rem;
+  font-size: clamp(1.75rem, 4vw, 2.5rem);
   font-weight: 800;
   color: var(--text);
   margin: 0 0 0.5rem 0;

@@ -58,8 +58,8 @@ const FeaturesGrid = styled.div`
 `;
 
 const FeatureCard = styled(motion.div)`
-  background: linear-gradient(135deg, var(--primary-faint) 0%, var(--primary-subtle) 100%);
-  border: 1px solid #d1fae5;
+  background: var(--surface-2);
+  border: 1px solid var(--border-strong);
   border-radius: 12px;
   padding: 1.5rem;
   display: flex;
@@ -69,7 +69,7 @@ const FeatureCard = styled(motion.div)`
 
   &:hover {
     transform: translateY(-4px);
-    box-shadow: 0 8px 20px rgba(var(--primary-rgb), 0.15);
+    box-shadow: 0 8px 20px var(--shadow-color);
     border-color: var(--primary);
   }
 `;
@@ -135,21 +135,21 @@ const TechnologiesGrid = styled.div`
 `;
 
 const TechnologyBadge = styled(motion.div)`
-  background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
-  border: 1px solid #bae6fd;
+  background: var(--surface-3);
+  border: 1px solid var(--border);
   border-radius: 8px;
   padding: 0.75rem 1rem;
   font-size: 0.875rem;
   font-weight: 600;
-  color: #0c4a6e;
+  color: var(--text);
   display: flex;
   align-items: center;
   gap: 0.5rem;
   transition: all 0.2s ease;
 
   &:hover {
-    background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
-    border-color: #0ea5e9;
+    background: var(--primary-subtle);
+    border-color: var(--primary);
     transform: translateX(4px);
   }
 `;
@@ -158,11 +158,11 @@ const TechnologyIcon = styled.div`
   width: 24px;
   height: 24px;
   border-radius: 6px;
-  background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+  background: var(--primary);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--brand-on-surface);
+  color: var(--text-inverse);
   font-size: 0.75rem;
   flex-shrink: 0;
 `;

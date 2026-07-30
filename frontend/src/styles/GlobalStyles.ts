@@ -72,32 +72,32 @@ export const GlobalStyles = createGlobalStyle`
     overflow-x: hidden;
   }
 
-  /* Typography */
+  /* Fluid Typography Scale (Impeccable Design Standard) */
   h1, h2, h3, h4, h5, h6 {
     font-weight: 600;
-    line-height: 1.25;
+    line-height: 1.2;
     margin: 0;
   }
 
   h1 {
-    font-size: 2.5rem;
+    font-size: clamp(2rem, 4vw + 1rem, 3.25rem);
     font-weight: 800;
-    letter-spacing: -0.02em;
+    letter-spacing: -0.025em;
   }
 
   h2 {
-    font-size: 2rem;
+    font-size: clamp(1.5rem, 3vw + 0.8rem, 2.25rem);
     font-weight: 700;
-    letter-spacing: -0.01em;
+    letter-spacing: -0.015em;
   }
 
   h3 {
-    font-size: 1.5rem;
+    font-size: clamp(1.25rem, 2vw + 0.5rem, 1.75rem);
     font-weight: 600;
   }
 
   h4 {
-    font-size: 1.25rem;
+    font-size: clamp(1.1rem, 1.5vw + 0.4rem, 1.35rem);
     font-weight: 600;
   }
 
@@ -114,6 +114,7 @@ export const GlobalStyles = createGlobalStyle`
   p {
     margin: 0;
     line-height: 1.6;
+    max-width: 75ch;
   }
 
   /* Links */
@@ -611,8 +612,68 @@ export const GlobalStyles = createGlobalStyle`
       background: white !important;
     }
   }
-  /* Sileo Toast Viewport Z-Index Override */
+  /* Sileo Toast Theme Overrides & Accessibility Fixes */
   [data-sileo-viewport] {
     z-index: 9999 !important;
+    font-family: inherit;
+  }
+
+  [data-sileo-toast] {
+    filter: drop-shadow(var(--shadow-lg));
+  }
+
+  /* Dark Theme Sileo Overrides (Fixes SVG rect background fill & description contrast) */
+  html[data-theme='dark'] [data-sileo-svg] rect,
+  html.theme-dark [data-sileo-svg] rect,
+  [data-sileo-viewport][data-theme='dark'] [data-sileo-svg] rect,
+  [data-sileo-viewport][data-theme='dark'] [data-sileo-pill],
+  [data-sileo-viewport][data-theme='dark'] [data-sileo-body] {
+    fill: #16221b !important;
+    stroke: #2f3d34 !important;
+    stroke-width: 1px !important;
+  }
+
+  html[data-theme='dark'] [data-sileo-description],
+  html.theme-dark [data-sileo-description],
+  [data-sileo-viewport][data-theme='dark'] [data-sileo-description] {
+    color: #e8efe9 !important;
+    font-weight: 500;
+  }
+
+  html[data-theme='dark'] [data-sileo-title],
+  html.theme-dark [data-sileo-title],
+  [data-sileo-viewport][data-theme='dark'] [data-sileo-title] {
+    color: #ffffff !important;
+    font-weight: 600;
+  }
+
+  /* Light Theme Sileo Overrides (Fixes SVG rect background fill & description contrast) */
+  html[data-theme='light'] [data-sileo-svg] rect,
+  html:not([data-theme='dark']) [data-sileo-svg] rect,
+  [data-sileo-viewport][data-theme='light'] [data-sileo-svg] rect,
+  [data-sileo-viewport][data-theme='light'] [data-sileo-pill],
+  [data-sileo-viewport][data-theme='light'] [data-sileo-body] {
+    fill: #ffffff !important;
+    stroke: #e5e7eb !important;
+    stroke-width: 1px !important;
+  }
+
+  html[data-theme='light'] [data-sileo-description],
+  html:not([data-theme='dark']) [data-sileo-description],
+  [data-sileo-viewport][data-theme='light'] [data-sileo-description] {
+    color: #1f2937 !important;
+    font-weight: 500;
+  }
+
+  html[data-theme='light'] [data-sileo-title],
+  html:not([data-theme='dark']) [data-sileo-title],
+  [data-sileo-viewport][data-theme='light'] [data-sileo-title] {
+    color: #111827 !important;
+    font-weight: 600;
+  }
+
+  /* Sileo Action Buttons */
+  [data-sileo-button] {
+    font-weight: 600 !important;
   }
 `;
