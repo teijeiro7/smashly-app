@@ -174,7 +174,7 @@ export const ReviewItem: React.FC<ReviewItemProps> = ({
     <Container ref={containerRef} id={`review-${review.id}`}>
       {/* Sección de la pala (si está disponible y activo) */}
       {showProductInfo && review.racket && (
-        <RacketInfo to={`/racket-detail?id=${review.racket.id}`}>
+        <RacketInfo to='/racket-detail' search={{ id: review.racket.id } as any}>
           {racketImage && <RacketImage src={racketImage} alt={review.racket.nombre} />}
           <RacketDetails>
             <RacketBrand>{review.racket.marca}</RacketBrand>

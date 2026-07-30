@@ -144,7 +144,7 @@ export const catalogItemListSchema = (rackets: Racket[], catalogUrl: string) => 
     .filter(r => r.id !== undefined)
     .slice(0, 25)
     .map((r, idx) => {
-      const url = buildUrl(`/racket-detail?id=${r.id}&name=${encodeURIComponent(r.nombre)}`);
+      const url = buildUrl(`/palas/${r.slug}`);
       return {
         '@type': 'ListItem',
         position: idx + 1,

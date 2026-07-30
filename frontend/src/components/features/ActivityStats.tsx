@@ -160,7 +160,7 @@ interface ActivityStatsProps {
     id: number;
     rating: number;
     created_at: string;
-    rackets?: { nombre: string; marca: string };
+    rackets?: { nombre: string; marca: string; slug: string };
   }>;
   recentLists?: Array<{
     id: string;
@@ -233,7 +233,8 @@ const ActivityStats: React.FC<ActivityStatsProps> = ({
             {recentReviews.slice(0, 3).map(review => (
               <RecentItem
                 key={review.id}
-                to={`/racket/${review.rackets?.nombre?.toLowerCase().replace(/\s+/g, '-')}`}
+                to='/palas/$slug'
+                params={{ slug: review.rackets?.slug ?? '' } as any}
               >
                 <RecentItemInfo>
                   <RecentItemIcon color='var(--accent)'>
@@ -250,7 +251,9 @@ const ActivityStats: React.FC<ActivityStatsProps> = ({
                 </RecentItemInfo>
               </RecentItem>
             ))}
-            <ViewAllLink to='/profile?tab=reviews'>Ver todas las reviews</ViewAllLink>
+            <ViewAllLink to='/profile' search={{ tab: 'reviews' } as any}>
+              Ver todas las reviews
+            </ViewAllLink>
           </RecentList>
         </>
       )}
@@ -276,7 +279,9 @@ const ActivityStats: React.FC<ActivityStatsProps> = ({
                 </RecentItemInfo>
               </RecentItem>
             ))}
-            <ViewAllLink to='/profile?tab=lists'>Ver todas las listas</ViewAllLink>
+            <ViewAllLink to='/profile' search={{ tab: 'lists' } as any}>
+              Ver todas las listas
+            </ViewAllLink>
           </RecentList>
         </>
       )}
@@ -302,7 +307,9 @@ const ActivityStats: React.FC<ActivityStatsProps> = ({
                 </RecentItemInfo>
               </RecentItem>
             ))}
-            <ViewAllLink to='/profile?tab=comparisons'>Ver todas las comparaciones</ViewAllLink>
+            <ViewAllLink to='/profile' search={{ tab: 'comparisons' } as any}>
+              Ver todas las comparaciones
+            </ViewAllLink>
           </RecentList>
         </>
       )}

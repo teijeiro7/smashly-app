@@ -1,6 +1,6 @@
 import type { IncomingMessage, ServerResponse } from 'http';
 import { supabaseAdmin } from '../../_lib/supabase';
-import { getAuthUser, isAdmin, unauthorized, forbidden } from '../../_lib/auth';
+import { getAuthUser, isAdmin, unauthorized, forbidden, setCorsHeaders, handleOptions } from '../../_lib/auth';
 
 function getUserId(url: string): string | null {
   // Vercel passes the dynamic segment via query, or we can parse from URL
@@ -22,15 +22,9 @@ function readBody(req: IncomingMessage): Promise<any> {
 }
 
 export default async function handler(req: IncomingMessage & { query?: any }, res: ServerResponse): Promise<void> {
-  res.setHeader('Access-Control-Allow-Origin', process.env.FRONTEND_URL || '*');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, PATCH, DELETE, OPTIONS');
+  setCorsHeaders(req, res);
 
-  if (req.method === 'OPTIONS') {
-    res.writeHead(204);
-    res.end();
-    return;
-  }
+  if (handleOptions(req, res)) return;
 
   const user = await getAuthUser(req);
   if (!user) return unauthorized(res);

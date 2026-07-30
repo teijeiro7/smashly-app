@@ -2,7 +2,6 @@ import { Link } from '@tanstack/react-router';
 import styled from 'styled-components';
 import { FiHome, FiSearch } from 'react-icons/fi';
 import SEO from '../components/seo/SEO';
-import { buildUrl } from '../config/seo';
 
 const Container = styled.div`
   min-height: 70vh;
@@ -106,7 +105,6 @@ export default function NotFoundPage() {
       <SEO
         title='Página no encontrada (404) | Smashly'
         description='La página que buscas no existe o ha sido movida. Vuelve al inicio o explora nuestro catálogo de palas de pádel.'
-        canonical={buildUrl('/')}
         noindex
         nofollow
         extraMeta={[{ name: 'prerender-status-code', content: '404' }]}

@@ -43,6 +43,7 @@ export interface StorePrice {
 // Interfaz principal para las palas que coincide con la estructura de la base de datos
 export interface Racket {
   id?: number;
+  slug: string;
   nombre: string;
   marca: string;
   modelo: string;

@@ -1,5 +1,5 @@
-import { useRackets } from '@/contexts/RacketsContext';
 import { useAuth } from '@/contexts/AuthContext';
+import { useAuthModal } from '@/contexts/AuthModalContext';
 import { Racket } from '@/types/racket';
 
 import React, { useEffect, useState, useRef, useCallback } from 'react';
@@ -17,7 +17,7 @@ import {
   FiCheck,
 } from 'react-icons/fi';
 
-import { Link, useSearch } from '@tanstack/react-router';
+import { Link, useParams } from '@tanstack/react-router';
 import styled from 'styled-components';
 import Button from '../components/common/Button';
 import { AddToListModal } from '../components/features/AddToListModal';
@@ -1324,15 +1324,14 @@ const RacketDetailSeo: React.FC<RacketDetailSeoProps> = ({
 };
 
 const RacketDetailPage: React.FC = () => {
-  const searchParams = useSearch({ strict: false }) as Record<string, string>;
-  const { rackets, loading: catalogLoading } = useRackets();
+  const { slug } = useParams({ from: '/palas/$slug' });
   const { isAuthenticated } = useAuth();
+  const { openLogin, openRegister } = useAuthModal();
   const { addRacket, isRacketInComparison } = useComparison();
 
   const [racket, setRacket] = useState<Racket | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const [loadAttempted, setLoadAttempted] = useState<boolean>(false);
   const [showAddToListModal, setShowAddToListModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
@@ -1346,7 +1345,6 @@ const RacketDetailPage: React.FC = () => {
   const carouselRef = useRef<HTMLDivElement>(null);
   const touchStartX = useRef<number | null>(null);
   const slideDirectionRef = useRef<'left' | 'right'>('left');
-  const racketId = searchParams['id'];
 
   const handleImageError = (e: React.SyntheticEvent<HTMLImageElement>) => {
     const target = e.target as HTMLImageElement;
@@ -1358,67 +1356,34 @@ const RacketDetailPage: React.FC = () => {
 
   // ── Load racket data ──────────────────────────────────────────────
   const loadRacket = useCallback(async () => {
-    if (!racketId) {
-      setError('ID not specified');
+    if (!slug) {
+      setError('Racket not found');
       setLoading(false);
-      setLoadAttempted(true);
       return;
     }
 
     try {
       setError(null);
       setLoading(true);
-      const numericId = parseInt(racketId);
-      let foundRacket: Racket | null = null;
-
-      if (!isNaN(numericId)) {
-        foundRacket = await racketService.getRacketById(numericId);
-      }
-
-      // Fallback: search in catalog context (if loaded)
-      if (!foundRacket && !catalogLoading) {
-        const decodedRacketId = decodeURIComponent(racketId);
-        foundRacket = rackets.find(pala => pala.nombre === decodedRacketId) || null;
-        if (!foundRacket) {
-          foundRacket = await racketService.getRacketByName(decodedRacketId);
-        }
-      }
+      const foundRacket = await racketService.getRacketBySlug(slug);
 
       if (foundRacket) {
         setRacket(foundRacket);
         setError(null);
       } else {
-        // If catalog is still loading, don't show error yet — wait for next attempt
-        if (catalogLoading && rackets.length === 0) {
-          // Keep loading state, will retry when catalog finishes
-          setLoading(true);
-        } else {
-          setError('Racket not found');
-        }
+        setError('Racket not found');
       }
     } catch (err: any) {
       console.error('Error loading racket:', err);
       setError(err.message || 'Error loading racket');
     } finally {
       setLoading(false);
-      setLoadAttempted(true);
     }
-  }, [racketId, rackets, catalogLoading]);
+  }, [slug]);
 
   useEffect(() => {
     loadRacket();
   }, [loadRacket]);
-
-  // Retry mechanism: if catalog finishes loading and we haven't found the racket, retry
-  useEffect(() => {
-    if (loadAttempted && !racket && !loading && !error && catalogLoading && rackets.length === 0) {
-      // Catalog was loading when we first tried, retry now
-      const timer = setTimeout(() => {
-        loadRacket();
-      }, 500);
-      return () => clearTimeout(timer);
-    }
-  }, [catalogLoading, rackets.length, loadAttempted, racket, loading, error, loadRacket]);
 
   useEffect(() => {
     if (racket?.id && isAuthenticated) {
@@ -1666,9 +1631,7 @@ const RacketDetailPage: React.FC = () => {
   const lowestPrice = getLowestPrice(racket);
   const allPrices = getAllStorePrices(racket);
   const availablePrices = allPrices.filter(p => p.available);
-  const productUrl = buildUrl(
-    `/racket-detail?id=${racket.id}&name=${encodeURIComponent(racket.nombre)}`
-  );
+  const productUrl = buildUrl(`/palas/${racket.slug}`);
 
   return (
     <PageContainer>
@@ -2116,10 +2079,10 @@ const RacketDetailPage: React.FC = () => {
               Historial de precios, comparativas de tiendas, reseñas de jugadores y mucho más.
             </AuthDescription>
             <AuthActions>
-              <Button as='a' variant='primary' href='/login'>
+              <Button variant='primary' onClick={openLogin}>
                 Iniciar sesión
               </Button>
-              <Button as='a' variant='secondary' href='/register'>
+              <Button variant='secondary' onClick={openRegister}>
                 Crear cuenta
               </Button>
             </AuthActions>

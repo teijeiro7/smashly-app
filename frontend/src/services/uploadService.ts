@@ -1,17 +1,14 @@
-import { buildApiUrl, getAuthHeaders } from '../config/api';
+import { supabase } from '../lib/supabase';
 
-interface UploadAvatarResponse {
-  success: boolean;
-  data?: {
-    avatar_url: string;
-    file_path: string;
-  };
-  message?: string;
-  error?: string;
-}
+const ALLOWED_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+const MAX_SIZE = 5 * 1024 * 1024; // 5MB
+const BUCKET = 'avatars';
 
 /**
- * Servicio para manejar la subida de archivos (avatares)
+ * Servicio para manejar la subida de archivos (avatares).
+ * Sube directamente a Supabase Storage (bucket `avatars`, RLS por
+ * auth.uid() en la carpeta `${uid}/...`, lectura pública) — no existe
+ * ningún endpoint /api/v1/upload/avatar en el backend.
  */
 export class UploadService {
   /**
@@ -21,46 +18,30 @@ export class UploadService {
    */
   static async uploadAvatar(file: File): Promise<string> {
     try {
-      // Validar el archivo antes de enviarlo
-      const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
-      if (!allowedTypes.includes(file.type)) {
-        throw new Error('Tipo de archivo no válido. Solo se permiten imágenes JPEG, PNG y WebP');
+      const validation = UploadService.validateImageFile(file);
+      if (!validation.isValid) {
+        throw new Error(validation.error);
       }
 
-      // Validar tamaño (máximo 5MB)
-      const maxSize = 5 * 1024 * 1024; // 5MB
-      if (file.size > maxSize) {
-        throw new Error('El archivo es demasiado grande. Tamaño máximo: 5MB');
-      }
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      if (!session) throw new Error('No hay sesión activa');
 
-      // Crear FormData
-      const formData = new FormData();
-      formData.append('avatar', file);
+      const ext = file.name.split('.').pop() || 'jpg';
+      const path = `${session.user.id}/avatar.${ext}`;
 
-      // Enviar el archivo al backend
-      const url = buildApiUrl('/api/v1/upload/avatar');
-      const headers = (await getAuthHeaders()) as Record<string, string>;
+      const { error } = await supabase.storage
+        .from(BUCKET)
+        .upload(path, file, { upsert: true, contentType: file.type });
 
-      // Eliminar Content-Type para que el navegador lo configure automáticamente con el boundary
-      delete headers['Content-Type'];
+      if (error) throw new Error(error.message);
 
-      const response = await fetch(url, {
-        method: 'POST',
-        headers,
-        body: formData,
-      });
+      const {
+        data: { publicUrl },
+      } = supabase.storage.from(BUCKET).getPublicUrl(path);
 
-      const data: UploadAvatarResponse = await response.json();
-
-      if (!response.ok || !data.success) {
-        throw new Error(data.message || data.error || 'Error al subir el avatar');
-      }
-
-      if (!data.data?.avatar_url) {
-        throw new Error('No se recibió la URL del avatar');
-      }
-
-      return data.data.avatar_url;
+      return publicUrl;
     } catch (error: any) {
       console.error('Error uploading avatar:', error);
       throw new Error(error.message || 'Error al subir el avatar');
@@ -68,21 +49,28 @@ export class UploadService {
   }
 
   /**
-   * Elimina el avatar del usuario
+   * Elimina el avatar del usuario.
+   * La extensión puede variar entre subidas, así que se lista la carpeta
+   * del usuario y se borra todo lo que haya en ella.
    */
   static async deleteAvatar(): Promise<void> {
     try {
-      const url = buildApiUrl('/api/v1/upload/avatar');
-      const response = await fetch(url, {
-        method: 'DELETE',
-        headers: await getAuthHeaders(),
-      });
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      if (!session) throw new Error('No hay sesión activa');
 
-      const data = await response.json();
+      const { data: files, error: listError } = await supabase.storage
+        .from(BUCKET)
+        .list(session.user.id);
 
-      if (!response.ok || !data.success) {
-        throw new Error(data.message || data.error || 'Error al eliminar el avatar');
-      }
+      if (listError) throw new Error(listError.message);
+      if (!files || files.length === 0) return;
+
+      const paths = files.map(f => `${session.user.id}/${f.name}`);
+      const { error } = await supabase.storage.from(BUCKET).remove(paths);
+
+      if (error) throw new Error(error.message);
     } catch (error: any) {
       console.error('Error deleting avatar:', error);
       throw new Error(error.message || 'Error al eliminar el avatar');
@@ -93,17 +81,14 @@ export class UploadService {
    * Valida si un archivo es una imagen válida
    */
   static validateImageFile(file: File): { isValid: boolean; error?: string } {
-    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
-    const maxSize = 5 * 1024 * 1024; // 5MB
-
-    if (!allowedTypes.includes(file.type)) {
+    if (!ALLOWED_TYPES.includes(file.type)) {
       return {
         isValid: false,
         error: 'Tipo de archivo no válido. Solo se permiten imágenes JPEG, PNG y WebP',
       };
     }
 
-    if (file.size > maxSize) {
+    if (file.size > MAX_SIZE) {
       return {
         isValid: false,
         error: 'El archivo es demasiado grande. Tamaño máximo: 5MB',

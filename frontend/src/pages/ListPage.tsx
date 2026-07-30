@@ -211,7 +211,7 @@ const ListPage: React.FC = () => {
                 racket={racket}
                 view='grid'
                 index={index}
-                onClick={() => navigate({ to: '/racket-detail', search: { id: racket.id } })}
+                onClick={() => navigate({ to: '/palas/$slug', params: { slug: racket.slug } })}
               />
             ))}
           </RacketsGrid>

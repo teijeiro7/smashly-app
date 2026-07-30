@@ -946,7 +946,7 @@ const CatalogPage: React.FC = () => {
 
   // Handlers
   const handleRacketClick = (racket: Racket) => {
-    navigate({ to: '/racket-detail', search: { id: racket.id } });
+    navigate({ to: '/palas/$slug', params: { slug: racket.slug } });
   };
 
   const handleLoadMore = useCallback(() => {

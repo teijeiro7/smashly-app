@@ -285,30 +285,36 @@ const formatTimeAgo = (dateString: string): string => {
   }
 };
 
-const getNotificationLink = (notification: Notification): string => {
+interface NotificationTarget {
+  to: string;
+  search?: Record<string, unknown>;
+}
+
+const getNotificationLink = (notification: Notification): NotificationTarget => {
   const { type, data } = notification;
 
   switch (type) {
+    // Was `/rackets/${id}` — that route never existed, only `/racket-detail?id=`.
     case 'price_drop':
-      return `/rackets/${data.racketId}`;
+      return { to: '/racket-detail', search: { id: data.racketId } };
     case 'comparison_complete':
-      return `/compare-rackets`;
+      return { to: '/compare-rackets' };
     case 'recommendation_complete':
-      return `/best-racket`;
+      return { to: '/best-racket' };
     case 'review':
-      return `/catalog`;
+      return { to: '/catalog' };
     case 'admin_update':
-      return `/admin`;
+      return { to: '/admin' };
     case 'new_user':
-      return `/admin/users`;
+      return { to: '/admin/users' };
     case 'new_store':
-      return `/admin/stores`;
+      return { to: '/admin/stores' };
     case 'store_status':
-      return `/dashboard`;
+      return { to: '/dashboard' };
     case 'review_reply':
-      return `/racket-detail?id=${data.racketId}&reviewId=${data.reviewId}`;
+      return { to: '/racket-detail', search: { id: data.racketId, reviewId: data.reviewId } };
     default:
-      return '/';
+      return { to: '/' };
   }
 };
 
@@ -326,8 +332,8 @@ export const NotificationDropdown: React.FC<NotificationDropdownProps> = ({ onCl
       await markAsRead(notification.id);
     }
 
-    const link = getNotificationLink(notification);
-    navigate({ to: link as any });
+    const target = getNotificationLink(notification);
+    navigate({ to: target.to as any, search: target.search as any });
     onClose();
   };
 

@@ -1,12 +1,4 @@
-const KNOWN_ROUTES = new Set([
-  '/',
-  '/catalog',
-  '/best-racket',
-  '/faq',
-  '/compare',
-  '/terms-and-conditions',
-  '/privacy-policy',
-]);
+import { isIndexable } from './frontend/src/config/seo';
 
 export default async function middleware(request: Request): Promise<Response> {
   const url = new URL(request.url);
@@ -19,7 +11,7 @@ export default async function middleware(request: Request): Promise<Response> {
 
   const response = await fetch(request);
 
-  if (!KNOWN_ROUTES.has(path)) {
+  if (!isIndexable(path)) {
     const headers = new Headers(response.headers);
     headers.set('x-robots-tag', 'noindex');
     return new Response(response.body, {

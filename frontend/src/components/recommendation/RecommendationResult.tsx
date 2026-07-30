@@ -544,7 +544,9 @@ export const RecommendationResult: React.FC<Props> = ({
                 </Section>
               )}
 
-              <ViewButton to={`/racket-detail?id=${racket.id}`}>Ver Detalles Completos</ViewButton>
+              <ViewButton to='/racket-detail' search={{ id: racket.id } as any}>
+                Ver Detalles Completos
+              </ViewButton>
             </RacketContent>
           </RacketCard>
         ))}

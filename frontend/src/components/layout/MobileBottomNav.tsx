@@ -152,11 +152,14 @@ const CloseButton = styled.button`
 const MobileBottomNav = React.memo(() => {
   const { location } = useRouterState();
   const navigate = useNavigate();
-  const { user, isAuthenticated, userProfile } = useAuth();
+  const { isAuthenticated, userProfile } = useAuth();
   const { openLogin } = useAuthModal();
   const [showPopup, setShowPopup] = useState<'none' | 'login' | 'onboarding' | null>(null);
 
-  const homePath = isAuthenticated && user?.role?.toLowerCase() === 'player' ? '/dashboard' : '/';
+  // '/' itself dispatches to the right role home via the router's beforeLoad
+  // (see indexRoute in router.tsx) — no need to duplicate that mapping here.
+  const homePath = '/';
+  const HOME_PAGES = ['/', '/dashboard', '/store/dashboard', '/admin'];
 
   const hasCompleteProfile = userProfile?.game_level && userProfile.game_level !== '';
 
@@ -181,7 +184,9 @@ const MobileBottomNav = React.memo(() => {
 
   const handleGoToOnboarding = () => {
     setShowPopup(null);
-    navigate({ to: '/onboarding' as any });
+    // No dedicated /onboarding route — completing the profile (game_level,
+    // preferences) happens on /profile itself.
+    navigate({ to: '/profile' });
   };
 
   const items = [
@@ -199,7 +204,7 @@ const MobileBottomNav = React.memo(() => {
           {items.map(item => {
             const isActive =
               location.pathname === item.to ||
-              (item.to === homePath && location.pathname === '/') ||
+              (item.to === homePath && HOME_PAGES.includes(location.pathname)) ||
               (item.to === '/profile' && location.pathname.startsWith('/profile'));
 
             if (item.onClick) {

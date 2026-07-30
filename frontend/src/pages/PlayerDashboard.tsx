@@ -680,7 +680,7 @@ export const PlayerDashboard: React.FC = () => {
               {favorites.map(racket => (
                 <RacketCard
                   key={racket.id}
-                  onClick={() => navigate({ to: '/racket-detail', search: { id: racket.id } })}
+                  onClick={() => navigate({ to: '/palas/$slug', params: { slug: racket.slug } })}
                 >
                   {racket.imagenes?.[0] && (
                     <RacketImage src={racketImageUrl(racket.imagenes[0])} alt={racket.nombre} />
@@ -691,7 +691,7 @@ export const PlayerDashboard: React.FC = () => {
                 </RacketCard>
               ))}
             </RacketsGrid>
-            <ViewAllButton onClick={() => navigate({ to: '/favorites' as any })}>
+            <ViewAllButton onClick={() => navigate({ to: '/profile', search: { tab: 'lists' } })}>
               Ver todas →
             </ViewAllButton>
           </Section>
@@ -731,7 +731,7 @@ export const PlayerDashboard: React.FC = () => {
               {offers.map(racket => (
                 <RacketCard
                   key={racket.id}
-                  onClick={() => navigate({ to: '/racket-detail', search: { id: racket.id } })}
+                  onClick={() => navigate({ to: '/palas/$slug', params: { slug: racket.slug } })}
                 >
                   {racket.imagenes?.[0] && (
                     <RacketImage src={racketImageUrl(racket.imagenes[0])} alt={racket.nombre} />
@@ -825,7 +825,7 @@ export const PlayerDashboard: React.FC = () => {
                       </div>
                       <RacketReason>{racket.reason}</RacketReason>
                     </RecommendedRacketBody>
-                    <DetailLinkButton to={`/racket-detail?id=${racket.id}`}>
+                    <DetailLinkButton to='/racket-detail' search={{ id: racket.id } as any}>
                       Ver detalle
                     </DetailLinkButton>
                   </RecommendedRacketCard>

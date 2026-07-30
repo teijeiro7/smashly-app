@@ -1,6 +1,6 @@
 import type { IncomingMessage, ServerResponse } from 'http';
 import { supabaseAdmin } from '../_lib/supabase';
-import { getAuthUser, isAdmin, unauthorized, forbidden } from '../_lib/auth';
+import { getAuthUser, isAdmin, unauthorized, forbidden, setCorsHeaders, handleOptions } from '../_lib/auth';
 
 async function getTableCount(table: string): Promise<number> {
   const { count } = await supabaseAdmin.from(table).select('*', { count: 'exact', head: true });
@@ -48,15 +48,9 @@ async function getFavoritesCount(): Promise<number> {
 }
 
 export default async function handler(req: IncomingMessage, res: ServerResponse): Promise<void> {
-  res.setHeader('Access-Control-Allow-Origin', process.env.FRONTEND_URL || '*');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
+  setCorsHeaders(req, res);
 
-  if (req.method === 'OPTIONS') {
-    res.writeHead(204);
-    res.end();
-    return;
-  }
+  if (handleOptions(req, res)) return;
 
   const user = await getAuthUser(req);
   if (!user) return unauthorized(res);

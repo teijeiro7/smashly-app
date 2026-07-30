@@ -5,6 +5,7 @@ import React, {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from 'react';
 import { supabase } from '../lib/supabase';
@@ -31,7 +32,7 @@ interface AuthContextType {
   ) => Promise<{ data: UserProfile | null; error: string | null; errorCode?: string }>;
   signInWithGoogle: () => Promise<{ data: UserProfile | null; error: string | null }>;
   signOut: () => Promise<{ error: string | null }>;
-  refreshUserProfile: () => Promise<void>;
+  refreshUserProfile: () => Promise<UserProfile | null>;
   clearGoogleOnboarding: () => void;
   clearGoogleBlockError: () => void;
   isAuthenticated: boolean;
@@ -40,6 +41,12 @@ interface AuthContextType {
    * parsing the URL hash itself, since by the time that (lazy-loaded) page
    * mounts, supabase-js has usually already consumed and stripped the hash. */
   isPasswordRecovery: boolean;
+  /** Resolves once the initial getSession() call has settled (success or
+   * failure) — the router's beforeLoad guards await this so they never run
+   * against the pre-hydration flash of `isAuthenticated: false`, which would
+   * otherwise bounce a genuinely logged-in user out of a protected route on
+   * every hard refresh. */
+  ready: Promise<void>;
 }
 
 interface AuthProviderProps {
@@ -93,6 +100,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   } | null>(null);
   const [googleBlockError, setGoogleBlockError] = useState<string | null>(null);
 
+  const readyResolveRef = useRef<() => void>(() => {});
+  const readyRef = useRef<Promise<void>>(
+    new Promise<void>(resolve => {
+      readyResolveRef.current = resolve;
+    })
+  );
+
   const loadAndSetProfile = useCallback(async (userId: string): Promise<UserProfile | null> => {
     const profile = await fetchProfile(userId);
     setUser(profile);
@@ -125,9 +139,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           setHasSession(true);
           loadAndSetProfile(session.user.id).finally(() => {
             if (mounted) setLoading(false);
+            readyResolveRef.current();
           });
         } else {
           setLoading(false);
+          readyResolveRef.current();
         }
       })
       .catch(error => {
@@ -135,6 +151,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         // fail as "no session" rather than hang the whole app on a spinner.
         logger.warn('Could not restore session:', error);
         if (mounted) setLoading(false);
+        readyResolveRef.current();
       });
 
     const {
@@ -328,13 +345,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     return { error: error?.message ?? null };
   }, [clearAuth]);
 
-  const refreshUserProfile = useCallback(async (): Promise<void> => {
+  const refreshUserProfile = useCallback(async (): Promise<UserProfile | null> => {
     const {
       data: { session },
     } = await supabase.auth.getSession();
     if (session?.user) {
-      await loadAndSetProfile(session.user.id);
+      return loadAndSetProfile(session.user.id);
     }
+    return null;
   }, [loadAndSetProfile]);
 
   const value = useMemo<AuthContextType>(
@@ -353,6 +371,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       clearGoogleBlockError,
       isAuthenticated: hasSession,
       isPasswordRecovery,
+      ready: readyRef.current,
     }),
     [
       user,

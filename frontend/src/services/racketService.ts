@@ -98,6 +98,7 @@ function mapDbToFrontend(raw: any): Racket {
 
   return {
     id: raw.id,
+    slug: raw.slug ?? '',
     nombre: raw.name ?? '',
     marca: raw.brand ?? '',
     modelo: raw.model ?? '',
@@ -200,6 +201,17 @@ const racketService = {
 
   async getRacketById(id: number): Promise<Racket | null> {
     const { data, error } = await supabase.from('rackets').select('*').eq('id', id).maybeSingle();
+
+    if (error) throw new Error(error.message);
+    return data ? mapDbToFrontend(data) : null;
+  },
+
+  async getRacketBySlug(slug: string): Promise<Racket | null> {
+    const { data, error } = await supabase
+      .from('rackets')
+      .select('*')
+      .eq('slug', slug)
+      .maybeSingle();
 
     if (error) throw new Error(error.message);
     return data ? mapDbToFrontend(data) : null;
