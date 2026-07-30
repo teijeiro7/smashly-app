@@ -357,10 +357,7 @@ export const RacketSearchInput: React.FC<RacketSearchInputProps> = ({
           transition={{ duration: 0.15 }}
         >
           {value.imagenes?.[0] ? (
-            <SelectedImage
-              src={racketImageUrl(value.imagenes[0])}
-              alt={formatRacketName(value)}
-            />
+            <SelectedImage src={racketImageUrl(value.imagenes[0])} alt={formatRacketName(value)} />
           ) : (
             <SelectedPlaceholder>
               <FiCheck size={18} />

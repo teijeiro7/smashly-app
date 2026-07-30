@@ -750,7 +750,8 @@ const CatalogPage: React.FC = () => {
       if (searchQuery.trim()) {
         const tokens = searchQuery.toLowerCase().trim().split(/\s+/).filter(Boolean);
         filtered = filtered.filter(racket => {
-          const haystack = `${racket.nombre || ''} ${racket.marca || ''} ${racket.modelo || ''} ${racket.caracteristicas_forma || ''} ${racket.caracteristicas_balance || ''}`.toLowerCase();
+          const haystack =
+            `${racket.nombre || ''} ${racket.marca || ''} ${racket.modelo || ''} ${racket.caracteristicas_forma || ''} ${racket.caracteristicas_balance || ''}`.toLowerCase();
           return tokens.every(token => haystack.includes(token));
         });
       }
@@ -1168,7 +1169,9 @@ const CatalogPage: React.FC = () => {
           </FiltersRow>
 
           <QuickSearchChipsRow>
-            <span style={{ fontSize: '0.75rem', color: 'var(--text-subtle)', fontWeight: 600 }}>Sugeridos:</span>
+            <span style={{ fontSize: '0.75rem', color: 'var(--text-subtle)', fontWeight: 600 }}>
+              Sugeridos:
+            </span>
             {['Bullpadel', 'Babolat', 'Nox', 'Forma Diamante', 'Ofertas'].map(chip => (
               <QuickSearchChip
                 key={chip}
@@ -1176,8 +1179,8 @@ const CatalogPage: React.FC = () => {
                   chip === 'Ofertas'
                     ? showOffers
                     : chip === 'Forma Diamante'
-                    ? selectedShape === 'Diamante'
-                    : selectedBrand === chip || searchQuery === chip
+                      ? selectedShape === 'Diamante'
+                      : selectedBrand === chip || searchQuery === chip
                 }
                 onClick={() => {
                   if (chip === 'Ofertas') {

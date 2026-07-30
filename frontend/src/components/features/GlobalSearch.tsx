@@ -219,7 +219,10 @@ const SearchResultsList = styled.div`
   overflow-y: auto;
 `;
 
-const SearchResultItem = styled.div<{ $variant?: 'racket' | 'brand' | 'category'; $isFocused?: boolean }>`
+const SearchResultItem = styled.div<{
+  $variant?: 'racket' | 'brand' | 'category';
+  $isFocused?: boolean;
+}>`
   display: flex;
   align-items: center;
   gap: 12px;
@@ -496,7 +499,10 @@ export const GlobalSearch: React.FC<GlobalSearchProps> = ({
   const addRecentSearch = (query: string) => {
     if (!query.trim()) return;
     const clean = query.trim();
-    const updated = [clean, ...recentSearches.filter(q => q.toLowerCase() !== clean.toLowerCase())].slice(0, 5);
+    const updated = [
+      clean,
+      ...recentSearches.filter(q => q.toLowerCase() !== clean.toLowerCase()),
+    ].slice(0, 5);
     setRecentSearches(updated);
     try {
       localStorage.setItem('smashly_recent_searches', JSON.stringify(updated));
@@ -544,7 +550,9 @@ export const GlobalSearch: React.FC<GlobalSearchProps> = ({
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       const target = e.target as HTMLElement;
-      const isInput = target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable);
+      const isInput =
+        target &&
+        (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable);
 
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
         e.preventDefault();
@@ -915,7 +923,7 @@ export const GlobalSearch: React.FC<GlobalSearchProps> = ({
                       <ResultsGroupCount>{groupedResults.brand.length}</ResultsGroupCount>
                     </ResultsGroupHeader>
                     <SearchResultsList>
-                      {groupedResults.brand.map((result) => {
+                      {groupedResults.brand.map(result => {
                         const itemIdx = currentIndexTracker++;
                         const isFocused = selectedIndex === itemIdx;
                         return (
@@ -948,7 +956,7 @@ export const GlobalSearch: React.FC<GlobalSearchProps> = ({
                       <ResultsGroupCount>{groupedResults.category.length}</ResultsGroupCount>
                     </ResultsGroupHeader>
                     <SearchResultsList>
-                      {groupedResults.category.map((result) => {
+                      {groupedResults.category.map(result => {
                         const itemIdx = currentIndexTracker++;
                         const isFocused = selectedIndex === itemIdx;
                         return (
@@ -982,7 +990,7 @@ export const GlobalSearch: React.FC<GlobalSearchProps> = ({
                       <ResultsGroupCount>{groupedResults.racket.length}</ResultsGroupCount>
                     </ResultsGroupHeader>
                     <SearchResultsList>
-                      {groupedResults.racket.map((result) => {
+                      {groupedResults.racket.map(result => {
                         const racket = result.data as Racket;
                         const itemIdx = currentIndexTracker++;
                         const isFocused = selectedIndex === itemIdx;
@@ -1007,7 +1015,9 @@ export const GlobalSearch: React.FC<GlobalSearchProps> = ({
                               <ResultName $variant='racket'>{formatRacketName(racket)}</ResultName>
                               <ResultSubtext>
                                 {formatBrandName(racket.marca)} •{' '}
-                                {racket.caracteristicas_forma || racket.especificaciones?.forma || 'Forma no especificada'}
+                                {racket.caracteristicas_forma ||
+                                  racket.especificaciones?.forma ||
+                                  'Forma no especificada'}
                               </ResultSubtext>
                             </ResultInfo>
 

@@ -1052,7 +1052,9 @@ const CompareRacketsPage: React.FC = () => {
           {showSearchResults && searchQuery && (
             <SearchResults>
               {filteredRackets.map(racket => {
-                const isAlreadySelected = selectedRackets.some(sr => sr.id === racket.id || sr.nombre === racket.nombre);
+                const isAlreadySelected = selectedRackets.some(
+                  sr => sr.id === racket.id || sr.nombre === racket.nombre
+                );
                 return (
                   <SearchResultItem
                     key={racket.id}
@@ -1065,7 +1067,15 @@ const CompareRacketsPage: React.FC = () => {
                       justifyContent: 'space-between',
                     }}
                   >
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flex: 1, minWidth: 0 }}>
+                    <div
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '1rem',
+                        flex: 1,
+                        minWidth: 0,
+                      }}
+                    >
                       <img
                         src={racket.imagenes?.[0] || '/placeholder-racket.png'}
                         alt={racket.nombre}
@@ -1082,7 +1092,14 @@ const CompareRacketsPage: React.FC = () => {
                         }}
                       />
                       <div style={{ minWidth: 0, flex: 1 }}>
-                        <div style={{ fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        <div
+                          style={{
+                            fontWeight: 600,
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap',
+                          }}
+                        >
                           {formatRacketName(racket)}
                         </div>
                         <div style={{ fontSize: '0.875rem', color: 'var(--text-muted)' }}>
@@ -1097,7 +1114,9 @@ const CompareRacketsPage: React.FC = () => {
                         fontWeight: 600,
                         padding: '4px 8px',
                         borderRadius: '6px',
-                        background: isAlreadySelected ? 'var(--surface-3)' : 'var(--primary-subtle)',
+                        background: isAlreadySelected
+                          ? 'var(--surface-3)'
+                          : 'var(--primary-subtle)',
                         color: isAlreadySelected ? 'var(--text-muted)' : 'var(--primary)',
                         display: 'inline-flex',
                         alignItems: 'center',
