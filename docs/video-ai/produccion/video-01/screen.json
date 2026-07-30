@@ -1,0 +1,14 @@
+[
+  {
+    "_comentario": "La UI real dentro de la pantalla del móvil del beat 3. Las coordenadas son de ejemplo: mídelas con  ./build.sh grid  y ajústalas.",
+    "clip": 3,
+    "image": "screenshots/08-best-racket-mobile.png",
+    "x": 390,
+    "y": 700,
+    "w": 300,
+    "h": 640,
+    "start": 2.2,
+    "end": 8.0,
+    "opacity": 1.0
+  }
+]

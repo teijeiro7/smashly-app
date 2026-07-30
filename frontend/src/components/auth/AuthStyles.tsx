@@ -124,7 +124,7 @@ export const ErrorText = styled.span`
 export const SubmitButton = styled.button`
   width: 100%;
   background: var(--brand-surface);
-  color: #000;
+  color: var(--brand-on-surface);
   font-weight: 700;
   padding: 16px;
   border-radius: 99px; // Pill shape or rounded rect? Image looks like rounded rect (12px-ish) but maybe more rounded.

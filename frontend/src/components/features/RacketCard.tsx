@@ -18,6 +18,7 @@ import { formatBrandName, formatModelName } from '../../utils/textUtils';
 // Styled Components
 const RacketCardContainer = styled.li<{ $view: 'grid' | 'list'; $index: number }>`
   background: var(--surface);
+  border: 1px solid var(--border);
   border-radius: 12px;
   overflow: hidden;
   box-shadow:
@@ -27,7 +28,8 @@ const RacketCardContainer = styled.li<{ $view: 'grid' | 'list'; $index: number }
   transition:
     transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
     box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-    background 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    background 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    border-color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   contain: layout style paint;
   will-change: transform, opacity;
   display: flex;
@@ -52,7 +54,8 @@ const RacketCardContainer = styled.li<{ $view: 'grid' | 'list'; $index: number }
   &:hover {
     transform: translateY(-4px);
     box-shadow: 0 10px 25px var(--shadow-color);
-    background: var(--primary-faint);
+    background: var(--surface-2);
+    border-color: var(--primary);
   }
 `;
 
@@ -81,7 +84,13 @@ const RacketImage = styled.img`
   aspect-ratio: 1 / 1;
   width: 100%;
   height: 100%;
-  transition: opacity 0.3s ease-in-out;
+  transition:
+    transform 0.3s ease-in-out,
+    opacity 0.3s ease-in-out;
+
+  ${RacketCardContainer}:hover & {
+    transform: scale(1.05);
+  }
 `;
 
 const RacketBadge = styled.div<{ $variant: 'bestseller' | 'offer' | 'comparison' }>`
