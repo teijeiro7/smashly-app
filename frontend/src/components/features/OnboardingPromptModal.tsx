@@ -302,9 +302,7 @@ const OnboardingPromptModal: React.FC<OnboardingPromptModalProps> = ({ isOpen, o
     setLoading(true);
 
     try {
-      const current_racket = currentRacket
-        ? formatRacketName(currentRacket)
-        : undefined;
+      const current_racket = currentRacket ? formatRacketName(currentRacket) : undefined;
 
       await UserProfileService.updateUserProfile({
         current_racket,

@@ -109,9 +109,7 @@ export const UserReviews: React.FC<UserReviewsProps> = ({ userId }) => {
 
                 {/* Información compacta */}
                 <CardContent>
-                  <RacketName>
-                    {formatRacketName(review.racket)}
-                  </RacketName>
+                  <RacketName>{formatRacketName(review.racket)}</RacketName>
 
                   <Rating>
                     {[...Array(5)].map((_, i) => (

@@ -231,8 +231,6 @@ const MetricValue = styled.span`
   color: var(--text);
 `;
 
-
-
 interface RacketCardProps {
   racket: Racket;
   view: 'grid' | 'list';

@@ -684,7 +684,10 @@ export const PlayerDashboard: React.FC = () => {
                   onClick={() => navigate({ to: '/racket-detail', search: { id: racket.id } })}
                 >
                   {racket.imagenes?.[0] && (
-                    <RacketImage src={racketImageUrl(racket.imagenes[0])} alt={formatRacketName(racket)} />
+                    <RacketImage
+                      src={racketImageUrl(racket.imagenes[0])}
+                      alt={formatRacketName(racket)}
+                    />
                   )}
                   <RacketName>{formatRacketName(racket)}</RacketName>
                   <RacketBrand>{formatBrandName(racket.marca)}</RacketBrand>
@@ -711,7 +714,10 @@ export const PlayerDashboard: React.FC = () => {
                   onClick={() => navigate({ to: '/racket-detail', search: { id: racket.id } })}
                 >
                   {racket.imagenes?.[0] && (
-                    <RacketImage src={racketImageUrl(racket.imagenes[0])} alt={formatRacketName(racket)} />
+                    <RacketImage
+                      src={racketImageUrl(racket.imagenes[0])}
+                      alt={formatRacketName(racket)}
+                    />
                   )}
                   <RacketName>{formatRacketName(racket)}</RacketName>
                   <RacketBrand>{formatBrandName(racket.marca)}</RacketBrand>
@@ -735,7 +741,10 @@ export const PlayerDashboard: React.FC = () => {
                   onClick={() => navigate({ to: '/racket-detail', search: { id: racket.id } })}
                 >
                   {racket.imagenes?.[0] && (
-                    <RacketImage src={racketImageUrl(racket.imagenes[0])} alt={formatRacketName(racket)} />
+                    <RacketImage
+                      src={racketImageUrl(racket.imagenes[0])}
+                      alt={formatRacketName(racket)}
+                    />
                   )}
                   <RacketName>{formatRacketName(racket)}</RacketName>
                   <RacketBrand>{formatBrandName(racket.marca)}</RacketBrand>

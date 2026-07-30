@@ -260,7 +260,10 @@ export const RacketSearchInput: React.FC<RacketSearchInputProps> = ({
             {results.map(racket => (
               <ResultItem key={racket.id} onClick={() => handleSelect(racket)}>
                 {racket.imagenes?.[0] ? (
-                  <ResultImage src={racketImageUrl(racket.imagenes[0])} alt={formatRacketName(racket)} />
+                  <ResultImage
+                    src={racketImageUrl(racket.imagenes[0])}
+                    alt={formatRacketName(racket)}
+                  />
                 ) : (
                   <ResultPlaceholder>🎾</ResultPlaceholder>
                 )}

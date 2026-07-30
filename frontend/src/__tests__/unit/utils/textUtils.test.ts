@@ -1,10 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import {
-  toTitleCase,
-  formatBrandName,
-  formatModelName,
-  formatRacketName,
-} from '@/utils/textUtils';
+import { toTitleCase, formatBrandName, formatModelName, formatRacketName } from '@/utils/textUtils';
 
 describe('textUtils', () => {
   describe('formatBrandName', () => {

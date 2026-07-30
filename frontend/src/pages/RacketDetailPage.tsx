@@ -1684,7 +1684,8 @@ const RacketDetailPage: React.FC = () => {
         hasOffers={availablePrices.length > 0}
       />
       <Breadcrumbs>
-        <Link to='/'>Home</Link> / <Link to='/catalog'>Palas</Link> / {formatBrandName(racket.marca)} /{' '}
+        <Link to='/'>Home</Link> / <Link to='/catalog'>Palas</Link> /{' '}
+        {formatBrandName(racket.marca)} /{' '}
         <CurrentBreadcrumb>{formatModelName(racket.modelo || racket.nombre)}</CurrentBreadcrumb>
       </Breadcrumbs>
 

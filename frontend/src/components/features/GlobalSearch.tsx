@@ -702,7 +702,9 @@ export const GlobalSearch: React.FC<GlobalSearchProps> = ({
                             <FiGrid size={16} />
                           </ResultIcon>
                           <ResultInfo>
-                            <ResultName $variant='category'>{toTitleCase(result.data as string)}</ResultName>
+                            <ResultName $variant='category'>
+                              {toTitleCase(result.data as string)}
+                            </ResultName>
                             <ResultSubtext>Forma de pala</ResultSubtext>
                           </ResultInfo>
                         </SearchResultItem>
@@ -736,9 +738,7 @@ export const GlobalSearch: React.FC<GlobalSearchProps> = ({
                               }}
                             />
                             <ResultInfo>
-                              <ResultName $variant='racket'>
-                                {formatRacketName(racket)}
-                              </ResultName>
+                              <ResultName $variant='racket'>{formatRacketName(racket)}</ResultName>
                               <ResultSubtext>
                                 {formatBrandName(racket.marca)} •{' '}
                                 {racket.caracteristicas_forma || 'forma'}

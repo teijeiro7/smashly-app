@@ -319,7 +319,9 @@ export const ViewListModal: React.FC<ViewListModalProps> = ({
                           }}
                         />
                         <RacketInfo>
-                          <RacketBrand>{formatBrandName(racket.marca) || 'Marca desconocida'}</RacketBrand>
+                          <RacketBrand>
+                            {formatBrandName(racket.marca) || 'Marca desconocida'}
+                          </RacketBrand>
                           <RacketName>{formatModelName(racket.modelo || racket.nombre)}</RacketName>
                           <RacketPrice>
                             {racket.precio_actual

@@ -241,9 +241,7 @@ const ActivityStats: React.FC<ActivityStatsProps> = ({
                     <FiStar size={16} />
                   </RecentItemIcon>
                   <RecentItemText>
-                    <RecentItemTitle>
-                      {formatRacketName(review.rackets)}
-                    </RecentItemTitle>
+                    <RecentItemTitle>{formatRacketName(review.rackets)}</RecentItemTitle>
                     <RecentItemMeta>
                       {review.rating} estrellas • {formatDate(review.created_at)}
                     </RecentItemMeta>

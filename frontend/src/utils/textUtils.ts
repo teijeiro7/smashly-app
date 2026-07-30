@@ -2,6 +2,7 @@
  * Text utility functions for formatting racket names, brands, models, and general text.
  */
 
+/* eslint-disable @typescript-eslint/naming-convention */
 // Known brand casing overrides (key: lowercase brand name, value: properly formatted brand name)
 const BRAND_CASING_MAP: Record<string, string> = {
   nox: 'NOX',
@@ -70,6 +71,7 @@ const SPEC_TOKEN_MAP: Record<string, string> = {
   '15k': '15K',
   '6k': '6K',
 };
+/* eslint-enable @typescript-eslint/naming-convention */
 
 /**
  * Formats a single word or token according to padel equipment naming conventions.
@@ -90,7 +92,7 @@ const formatWordToken = (word: string): string => {
 
   // Handle version tokens like v1.0, v2, v3
   if (/^v\d+(\.\d+)?$/i.test(word)) {
-    return 'V' + word.slice(1);
+    return `V${word.slice(1)}`;
   }
 
   // Handle year tokens or pure numbers (leave as is)
@@ -199,4 +201,3 @@ export const formatRacketName = (racket?: RacketNameInput | string | null): stri
 
   return toTitleCase(name);
 };
-
