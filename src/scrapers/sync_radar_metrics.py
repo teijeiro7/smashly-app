@@ -1,29 +1,33 @@
 """
-sync_radar_metrics.py — Sincroniza métricas radar desde fuentes externas a Supabase.
+sync_radar_metrics.py — Sincroniza métricas radar desde fuentes externas y calcula fallback determinista.
 
 Carga palas sin métricas radar, intenta scrappearlas de PadelZoom/TuMejorPala,
-y actualiza la BD. Para palas sin fuentes externas, el script populate-radar-metrics.ts
-aplicará el fallback determinista.
+y actualiza la BD. Para palas sin fuentes externas, aplica el fallback determinista.
 
 USO:
-  python sync_radar_metrics.py                      # Ejecuta en todas las palas
-  python sync_radar_metrics.py --limit 10           # Prueba con 10 palas
-  python sync_radar_metrics.py --dry-run --limit 5  # Simulación sin escribir
-  python sync_radar_metrics.py --batch-size 5       # Procesa 5 en paralelo
+  python3 src/scrapers/sync_radar_metrics.py                      # Ejecuta en todas las palas
+  python3 src/scrapers/sync_radar_metrics.py --limit 10           # Prueba con 10 palas
+  python3 src/scrapers/sync_radar_metrics.py --dry-run --limit 5  # Simulación sin escribir
+  python3 src/scrapers/sync_radar_metrics.py --apply-fallback     # Aplica fallback si no se halla fuente
 """
 
 import os
-import json
+import sys
 import argparse
 import logging
 from typing import List, Dict, Optional, Any
-from datetime import datetime
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 import dotenv
 from supabase import create_client, Client
 
-from src.scrapers.radar_metrics_scraper import scrape_pala_metrics
+# Asegurar importación correcta como módulo o script independiente
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
+
+from src.scrapers.radar_metrics_scraper import (
+    scrape_pala_metrics,
+    calculate_deterministic_metrics,
+)
 
 dotenv.load_dotenv()
 
@@ -47,44 +51,37 @@ supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 
 def fetch_rackets_needing_metrics(limit: Optional[int] = None) -> List[Dict[str, Any]]:
-    """
-    Obtiene palas que NO tienen todas las métricas radar. Deambigüa entre:
-      - Totalmente vacías (NULL)
-      - Parcialmente llenas (algunas metricas pero no todas)
-    """
+    """Obtiene palas que NO tienen todas las métricas radar con sus atributos físicos."""
     try:
         query = (
             supabase.table("rackets")
-            .select("id, name, brand, model")
+            .select("id, name, brand, model, characteristics_shape, characteristics_balance, characteristics_hardness, specs")
             .or_(
                 "radar_potencia.is.null,radar_control.is.null,"
                 "radar_manejabilidad.is.null,radar_salida_bola.is.null,"
                 "radar_punto_dulce.is.null"
             )
-            .limit(limit or 1000)
-        )
-        response = query.execute()
-        return response.data or []
-    except Exception as e:
-        logger.error(f"Error fetcheando palas: {e}")
-        return []
-
-
-def fetch_all_rackets(limit: Optional[int] = None) -> List[Dict[str, Any]]:
-    """
-    Obtiene TODAS las palas para forzar actualización completa de métricas.
-    Independientemente de si ya tienen valores o no.
-    """
-    try:
-        query = (
-            supabase.table("rackets")
-            .select("id, name, brand, model")
             .limit(limit or 10000)
         )
         response = query.execute()
         return response.data or []
     except Exception as e:
-        logger.error(f"Error fetcheando todas las palas: {e}")
+        logger.error(f"Error cargando palas: {e}")
+        return []
+
+
+def fetch_all_rackets(limit: Optional[int] = None) -> List[Dict[str, Any]]:
+    """Obtiene TODAS las palas para forzar actualización completa de métricas."""
+    try:
+        query = (
+            supabase.table("rackets")
+            .select("id, name, brand, model, characteristics_shape, characteristics_balance, characteristics_hardness, specs")
+            .limit(limit or 10000)
+        )
+        response = query.execute()
+        return response.data or []
+    except Exception as e:
+        logger.error(f"Error cargando todas las palas: {e}")
         return []
 
 
@@ -93,7 +90,7 @@ def update_racket_metrics(
     metrics_dict: Dict[str, Any],
     dry_run: bool = False,
 ) -> bool:
-    """Actualiza una pala con métricas radar."""
+    """Actualiza una pala en Supabase con métricas radar."""
     if dry_run:
         logger.info(f"[DRY-RUN] Actualizar racket {racket_id}: {metrics_dict}")
         return True
@@ -109,9 +106,10 @@ def update_racket_metrics(
 
 def process_racket(
     racket: Dict[str, Any],
+    apply_fallback: bool = True,
     dry_run: bool = False,
 ) -> Dict[str, Any]:
-    """Procesa una pala: scrapea metrics e intenta actualizar."""
+    """Procesa una pala: scrapea metrics externas o aplica fallback determinista."""
     racket_id = racket.get("id")
     raw_name = (racket.get("name") or "").strip()
     brand = (racket.get("brand") or "").strip()
@@ -124,10 +122,15 @@ def process_racket(
     else:
         pala_name = f"{brand} {model}".strip()
 
-    logger.info(f"[{racket_id}] Procesando: {pala_name}")
+    logger.info(f"[{racket_id}] Buscando métricas para: {pala_name}")
 
-    # Intenta scrappear
+    # 1. Intentar scrappear fuente externa
     metrics = scrape_pala_metrics(pala_name)
+
+    # 2. Si falla y apply_fallback es True, calcular métricas deterministas
+    if not metrics and apply_fallback:
+        logger.info(f"[{racket_id}] Aplicando fallback determinista para: {pala_name}")
+        metrics = calculate_deterministic_metrics(racket)
 
     if not metrics:
         logger.warning(f"[{racket_id}] No encontrada en fuentes externas")
@@ -135,10 +138,9 @@ def process_racket(
             "id": racket_id,
             "name": pala_name,
             "status": "no_found",
-            "message": "Fallback a algoritmo determinista",
         }
 
-    # Tiene metrics → actualizar
+    # 3. Actualizar BD
     metrics_dict = metrics.to_dict()
     success = update_racket_metrics(racket_id, metrics_dict, dry_run=dry_run)
 
@@ -147,19 +149,24 @@ def process_racket(
         "name": pala_name,
         "status": "success" if success else "error",
         "source": metrics.source,
-        "metrics": {"potencia": round(metrics.potencia, 1), "control": round(metrics.control, 1)},
+        "metrics": metrics_dict,
     }
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Sincroniza métricas radar desde web")
+    parser = argparse.ArgumentParser(description="Sincroniza métricas radar desde web y fallback")
     parser.add_argument("--limit", type=int, default=None, help="Límite de palas a procesar")
     parser.add_argument("--dry-run", action="store_true", help="Simulación sin escribir BD")
+    parser.add_argument(
+        "--no-fallback",
+        action="store_true",
+        help="Desactiva el fallback determinista para palas no encontradas",
+    )
     parser.add_argument(
         "--batch-size",
         type=int,
         default=3,
-        help="Palas concurrentes (default 3, max 5 por timeouts)",
+        help="Palas concurrentes (default 3)",
     )
     parser.add_argument(
         "--force-all",
@@ -168,56 +175,54 @@ def main():
     )
     args = parser.parse_args()
 
+    apply_fallback = not args.no_fallback
+
     logger.info("=" * 60)
     logger.info("SYNC RADAR METRICS")
     logger.info(f"Modo: {'DRY-RUN' if args.dry_run else 'LIVE'}")
     logger.info(f"Alcance: {'TODAS las palas' if args.force_all else 'Solo sin metrics'}")
+    logger.info(f"Fallback determinista: {'Activado' if apply_fallback else 'Desactivado'}")
     logger.info(f"Límite: {args.limit or 'ilimitado'}")
-    logger.info(f"Concurrencia: {args.batch_size}")
     logger.info("=" * 60)
 
     # Cargar palas
     if args.force_all:
         rackets = fetch_all_rackets(limit=args.limit)
-        logger.info(f"Cargadas {len(rackets)} palas para actualización completa")
     else:
         rackets = fetch_rackets_needing_metrics(limit=args.limit)
-        logger.info(f"Encontradas {len(rackets)} palas sin metrics radar")
 
     if not rackets:
         logger.info("✓ Ninguna pala para procesar")
         return
 
+    logger.info(f"Procesando {len(rackets)} palas...")
+
     # Procesar en paralelo
     results = []
     with ThreadPoolExecutor(max_workers=args.batch_size) as executor:
         futures = {
-            executor.submit(process_racket, racket, args.dry_run): racket
+            executor.submit(process_racket, racket, apply_fallback, args.dry_run): racket
             for racket in rackets
         }
 
         for i, future in enumerate(as_completed(futures), 1):
             result = future.result()
             results.append(result)
-            logger.info(f"[{i}/{len(rackets)}] {result['status']}: {result['name']}")
+            status_str = f"✓ {result['source']}" if result['status'] == 'success' else f"✗ {result['status']}"
+            logger.info(f"[{i}/{len(rackets)}] {status_str}: {result['name']}")
 
     # Resumen
     logger.info("\n" + "=" * 60)
     logger.info("RESUMEN")
     logger.info("=" * 60)
 
-    success = sum(1 for r in results if r["status"] == "success")
-    no_found = sum(1 for r in results if r["status"] == "no_found")
+    external_matches = sum(1 for r in results if r.get("source") in ("padelzoom", "tumejorpala"))
+    fallback_matches = sum(1 for r in results if r.get("source") == "estimacion_algoritmica")
     errors = sum(1 for r in results if r["status"] == "error")
 
-    logger.info(f"✓ Exitosas: {success}/{len(results)}")
-    logger.info(f"○ Sin fuente externa: {no_found}/{len(results)}")
+    logger.info(f"✓ Fuentes Externas (PadelZoom/TuMejorPala): {external_matches}/{len(results)}")
+    logger.info(f"✓ Fallback Determinista: {fallback_matches}/{len(results)}")
     logger.info(f"✗ Errores: {errors}/{len(results)}")
-    logger.info("")
-    logger.info("Próximo paso:")
-    logger.info("  1. Para palas sin metrics externos, ejecutar:")
-    logger.info("     cd backend/api && npx ts-node src/scripts/populate-radar-metrics.ts")
-    logger.info("  2. Esto aplicará el algoritmo determinista como fallback")
     logger.info("=" * 60)
 
 
