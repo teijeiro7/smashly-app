@@ -39,3 +39,9 @@ Monorepo: frontend (Vite/React) + API (Vercel serverless) + Supabase.
 - Admin client (`supabaseAdmin`) bypasses RLS — used server-side only
 - Frontend uses Vite proxy for Supabase in dev (same-origin, avoids CORS)
 - Auth is client-side via `@supabase/supabase-js`, which persists the session in browser `localStorage`; `api/` verifies bearer tokens per-request via `getAuthUser()` (no cookies involved)
+
+## Project Skills
+- **Local Skills Directory**: `.claude/skills/`
+  - `/develop-pr`: Opens a PR from current branch to `main` with standard repo structure (`## Summary` + `## Test plan`) and PR-Agent review logic.
+  - `/pr-agent-review`: Processes GitHub Action PR-Agent review comments on PRs.
+  - *Rule*: Always inspect `.claude/skills/` in the project root for project-specific workflow skills.
