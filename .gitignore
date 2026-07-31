@@ -107,6 +107,9 @@ config/secrets.json
 !.vscode/launch.json
 !.vscode/extensions.json
 
+# Serena
+.serena/
+
 # IntelliJ IDEA
 .idea/
 *.iws
