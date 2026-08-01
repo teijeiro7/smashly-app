@@ -350,6 +350,7 @@ Thumbs.db
 !.claude/skills/
 .venv
 .agents
+.serena/
 
 # ===================================
 # MISC / DEBUG
