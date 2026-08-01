@@ -42,40 +42,8 @@
       "destination": "/api/admin/stores/[id]"
     },
     {
-      "source": "/api/v1/analytics/store",
-      "destination": "/api/v1/analytics/store"
-    },
-    {
-      "source": "/api/v1/messaging/conversations",
-      "destination": "/api/v1/messaging/conversations"
-    },
-    {
-      "source": "/api/v1/messaging/messages",
-      "destination": "/api/v1/messaging/messages"
-    },
-    {
-      "source": "/api/v1/stores",
-      "destination": "/api/v1/stores/index"
-    },
-    {
-      "source": "/api/v1/stores/my-store",
-      "destination": "/api/v1/stores/my-store"
-    },
-    {
-      "source": "/api/v1/stores/catalog/:storeId/search",
-      "destination": "/api/v1/stores/catalog/[storeId]/search"
-    },
-    {
-      "source": "/api/v1/stores/catalog/:storeId/:priceId",
-      "destination": "/api/v1/stores/catalog/[storeId]/[priceId]"
-    },
-    {
-      "source": "/api/v1/stores/catalog/:storeId",
-      "destination": "/api/v1/stores/catalog/[storeId]"
-    },
-    {
-      "source": "/api/v1/stores/:id",
-      "destination": "/api/v1/stores/[id]"
+      "source": "/api/v1/:a/:rest+",
+      "destination": "/api/v1/:a"
     }
   ],
   "headers": [

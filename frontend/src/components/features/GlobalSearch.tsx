@@ -572,14 +572,6 @@ export const GlobalSearch: React.FC<GlobalSearchProps> = ({
   }, [onSearchToggle]);
 
   useEffect(() => {
-    if (isInHeader && searchInputRef.current) {
-      setTimeout(() => {
-        searchInputRef.current?.focus();
-      }, 100);
-    }
-  }, [isInHeader]);
-
-  useEffect(() => {
     if (deferredQuery.trim() === '') {
       setSearchResults([]);
       setSelectedIndex(-1);

@@ -88,19 +88,24 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
     ]);
 
     res.writeHead(200, { 'Content-Type': 'application/json' });
-    res.end(JSON.stringify({
-      totalUsers,
-      totalRackets,
-      totalStores,
-      totalReviews,
-      pendingRequests,
-      activeUsers,
-      totalFavorites,
-      usersChange: 0,
-      racketsChange: 0,
-      reviewsChange: 0,
-      activeUsersChange: 0,
-    }));
+    res.end(
+      JSON.stringify({
+        success: true,
+        data: {
+          totalUsers,
+          totalRackets,
+          totalStores,
+          totalReviews,
+          pendingRequests,
+          activeUsers,
+          totalFavorites,
+          usersChange: 0,
+          racketsChange: 0,
+          reviewsChange: 0,
+          activeUsersChange: 0,
+        },
+      })
+    );
   } catch (err: any) {
     console.error('Error fetching metrics:', err?.message);
     res.writeHead(500, { 'Content-Type': 'application/json' });
