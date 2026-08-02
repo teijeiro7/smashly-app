@@ -16,12 +16,14 @@ function mockAuth(
     isAuthenticated?: boolean;
     role?: string | null;
     refreshedRole?: string | null;
+    isSigningOut?: boolean;
   } = {}
 ) {
-  const { isAuthenticated = true, role = null, refreshedRole = null } = overrides;
+  const { isAuthenticated = true, role = null, refreshedRole = null, isSigningOut = false } = overrides;
   return {
     ready: Promise.resolve(),
     isAuthenticated,
+    isSigningOut,
     user: role ? ({ role } as any) : null,
     refreshUserProfile: vi.fn().mockResolvedValue(refreshedRole ? { role: refreshedRole } : null),
   } as any;
@@ -82,6 +84,17 @@ describe('ensureAuthenticated', () => {
     expect(redirectOpts.search).toEqual({ next: '/admin' });
   });
 
+  it('redirects to a clean `/` WITHOUT `?next=` while a logout is in progress', async () => {
+    // Right after sign-out the session is cleared but `isSigningOut` is still
+    // true; the invalidate re-runs this guard on the current (protected) route.
+    // Attaching `?next=` here would reopen the login modal the instant the user
+    // logged out.
+    const auth = mockAuth({ isAuthenticated: false, isSigningOut: true });
+    const redirectOpts = await captureRedirect(() => ensureAuthenticated(auth, '/dashboard'));
+    expect(redirectOpts.to).toBe('/');
+    expect(redirectOpts.search).toBeUndefined();
+  });
+
   it('awaits auth.ready before checking isAuthenticated — never fires on the pre-hydration flash', async () => {
     let resolveReady!: () => void;
     const auth = mockAuth({ isAuthenticated: true });
@@ -119,6 +132,14 @@ describe('requireAuth', () => {
     );
     expect(redirectOpts.to).toBe('/');
     expect(redirectOpts.search).toEqual({ next: '/messages' });
+  });
+
+  it('redirects a signing-out request to a clean `/` (no `?next=`)', async () => {
+    const redirectOpts = await captureRedirect(() =>
+      requireAuth(args(mockAuth({ isAuthenticated: false, isSigningOut: true })))
+    );
+    expect(redirectOpts.to).toBe('/');
+    expect(redirectOpts.search).toBeUndefined();
   });
 });
 

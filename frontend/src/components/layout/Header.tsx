@@ -594,7 +594,7 @@ const Header = React.memo(() => {
                   onClick={async () => {
                     await signOut();
                     setIsUserMenuOpen(false);
-                    navigate({ to: '/' });
+                    navigate({ to: '/', replace: true, search: {} });
                   }}
                 >
                   <SignOut />
@@ -713,7 +713,7 @@ const Header = React.memo(() => {
                     onClick={async () => {
                       await signOut();
                       closeAllMenus();
-                      navigate({ to: '/' });
+                      navigate({ to: '/', replace: true, search: {} });
                     }}
                     style={{ cursor: 'pointer', marginTop: '0.5rem', width: '100%' }}
                   >

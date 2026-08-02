@@ -165,6 +165,11 @@ export async function resolveRole(auth: AuthCtx): Promise<string | undefined> {
 export async function ensureAuthenticated(auth: AuthCtx, next: string): Promise<void> {
   await auth.ready;
   if (!auth.isAuthenticated) {
+    // A sign-out just cleared the session and is navigating to '/' — carrying
+    // `?next=` would reopen the login modal the moment the user logged out.
+    if (auth.isSigningOut) {
+      throw redirect({ to: '/' });
+    }
     throw redirect({ to: '/', search: { next } });
   }
 }
