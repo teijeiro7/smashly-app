@@ -65,7 +65,10 @@ STORE_CONFIGS = {
 # Días sin aparecer en el catálogo de TODAS las tiendas para marcar como descatalogada.
 DISCONTINUED_THRESHOLD_DAYS = 30
 
-MAX_CONCURRENT_REFRESH = 5
+# Concurrencia baja a propósito: padelmarket y padelproshop están detrás de
+# Cloudflare y throttlean a IPs de datacenter con 429 + Retry-After 60s.
+# Lanzar 5 peticiones a la vez disparaba el rate-limit y quemaba el timeout.
+MAX_CONCURRENT_REFRESH = 2
 MAX_CONCURRENT_DISCOVER = 2
 
 
