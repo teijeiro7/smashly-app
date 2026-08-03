@@ -9,6 +9,7 @@ from typing import Dict, List, Optional
 from .base_scraper import (
     BaseScraper, Product, normalize_specs, is_junior_racket,
     FetchOutcome, FetchResult, ScraperGone, sync_fetch_with_retry, ssl_ctx,
+    browser_headers,
 )
 
 
@@ -126,11 +127,9 @@ class PadelMarketScraper(BaseScraper):
         """Fetch a single product's full data from the Shopify JSON API (sync)."""
         time.sleep(random.uniform(0.8, 1.5))
         api_url = f"https://padelmarket.com/es-eu/products/{handle}.json"
-        req = urllib.request.Request(api_url, headers={
-            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
-            'Accept': 'application/json',
-            'Accept-Language': 'es-ES,es;q=0.9',
-        })
+        req = urllib.request.Request(api_url, headers=browser_headers(
+            origin="https://padelmarket.com/", accept="application/json",
+        ))
 
         def _once():
             with urllib.request.urlopen(req, timeout=30, context=ssl_ctx()) as resp:
@@ -212,7 +211,10 @@ class PadelMarketScraper(BaseScraper):
         # Fallback to full HTML if Forma or other key specs are missing
         if 'Forma' not in specs:
             try:
-                req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+                req = urllib.request.Request(url, headers=browser_headers(
+                    origin="https://padelmarket.com/",
+                    accept="text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+                ))
 
                 def _fetch_full_html():
                     with urllib.request.urlopen(req, timeout=15, context=ssl_ctx()) as resp:
@@ -248,35 +250,34 @@ class PadelMarketScraper(BaseScraper):
             return FetchResult(FetchOutcome.NO_PRICE, product=product)
         return FetchResult(FetchOutcome.OK, product=product)
 
-    def _fetch_api_page(self, collection_path: str, page_num: int) -> list:
-        """Fetch a single page of products from the Shopify JSON API (sync, run in executor)."""
-        time.sleep(random.uniform(1.5, 3.0))
-        api_url = f"https://padelmarket.com{collection_path}/products.json?limit=250&page={page_num}"
-        req = urllib.request.Request(api_url, headers={
-            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
-            'Accept': 'application/json',
-            'Accept-Language': 'es-ES,es;q=0.9',
-        })
+    def _fetch_category_page(self, collection_path: str, page_num: int) -> List[str]:
+        """Fetch one collection HTML page and return canonical product URLs (sync).
+
+        The store's Cloudflare setup hard-blocks the Shopify `products.json`
+        collection endpoint (`local_rate_limited`) for every client, but serves
+        the collection HTML fine — so we paginate the HTML instead.
+        """
+        time.sleep(random.uniform(1.0, 2.0))
+        page_url = f"https://padelmarket.com{collection_path}?page={page_num}"
+        req = urllib.request.Request(page_url, headers=browser_headers(
+            origin="https://padelmarket.com/",
+            accept="text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+        ))
 
         def _once():
             with urllib.request.urlopen(req, timeout=30, context=ssl_ctx()) as resp:
-                return json.loads(resp.read().decode('utf-8'))
+                return resp.read().decode('utf-8')
 
-        try:
-            data = sync_fetch_with_retry(_once, label=f"PadelMarket:page{page_num}", max_retries=4, base_delay=8.0)
-        except ScraperGone:
-            return []
-        return data.get('products', [])
+        html = sync_fetch_with_retry(
+            _once, label=f"PadelMarket:page{page_num}", max_retries=2, base_delay=6.0,
+        )
+        # Product card links look like /es-eu/collections/palas/products/{handle}.
+        # Grab the handle from any /products/{handle} path and canonicalize.
+        handles = re.findall(r'/products/([a-z0-9][a-z0-9-]*)', html)
+        return [f"https://padelmarket.com/es-eu/products/{h}" for h in dict.fromkeys(handles)]
 
     async def scrape_category(self, url: str) -> List[str]:
-        """Scrape product URLs using the Shopify products.json API.
-
-        Uses the public Shopify JSON API instead of Playwright-based
-        'Load More' button clicks, which were unreliable.
-        """
-
-        # Determine the collection path from the URL
-        # e.g. https://padelmarket.com/es-eu/collections/palas -> /es-eu/collections/palas
+        """Scrape product URLs by paginating the collection HTML pages."""
         if '/collections/' in url:
             from urllib.parse import urlparse
             parsed = urlparse(url)
@@ -284,42 +285,36 @@ class PadelMarketScraper(BaseScraper):
         else:
             collection_path = '/es-eu/collections/palas'
 
-        product_urls = []
+        product_urls: List[str] = []
+        seen: set = set()
         page_num = 1
+        max_pages = 40
 
-        print(f"[PadelMarket] Using Shopify API for product discovery...")
+        print("[PadelMarket] Scraping category via HTML pagination...")
 
-        while True:
-            # Safety limit
-            if page_num > 20:
-                print(f"[PadelMarket] Reached page limit (20). Stopping.")
-                break
-
-            print(f"[PadelMarket] Fetching API page {page_num}...")
-
+        loop = asyncio.get_running_loop()
+        while page_num <= max_pages:
             try:
-                # Run sync HTTP request in thread executor to keep async
-                loop = asyncio.get_event_loop()
-                products = await loop.run_in_executor(
-                    None, self._fetch_api_page, collection_path, page_num
+                links = await loop.run_in_executor(
+                    None, self._fetch_category_page, collection_path, page_num
                 )
             except Exception as e:
                 print(f"[PadelMarket] API error on page {page_num}: {e}")
                 break
 
-            if not products:
-                print(f"[PadelMarket] No more products on page {page_num}. Done.")
+            if not links:
+                print(f"[PadelMarket] Page {page_num}: no products. Done.")
                 break
 
-            for product in products:
-                handle = product.get('handle')
-                if handle:
-                    product_url = f"https://padelmarket.com/es-eu/products/{handle}"
-                    if product_url not in product_urls:
-                        product_urls.append(product_url)
+            added = 0
+            for link in links:
+                if link not in seen:
+                    product_urls.append(link)
+                    seen.add(link)
+                    added += 1
 
-            print(f"[PadelMarket] Page {page_num}: {len(products)} products fetched. Total: {len(product_urls)}")
+            print(f"[PadelMarket] Page {page_num}: {len(links)} found, {added} added. Total: {len(product_urls)}")
             page_num += 1
 
-        print(f"[PadelMarket] Final count: {len(product_urls)} products from API")
+        print(f"[PadelMarket] Final count: {len(product_urls)} products from HTML")
         return product_urls
