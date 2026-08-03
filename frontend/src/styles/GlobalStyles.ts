@@ -272,17 +272,17 @@ export const GlobalStyles = createGlobalStyle`
     --surface-3: #f3f4f6;
     --text: #1f2937;
     --text-muted: #6b7280;
-    --text-subtle: #9ca3af;
+    --text-subtle: #737373;
     --text-inverse: #ffffff;
     --border: #e5e7eb;
     --border-strong: #d1d5db;
-    --primary: #16a34a;
+    --primary: #12873c;
     --primary-hover: #15803d;
     --primary-light: #22c55e;
-    --primary-rgb: 22, 163, 74;
+    --primary-rgb: 18, 135, 60;
     --primary-rgb-dark: 21, 128, 61;
-    --primary-subtle: rgba(22, 163, 74, 0.10);
-    --primary-faint: rgba(22, 163, 74, 0.04);
+    --primary-subtle: rgba(18, 135, 60, 0.10);
+    --primary-faint: rgba(18, 135, 60, 0.04);
     --accent: #d97706;
     --accent-rgb: 217, 119, 6;
     --success: #10b981;
@@ -300,11 +300,11 @@ export const GlobalStyles = createGlobalStyle`
        solid CTA buttons, banners). They stay the same in light and dark so
        the brand identity is preserved; only foreground text/icons use the
        theme-aware --primary* tokens. */
-    --brand-surface: #16a34a;
+    --brand-surface: #12873c;
     --brand-surface-hover: #15803d;
     --brand-surface-strong: #0f6e38;
     --brand-surface-deep: #0f2818;
-    --brand-rgb: 22, 163, 74;
+    --brand-rgb: 18, 135, 60;
     --brand-on-surface: #ffffff;
     --surface-inverse: #0f172a;
     --footer-bg: #0f2818;
@@ -390,7 +390,7 @@ export const GlobalStyles = createGlobalStyle`
     --surface-3: #243029;
     --text: #e8efe9;
     --text-muted: #94a89c;
-    --text-subtle: #6b7d72;
+    --text-subtle: #8ba195;
     --text-inverse: #0a0f0d;
     --border: #243029;
     --border-strong: #2f3d34;
@@ -416,11 +416,11 @@ export const GlobalStyles = createGlobalStyle`
 
     /* Brand surface tokens — FIXED (identical in light and dark).
        See :root above for the rationale. */
-    --brand-surface: #16a34a;
+    --brand-surface: #12873c;
     --brand-surface-hover: #15803d;
     --brand-surface-strong: #0f6e38;
     --brand-surface-deep: #0f2818;
-    --brand-rgb: 22, 163, 74;
+    --brand-rgb: 18, 135, 60;
     --brand-on-surface: #ffffff;
     --surface-inverse: #0f172a;
     --footer-bg: #051008;
@@ -469,7 +469,7 @@ export const GlobalStyles = createGlobalStyle`
       --surface-3: #243029;
       --text: #e8efe9;
       --text-muted: #94a89c;
-      --text-subtle: #6b7d72;
+      --text-subtle: #8ba195;
       --text-inverse: #0a0f0d;
       --border: #243029;
       --border-strong: #2f3d34;
@@ -495,11 +495,11 @@ export const GlobalStyles = createGlobalStyle`
 
       /* Brand surface tokens — FIXED (identical in light and dark).
          See :root above for the rationale. */
-      --brand-surface: #16a34a;
+      --brand-surface: #12873c;
       --brand-surface-hover: #15803d;
     --brand-surface-strong: #0f6e38;
     --brand-surface-deep: #0f2818;
-    --brand-rgb: 22, 163, 74;
+    --brand-rgb: 18, 135, 60;
     --brand-on-surface: #ffffff;
     --surface-inverse: #0f172a;
     --footer-bg: #051008;
