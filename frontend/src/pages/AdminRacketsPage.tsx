@@ -4,6 +4,7 @@ import { Link } from '@tanstack/react-router';
 import { FiArrowLeft, FiEdit2, FiTrash2, FiSearch, FiPackage, FiTag, FiX } from 'react-icons/fi';
 import { Racket } from '@/types/racket';
 import { racketImageUrl } from '../utils/imageUrl';
+import { formatBrandName, formatRacketName } from '../utils/textUtils';
 import racketService from '@/services/racketService';
 import { EditRacketModal } from '@/components/admin/EditRacketModal';
 import { sileo } from 'sileo';
@@ -567,7 +568,7 @@ const AdminRacketsPage: React.FC = () => {
             <option value=''>Todas</option>
             {uniqueMarcas.map(marca => (
               <option key={marca} value={marca}>
-                {marca}
+                {formatBrandName(marca)}
               </option>
             ))}
           </FilterSelect>
@@ -696,7 +697,7 @@ const AdminRacketsPage: React.FC = () => {
                           <RacketImage src='/placeholder-racket.svg' alt='Sin imagen' />
                         )}
                         <div>
-                          <RacketName>{racket.nombre || racket.modelo || 'Sin nombre'}</RacketName>
+                          <RacketName>{formatRacketName(racket) || 'Sin nombre'}</RacketName>
                           <RacketDetails>
                             {racket.caracteristicas_forma || '-'} •{' '}
                             {racket.caracteristicas_balance || '-'}
@@ -704,7 +705,7 @@ const AdminRacketsPage: React.FC = () => {
                         </div>
                       </RacketInfo>
                     </Td>
-                    <Td>{racket.marca || '-'}</Td>
+                    <Td>{formatBrandName(racket.marca) || '-'}</Td>
                     <Td>
                       {racket.padelnuestro_precio_actual != null ? (
                         <Price sale={racket.en_oferta}>

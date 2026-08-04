@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { UserProfile } from '../../services/userProfileService';
 import { UploadService } from '../../services/uploadService';
 import { useRackets } from '../../contexts/RacketsContext';
+import { formatRacketName } from '../../utils/textUtils';
 
 interface EditProfileModalProps {
   isOpen: boolean;
@@ -654,8 +655,7 @@ export const EditProfileModal: React.FC<EditProfileModalProps> = ({
                   >
                     <option value=''>Selecciona tu pala actual</option>
                     {rackets.map(racket => {
-                      const displayName =
-                        `${racket.marca} ${racket.modelo || racket.nombre}`.trim();
+                      const displayName = formatRacketName(racket);
                       return (
                         <option key={racket.id} value={displayName}>
                           {displayName}

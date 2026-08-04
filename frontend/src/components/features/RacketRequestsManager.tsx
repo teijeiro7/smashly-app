@@ -5,6 +5,7 @@ import { sileo } from 'sileo';
 import RacketCRUDModal from './RacketCRUDModal';
 import racketService from '../../services/racketService';
 import { AdminService } from '../../services/adminService';
+import { formatBrandName, formatRacketName } from '../../utils/textUtils';
 
 const Container = styled.div`
   display: flex;
@@ -422,8 +423,8 @@ const RacketRequestsManager: React.FC = () => {
           filteredRackets.map(racket => (
             <TableRow key={racket.id}>
               <Cell>#{racket.id}</Cell>
-              <Cell>{racket.nombre}</Cell>
-              <BrandCell>{racket.marca}</BrandCell>
+              <Cell>{formatRacketName(racket)}</Cell>
+              <BrandCell>{formatBrandName(racket.marca)}</BrandCell>
               <Cell>€{racket.precio_actual.toFixed(2)}</Cell>
               <Cell>
                 {racket.status && (

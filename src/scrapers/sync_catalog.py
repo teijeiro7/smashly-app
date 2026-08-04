@@ -65,7 +65,10 @@ STORE_CONFIGS = {
 # Días sin aparecer en el catálogo de TODAS las tiendas para marcar como descatalogada.
 DISCONTINUED_THRESHOLD_DAYS = 30
 
-MAX_CONCURRENT_REFRESH = 5
+# Concurrencia baja a propósito: padelmarket y padelproshop están detrás de
+# Cloudflare y throttlean a IPs de datacenter con 429 + Retry-After 60s.
+# Lanzar 5 peticiones a la vez disparaba el rate-limit y quemaba el timeout.
+MAX_CONCURRENT_REFRESH = 2
 MAX_CONCURRENT_DISCOVER = 2
 
 
@@ -249,6 +252,20 @@ async def discover(limit: int, dry_run: bool, dedupe_cap: int) -> None:
 
     print(f"\n{'─' * 50}\n🔁 Deduplicando catálogo...\n{'─' * 50}")
     run_deduplication(dry_run=False, delete_cap=dedupe_cap)
+
+    print(f"\n{'─' * 50}\n📊 Sincronizando métricas radar de palas...\n{'─' * 50}")
+    try:
+        from .sync_radar_metrics import fetch_rackets_needing_metrics, process_racket
+        needing_radar = fetch_rackets_needing_metrics()
+        if needing_radar:
+            print(f"  Encontradas {len(needing_radar)} palas sin métricas radar. Sincronizando...")
+            for racket in needing_radar:
+                res = process_racket(racket, apply_fallback=True, dry_run=False)
+                print(f"  ✓ [{res.get('source', 'fallback')}]: {res.get('name')}")
+        else:
+            print("  ✓ Todas las palas del catálogo tienen métricas radar completas.")
+    except Exception as e:
+        print(f"  ⚠️ Error en sincronización de métricas radar: {e}")
 
 
 # ── Main ───────────────────────────────────────────────────────────────

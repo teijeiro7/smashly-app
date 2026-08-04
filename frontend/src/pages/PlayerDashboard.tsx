@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { useAuth } from '../contexts/AuthContext';
 import { racketImageUrl } from '../utils/imageUrl';
+import { formatBrandName, formatRacketName } from '../utils/textUtils';
 import { Link, useRouterState, useNavigate } from '@tanstack/react-router';
 import { QuickActionCard } from '../components/dashboard/QuickActionCard';
 import {
@@ -72,7 +73,7 @@ const HeroSection = styled.div`
 `;
 
 const Greeting = styled.h1`
-  font-size: 2.5rem;
+  font-size: clamp(1.75rem, 4vw, 2.5rem);
   font-weight: 800;
   color: var(--text);
   margin: 0 0 0.5rem 0;
@@ -683,10 +684,13 @@ export const PlayerDashboard: React.FC = () => {
                   onClick={() => navigate({ to: '/palas/$slug', params: { slug: racket.slug } })}
                 >
                   {racket.imagenes?.[0] && (
-                    <RacketImage src={racketImageUrl(racket.imagenes[0])} alt={racket.nombre} />
+                    <RacketImage
+                      src={racketImageUrl(racket.imagenes[0])}
+                      alt={formatRacketName(racket)}
+                    />
                   )}
-                  <RacketName>{racket.nombre}</RacketName>
-                  <RacketBrand>{racket.marca}</RacketBrand>
+                  <RacketName>{formatRacketName(racket)}</RacketName>
+                  <RacketBrand>{formatBrandName(racket.marca)}</RacketBrand>
                   {racket.precio_actual && <RacketPrice>{racket.precio_actual}€</RacketPrice>}
                 </RacketCard>
               ))}
@@ -710,10 +714,13 @@ export const PlayerDashboard: React.FC = () => {
                   onClick={() => navigate({ to: '/racket-detail', search: { id: racket.id } })}
                 >
                   {racket.imagenes?.[0] && (
-                    <RacketImage src={racketImageUrl(racket.imagenes[0])} alt={racket.nombre} />
+                    <RacketImage
+                      src={racketImageUrl(racket.imagenes[0])}
+                      alt={formatRacketName(racket)}
+                    />
                   )}
-                  <RacketName>{racket.nombre}</RacketName>
-                  <RacketBrand>{racket.marca}</RacketBrand>
+                  <RacketName>{formatRacketName(racket)}</RacketName>
+                  <RacketBrand>{formatBrandName(racket.marca)}</RacketBrand>
                   {racket.precio_actual && <RacketPrice>{racket.precio_actual}€</RacketPrice>}
                 </RacketCard>
               ))}
@@ -734,10 +741,13 @@ export const PlayerDashboard: React.FC = () => {
                   onClick={() => navigate({ to: '/palas/$slug', params: { slug: racket.slug } })}
                 >
                   {racket.imagenes?.[0] && (
-                    <RacketImage src={racketImageUrl(racket.imagenes[0])} alt={racket.nombre} />
+                    <RacketImage
+                      src={racketImageUrl(racket.imagenes[0])}
+                      alt={formatRacketName(racket)}
+                    />
                   )}
-                  <RacketName>{racket.nombre}</RacketName>
-                  <RacketBrand>{racket.marca}</RacketBrand>
+                  <RacketName>{formatRacketName(racket)}</RacketName>
+                  <RacketBrand>{formatBrandName(racket.marca)}</RacketBrand>
                   {racket.precio_actual && <RacketPrice>{racket.precio_actual}€</RacketPrice>}
                 </RacketCard>
               ))}

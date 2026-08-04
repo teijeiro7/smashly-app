@@ -16,6 +16,7 @@ import { UserProfileService } from '../../services/userProfileService';
 import { sileo } from 'sileo';
 import { useAuth } from '../../contexts/AuthContext';
 import RacketSearchInput, { RacketSearchResult } from '../recommendation/RacketSearchInput';
+import { formatRacketName } from '../../utils/textUtils';
 
 interface OnboardingPromptModalProps {
   isOpen: boolean;
@@ -301,9 +302,7 @@ const OnboardingPromptModal: React.FC<OnboardingPromptModalProps> = ({ isOpen, o
     setLoading(true);
 
     try {
-      const current_racket = currentRacket
-        ? `${currentRacket.marca} ${currentRacket.name}`.trim()
-        : undefined;
+      const current_racket = currentRacket ? formatRacketName(currentRacket) : undefined;
 
       await UserProfileService.updateUserProfile({
         current_racket,

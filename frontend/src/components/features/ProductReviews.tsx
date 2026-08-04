@@ -249,9 +249,10 @@ const SummaryCard = styled.div`
   background: var(--surface);
   padding: 2rem;
   border-radius: 20px;
+  border: 1px solid var(--border);
   box-shadow:
-    0 0 0 1px rgba(0, 0, 0, 0.06),
-    0 4px 12px rgba(0, 0, 0, 0.05);
+    0 0 0 1px var(--shadow-color),
+    0 4px 12px var(--shadow-color);
   position: sticky;
   top: 2rem;
 `;

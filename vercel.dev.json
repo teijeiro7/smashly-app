@@ -40,6 +40,10 @@
     {
       "source": "/api/admin/stores/:id",
       "destination": "/api/admin/stores/[id]"
+    },
+    {
+      "source": "/api/v1/:a/:rest+",
+      "destination": "/api/v1/:a"
     }
   ],
   "headers": [

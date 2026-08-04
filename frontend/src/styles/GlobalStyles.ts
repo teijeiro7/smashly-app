@@ -72,32 +72,32 @@ export const GlobalStyles = createGlobalStyle`
     overflow-x: hidden;
   }
 
-  /* Typography */
+  /* Fluid Typography Scale (Impeccable Design Standard) */
   h1, h2, h3, h4, h5, h6 {
     font-weight: 600;
-    line-height: 1.25;
+    line-height: 1.2;
     margin: 0;
   }
 
   h1 {
-    font-size: 2.5rem;
+    font-size: clamp(2rem, 4vw + 1rem, 3.25rem);
     font-weight: 800;
-    letter-spacing: -0.02em;
+    letter-spacing: -0.025em;
   }
 
   h2 {
-    font-size: 2rem;
+    font-size: clamp(1.5rem, 3vw + 0.8rem, 2.25rem);
     font-weight: 700;
-    letter-spacing: -0.01em;
+    letter-spacing: -0.015em;
   }
 
   h3 {
-    font-size: 1.5rem;
+    font-size: clamp(1.25rem, 2vw + 0.5rem, 1.75rem);
     font-weight: 600;
   }
 
   h4 {
-    font-size: 1.25rem;
+    font-size: clamp(1.1rem, 1.5vw + 0.4rem, 1.35rem);
     font-weight: 600;
   }
 
@@ -114,6 +114,7 @@ export const GlobalStyles = createGlobalStyle`
   p {
     margin: 0;
     line-height: 1.6;
+    max-width: 75ch;
   }
 
   /* Links */
@@ -271,17 +272,17 @@ export const GlobalStyles = createGlobalStyle`
     --surface-3: #f3f4f6;
     --text: #1f2937;
     --text-muted: #6b7280;
-    --text-subtle: #9ca3af;
+    --text-subtle: #737373;
     --text-inverse: #ffffff;
     --border: #e5e7eb;
     --border-strong: #d1d5db;
-    --primary: #16a34a;
+    --primary: #12873c;
     --primary-hover: #15803d;
     --primary-light: #22c55e;
-    --primary-rgb: 22, 163, 74;
+    --primary-rgb: 18, 135, 60;
     --primary-rgb-dark: 21, 128, 61;
-    --primary-subtle: rgba(22, 163, 74, 0.10);
-    --primary-faint: rgba(22, 163, 74, 0.04);
+    --primary-subtle: rgba(18, 135, 60, 0.10);
+    --primary-faint: rgba(18, 135, 60, 0.04);
     --accent: #d97706;
     --accent-rgb: 217, 119, 6;
     --success: #10b981;
@@ -299,11 +300,11 @@ export const GlobalStyles = createGlobalStyle`
        solid CTA buttons, banners). They stay the same in light and dark so
        the brand identity is preserved; only foreground text/icons use the
        theme-aware --primary* tokens. */
-    --brand-surface: #16a34a;
+    --brand-surface: #12873c;
     --brand-surface-hover: #15803d;
     --brand-surface-strong: #0f6e38;
     --brand-surface-deep: #0f2818;
-    --brand-rgb: 22, 163, 74;
+    --brand-rgb: 18, 135, 60;
     --brand-on-surface: #ffffff;
     --surface-inverse: #0f172a;
     --footer-bg: #0f2818;
@@ -389,7 +390,7 @@ export const GlobalStyles = createGlobalStyle`
     --surface-3: #243029;
     --text: #e8efe9;
     --text-muted: #94a89c;
-    --text-subtle: #6b7d72;
+    --text-subtle: #8ba195;
     --text-inverse: #0a0f0d;
     --border: #243029;
     --border-strong: #2f3d34;
@@ -415,11 +416,11 @@ export const GlobalStyles = createGlobalStyle`
 
     /* Brand surface tokens — FIXED (identical in light and dark).
        See :root above for the rationale. */
-    --brand-surface: #16a34a;
+    --brand-surface: #12873c;
     --brand-surface-hover: #15803d;
     --brand-surface-strong: #0f6e38;
     --brand-surface-deep: #0f2818;
-    --brand-rgb: 22, 163, 74;
+    --brand-rgb: 18, 135, 60;
     --brand-on-surface: #ffffff;
     --surface-inverse: #0f172a;
     --footer-bg: #051008;
@@ -468,7 +469,7 @@ export const GlobalStyles = createGlobalStyle`
       --surface-3: #243029;
       --text: #e8efe9;
       --text-muted: #94a89c;
-      --text-subtle: #6b7d72;
+      --text-subtle: #8ba195;
       --text-inverse: #0a0f0d;
       --border: #243029;
       --border-strong: #2f3d34;
@@ -494,11 +495,11 @@ export const GlobalStyles = createGlobalStyle`
 
       /* Brand surface tokens — FIXED (identical in light and dark).
          See :root above for the rationale. */
-      --brand-surface: #16a34a;
+      --brand-surface: #12873c;
       --brand-surface-hover: #15803d;
     --brand-surface-strong: #0f6e38;
     --brand-surface-deep: #0f2818;
-    --brand-rgb: 22, 163, 74;
+    --brand-rgb: 18, 135, 60;
     --brand-on-surface: #ffffff;
     --surface-inverse: #0f172a;
     --footer-bg: #051008;
@@ -611,8 +612,68 @@ export const GlobalStyles = createGlobalStyle`
       background: white !important;
     }
   }
-  /* Sileo Toast Viewport Z-Index Override */
+  /* Sileo Toast Theme Overrides & Accessibility Fixes */
   [data-sileo-viewport] {
     z-index: 9999 !important;
+    font-family: inherit;
+  }
+
+  [data-sileo-toast] {
+    filter: drop-shadow(var(--shadow-lg));
+  }
+
+  /* Dark Theme Sileo Overrides (Fixes SVG rect background fill & description contrast) */
+  html[data-theme='dark'] [data-sileo-svg] rect,
+  html.theme-dark [data-sileo-svg] rect,
+  [data-sileo-viewport][data-theme='dark'] [data-sileo-svg] rect,
+  [data-sileo-viewport][data-theme='dark'] [data-sileo-pill],
+  [data-sileo-viewport][data-theme='dark'] [data-sileo-body] {
+    fill: #16221b !important;
+    stroke: #2f3d34 !important;
+    stroke-width: 1px !important;
+  }
+
+  html[data-theme='dark'] [data-sileo-description],
+  html.theme-dark [data-sileo-description],
+  [data-sileo-viewport][data-theme='dark'] [data-sileo-description] {
+    color: #e8efe9 !important;
+    font-weight: 500;
+  }
+
+  html[data-theme='dark'] [data-sileo-title],
+  html.theme-dark [data-sileo-title],
+  [data-sileo-viewport][data-theme='dark'] [data-sileo-title] {
+    color: #ffffff !important;
+    font-weight: 600;
+  }
+
+  /* Light Theme Sileo Overrides (Fixes SVG rect background fill & description contrast) */
+  html[data-theme='light'] [data-sileo-svg] rect,
+  html:not([data-theme='dark']) [data-sileo-svg] rect,
+  [data-sileo-viewport][data-theme='light'] [data-sileo-svg] rect,
+  [data-sileo-viewport][data-theme='light'] [data-sileo-pill],
+  [data-sileo-viewport][data-theme='light'] [data-sileo-body] {
+    fill: #ffffff !important;
+    stroke: #e5e7eb !important;
+    stroke-width: 1px !important;
+  }
+
+  html[data-theme='light'] [data-sileo-description],
+  html:not([data-theme='dark']) [data-sileo-description],
+  [data-sileo-viewport][data-theme='light'] [data-sileo-description] {
+    color: #1f2937 !important;
+    font-weight: 500;
+  }
+
+  html[data-theme='light'] [data-sileo-title],
+  html:not([data-theme='dark']) [data-sileo-title],
+  [data-sileo-viewport][data-theme='light'] [data-sileo-title] {
+    color: #111827 !important;
+    font-weight: 600;
+  }
+
+  /* Sileo Action Buttons */
+  [data-sileo-button] {
+    font-weight: 600 !important;
   }
 `;

@@ -24,6 +24,8 @@ import ThemeToggle from '../common/ThemeToggle';
 
 const HeaderContainer = styled.header`
   background: var(--header-bg);
+  backdrop-filter: blur(12px) saturate(180%);
+  -webkit-backdrop-filter: blur(12px) saturate(180%);
   padding: 0;
   box-shadow:
     0 1px 3px var(--shadow-color),

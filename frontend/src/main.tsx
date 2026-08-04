@@ -4,7 +4,7 @@ import { RouterProvider } from '@tanstack/react-router';
 import { StrictMode, useEffect } from 'react';
 import { createRoot } from 'react-dom/client';
 import 'sileo/styles.css';
-import { Toaster } from 'sileo';
+import SmashlyToaster from './components/common/SmashlyToaster';
 import { HelmetProvider } from 'react-helmet-async';
 import { registerSW } from 'virtual:pwa-register';
 import * as Sentry from '@sentry/react';
@@ -39,7 +39,7 @@ const InnerApp = () => {
   return (
     <>
       <RouterProvider router={router} context={{ auth }} />
-      <Toaster position='top-center' options={{ duration: 4000 }} />
+      <SmashlyToaster />
     </>
   );
 };

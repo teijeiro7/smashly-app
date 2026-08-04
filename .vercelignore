@@ -1,0 +1,9 @@
+# Local agent/tooling state. Not deployable, and `vercel dev` watches the repo
+# root using only this file's patterns (it ignores .gitignore), so a UNIX socket
+# left here — e.g. .codegraph/daemon.sock — crashes its file watcher with
+# "UNKNOWN: unknown error, watch ...".
+.codegraph
+.serena
+.superpowers
+.claude
+.pytest_cache

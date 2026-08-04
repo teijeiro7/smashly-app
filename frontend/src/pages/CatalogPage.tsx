@@ -10,6 +10,7 @@ import { Racket } from '../types/racket';
 import { AddToListModal } from '../components/features/AddToListModal';
 import RacketCard from '../components/features/RacketCard';
 import { getLowestPrice } from '../utils/priceUtils';
+import { formatBrandName, formatRacketName } from '../utils/textUtils';
 import SEO from '../components/seo/SEO';
 import {
   organizationSchema,
@@ -150,6 +151,53 @@ const SearchIcon = styled(FiSearch)`
   top: 50%;
   transform: translateY(-50%);
   color: var(--text-muted);
+`;
+
+const ClearSearchIconButton = styled.button`
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: var(--text-subtle);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: var(--surface-3);
+    color: var(--text);
+  }
+`;
+
+const QuickSearchChipsRow = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+  flex-wrap: wrap;
+`;
+
+const QuickSearchChip = styled.button<{ $active?: boolean }>`
+  font-size: 0.75rem;
+  font-weight: 500;
+  padding: 0.25rem 0.625rem;
+  border-radius: 20px;
+  border: 1px solid ${props => (props.$active ? 'var(--primary-hover)' : 'var(--border)')};
+  background: ${props => (props.$active ? 'var(--primary-subtle)' : 'var(--surface-2)')};
+  color: ${props => (props.$active ? 'var(--primary-hover)' : 'var(--text-muted)')};
+  cursor: pointer;
+  transition: all 0.15s ease;
+
+  &:hover {
+    border-color: var(--primary-hover);
+    color: var(--primary-hover);
+  }
 `;
 
 const FilterButton = styled.button<{ $active?: boolean }>`
@@ -647,7 +695,7 @@ const CatalogPage: React.FC = () => {
 
           const result = await racketService.searchRackets(searchQuery, filters);
 
-          if (result?.data) {
+          if (result?.data && result.data.length > 0) {
             // Apply local sorting since API returns sorted by relevance
             const sorted = [...result.data];
             try {
@@ -681,7 +729,8 @@ const CatalogPage: React.FC = () => {
             }
             setFilteredRackets(sorted);
           } else {
-            setFilteredRackets([]);
+            // API returned empty results, fall back to robust local token matching
+            filterLocally();
           }
         } catch (error) {
           console.error('Fuzzy search error, falling back to local:', error);
@@ -696,6 +745,16 @@ const CatalogPage: React.FC = () => {
 
     const filterLocally = () => {
       let filtered = [...rackets];
+
+      // Apply search query token filter
+      if (searchQuery.trim()) {
+        const tokens = searchQuery.toLowerCase().trim().split(/\s+/).filter(Boolean);
+        filtered = filtered.filter(racket => {
+          const haystack =
+            `${racket.nombre || ''} ${racket.marca || ''} ${racket.modelo || ''} ${racket.caracteristicas_forma || ''} ${racket.caracteristicas_balance || ''}`.toLowerCase();
+          return tokens.every(token => haystack.includes(token));
+        });
+      }
 
       // Apply brand filter
       if (selectedBrand !== 'Todas') {
@@ -1092,10 +1151,15 @@ const CatalogPage: React.FC = () => {
               <SearchIcon />
               <SearchInput
                 type='text'
-                placeholder='Buscar por nombre, marca o modelo...'
+                placeholder='Buscar por nombre, marca o modelo... (⌘K)'
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
               />
+              {searchQuery && (
+                <ClearSearchIconButton onClick={() => setSearchQuery('')}>
+                  <FiX size={16} />
+                </ClearSearchIconButton>
+              )}
             </SearchContainer>
 
             <ClearFiltersIconButton onClick={clearFilters}>
@@ -1103,6 +1167,39 @@ const CatalogPage: React.FC = () => {
               Limpiar
             </ClearFiltersIconButton>
           </FiltersRow>
+
+          <QuickSearchChipsRow>
+            <span style={{ fontSize: '0.75rem', color: 'var(--text-subtle)', fontWeight: 600 }}>
+              Sugeridos:
+            </span>
+            {['Bullpadel', 'Babolat', 'Nox', 'Forma Diamante', 'Ofertas'].map(chip => (
+              <QuickSearchChip
+                key={chip}
+                $active={
+                  chip === 'Ofertas'
+                    ? showOffers
+                    : chip === 'Forma Diamante'
+                      ? selectedShape === 'Diamante'
+                      : selectedBrand === chip || searchQuery === chip
+                }
+                onClick={() => {
+                  if (chip === 'Ofertas') {
+                    setShowOffers(!showOffers);
+                  } else if (chip === 'Forma Diamante') {
+                    setSelectedShape(selectedShape === 'Diamante' ? 'Todas' : 'Diamante');
+                  } else {
+                    if (selectedBrand === chip) {
+                      setSelectedBrand('Todas');
+                    } else {
+                      setSelectedBrand(chip);
+                    }
+                  }
+                }}
+              >
+                {chip}
+              </QuickSearchChip>
+            ))}
+          </QuickSearchChipsRow>
 
           {/* Advanced Filters Toggle */}
           <AdvancedFiltersToggle
@@ -1121,7 +1218,7 @@ const CatalogPage: React.FC = () => {
               <FilterSelect value={selectedBrand} onChange={e => setSelectedBrand(e.target.value)}>
                 {uniqueBrands.map(brand => (
                   <option key={brand} value={brand}>
-                    {brand === 'Todas' ? 'Todas las marcas' : brand}
+                    {brand === 'Todas' ? 'Todas las marcas' : formatBrandName(brand)}
                   </option>
                 ))}
               </FilterSelect>
@@ -1337,7 +1434,7 @@ const CatalogPage: React.FC = () => {
             setSelectedRacket(null);
           }}
           racketId={selectedRacket.id || 0}
-          racketName={`${selectedRacket.marca} ${selectedRacket.modelo}`}
+          racketName={formatRacketName(selectedRacket)}
         />
       )}
     </Container>
