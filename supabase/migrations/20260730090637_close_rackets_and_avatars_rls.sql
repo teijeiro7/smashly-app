@@ -16,6 +16,16 @@
 -- bucket — 20260725000003_apply_avatars_storage_policies.sql drafted read
 -- +insert+delete but was likewise never applied, and never had an UPDATE
 -- policy (needed for upsert-in-place re-uploads). This supersedes it.
+--
+-- NOTE (merged 2026-08-04): after merging into main, the earlier migrations
+-- 20260621000001_enable_rls.sql and 20260725000003_apply_avatars_storage_
+-- policies.sql already CREATE the same rackets/avatars policies on a fresh
+-- database. Every CREATE below is therefore preceded by DROP POLICY IF
+-- EXISTS so this migration is idempotent — it runs cleanly whether those
+-- earlier migrations were applied (fresh DB / CI) or skipped (production's
+-- migration gap), and on production it is still what closes the
+-- "authenticated user can write to rackets" hole and adds the missing
+-- avatars_owner_update policy.
 -- ============================================================
 
 -- ---- rackets: replace permissive defaults with store_owner_or_admin ----
@@ -23,6 +33,10 @@
 DROP POLICY IF EXISTS "Enable insert for authenticated users only" ON rackets;
 DROP POLICY IF EXISTS "Enable update for authenticated users only" ON rackets;
 DROP POLICY IF EXISTS "Enable delete for authenticated users only" ON rackets;
+
+DROP POLICY IF EXISTS "rackets_insert_store_owner_or_admin" ON rackets;
+DROP POLICY IF EXISTS "rackets_update_store_owner_or_admin" ON rackets;
+DROP POLICY IF EXISTS "rackets_delete_store_owner_or_admin" ON rackets;
 
 CREATE POLICY "rackets_insert_store_owner_or_admin"
   ON rackets FOR INSERT
@@ -47,6 +61,11 @@ CREATE POLICY "rackets_delete_store_owner_or_admin"
   );
 
 -- ---- storage.objects: avatars bucket, owner-scoped by uid folder ----
+
+DROP POLICY IF EXISTS "avatars_public_read" ON storage.objects;
+DROP POLICY IF EXISTS "avatars_owner_insert" ON storage.objects;
+DROP POLICY IF EXISTS "avatars_owner_update" ON storage.objects;
+DROP POLICY IF EXISTS "avatars_owner_delete" ON storage.objects;
 
 CREATE POLICY "avatars_public_read"
   ON storage.objects FOR SELECT

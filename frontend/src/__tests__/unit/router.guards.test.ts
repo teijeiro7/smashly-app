@@ -19,7 +19,12 @@ function mockAuth(
     isSigningOut?: boolean;
   } = {}
 ) {
-  const { isAuthenticated = true, role = null, refreshedRole = null, isSigningOut = false } = overrides;
+  const {
+    isAuthenticated = true,
+    role = null,
+    refreshedRole = null,
+    isSigningOut = false,
+  } = overrides;
   return {
     ready: Promise.resolve(),
     isAuthenticated,
