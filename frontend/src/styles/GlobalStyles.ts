@@ -153,7 +153,7 @@ export const GlobalStyles = createGlobalStyle`
     font-family: inherit;
     font-size: inherit;
     line-height: inherit;
-    border: 1px solid var(--border-strong);
+    border: 1px solid var(--border-control);
     border-radius: 8px;
     padding: 12px 16px;
     background-color: var(--surface);
@@ -164,7 +164,7 @@ export const GlobalStyles = createGlobalStyle`
   input:focus, textarea:focus, select:focus {
     outline: none;
     border-color: var(--primary);
-    box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.1);
+    box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.12);
   }
 
   input::placeholder, textarea::placeholder {
@@ -271,8 +271,8 @@ export const GlobalStyles = createGlobalStyle`
     --surface-2: #f9fafb;
     --surface-3: #f3f4f6;
     --text: #1f2937;
-    --text-muted: #6b7280;
-    --text-subtle: #737373;
+    --text-muted: #6c6c6c;
+    --text-subtle: #6f6f6f;
     --text-inverse: #ffffff;
     --border: #e5e7eb;
     --border-strong: #d1d5db;
@@ -294,6 +294,50 @@ export const GlobalStyles = createGlobalStyle`
     --danger-strong: #fecaca;
     --info: #3b82f6;
     --bg-glow-primary: rgba(22, 163, 74, 0.14);
+
+    /* Foreground-on-fill tokens — text/icon color when painted on a solid
+       semantic fill (background: var(--success); color: var(--on-success)).
+       Never hardcode white/black on these fills — the correct foreground
+       flips per theme (in dark mode every fill below needs dark text). */
+    --on-primary: #ffffff;
+    --on-success: #0a0f0d;
+    --on-warning: #0a0f0d;
+    --on-error: #0a0f0d;
+    --on-danger: #ffffff;
+    --on-info: #0a0f0d;
+    --on-accent: #0a0f0d;
+
+    /* Status-as-text tokens — use when a semantic color IS the text itself
+       (color: var(--success-text), not a fill). Darkened here so they clear
+       4.5:1 against all four page surfaces (--bg/--surface/-2/-3); the base
+       --success/--warning/etc. tokens already fail that as body text. */
+    --primary-text: #118139;
+    --success-text: #0b7f59;
+    --warning-text: #946005;
+    --error-text: #d51010;
+    --danger-text: #d92323;
+    --info-text: #1066f4;
+    --accent-text: #a85c05;
+
+    /* Content painted directly on the fixed brand surfaces below
+       (--brand-surface*, --header-bg, --footer-bg, --surface-inverse) —
+       identical in both themes, so declared once here (no dark override
+       needed). --on-brand-muted clears only 3:1: large text/icons only. */
+    --on-brand: #ffffff;
+    --on-brand-muted: rgba(255, 255, 255, 0.8);
+
+    /* Border for interactive form controls — needs 3:1 (WCAG 1.4.11).
+       --border/--border-strong stay decorative (dividers, card edges). */
+    --border-control: #6b7280;
+
+    /* Focus ring — a fixed (non-themed) black-on-white double ring.
+       Mathematically, for ANY background luminance L, at least one of
+       white/black clears 3:1 against it (the two failure zones don't
+       overlap), so this is guaranteed visible on every surface in the
+       app, including the green header/footer brand surfaces where a
+       themed --primary ring would disappear. */
+    --focus-ring: #0a0f0d;
+    --focus-ring-halo: #ffffff;
 
     /* Brand surface tokens — FIXED (do NOT flip with theme).
        These represent always-dark-green surfaces (hero gradients, header bar,
@@ -358,8 +402,10 @@ export const GlobalStyles = createGlobalStyle`
   }
 
   /* Dark mode — selectors use BOTH attribute and class for maximum
-     compatibility across browsers and any caching layers.
-     Keep in sync with the @media (prefers-color-scheme: dark) block below. */
+     compatibility across browsers and any caching layers. Auto mode is
+     resolved by ThemeContext + the anti-FOUC script, which always sets
+     data-theme before paint — so there is no bare-media-query fallback
+     to keep in sync here. */
   html[data-theme='dark'],
   html.theme-dark {
     /* Forest-tinted dark palette: backgrounds are green-graphite (not pure black) */
@@ -367,7 +413,7 @@ export const GlobalStyles = createGlobalStyle`
     --color-primary-dark: #16a34a;
     --color-primary-light: #4ade80;
     --color-secondary: #60a5fa;
-    --color-accent: #84cc16;
+    --color-accent: #f59e0b;
     --color-success: #34d399;
     --color-warning: #fbbf24;
     --color-error: #f87171;
@@ -396,7 +442,7 @@ export const GlobalStyles = createGlobalStyle`
     --border-strong: #2f3d34;
     --primary: #22c55e;
     --primary-hover: #4ade80;
-    --primary-light: #4ade80;
+    --primary-light: #6ee7a0;
     --primary-rgb: 34, 197, 94;
     --primary-rgb-dark: 22, 163, 74;
     --primary-subtle: rgba(34, 197, 94, 0.18);
@@ -409,10 +455,33 @@ export const GlobalStyles = createGlobalStyle`
     --danger: #f87171;
     --danger-rgb: 248, 113, 113;
     --danger-subtle: rgba(248, 113, 113, 0.15);
-    --danger-strong: rgba(248, 113, 113, 0.30);
+    --danger-strong: #f87171;
     --info: #60a5fa;
     --bg-glow-primary: rgba(34, 197, 94, 0.10);
     --bg-glow-secondary: rgba(96, 165, 250, 0.06);
+
+    /* Foreground-on-fill tokens — see :root. In dark every semantic fill
+       is light/vivid enough that dark text is the correct foreground. */
+    --on-primary: #0a0f0d;
+    --on-success: #0a0f0d;
+    --on-warning: #0a0f0d;
+    --on-error: #0a0f0d;
+    --on-danger: #0a0f0d;
+    --on-info: #0a0f0d;
+    --on-accent: #0a0f0d;
+
+    /* Status-as-text tokens — already pass 4.5:1 in dark, so they mirror
+       the base semantic color (kept separate for API symmetry with the
+       light tokens above, which do diverge from their base color). */
+    --primary-text: #22c55e;
+    --success-text: #34d399;
+    --warning-text: #fbbf24;
+    --error-text: #f87171;
+    --danger-text: #f87171;
+    --info-text: #60a5fa;
+    --accent-text: #f59e0b;
+
+    --border-control: #94a89c;
 
     /* Brand surface tokens — FIXED (identical in light and dark).
        See :root above for the rationale. */
@@ -433,87 +502,14 @@ export const GlobalStyles = createGlobalStyle`
     --shadow-lg: 0 10px 15px -3px var(--shadow-color), 0 4px 6px -2px var(--shadow-color);
     --shadow-xl: 0 20px 25px -5px var(--shadow-color), 0 10px 10px -5px var(--shadow-color);
 
+    /* Racket image tile — bg stays fixed white on purpose (product photos
+       are white-background cutouts; darkening the plate would break them).
+       Border/shadow ARE adapted so the tile doesn't look like a floating
+       hole on a dark page. */
+    --racket-image-border: 1px solid #2f3d34;
+    --racket-image-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.35);
+
     color-scheme: dark;
-  }
-
-  /* Auto mode: follow OS, but only when user has NOT made an explicit choice
-     (the anti-FOUC script sets data-theme='light'/'dark' when there is a stored
-     preference, and leaves the attribute unset in auto mode).
-     Keep in sync with the html[data-theme='dark'] block above. */
-  @media (prefers-color-scheme: dark) {
-    html:not([data-theme='light']):not([data-theme='dark']):not(.theme-light):not(.theme-dark) {
-      --color-primary: #22c55e;
-      --color-primary-dark: #16a34a;
-      --color-primary-light: #4ade80;
-      --color-secondary: #60a5fa;
-      --color-accent: #84cc16;
-      --color-success: #34d399;
-      --color-warning: #fbbf24;
-      --color-error: #f87171;
-      --color-gray-50: #1a2420;
-      --color-gray-100: #121a16;
-      --color-gray-200: #243029;
-      --color-gray-300: #2f3d34;
-      --color-gray-400: #5a6e62;
-      --color-gray-500: #8a9d91;
-      --color-gray-600: #b5c2ba;
-      --color-gray-700: #d4dcd8;
-      --color-gray-800: #e8efe9;
-      --color-gray-900: #f0f4f1;
-      --color-white: #e8efe9;
-      --color-black: #0a0f0d;
-
-      --bg: #0a0f0d;
-      --surface: #121a16;
-      --surface-2: #1a2420;
-      --surface-3: #243029;
-      --text: #e8efe9;
-      --text-muted: #94a89c;
-      --text-subtle: #8ba195;
-      --text-inverse: #0a0f0d;
-      --border: #243029;
-      --border-strong: #2f3d34;
-      --primary: #22c55e;
-      --primary-hover: #4ade80;
-      --primary-light: #4ade80;
-      --primary-rgb: 34, 197, 94;
-      --primary-rgb-dark: 22, 163, 74;
-      --primary-subtle: rgba(34, 197, 94, 0.18);
-      --primary-faint: rgba(34, 197, 94, 0.06);
-      --accent: #f59e0b;
-      --accent-rgb: 245, 158, 11;
-      --success: #34d399;
-      --warning: #fbbf24;
-      --error: #f87171;
-      --danger: #f87171;
-      --danger-rgb: 248, 113, 113;
-      --danger-subtle: rgba(248, 113, 113, 0.15);
-      --danger-strong: rgba(248, 113, 113, 0.30);
-      --info: #60a5fa;
-      --bg-glow-primary: rgba(34, 197, 94, 0.10);
-      --bg-glow-secondary: rgba(96, 165, 250, 0.06);
-
-      /* Brand surface tokens — FIXED (identical in light and dark).
-         See :root above for the rationale. */
-      --brand-surface: #12873c;
-      --brand-surface-hover: #15803d;
-    --brand-surface-strong: #0f6e38;
-    --brand-surface-deep: #0f2818;
-    --brand-rgb: 18, 135, 60;
-    --brand-on-surface: #ffffff;
-    --surface-inverse: #0f172a;
-    --footer-bg: #051008;
-    --header-bg: #0a3818;
-
-      --shadow-color: rgba(0, 0, 0, 0.55);
-      --surface-overlay: rgba(18, 26, 22, 0.85);
-      --shadow-sm: 0 1px 2px 0 var(--shadow-color);
-      --shadow-md: 0 4px 6px -1px var(--shadow-color), 0 2px 4px -1px var(--shadow-color);
-      --shadow-lg: 0 10px 15px -3px var(--shadow-color), 0 4px 6px -2px var(--shadow-color);
-      --shadow-xl: 0 20px 25px -5px var(--shadow-color), 0 10px 10px -5px var(--shadow-color);
-
-      color-scheme: dark;
-    }
   }
 
   /* Media queries */
@@ -555,11 +551,16 @@ export const GlobalStyles = createGlobalStyle`
     }
   }
 
-  /* Focus styles for accessibility (WCAG 2.1 AA)
-   * :focus-visible only shows for keyboard nav, not mouse clicks */
+  /* Focus styles for accessibility (WCAG 2.2 AA, 2.4.11)
+   * :focus-visible only shows for keyboard nav, not mouse clicks.
+   * Bitone ring (dark outline + light halo) so it clears 3:1 on any
+   * surface, including the fixed green header/footer. !important beats
+   * the many component-level "&:focus { outline: none }" overrides
+   * without having to touch every one of those files individually. */
   :focus-visible {
-    outline: 3px solid var(--color-primary);
+    outline: 2px solid var(--focus-ring-halo) !important;
     outline-offset: 2px;
+    box-shadow: 0 0 0 4px var(--focus-ring) !important;
     border-radius: 2px;
   }
 
@@ -570,8 +571,9 @@ export const GlobalStyles = createGlobalStyle`
 
   /* Legacy class for components that use it explicitly */
   .focus-visible:focus {
-    outline: 3px solid var(--color-primary);
+    outline: 2px solid var(--focus-ring-halo) !important;
     outline-offset: 2px;
+    box-shadow: 0 0 0 4px var(--focus-ring) !important;
   }
 
   /* Skip-to-content link (visible only on keyboard focus) */
@@ -581,8 +583,8 @@ export const GlobalStyles = createGlobalStyle`
     left: 0;
     z-index: 9999;
     padding: 12px 24px;
-    background: var(--color-primary);
-    color: white;
+    background: var(--brand-surface);
+    color: var(--on-brand);
     font-weight: 600;
     text-decoration: none;
     border-radius: 0 0 8px 0;
@@ -591,8 +593,9 @@ export const GlobalStyles = createGlobalStyle`
 
   .skip-to-content:focus {
     top: 0;
-    outline: 3px solid white;
+    outline: 2px solid var(--focus-ring-halo);
     outline-offset: 2px;
+    box-shadow: 0 0 0 4px var(--focus-ring);
   }
 
   /* Reduce motion for users who prefer it */
