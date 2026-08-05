@@ -53,8 +53,11 @@
          SEO: Static base meta (kept here so the home route is indexable
          even before react-helmet-async hydrates).
          Per-page <SEO /> components override these at runtime.
+         No canonical/og:url here on purpose — without prerendering, a
+         hardcoded value would apply to every route until Helmet hydrates,
+         making every page's canonical look like the home page to a
+         crawler that doesn't run JS. <SEO/> sets its own per-page.
          ============================================================ -->
-    <link rel="canonical" href="https://smashly-app.es/" />
     <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />
     <meta name="googlebot" content="index, follow" />
     <meta name="rating" content="general" />
@@ -76,7 +79,6 @@
     <meta property="og:site_name" content="Smashly" />
     <meta property="og:locale" content="es_ES" />
     <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://smashly-app.es/" />
     <meta property="og:title" content="Smashly — Comparador de Palas de Pádel con IA | +800 Modelos" />
     <meta
       property="og:description"

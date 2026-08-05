@@ -73,7 +73,7 @@ vi.mock('../../lib/supabase', () => ({
 }));
 
 const AuthActionsProbe: React.FC = () => {
-  const { signIn, signOut, isAuthenticated, userProfile } = useAuth();
+  const { signIn, signOut, isAuthenticated, isSigningOut, userProfile } = useAuth();
   return (
     <div>
       <button data-testid='login' onClick={() => signIn('User@Test.com', 'secret')}>
@@ -83,6 +83,7 @@ const AuthActionsProbe: React.FC = () => {
         Logout
       </button>
       <div data-testid='status'>{isAuthenticated ? 'yes' : 'no'}</div>
+      <div data-testid='signingOut'>{isSigningOut ? 'true' : 'false'}</div>
       <div data-testid='nickname'>{userProfile?.nickname || ''}</div>
     </div>
   );
@@ -165,6 +166,31 @@ test('signOut clears session and resets authenticated state', async () => {
     expect(mock.signOutScope).toBe('local');
     expect(screen.getByTestId('status').textContent).toBe('no');
     expect(screen.getByTestId('nickname').textContent).toBe('');
+  });
+});
+
+test('signOut sets isSigningOut while the logout is settling, so guards redirect clean', async () => {
+  render(
+    <AuthProvider>
+      <AuthActionsProbe />
+    </AuthProvider>
+  );
+
+  await act(async () => {
+    await userEvent.click(screen.getByTestId('login'));
+  });
+  await waitFor(() => expect(screen.getByTestId('status').textContent).toBe('yes'));
+  expect(screen.getByTestId('signingOut').textContent).toBe('false');
+
+  await act(async () => {
+    await userEvent.click(screen.getByTestId('logout'));
+  });
+
+  // Right after signOut the session is cleared but the flag is still set —
+  // exactly the state the guards need to skip the `?next=` login-modal bounce.
+  await waitFor(() => {
+    expect(screen.getByTestId('status').textContent).toBe('no');
+    expect(screen.getByTestId('signingOut').textContent).toBe('true');
   });
 });
 

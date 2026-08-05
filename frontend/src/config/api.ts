@@ -17,22 +17,10 @@ export const API_URL = (import.meta as any).env?.VITE_API_URL || DEFAULT_ORIGIN;
 export const API_ENDPOINTS = {
   // Rackets
   RACKETS: '/api/v1/rackets',
-  RACKETS_BY_ID: (id: number) => `/api/v1/rackets/${id}`,
-  RACKETS_BY_NAME: (nombre: string) => `/api/v1/rackets/by-name/${encodeURIComponent(nombre)}`,
-  RACKETS_SEARCH: '/api/v1/rackets/search',
-  RACKETS_FILTER: '/api/v1/rackets/filter',
-  RACKETS_BESTSELLERS: '/api/v1/rackets/bestsellers',
-  RACKETS_OFFERS: '/api/v1/rackets/offers',
-  RACKETS_BRANDS: '/api/v1/rackets/brands',
-  RACKETS_STATS: '/api/v1/rackets/stats',
-  RACKETS_BULK_UPDATE: '/api/v1/rackets/bulk-update',
-  RACKETS_BY_BRAND: (brand: string) => `/api/v1/rackets/brands/${brand}`,
   RECOMMENDATION_RAG: '/api/recommendations/generate-rag',
 
   // Users
   USERS_PROFILE: '/api/v1/users/profile',
-  USERS_FAVORITES: '/api/v1/users/favorites',
-  USERS_FAVORITE_BY_ID: (id: number) => `/api/v1/users/favorites/${id}`,
 
   // Stores
   STORES: '/api/v1/stores',
@@ -50,26 +38,15 @@ export const API_ENDPOINTS = {
     RACKET_REQUESTS: '/api/v1/admin/racket-requests',
     STORE_REQUESTS: '/api/v1/admin/store-requests',
     RECENT_ACTIVITY: '/api/v1/admin/recent-activity',
-    BRANDS: '/api/v1/admin/brands',
     CATEGORIES: '/api/v1/admin/categories',
     VERIFY_STORE: (id: string) => `/api/admin/stores/${id}`,
     REJECT_STORE: (id: string) => `/api/admin/stores/${id}`,
     CONFLICTS: '/api/v1/admin/rackets/conflicts',
     RESOLVE_CONFLICT: (id: number) => `/api/v1/admin/rackets/${id}/resolve`,
-    EMBEDDING_STATS: '/api/v1/admin/embeddings/stats',
-    REINDEX_KNOWLEDGE: '/api/v1/admin/embeddings/reindex-knowledge',
-  },
-
-  // Racket Views
-  RACKET_VIEWS: {
-    RECENTLY_VIEWED: '/api/v1/racket-views/recently-viewed',
-    RECORD_VIEW: (racketId: number) => `/api/v1/racket-views/${racketId}`,
-    REMOVE_VIEW: (racketId: number) => `/api/v1/racket-views/${racketId}`,
-    CLEAR_HISTORY: '/api/v1/racket-views/clear',
   },
 
   // Health
-  HEALTH: '/api/v1/health',
+  HEALTH: '/api/health',
 
   // Analytics
   ANALYTICS_TRACK: '/api/v1/analytics/store',
@@ -78,13 +55,6 @@ export const API_ENDPOINTS = {
   // Price Watch
   PRICE_WATCH: '/api/v1/price-watch',
   PRICE_WATCH_BY_ID: (id: string) => `/api/v1/price-watch/${id}`,
-
-  // Notifications
-  NOTIFICATIONS: '/api/v1/notifications',
-  NOTIFICATIONS_UNREAD_COUNT: '/api/v1/notifications/unread-count',
-  NOTIFICATIONS_MARK_READ: (id: string) => `/api/v1/notifications/${id}/read`,
-  NOTIFICATIONS_MARK_ALL_READ: '/api/v1/notifications/read-all',
-  NOTIFICATIONS_DELETE: (id: string) => `/api/v1/notifications/${id}`,
 } as const;
 
 // Feature Flags

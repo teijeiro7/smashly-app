@@ -569,12 +569,34 @@ const Header = React.memo(() => {
                   <User />
                   Mi cuenta
                 </DropdownItem>
+                {userProfile.role?.toLowerCase() === 'admin' && (
+                  <DropdownItem
+                    onClick={() => {
+                      navigate({ to: '/admin' });
+                      setIsUserMenuOpen(false);
+                    }}
+                  >
+                    <User />
+                    Panel admin
+                  </DropdownItem>
+                )}
+                {userProfile.role?.toLowerCase() === 'store' && (
+                  <DropdownItem
+                    onClick={() => {
+                      navigate({ to: '/store/dashboard' });
+                      setIsUserMenuOpen(false);
+                    }}
+                  >
+                    <User />
+                    Mi tienda
+                  </DropdownItem>
+                )}
                 <Divider />
                 <DropdownItem
                   onClick={async () => {
                     await signOut();
                     setIsUserMenuOpen(false);
-                    navigate({ to: '/' });
+                    navigate({ to: '/', replace: true, search: {} });
                   }}
                 >
                   <SignOut />
@@ -665,13 +687,35 @@ const Header = React.memo(() => {
                     <User />
                     Mi cuenta
                   </NavLink>
+                  {userProfile.role?.toLowerCase() === 'admin' && (
+                    <NavLink
+                      to='/admin'
+                      $isActive={isActive('/admin')}
+                      $isMobile
+                      onClick={closeAllMenus}
+                    >
+                      <User />
+                      Panel admin
+                    </NavLink>
+                  )}
+                  {userProfile.role?.toLowerCase() === 'store' && (
+                    <NavLink
+                      to='/store/dashboard'
+                      $isActive={isActive('/store/dashboard')}
+                      $isMobile
+                      onClick={closeAllMenus}
+                    >
+                      <User />
+                      Mi tienda
+                    </NavLink>
+                  )}
                   <LogoutButton
                     $variant='secondary'
                     $isMobile
                     onClick={async () => {
                       await signOut();
                       closeAllMenus();
-                      navigate({ to: '/' });
+                      navigate({ to: '/', replace: true, search: {} });
                     }}
                     style={{ cursor: 'pointer', marginTop: '0.5rem', width: '100%' }}
                   >

@@ -148,7 +148,7 @@ const AccountSettings: React.FC<AccountSettingsProps> = ({ user }) => {
     setIsLoggingOut(true);
     try {
       await signOut();
-      navigate({ to: '/' });
+      navigate({ to: '/', replace: true, search: {} });
     } catch (error) {
       sileo.error({ title: 'Error', description: 'Error al cerrar sesión' });
     } finally {

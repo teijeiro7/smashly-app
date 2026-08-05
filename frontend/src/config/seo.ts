@@ -68,58 +68,64 @@ export const KEYWORDS = {
   ],
 } as const;
 
-export const ROUTES = {
-  home: '/',
-  catalog: '/catalog',
-  bestRacket: '/best-racket',
-  compare: '/compare',
-  compareRackets: '/compare-rackets',
-  faq: '/faq',
-  terms: '/terms-and-conditions',
-  privacy: '/privacy-policy',
-  login: '/login',
-  register: '/register',
-  forgotPassword: '/forgot-password',
-} as const;
+export interface RouteEntry {
+  /** Exact pathname, or (when `dynamic`) a prefix like '/palas/'. */
+  match: string;
+  /** true = prefix match (startsWith); false/undefined = exact match. */
+  dynamic?: boolean;
+  indexable: boolean;
+}
 
-export type RouteKey = keyof typeof ROUTES;
+/**
+ * Single source of truth for which paths search engines should see \u2014
+ * consumed by both /middleware.ts (noindex header) and
+ * scripts/generate-sitemap.mjs (which URLs to submit). Order matters:
+ * first match wins, so a specific exact path must be listed before a
+ * dynamic prefix that would otherwise swallow it (e.g. '/store/dashboard'
+ * before '/store/', since both start with '/store').
+ */
+export const ROUTES: RouteEntry[] = [
+  { match: '/', indexable: true },
+  { match: '/catalog', indexable: true },
+  { match: '/palas/', dynamic: true, indexable: true },
+  { match: '/racket-detail', indexable: false },
+  { match: '/best-racket', indexable: true },
+  { match: '/compare-rackets', indexable: true },
+  { match: '/compare', indexable: true },
+  { match: '/compare/', dynamic: true, indexable: false },
+  { match: '/shared/', dynamic: true, indexable: true },
+  { match: '/faq', indexable: true },
+  { match: '/terms-and-conditions', indexable: true },
+  { match: '/privacy-policy', indexable: true },
+  { match: '/forgot-password', indexable: false },
+  { match: '/update-password', indexable: false },
+  { match: '/store/dashboard', indexable: false },
+  { match: '/store/', dynamic: true, indexable: true },
+  { match: '/dashboard', indexable: false },
+  { match: '/messages', indexable: false },
+  { match: '/comparisons', indexable: false },
+  { match: '/profile', indexable: false },
+  { match: '/lists/', dynamic: true, indexable: false },
+  { match: '/admin', indexable: false },
+  { match: '/admin/', dynamic: true, indexable: false },
+  { match: '/error', indexable: false },
+];
+
+/** Unknown paths (typos, the 404 splat) default to non-indexable. */
+export function isIndexable(pathname: string): boolean {
+  for (const r of ROUTES) {
+    if (r.dynamic ? pathname.startsWith(r.match) : pathname === r.match) {
+      return r.indexable;
+    }
+  }
+  return false;
+}
 
 export const buildUrl = (path: string): string => {
   if (!path || path === '/') return SITE_URL;
   const normalized = path.startsWith('/') ? path : `/${path}`;
   return `${SITE_URL}${normalized}`;
 };
-
-export const buildCatalogUrl = (params?: {
-  brand?: string;
-  shape?: string;
-  level?: string;
-  search?: string;
-}): string => {
-  const url = new URL(buildUrl('/catalog'));
-  if (params?.brand) url.searchParams.set('brand', params.brand);
-  if (params?.shape) url.searchParams.set('shape', params.shape);
-  if (params?.level) url.searchParams.set('level', params.level);
-  if (params?.search) url.searchParams.set('q', params.search);
-  return url.toString();
-};
-
-export const buildRacketUrl = (racket: { id?: number; nombre: string }): string => {
-  const slug = slugify(racket.nombre);
-  return buildUrl(`/racket-detail?id=${racket.id ?? ''}&name=${encodeURIComponent(slug)}`);
-};
-
-export const slugify = (text: string): string =>
-  text
-    .toString()
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .toLowerCase()
-    .trim()
-    .replace(/[^a-z0-9\s-]/g, '')
-    .replace(/\s+/g, '-')
-    .replace(/-+/g, '-')
-    .replace(/^-+|-+$/g, '');
 
 export const allKeywords = [...KEYWORDS.primary, ...KEYWORDS.secondary, ...KEYWORDS.longtail].join(
   ', '

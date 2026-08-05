@@ -13,11 +13,10 @@ import {
   FiCopy,
   FiCheck,
 } from 'react-icons/fi';
-import { Link, useNavigate } from '@tanstack/react-router';
+import { Link } from '@tanstack/react-router';
 import comparisonService, { SavedComparison } from '../services/comparisonService';
 import racketService from '../services/racketService';
 import { Racket } from '../types/racket';
-import { useAuth } from '../contexts/AuthContext';
 import { sileo } from 'sileo';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -495,8 +494,6 @@ const ModalBody = styled.div`
 `;
 
 const MyComparisonsPage: React.FC = () => {
-  const { isAuthenticated } = useAuth();
-  const navigate = useNavigate();
   const [allComparisons, setAllComparisons] = useState<SavedComparison[]>([]);
   const [displayedComparisons, setDisplayedComparisons] = useState<SavedComparison[]>([]);
   const [loading, setLoading] = useState(true);
@@ -512,14 +509,12 @@ const MyComparisonsPage: React.FC = () => {
 
   const ITEMS_PER_PAGE = 9;
 
+  // No in-page auth guard needed: the router's requireAuth beforeLoad on
+  // /comparisons already keeps an anonymous user from ever mounting this page.
   useEffect(() => {
-    if (!isAuthenticated) {
-      navigate({ to: '/login' });
-      return;
-    }
-
     loadComparisons();
-  }, [isAuthenticated, navigate]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const loadComparisons = async () => {
     try {

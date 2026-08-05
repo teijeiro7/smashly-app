@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import { Link } from '@tanstack/react-router';
 import { reviewService } from '../../services/reviewService';
 import type { ReviewsResponse } from '../../types/review';
 import { ReviewItem } from './ReviewItem';
 import { ReviewForm } from './ReviewForm';
 import { useAuth } from '../../contexts/AuthContext';
+import { useAuthModal } from '../../contexts/AuthModalContext';
 
 interface ProductReviewsProps {
   racketId: number;
@@ -13,6 +13,7 @@ interface ProductReviewsProps {
 
 export const ProductReviews: React.FC<ProductReviewsProps> = ({ racketId }) => {
   const { user } = useAuth();
+  const { openLogin } = useAuthModal();
   const [reviewsData, setReviewsData] = useState<ReviewsResponse | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [page, setPage] = useState(1);
@@ -134,7 +135,7 @@ export const ProductReviews: React.FC<ProductReviewsProps> = ({ racketId }) => {
                   {showForm ? 'Cancel' : 'Write a Review'}
                 </WriteReviewButton>
               )}
-              {!user && <LoginPrompt to='/login'>Log in to write a review</LoginPrompt>}
+              {!user && <LoginPrompt onClick={openLogin}>Log in to write a review</LoginPrompt>}
             </WriteActionArea>
           </SummaryCard>
 
@@ -179,7 +180,9 @@ export const ProductReviews: React.FC<ProductReviewsProps> = ({ racketId }) => {
                 </WriteReviewButton>
               )}
               {!user && (
-                <LoginPrompt to='/login'>Inicia sesión para escribir una valoración</LoginPrompt>
+                <LoginPrompt onClick={openLogin}>
+                  Inicia sesión para escribir una valoración
+                </LoginPrompt>
               )}
             </div>
           </EmptyStateBanner>
@@ -364,7 +367,7 @@ const WriteReviewButton = styled.button`
   }
 `;
 
-const LoginPrompt = styled(Link)`
+const LoginPrompt = styled.button`
   display: block;
   width: 100%;
   padding: 1rem;
@@ -373,6 +376,8 @@ const LoginPrompt = styled(Link)`
   color: var(--text);
   font-weight: 600;
   border-radius: 12px;
+  border: none;
+  cursor: pointer;
   text-decoration: none;
   transition: background 0.2s;
 

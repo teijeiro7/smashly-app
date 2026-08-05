@@ -262,8 +262,8 @@ export const ViewListModal: React.FC<ViewListModalProps> = ({
     }
   };
 
-  const handleViewRacket = (racketId: number) => {
-    navigate({ to: '/racket-detail', search: { id: racketId } });
+  const handleViewRacket = (slug: string) => {
+    navigate({ to: '/palas/$slug', params: { slug } });
     onClose();
   };
 
@@ -306,9 +306,6 @@ export const ViewListModal: React.FC<ViewListModalProps> = ({
               ) : (
                 <RacketsList>
                   {list.rackets.map((racket: any) => {
-                    // Debug log
-                    console.log('🎾 Racket data:', racket);
-
                     return (
                       <RacketCard key={racket.id}>
                         <RacketImage
@@ -334,7 +331,7 @@ export const ViewListModal: React.FC<ViewListModalProps> = ({
                         <RacketActions>
                           <ActionButton
                             variant='primary'
-                            onClick={() => handleViewRacket(racket.id!)}
+                            onClick={() => handleViewRacket(racket.slug)}
                             title='Ver detalles'
                           >
                             <FiExternalLink size={18} />

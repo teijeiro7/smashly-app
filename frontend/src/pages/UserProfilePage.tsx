@@ -14,7 +14,7 @@ import {
   FiCalendar,
 } from 'react-icons/fi';
 import { GiTennisRacket } from 'react-icons/gi';
-import { Link, useNavigate, useSearch } from '@tanstack/react-router';
+import { Link, useSearch } from '@tanstack/react-router';
 import { useAuth } from '../contexts/AuthContext';
 import { getAuthHeaders } from '../config/api';
 import { UserProfileService } from '../services/userProfileService';
@@ -423,8 +423,7 @@ interface UserProfileFormData {
 }
 
 const UserProfilePage: React.FC = () => {
-  const { user, userProfile, refreshUserProfile, loading } = useAuth();
-  const navigate = useNavigate();
+  const { user, userProfile, refreshUserProfile } = useAuth();
   const searchParams = useSearch({ strict: false }) as Record<string, string>;
   const [activeTab, setActiveTab] = useState<TabType>('profile');
   const [saving, setSaving] = useState(false);
@@ -477,14 +476,8 @@ const UserProfilePage: React.FC = () => {
     }
   }, [userProfile]);
 
-  useEffect(() => {
-    // No redirigir mientras está cargando la sesión
-    if (loading) return;
-
-    if (!user) {
-      navigate({ to: '/login' });
-    }
-  }, [user, navigate, loading]);
+  // No in-page auth guard needed: the router's requireAuth beforeLoad on
+  // /profile already keeps an anonymous user from ever mounting this page.
 
   useEffect(() => {
     if (activeTab === 'activity') {

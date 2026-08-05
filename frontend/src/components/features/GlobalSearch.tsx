@@ -693,7 +693,7 @@ export const GlobalSearch: React.FC<GlobalSearchProps> = ({
     } else {
       toggleSearch();
     }
-    navigate({ to: '/racket-detail', search: { id: racket.id } });
+    navigate({ to: '/palas/$slug', params: { slug: racket.slug } });
   };
 
   const handleBrandSelect = (brand: string) => {

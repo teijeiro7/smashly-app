@@ -466,19 +466,6 @@ const AdminDashboard: React.FC = () => {
         <Card>
           <CardHeader>
             <CardTitle>Actividad Reciente</CardTitle>
-            <Link
-              to={'/admin/activity' as any}
-              style={{
-                fontSize: '0.875rem',
-                color: 'var(--primary)',
-                textDecoration: 'none',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.25rem',
-              }}
-            >
-              Ver todo <FiArrowRight size={14} />
-            </Link>
           </CardHeader>
           <CardContent>
             <ActivityList>

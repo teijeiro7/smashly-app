@@ -61,11 +61,19 @@ vi.mock('../../../services/recommendationService', () => ({
 vi.mock('@tanstack/react-router', () => ({
   useNavigate: () => mocks.mockNavigate,
   useRouterState: () => ({ location: { hash: '' } }),
-  Link: ({ to, children, className, ...props }: any) => (
-    <a href={to} className={className} {...props}>
-      {children}
-    </a>
-  ),
+  Link: ({ to, search, children, className, ...props }: any) => {
+    const qs = search
+      ? '?' +
+        Object.entries(search)
+          .map(([key, value]) => `${key}=${encodeURIComponent(String(value))}`)
+          .join('&')
+      : '';
+    return (
+      <a href={`${to}${qs}`} className={className} {...props}>
+        {children}
+      </a>
+    );
+  },
 }));
 
 const recommendation = {

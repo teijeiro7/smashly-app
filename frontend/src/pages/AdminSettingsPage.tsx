@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useAuth } from '../contexts/AuthContext';
-import { Navigate } from '@tanstack/react-router';
 import AdminLayout from '../components/features/AdminLayout';
 import Button from '../components/common/Button';
 import {
@@ -879,22 +877,12 @@ const SettingsContent: React.FC = () => {
   );
 };
 
-const AdminSettingsPageWithLayout: React.FC = () => {
-  const { user, loading } = useAuth();
-
-  if (loading) {
-    return <LoadingContainer>Cargando...</LoadingContainer>;
-  }
-
-  if (!user || user.role?.toLowerCase() !== 'admin') {
-    return <Navigate to='/profile' replace />;
-  }
-
-  return (
-    <AdminLayout>
-      <SettingsContent />
-    </AdminLayout>
-  );
-};
+// No in-page auth/role guard needed: the router's requireAdmin beforeLoad on
+// /admin/settings already keeps a non-admin from ever mounting this page.
+const AdminSettingsPageWithLayout: React.FC = () => (
+  <AdminLayout>
+    <SettingsContent />
+  </AdminLayout>
+);
 
 export default AdminSettingsPageWithLayout;
