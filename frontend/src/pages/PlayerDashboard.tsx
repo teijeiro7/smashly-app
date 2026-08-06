@@ -537,7 +537,20 @@ export const PlayerDashboard: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [_recommendationLoading, setRecommendationLoading] = useState(true);
   const [showFinderModal, setShowFinderModal] = useState(false);
-  const hasRecommendation = Boolean(lastRecommendation?.recommendation_result?.rackets?.length);
+  const recommendedRackets = React.useMemo(() => {
+    if (!lastRecommendation?.recommendation_result) return [];
+    let res = lastRecommendation.recommendation_result;
+    if (typeof res === 'string') {
+      try {
+        res = JSON.parse(res);
+      } catch {
+        return [];
+      }
+    }
+    return Array.isArray(res?.rackets) ? res.rackets : [];
+  }, [lastRecommendation]);
+
+  const hasRecommendation = recommendedRackets.length > 0;
 
   const loadLastRecommendation = async () => {
     try {
@@ -557,36 +570,36 @@ export const PlayerDashboard: React.FC = () => {
       try {
         setLoading(true);
 
-        // Fetch favorites count from "Favoritas" list
-        const lists = await ListService.getUserLists();
-        const favoritasList = lists.find(list => list.name === 'Favoritas');
+        const [userLists, offersData, recentlyViewedData] = await Promise.all([
+          ListService.getUserLists().catch(() => []),
+          racketService.getRacketsOnSale(12).catch(() => []),
+          RacketViewService.getRecentlyViewed(4).catch(() => []),
+        ]);
+
+        // Process favorites list
+        const favoritasList = userLists.find(list => list.name === 'Favoritas');
         if (favoritasList) {
           setFavoritesCount(favoritasList.racket_count || 0);
-
-          // If we want to show the rackets, fetch the list with details
           if (favoritasList.racket_count && favoritasList.racket_count > 0) {
-            const listWithRackets = await ListService.getListById(favoritasList.id);
-            if (listWithRackets?.rackets) {
-              setFavorites(listWithRackets.rackets.slice(0, 4));
-            }
+            ListService.getListById(favoritasList.id)
+              .then(listWithRackets => {
+                if (listWithRackets?.rackets) {
+                  setFavorites(listWithRackets.rackets.slice(0, 4));
+                }
+              })
+              .catch(() => {});
           }
         }
 
-        // Fetch recommendations based on user profile
-        // const recs = await racketService.getRecommendedRackets(user?.game_level);
-        // setRecommendations(recs.slice(0, 3));
-
-        // Fetch offers and recently viewed in parallel
-        const [allRackets, recentlyViewedData] = await Promise.all([
-          racketService.getAllRackets(),
-          RacketViewService.getRecentlyViewed(4).catch(() => []), // Obtener últimas 4 palas vistas
-        ]);
-
-        // Filter offers and shuffle them to show different ones each time
-        const onOffer = allRackets.filter((r: Racket) => r.en_oferta);
-
-        // Shuffle array using Fisher-Yates algorithm
-        const shuffled = [...onOffer].sort(() => Math.random() - 0.5);
+        const validOffers = offersData.filter(
+          (r: Racket) =>
+            r.en_oferta &&
+            !r.solo_comparacion &&
+            r.precio_actual !== undefined &&
+            r.precio_actual !== null &&
+            r.precio_actual > 0
+        );
+        const shuffled = [...validOffers].sort(() => Math.random() - 0.5);
 
         setOffers(shuffled.slice(0, 4));
         setRecentlyViewed(recentlyViewedData);
@@ -691,7 +704,11 @@ export const PlayerDashboard: React.FC = () => {
                   )}
                   <RacketName>{formatRacketName(racket)}</RacketName>
                   <RacketBrand>{formatBrandName(racket.marca)}</RacketBrand>
-                  {racket.precio_actual && <RacketPrice>{racket.precio_actual}€</RacketPrice>}
+                  {racket.solo_comparacion || !racket.precio_actual || racket.precio_actual <= 0 ? (
+                    <NoPriceTag>Solo comparación</NoPriceTag>
+                  ) : (
+                    <RacketPrice>{racket.precio_actual}€</RacketPrice>
+                  )}
                 </RacketCard>
               ))}
             </RacketsGrid>
@@ -721,7 +738,11 @@ export const PlayerDashboard: React.FC = () => {
                   )}
                   <RacketName>{formatRacketName(racket)}</RacketName>
                   <RacketBrand>{formatBrandName(racket.marca)}</RacketBrand>
-                  {racket.precio_actual && <RacketPrice>{racket.precio_actual}€</RacketPrice>}
+                  {racket.solo_comparacion || !racket.precio_actual || racket.precio_actual <= 0 ? (
+                    <NoPriceTag>Solo comparación</NoPriceTag>
+                  ) : (
+                    <RacketPrice>{racket.precio_actual}€</RacketPrice>
+                  )}
                 </RacketCard>
               ))}
             </RacketsGrid>
@@ -748,7 +769,11 @@ export const PlayerDashboard: React.FC = () => {
                   )}
                   <RacketName>{formatRacketName(racket)}</RacketName>
                   <RacketBrand>{formatBrandName(racket.marca)}</RacketBrand>
-                  {racket.precio_actual && <RacketPrice>{racket.precio_actual}€</RacketPrice>}
+                  {racket.solo_comparacion || !racket.precio_actual || racket.precio_actual <= 0 ? (
+                    <NoPriceTag>Solo comparación</NoPriceTag>
+                  ) : (
+                    <RacketPrice>{racket.precio_actual}€</RacketPrice>
+                  )}
                 </RacketCard>
               ))}
             </RacketsGrid>
@@ -805,14 +830,15 @@ export const PlayerDashboard: React.FC = () => {
               <FaStar /> Tus próximas palas
             </SectionTitle>
             <RecommendationsGrid>
-              {lastRecommendation!.recommendation_result.rackets
-                .slice(0, 3)
-                .map((racket, index) => (
-                  <RecommendedRacketCard key={racket.id}>
+              {recommendedRackets.slice(0, 3).map((racket, index) => {
+                const score = typeof racket.match_score === 'number' ? racket.match_score : 0;
+                const price = typeof racket.price === 'number' ? racket.price : null;
+                return (
+                  <RecommendedRacketCard key={racket.id || index}>
                     <RacketPosition>#{index + 1}</RacketPosition>
                     <RacketImageWrap>
                       {racket.image ? (
-                        <RacketImageSmall src={racket.image} alt={racket.name} />
+                        <RacketImageSmall src={racket.image} alt={racket.name || 'Pala'} />
                       ) : null}
                     </RacketImageWrap>
                     <RecommendedRacketBody>
@@ -823,12 +849,12 @@ export const PlayerDashboard: React.FC = () => {
                         <ScoreRow>
                           <ScoreLabel>Match</ScoreLabel>
                           <ScoreBarTrack>
-                            <ScoreBarFill $pct={racket.match_score} />
+                            <ScoreBarFill $pct={score} />
                           </ScoreBarTrack>
-                          <ScoreValue>{(racket.match_score / 10).toFixed(1)}/10</ScoreValue>
+                          <ScoreValue>{(score / 10).toFixed(1)}/10</ScoreValue>
                         </ScoreRow>
-                        {racket.price ? (
-                          <PriceTag>€{racket.price.toFixed(2)}</PriceTag>
+                        {price ? (
+                          <PriceTag>€{price.toFixed(2)}</PriceTag>
                         ) : (
                           <NoPriceTag>Solo para recomendación</NoPriceTag>
                         )}
@@ -839,7 +865,8 @@ export const PlayerDashboard: React.FC = () => {
                       Ver detalle
                     </DetailLinkButton>
                   </RecommendedRacketCard>
-                ))}
+                );
+              })}
             </RecommendationsGrid>
           </Section>
         )}

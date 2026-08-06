@@ -348,15 +348,15 @@ const AdminDashboard: React.FC = () => {
 
   const loadDashboardData = async () => {
     try {
-      const [metricsData, activitiesData, conflictsData] = await Promise.all([
+      const [metricsData, activitiesData, conflictsCount] = await Promise.all([
         AdminService.getDashboardMetrics(),
         AdminService.getRecentActivity(10),
-        AdminService.getRacketConflicts(),
+        AdminService.getRacketConflictsCount(),
       ]);
 
       setMetrics(metricsData);
       setActivities(activitiesData);
-      setConflictsCount(conflictsData.length);
+      setConflictsCount(conflictsCount);
     } catch (error: any) {
       console.error('Error loading dashboard data:', error);
 

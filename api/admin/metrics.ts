@@ -47,6 +47,8 @@ async function getFavoritesCount(): Promise<number> {
   return count || 0;
 }
 
+let metricsCache: { data: any; expiresAt: number } | null = null;
+
 export default async function handler(req: IncomingMessage, res: ServerResponse): Promise<void> {
   setCorsHeaders(req, res);
 
@@ -63,6 +65,13 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
   }
 
   try {
+    const now = Date.now();
+    if (metricsCache && metricsCache.expiresAt > now) {
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ success: true, data: metricsCache.data }));
+      return;
+    }
+
     const [
       totalUsers,
       totalRackets,
@@ -81,23 +90,27 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
       getFavoritesCount(),
     ]);
 
+    const metricsData = {
+      totalUsers,
+      totalRackets,
+      totalStores,
+      totalReviews,
+      pendingRequests,
+      activeUsers,
+      totalFavorites,
+      usersChange: 0,
+      racketsChange: 0,
+      reviewsChange: 0,
+      activeUsersChange: 0,
+    };
+
+    metricsCache = { data: metricsData, expiresAt: now + 60 * 1000 };
+
     res.writeHead(200, { 'Content-Type': 'application/json' });
     res.end(
       JSON.stringify({
         success: true,
-        data: {
-          totalUsers,
-          totalRackets,
-          totalStores,
-          totalReviews,
-          pendingRequests,
-          activeUsers,
-          totalFavorites,
-          usersChange: 0,
-          racketsChange: 0,
-          reviewsChange: 0,
-          activeUsersChange: 0,
-        },
+        data: metricsData,
       })
     );
   } catch (err: any) {

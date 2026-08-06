@@ -1,3 +1,4 @@
+import { getAuthHeaders } from '../config/api';
 import { supabase } from '../lib/supabase';
 import {
   BasicFormData,
@@ -6,23 +7,12 @@ import {
   Recommendation,
 } from '../types/recommendation';
 
-async function getAuthHeader(): Promise<HeadersInit> {
-  const {
-    data: { session },
-  } = await supabase.auth.getSession();
-  const headers: HeadersInit = { 'Content-Type': 'application/json' };
-  if (session?.access_token) {
-    headers['Authorization'] = `Bearer ${session.access_token}`;
-  }
-  return headers;
-}
-
 export class RecommendationService {
   static async generate(
     type: 'basic' | 'advanced',
     data: BasicFormData | AdvancedFormData
   ): Promise<RecommendationResult> {
-    const headers = await getAuthHeader();
+    const headers = await getAuthHeaders();
     const response = await fetch('/api/recommendations/generate', {
       method: 'POST',
       headers,
@@ -43,7 +33,7 @@ export class RecommendationService {
     type: 'basic' | 'advanced',
     data: BasicFormData | AdvancedFormData
   ): Promise<RecommendationResult> {
-    const headers = await getAuthHeader();
+    const headers = await getAuthHeaders();
     const response = await fetch('/api/recommendations/generate-rag', {
       method: 'POST',
       headers,

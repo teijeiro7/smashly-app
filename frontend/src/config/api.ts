@@ -98,9 +98,20 @@ export const buildApiUrl = (endpoint: string, params?: Record<string, any>): str
  * (`getAuthUser`) espera en el servidor.
  */
 export const getAuthHeaders = async (): Promise<HeadersInit> => {
-  const {
+  let {
     data: { session },
   } = await supabase.auth.getSession();
+
+  // If session token is expired or expiring within 60 seconds, refresh it
+  if (session?.expires_at) {
+    const nowInSeconds = Math.floor(Date.now() / 1000);
+    if (session.expires_at - nowInSeconds < 60) {
+      const { data: refreshData } = await supabase.auth.refreshSession();
+      if (refreshData?.session) {
+        session = refreshData.session;
+      }
+    }
+  }
 
   const headers: HeadersInit = { 'Content-Type': 'application/json' };
   if (session?.access_token) {

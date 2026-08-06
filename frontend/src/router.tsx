@@ -22,6 +22,7 @@ import { RouteLoadingFallback, CatalogSkeleton } from './components/common/Loadi
 import { PWAInstallPrompt } from './components/pwa/PWAInstallPrompt';
 import { BackgroundTaskPopup } from './components/common/BackgroundTaskPopup';
 import LoadingSpinner from './components/common/LoadingSpinner';
+import ErrorBoundary from './components/ErrorBoundary';
 import { logger } from './utils/logger';
 import { sileo } from 'sileo';
 
@@ -305,10 +306,20 @@ const NextParamHandler: React.FC = () => {
 // ──────────────────────────────────────────────────────────────────────────────
 const RootOutlet: React.FC = () => {
   const pathname = useRouterState({ select: state => state.location.pathname });
+
+  useEffect(() => {
+    document.getElementById('main-content')?.focus();
+  }, [pathname]);
+
   return (
-    <AnimatePresence mode='wait'>
-      <Outlet key={pathname} />
-    </AnimatePresence>
+    <ErrorBoundary>
+      <div aria-live='polite' className='sr-only'>
+        Página actualizada
+      </div>
+      <AnimatePresence mode='wait'>
+        <Outlet key={pathname} />
+      </AnimatePresence>
+    </ErrorBoundary>
   );
 };
 

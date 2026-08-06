@@ -301,6 +301,23 @@ export class AdminService {
   }
 
   /**
+   * Obtiene la cantidad de conflictos de palas pendientes de revisión (optimizado)
+   */
+  static async getRacketConflictsCount(): Promise<number> {
+    try {
+      const response = await fetch(buildApiUrl(API_ENDPOINTS.ADMIN.CONFLICTS, { countOnly: 'true' }), {
+        method: 'GET',
+        headers: await getAuthHeaders(),
+      });
+
+      const res = await handleApiResponse<{ count: number }>(response);
+      return res?.count ?? 0;
+    } catch {
+      return 0;
+    }
+  }
+
+  /**
    * Obtiene los conflictos de palas pendientes de revisión
    */
   static async getRacketConflicts(): Promise<any[]> {
