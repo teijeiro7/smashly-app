@@ -199,7 +199,7 @@ export const ImageLightbox: React.FC<ImageLightboxProps> = ({
 
   return (
     <Overlay onClick={onClose}>
-      <CloseButton onClick={onClose}>
+      <CloseButton onClick={onClose} aria-label='Cerrar'>
         <FiX size={24} />
       </CloseButton>
 
@@ -212,6 +212,7 @@ export const ImageLightbox: React.FC<ImageLightboxProps> = ({
               if (currentIndex > 0) onNavigate(currentIndex - 1);
             }}
             disabled={currentIndex === 0}
+            aria-label='Imagen anterior'
           >
             <FiChevronLeft size={24} />
           </NavigationButton>
@@ -223,6 +224,7 @@ export const ImageLightbox: React.FC<ImageLightboxProps> = ({
               if (currentIndex < images.length - 1) onNavigate(currentIndex + 1);
             }}
             disabled={currentIndex === images.length - 1}
+            aria-label='Imagen siguiente'
           >
             <FiChevronRight size={24} />
           </NavigationButton>

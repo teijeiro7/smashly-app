@@ -601,11 +601,14 @@ export const BackgroundTaskPopup: React.FC = () => {
                 </HeaderTitle>
               </HeaderLeft>
               <HeaderActions>
-                <IconButton onClick={handleToggleMinimize}>
+                <IconButton
+                  onClick={handleToggleMinimize}
+                  aria-label={minimized ? 'Expandir panel' : 'Minimizar panel'}
+                >
                   <FiMinimize2 size={16} />
                 </IconButton>
                 {visibleTask.status !== 'running' && (
-                  <IconButton onClick={handleClose}>
+                  <IconButton onClick={handleClose} aria-label='Cerrar'>
                     <FiX size={16} />
                   </IconButton>
                 )}

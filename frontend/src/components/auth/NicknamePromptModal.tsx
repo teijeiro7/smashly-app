@@ -243,7 +243,7 @@ const NicknamePromptModal: React.FC<NicknamePromptModalProps> = ({
               autoFocus={isEditing}
             />
             {!isEditing && (
-              <EditButton onClick={handleEdit} disabled={isLoading}>
+              <EditButton onClick={handleEdit} disabled={isLoading} aria-label='Editar nickname'>
                 <FiEdit2 size={18} />
               </EditButton>
             )}

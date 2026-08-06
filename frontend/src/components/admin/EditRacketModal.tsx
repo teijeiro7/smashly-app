@@ -226,7 +226,7 @@ export const EditRacketModal: React.FC<EditRacketModalProps> = ({
           exit={{ scale: 0.9, opacity: 0 }}
           onClick={e => e.stopPropagation()}
         >
-          <CloseButton onClick={onClose}>
+          <CloseButton onClick={onClose} aria-label='Cerrar'>
             <FiX />
           </CloseButton>
 

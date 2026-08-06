@@ -399,7 +399,7 @@ const MessagingPage: React.FC = () => {
         {activeConv ? (
           <>
             <ChatHeader>
-              <BackButton onClick={() => setShowChat(false)}>
+              <BackButton onClick={() => setShowChat(false)} aria-label='Volver a conversaciones'>
                 <FiArrowLeft size={20} />
               </BackButton>
               <FaStore size={18} />
@@ -436,7 +436,11 @@ const MessagingPage: React.FC = () => {
                 onKeyDown={handleKeyDown}
                 placeholder='Escribe un mensaje...'
               />
-              <SendButton onClick={handleSend} disabled={!inputValue.trim() || sending}>
+              <SendButton
+                onClick={handleSend}
+                disabled={!inputValue.trim() || sending}
+                aria-label='Enviar mensaje'
+              >
                 <FiSend size={18} />
               </SendButton>
             </InputBar>

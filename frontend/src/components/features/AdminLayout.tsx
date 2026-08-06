@@ -215,7 +215,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
       <Sidebar $isOpen={mobileOpen}>
         <SidebarHeader>
           <span style={{ fontWeight: 600, color: 'var(--text)' }}>Menú</span>
-          <CloseButton onClick={() => setMobileOpen(false)}>
+          <CloseButton onClick={() => setMobileOpen(false)} aria-label='Cerrar menú'>
             <FiX size={18} />
           </CloseButton>
         </SidebarHeader>
@@ -264,7 +264,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
 
       <MainContent>
         <MobileHeader>
-          <MobileMenuButton onClick={() => setMobileOpen(true)}>
+          <MobileMenuButton onClick={() => setMobileOpen(true)} aria-label='Abrir menú'>
             <FiMenu size={20} />
           </MobileMenuButton>
           <MobileTitle>Smashly Admin</MobileTitle>

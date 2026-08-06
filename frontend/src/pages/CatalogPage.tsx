@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef, useCallback, useMemo } from 'react'
 import { FiGrid, FiList, FiSearch, FiX, FiChevronDown, FiFilter, FiTag } from 'react-icons/fi';
 import { useNavigate, useSearch } from '@tanstack/react-router';
 import styled from 'styled-components';
+import { useDebounce } from '../hooks/useDebounce';
 import { useComparison } from '../contexts/ComparisonContext';
 import { useRackets } from '../contexts/RacketsContext';
 import racketService from '../services/racketService';
@@ -455,7 +456,7 @@ const EmptyIcon = styled.div`
   opacity: 0.5;
 `;
 
-const EmptyTitle = styled.h3`
+const EmptyTitle = styled.h2`
   font-size: 1.25rem;
   font-weight: 700;
   color: var(--text);
@@ -595,6 +596,8 @@ const CatalogPage: React.FC = () => {
 
   const ITEMS_PER_PAGE = 9;
 
+  const debouncedSearchQuery = useDebounce(searchQuery, 300);
+
   // Initialize state from URL params
   useEffect(() => {
     const queryParam = searchParams['search'] || '';
@@ -625,11 +628,11 @@ const CatalogPage: React.FC = () => {
     setSortBy(sortParam);
   }, [searchParams]);
 
-  // Update URL when filters change
+  // Update URL when filters change (guarded to prevent infinite re-render loops)
   useEffect(() => {
     const params = new URLSearchParams();
 
-    if (searchQuery) params.set('search', searchQuery);
+    if (debouncedSearchQuery) params.set('search', debouncedSearchQuery);
     if (selectedBrand !== 'Todas') params.set('brand', selectedBrand);
     if (selectedShape !== 'Todas') params.set('shape', selectedShape);
     if (selectedBalance !== 'Todos') params.set('balance', selectedBalance);
@@ -644,9 +647,14 @@ const CatalogPage: React.FC = () => {
     if (sortBy !== 'name') params.set('sort', sortBy);
 
     const searchObj = Object.fromEntries(params.entries());
-    navigate({ to: '/catalog', search: searchObj, replace: true });
+    const currentStr = JSON.stringify(searchParams);
+    const newStr = JSON.stringify(searchObj);
+
+    if (currentStr !== newStr) {
+      navigate({ to: '/catalog', search: searchObj, replace: true });
+    }
   }, [
-    searchQuery,
+    debouncedSearchQuery,
     selectedBrand,
     selectedShape,
     selectedBalance,
@@ -657,7 +665,9 @@ const CatalogPage: React.FC = () => {
     selectedHardness,
     showOffers,
     showMostViewed,
+    showAvailableOnly,
     sortBy,
+    searchParams,
     navigate,
   ]);
 
@@ -677,7 +687,7 @@ const CatalogPage: React.FC = () => {
   useEffect(() => {
     const performSearch = async () => {
       // If there's a search query, use API-based fuzzy search
-      if (searchQuery.trim().length >= 2) {
+      if (debouncedSearchQuery.trim().length >= 2) {
         try {
           const filters: Record<string, string> = {};
 
@@ -693,7 +703,7 @@ const CatalogPage: React.FC = () => {
           if (showAvailableOnly) filters.available_only = 'true';
           if (showMostViewed) filters.most_viewed = 'true';
 
-          const result = await racketService.searchRackets(searchQuery, filters);
+          const result = await racketService.searchRackets(debouncedSearchQuery, filters);
 
           if (result?.data && result.data.length > 0) {
             // Apply local sorting since API returns sorted by relevance
@@ -873,7 +883,7 @@ const CatalogPage: React.FC = () => {
     return () => clearTimeout(debounceTimer);
   }, [
     rackets,
-    searchQuery,
+    debouncedSearchQuery,
     selectedBrand,
     showMostViewed,
     showOffers,
@@ -1156,7 +1166,10 @@ const CatalogPage: React.FC = () => {
                 onChange={e => setSearchQuery(e.target.value)}
               />
               {searchQuery && (
-                <ClearSearchIconButton onClick={() => setSearchQuery('')}>
+                <ClearSearchIconButton
+                  onClick={() => setSearchQuery('')}
+                  aria-label='Limpiar búsqueda'
+                >
                   <FiX size={16} />
                 </ClearSearchIconButton>
               )}
@@ -1325,10 +1338,18 @@ const CatalogPage: React.FC = () => {
             </SortSelect>
 
             <ViewToggle>
-              <ViewButton $active={viewMode === 'grid'} onClick={() => setViewMode('grid')}>
+              <ViewButton
+                $active={viewMode === 'grid'}
+                onClick={() => setViewMode('grid')}
+                aria-label='Vista en cuadrícula'
+              >
                 <FiGrid />
               </ViewButton>
-              <ViewButton $active={viewMode === 'list'} onClick={() => setViewMode('list')}>
+              <ViewButton
+                $active={viewMode === 'list'}
+                onClick={() => setViewMode('list')}
+                aria-label='Vista en lista'
+              >
                 <FiList />
               </ViewButton>
             </ViewToggle>

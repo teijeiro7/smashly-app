@@ -429,6 +429,7 @@ const UserCollections: React.FC = () => {
                               onClick={e => handleDeleteList(list.id, e)}
                               whileHover={{ scale: 1.1 }}
                               whileTap={{ scale: 0.9 }}
+                              aria-label={`Eliminar lista ${list.name}`}
                             >
                               <FiTrash2 size={14} />
                             </ActionButton>

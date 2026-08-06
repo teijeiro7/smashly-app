@@ -389,7 +389,7 @@ const StoreProfileForm: React.FC<StoreProfileFormProps> = ({ store, isOpen, onCl
       <ModalContainer onClick={e => e.stopPropagation()}>
         <Header>
           <Title>Editar perfil de tienda</Title>
-          <CloseButton onClick={onClose}>
+          <CloseButton onClick={onClose} aria-label='Cerrar'>
             <FiX size={24} />
           </CloseButton>
         </Header>
@@ -510,7 +510,10 @@ const StoreProfileForm: React.FC<StoreProfileFormProps> = ({ store, isOpen, onCl
                 {form.gallery_images.map((url, i) => (
                   <GalleryUrlTag key={i}>
                     <span>{url}</span>
-                    <RemoveUrlButton onClick={() => removeGalleryUrl(i)}>
+                    <RemoveUrlButton
+                      onClick={() => removeGalleryUrl(i)}
+                      aria-label={`Eliminar imagen ${i + 1} de la galería`}
+                    >
                       <FiTrash2 size={14} />
                     </RemoveUrlButton>
                   </GalleryUrlTag>

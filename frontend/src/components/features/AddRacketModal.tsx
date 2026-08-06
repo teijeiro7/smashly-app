@@ -319,7 +319,7 @@ const AddRacketModal: React.FC<AddRacketModalProps> = ({ storeId, isOpen, onClos
       <Modal onClick={e => e.stopPropagation()}>
         <Header>
           <Title>Añadir pala al catálogo</Title>
-          <CloseBtn onClick={onClose}>
+          <CloseBtn onClick={onClose} aria-label='Cerrar'>
             <FiX size={22} />
           </CloseBtn>
         </Header>

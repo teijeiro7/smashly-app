@@ -293,7 +293,7 @@ const ContactIconContainer = styled.div`
   }
 `;
 
-const ContactTitle = styled.h3`
+const ContactTitle = styled.h2`
   font-size: clamp(1.125rem, 3vw, 1.25rem);
   font-weight: 700;
   color: var(--text);
