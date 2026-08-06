@@ -15,7 +15,7 @@ const BellButton = styled.button`
   height: 40px;
   border-radius: 50%;
   border: 2px solid var(--brand-on-surface);
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(var(--on-brand-rgb), 0.15);
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -25,7 +25,7 @@ const BellButton = styled.button`
   position: relative;
 
   &:hover {
-    background: rgba(255, 255, 255, 0.25);
+    background: rgba(var(--on-brand-rgb), 0.25);
     transform: scale(1.05);
   }
 
@@ -85,7 +85,7 @@ const MobileBellButton = styled.button`
   position: relative;
 
   &:hover {
-    background: rgba(255, 255, 255, 0.15);
+    background: rgba(var(--on-brand-rgb), 0.15);
   }
 
   @media (max-width: 1024px) {

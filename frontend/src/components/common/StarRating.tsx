@@ -36,7 +36,7 @@ const StarForeground = styled(FiStar)<{ $size: number; $fillPercentage: number }
   position: absolute;
   top: 0;
   left: 0;
-  color: #fdb022;
+  color: var(--warning);
   stroke-width: 1.5px;
   clip-path: ${props => `inset(0 ${100 - props.$fillPercentage}% 0 0)`};
 `;
@@ -62,7 +62,7 @@ export const StarRating: React.FC<StarRatingProps> = ({
     return (
       <StarContainer key={index}>
         <StarBackground $size={size} size={size} />
-        <StarForeground $size={size} size={size} $fillPercentage={fillPercentage} fill='#FDB022' />
+        <StarForeground $size={size} size={size} $fillPercentage={fillPercentage} fill='var(--warning)' />
       </StarContainer>
     );
   });

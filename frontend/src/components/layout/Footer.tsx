@@ -18,7 +18,7 @@ const FooterContent = styled.div`
 `;
 
 const FooterBottom = styled.div`
-  border-top: 1px solid rgba(255, 255, 255, 0.15);
+  border-top: 1px solid rgba(var(--on-brand-rgb), 0.15);
   padding-top: 1.5rem;
   display: flex;
   justify-content: space-between;
@@ -34,7 +34,7 @@ const FooterBottom = styled.div`
 `;
 
 const Copyright = styled.p`
-  color: rgba(255, 255, 255, 0.75);
+  color: var(--on-brand-muted);
   margin: 0;
   display: flex;
   align-items: center;
@@ -53,7 +53,7 @@ const SocialLinks = styled.div`
   gap: 1rem;
 
   a {
-    color: rgba(255, 255, 255, 0.75);
+    color: var(--on-brand-muted);
     font-size: 1.25rem;
     transition:
       color 0.2s ease,
@@ -63,7 +63,7 @@ const SocialLinks = styled.div`
 
     &:hover {
       color: var(--brand-on-surface);
-      background: rgba(255, 255, 255, 0.1);
+      background: rgba(var(--on-brand-rgb), 0.1);
     }
   }
 
@@ -82,7 +82,7 @@ const LegalLinks = styled.div`
   gap: 1.5rem;
 
   a {
-    color: rgba(255, 255, 255, 0.6);
+    color: var(--on-brand-muted);
     font-size: 0.85rem;
     transition: color 0.2s;
     text-decoration: none;

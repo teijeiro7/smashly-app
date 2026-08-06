@@ -293,6 +293,8 @@ export const GlobalStyles = createGlobalStyle`
     --danger-subtle: rgba(239, 68, 68, 0.10);
     --danger-strong: #fecaca;
     --info: #3b82f6;
+    --info-subtle: rgba(59, 130, 246, 0.10);
+    --accent-subtle: rgba(217, 119, 6, 0.10);
     --bg-glow-primary: rgba(22, 163, 74, 0.14);
 
     /* Foreground-on-fill tokens — text/icon color when painted on a solid
@@ -325,6 +327,12 @@ export const GlobalStyles = createGlobalStyle`
        needed). --on-brand-muted clears only 3:1: large text/icons only. */
     --on-brand: #ffffff;
     --on-brand-muted: rgba(255, 255, 255, 0.8);
+    --on-brand-rgb: 255, 255, 255;
+
+    /* Fixed near-black scrim for full-screen overlays (lightbox backdrop,
+       mobile drawer backdrop) — same in both themes by design, so callers
+       vary only the alpha: rgba(var(--scrim-rgb), 0.5). */
+    --scrim-rgb: 0, 0, 0;
 
     /* Border for interactive form controls — needs 3:1 (WCAG 1.4.11).
        --border/--border-strong stay decorative (dividers, card edges). */
@@ -457,6 +465,8 @@ export const GlobalStyles = createGlobalStyle`
     --danger-subtle: rgba(248, 113, 113, 0.15);
     --danger-strong: #f87171;
     --info: #60a5fa;
+    --info-subtle: rgba(96, 165, 250, 0.16);
+    --accent-subtle: rgba(245, 158, 11, 0.16);
     --bg-glow-primary: rgba(34, 197, 94, 0.10);
     --bg-glow-secondary: rgba(96, 165, 250, 0.06);
 

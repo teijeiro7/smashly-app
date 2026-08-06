@@ -68,13 +68,13 @@ const StyledButton = styled.button<{
     props.$variant === 'secondary' &&
     css`
       background: transparent;
-      color: ${props.$inverse ? 'white' : 'var(--text)'};
-      border: 1.5px solid ${props.$inverse ? 'rgba(255,255,255,0.25)' : 'var(--border)'};
+      color: ${props.$inverse ? 'var(--on-brand)' : 'var(--text)'};
+      border: 1.5px solid ${props.$inverse ? 'rgba(var(--on-brand-rgb), 0.25)' : 'var(--border)'};
 
       &:hover {
-        background: ${props.$inverse ? 'rgba(255,255,255,0.08)' : 'var(--surface-2)'};
-        border-color: ${props.$inverse ? 'rgba(255,255,255,0.4)' : 'var(--primary-hover)'};
-        color: ${props.$inverse ? 'white' : 'var(--primary-hover)'};
+        background: ${props.$inverse ? 'rgba(var(--on-brand-rgb), 0.08)' : 'var(--surface-2)'};
+        border-color: ${props.$inverse ? 'rgba(var(--on-brand-rgb), 0.4)' : 'var(--primary-hover)'};
+        color: ${props.$inverse ? 'var(--on-brand)' : 'var(--primary-hover)'};
         transform: translateY(-1px);
       }
     `}
@@ -83,12 +83,12 @@ const StyledButton = styled.button<{
     props.$variant === 'ghost' &&
     css`
       background: transparent;
-      color: ${props.$inverse ? 'white' : 'var(--text)'};
+      color: ${props.$inverse ? 'var(--on-brand)' : 'var(--text)'};
       border: none;
 
       &:hover {
-        background: ${props.$inverse ? 'rgba(255,255,255,0.08)' : 'var(--surface-2)'};
-        color: ${props.$inverse ? 'white' : 'var(--primary-hover)'};
+        background: ${props.$inverse ? 'rgba(var(--on-brand-rgb), 0.08)' : 'var(--surface-2)'};
+        color: ${props.$inverse ? 'var(--on-brand)' : 'var(--primary-hover)'};
         transform: translateY(-1px);
       }
     `}
@@ -97,7 +97,7 @@ const StyledButton = styled.button<{
     props.$variant === 'tertiary' &&
     css`
       background: transparent;
-      color: ${props.$inverse ? 'white' : 'var(--primary-hover)'};
+      color: ${props.$inverse ? 'var(--on-brand)' : 'var(--primary-hover)'};
       border: none;
       padding: 0;
       height: auto;
@@ -112,11 +112,6 @@ const StyledButton = styled.button<{
 
   &:active {
     transform: scale(0.97);
-  }
-
-  &:focus-visible {
-    outline: 2px solid var(--primary-hover);
-    outline-offset: 2px;
   }
 
   &:disabled {
