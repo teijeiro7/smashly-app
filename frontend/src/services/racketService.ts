@@ -166,25 +166,12 @@ function mapDbToFrontend(raw: any): Racket {
   } as Racket;
 }
 
-const CATALOG_SELECT_FIELDS = `
-  id, slug, name, brand, model, images, on_offer, created_at, updated_at,
-  characteristics_brand, characteristics_color, characteristics_color_2, characteristics_product,
-  characteristics_balance, characteristics_core, characteristics_face, characteristics_format,
-  characteristics_hardness, characteristics_game_level, characteristics_finish, characteristics_shape,
-  characteristics_surface, characteristics_game_type, characteristics_player_collection, characteristics_player,
-  specs, padelnuestro_actual_price, padelnuestro_original_price, padelnuestro_discount_percentage, padelnuestro_link,
-  padelmarket_actual_price, padelmarket_original_price, padelmarket_discount_percentage, padelmarket_link,
-  padelproshop_actual_price, padelproshop_original_price, padelproshop_discount_percentage, padelproshop_link,
-  view_count, radar_potencia, radar_control, radar_manejabilidad, radar_punto_dulce, radar_salida_bola,
-  testea_potencia, testea_control, testea_manejabilidad, testea_confort, testea_iniciacion, peso, comparison_only, store_id
-`.trim();
-
 // ── Service ───────────────────────────────────────────────────────────────────
 const racketService = {
   async getAllRackets(): Promise<Racket[]> {
     const { data, error } = await supabase
       .from('rackets')
-      .select(CATALOG_SELECT_FIELDS)
+      .select('*')
       .order('name');
 
     if (error) throw new Error(error.message);
@@ -319,7 +306,7 @@ const racketService = {
   async getRacketsOnSale(limit?: number): Promise<Racket[]> {
     let query = supabase
       .from('rackets')
-      .select(CATALOG_SELECT_FIELDS)
+      .select('*')
       .eq('on_offer', true)
       .order('name');
 
