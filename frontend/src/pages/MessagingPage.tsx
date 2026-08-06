@@ -107,7 +107,7 @@ const UnreadBadge = styled.span`
   height: 18px;
   padding: 0 4px;
   background: var(--primary);
-  color: white;
+  color: var(--on-primary);
   border-radius: 10px;
   font-size: 0.7rem;
   font-weight: 700;
@@ -157,7 +157,7 @@ const MessageBubble = styled.div<{ $mine: boolean }>`
   padding: 0.75rem 1rem;
   border-radius: ${({ $mine }) => ($mine ? '16px 16px 4px 16px' : '16px 16px 16px 4px')};
   background: ${({ $mine }) => ($mine ? 'var(--primary)' : 'var(--surface-2)')};
-  color: ${({ $mine }) => ($mine ? 'white' : 'var(--text)')};
+  color: ${({ $mine }) => ($mine ? 'var(--on-primary)' : 'var(--text)')};
   font-size: 0.9rem;
   line-height: 1.5;
   word-wrap: break-word;
@@ -165,7 +165,7 @@ const MessageBubble = styled.div<{ $mine: boolean }>`
 
 const MessageTime = styled.div<{ $mine: boolean }>`
   font-size: 0.7rem;
-  color: ${({ $mine }) => ($mine ? 'rgba(255,255,255,0.7)' : 'var(--text-subtle)')};
+  color: ${({ $mine }) => ($mine ? 'rgba(var(--on-primary-rgb), 0.7)' : 'var(--text-subtle)')};
   margin-top: 0.25rem;
   text-align: ${({ $mine }) => ($mine ? 'right' : 'left')};
 `;
@@ -198,7 +198,7 @@ const SendButton = styled.button`
   border: none;
   border-radius: 12px;
   background: var(--primary);
-  color: white;
+  color: var(--on-primary);
   cursor: pointer;
   display: flex;
   align-items: center;

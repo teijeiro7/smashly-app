@@ -396,12 +396,12 @@ const ViewButton = styled.button<{ $active: boolean }>`
   border: none;
   border-radius: 6px;
   background: ${props => (props.$active ? 'var(--primary-hover)' : 'transparent')};
-  color: ${props => (props.$active ? 'white' : 'var(--text-muted)')};
+  color: ${props => (props.$active ? 'var(--on-primary)' : 'var(--text-muted)')};
   cursor: pointer;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 
   &:hover {
-    color: ${props => (props.$active ? 'white' : 'var(--primary-hover)')};
+    color: ${props => (props.$active ? 'var(--on-primary)' : 'var(--primary-hover)')};
   }
 `;
 
@@ -471,7 +471,7 @@ const EmptyDescription = styled.p`
 
 const ClearFiltersButton = styled.button`
   background: var(--primary-hover);
-  color: white;
+  color: var(--on-primary);
   border: none;
   padding: 0.625rem 1.25rem;
   border-radius: 8px;
@@ -532,7 +532,7 @@ const PanelText = styled.div`
 
 const CompareButton = styled.button`
   background: var(--primary-hover);
-  color: white;
+  color: var(--on-primary);
   border: none;
   padding: 0.5rem 1rem;
   border-radius: 8px;

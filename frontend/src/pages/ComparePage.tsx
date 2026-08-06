@@ -127,7 +127,7 @@ const Card = styled(motion.div)`
   box-shadow:
     0 4px 6px -1px var(--shadow-color),
     0 2px 4px -1px var(--shadow-color);
-  border: 1px solid rgba(0, 0, 0, 0.06);
+  border: 1px solid var(--shadow-color);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -150,7 +150,7 @@ const Card = styled(motion.div)`
 
     .icon-container {
       background: var(--primary-hover);
-      color: white;
+      color: var(--on-primary);
       transform: scale(1.08);
     }
 

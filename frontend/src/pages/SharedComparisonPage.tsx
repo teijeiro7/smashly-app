@@ -11,8 +11,8 @@ import remarkGfm from 'remark-gfm';
 const Container = styled.div`
   min-height: 100dvh;
   background:
-    radial-gradient(circle at top right, rgba(22, 163, 74, 0.08), transparent 42%),
-    linear-gradient(135deg, #f8faf8 0%, #e8f5e8 100%);
+    radial-gradient(circle at top right, rgba(var(--primary-rgb), 0.08), transparent 42%),
+    linear-gradient(135deg, var(--surface-2) 0%, var(--primary-faint) 100%);
   padding: 1rem 0 calc(6.25rem + env(safe-area-inset-bottom, 0));
 
   @media (min-width: 1025px) {
@@ -29,7 +29,7 @@ const ContentWrapper = styled.div`
 const Card = styled.div`
   background: var(--surface);
   border-radius: 16px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 10px 40px var(--shadow-color);
   overflow: hidden;
 `;
 
@@ -267,17 +267,17 @@ const BackButton = styled(Link)`
   min-height: 48px;
   padding: 0.75rem 1.5rem;
   background: linear-gradient(135deg, var(--brand-surface) 0%, var(--brand-surface-strong) 100%);
-  color: white;
+  color: var(--on-brand);
   text-decoration: none;
   border-radius: 8px;
   font-weight: 600;
   transition: all 0.3s ease;
 
   &:hover {
-    color: white;
+    color: var(--on-brand);
     text-decoration: none;
     transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(22, 163, 74, 0.4);
+    box-shadow: 0 8px 25px rgba(var(--brand-rgb), 0.4);
   }
 `;
 

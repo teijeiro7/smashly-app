@@ -293,6 +293,7 @@ export const GlobalStyles = createGlobalStyle`
     --danger-subtle: rgba(239, 68, 68, 0.10);
     --danger-strong: #fecaca;
     --info: #3b82f6;
+    --info-rgb: 59, 130, 246;
     --info-subtle: rgba(59, 130, 246, 0.10);
     --accent-subtle: rgba(217, 119, 6, 0.10);
     --bg-glow-primary: rgba(22, 163, 74, 0.14);
@@ -302,6 +303,7 @@ export const GlobalStyles = createGlobalStyle`
        Never hardcode white/black on these fills — the correct foreground
        flips per theme (in dark mode every fill below needs dark text). */
     --on-primary: #ffffff;
+    --on-primary-rgb: 255, 255, 255;
     --on-success: #0a0f0d;
     --on-warning: #0a0f0d;
     --on-error: #0a0f0d;
@@ -465,6 +467,7 @@ export const GlobalStyles = createGlobalStyle`
     --danger-subtle: rgba(248, 113, 113, 0.15);
     --danger-strong: #f87171;
     --info: #60a5fa;
+    --info-rgb: 96, 165, 250;
     --info-subtle: rgba(96, 165, 250, 0.16);
     --accent-subtle: rgba(245, 158, 11, 0.16);
     --bg-glow-primary: rgba(34, 197, 94, 0.10);
@@ -473,6 +476,7 @@ export const GlobalStyles = createGlobalStyle`
     /* Foreground-on-fill tokens — see :root. In dark every semantic fill
        is light/vivid enough that dark text is the correct foreground. */
     --on-primary: #0a0f0d;
+    --on-primary-rgb: 10, 15, 13;
     --on-success: #0a0f0d;
     --on-warning: #0a0f0d;
     --on-error: #0a0f0d;

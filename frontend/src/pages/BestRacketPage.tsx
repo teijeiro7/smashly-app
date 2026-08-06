@@ -94,7 +94,7 @@ const ModeButton = styled.button<{ $active: boolean }>`
   border-radius: 9999px;
   border: 1.5px solid ${props => (props.$active ? 'var(--primary-hover)' : 'var(--border)')};
   background: ${props => (props.$active ? 'var(--primary-hover)' : 'var(--surface)')};
-  color: ${props => (props.$active ? 'white' : 'var(--text-muted)')};
+  color: ${props => (props.$active ? 'var(--on-primary)' : 'var(--text-muted)')};
   cursor: pointer;
   transition:
     background-color 0.2s ease,
@@ -111,7 +111,7 @@ const ModeButton = styled.button<{ $active: boolean }>`
 
   &:hover {
     border-color: var(--primary-hover);
-    color: ${props => (props.$active ? 'white' : 'var(--primary-hover)')};
+    color: ${props => (props.$active ? 'var(--on-primary)' : 'var(--primary-hover)')};
     transform: translateY(-1px);
   }
 `;
@@ -141,7 +141,7 @@ const AlertText = styled.p`
 
 const AlertButton = styled.button`
   background: var(--primary-hover);
-  color: white;
+  color: var(--on-primary);
   border: none;
   padding: 0.5rem 1rem;
   border-radius: 6px;

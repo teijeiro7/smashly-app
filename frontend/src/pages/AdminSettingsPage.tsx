@@ -17,6 +17,12 @@ import {
 } from 'react-icons/fi';
 import { sileo } from 'sileo';
 import { AdminService, Brand, Category } from '../services/adminService';
+import { useTheme } from '../contexts/ThemeContext';
+
+// No semantic token fits these two ad-hoc category colors (violet/cyan),
+// so they get their own light/dark values instead of new global tokens.
+const BRAND_COLOR = { light: '#8b5cf6', dark: '#a78bfa' };
+const WEBSITE_ICON_COLOR = { light: '#06b6d4', dark: '#22d3ee' };
 
 const Container = styled.div`
   display: flex;
@@ -72,11 +78,11 @@ const Tab = styled.button<{ $active: boolean }>`
     color 0.2s ease;
   white-space: nowrap;
   background: ${props => (props.$active ? 'var(--text)' : 'transparent')};
-  color: ${props => (props.$active ? 'white' : 'var(--text-muted)')};
+  color: ${props => (props.$active ? 'var(--surface)' : 'var(--text-muted)')};
 
   &:hover {
     background: ${props => (props.$active ? 'var(--text)' : 'var(--surface-3)')};
-    color: ${props => (props.$active ? 'white' : 'var(--text)')};
+    color: ${props => (props.$active ? 'var(--surface)' : 'var(--text)')};
   }
 
   svg {
@@ -248,7 +254,7 @@ const IconButton = styled(motion.button)<{ $variant?: 'danger' }>`
 
   &:hover {
     background: ${props => (props.$variant === 'danger' ? 'var(--danger)' : 'var(--text)')};
-    color: ${props => (props.$variant === 'danger' ? 'white' : 'white')};
+    color: ${props => (props.$variant === 'danger' ? 'var(--on-danger)' : 'var(--surface)')};
   }
 `;
 
@@ -296,7 +302,7 @@ const FormInput = styled.input`
   &:focus {
     outline: none;
     border-color: var(--text);
-    box-shadow: 0 0 0 3px rgba(15, 23, 42, 0.1);
+    box-shadow: 0 0 0 3px var(--shadow-color);
   }
 
   &::placeholder {
@@ -386,7 +392,7 @@ const SettingsInput = styled.input`
   &:focus {
     outline: none;
     border-color: var(--text);
-    box-shadow: 0 0 0 3px rgba(15, 23, 42, 0.1);
+    box-shadow: 0 0 0 3px var(--shadow-color);
   }
 `;
 
@@ -432,6 +438,8 @@ const LoadingContainer = styled.div`
 type TabType = 'brands' | 'categories' | 'general';
 
 const SettingsContent: React.FC = () => {
+  const { resolved } = useTheme();
+  const isDark = resolved === 'dark';
   const [activeTab, setActiveTab] = useState<TabType>('brands');
   const [brands, setBrands] = useState<Brand[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
@@ -651,12 +659,12 @@ const SettingsContent: React.FC = () => {
                           animate={{ opacity: 1, x: 0 }}
                         >
                           <ItemInfo>
-                            <ItemAvatar color='#8b5cf6'>{brand.name.charAt(0)}</ItemAvatar>
+                            <ItemAvatar color={isDark ? BRAND_COLOR.dark : BRAND_COLOR.light}>{brand.name.charAt(0)}</ItemAvatar>
                             <ItemDetails>
                               <ItemName>{brand.name}</ItemName>
                               <ItemMeta>
                                 {brand.country}
-                                <Badge color='#8b5cf6'>
+                                <Badge color={isDark ? BRAND_COLOR.dark : BRAND_COLOR.light}>
                                   <FiPackage size={10} /> {brand.racketCount}
                                 </Badge>
                               </ItemMeta>
@@ -844,7 +852,7 @@ const SettingsContent: React.FC = () => {
 
                     <SettingsCard>
                       <SettingsRow>
-                        <SettingsIcon color='#06b6d4'>
+                        <SettingsIcon color={isDark ? WEBSITE_ICON_COLOR.dark : WEBSITE_ICON_COLOR.light}>
                           <FiGlobe />
                         </SettingsIcon>
                         <SettingsInfo style={{ flex: 1 }}>

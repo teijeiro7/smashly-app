@@ -88,10 +88,10 @@ const ComparisonGrid = styled.div`
 `;
 
 const RacketColumn = styled.div<{ type: 'existing' | 'new' }>`
-  background: ${props => (props.type === 'existing' ? 'var(--primary-subtle)' : '#fff7ed')};
+  background: ${props => (props.type === 'existing' ? 'var(--primary-subtle)' : 'var(--accent-subtle)')};
   padding: 1rem;
   border-radius: 8px;
-  border: 1px solid ${props => (props.type === 'existing' ? 'var(--primary-subtle)' : '#fed7aa')};
+  border: 1px solid ${props => (props.type === 'existing' ? 'var(--primary-subtle)' : 'var(--accent-subtle)')};
 `;
 
 const ColumnTitle = styled.h4`
@@ -149,13 +149,13 @@ const ActionButton = styled.button<{ variant: 'success' | 'danger' | 'neutral' }
       case 'success':
         return `
           background: var(--primary);
-          color: white;
+          color: var(--on-primary);
           &:hover { background: var(--primary-hover); }
         `;
       case 'danger':
         return `
           background: var(--error);
-          color: white;
+          color: var(--on-error);
           &:hover { background: var(--danger); }
         `;
       case 'neutral':

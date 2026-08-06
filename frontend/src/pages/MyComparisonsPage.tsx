@@ -152,14 +152,14 @@ const CompareButton = styled(Link)`
   min-height: 48px;
   padding: 0.75rem 1.5rem;
   background: linear-gradient(135deg, var(--primary) 0%, var(--success) 100%);
-  color: white;
+  color: var(--on-primary);
   text-decoration: none;
   border-radius: 8px;
   font-weight: 600;
   transition: all 0.3s ease;
 
   &:hover {
-    color: white;
+    color: var(--on-primary);
     text-decoration: none;
     transform: translateY(-2px);
     box-shadow: 0 8px 25px rgba(var(--primary-rgb), 0.4);
@@ -271,7 +271,7 @@ const ActionButton = styled.button<{ variant?: 'primary' | 'danger' }>`
     props.variant === 'danger'
       ? 'var(--danger)'
       : props.variant === 'primary'
-        ? 'white'
+        ? 'var(--on-primary)'
         : 'var(--text)'};
 
   &:hover {
@@ -279,10 +279,10 @@ const ActionButton = styled.button<{ variant?: 'primary' | 'danger' }>`
     box-shadow: 0 4px 12px
       ${props =>
         props.variant === 'danger'
-          ? 'rgba(220, 38, 38, 0.3)'
+          ? 'rgba(var(--danger-rgb), 0.3)'
           : props.variant === 'primary'
             ? 'rgba(var(--primary-rgb), 0.4)'
-            : 'rgba(0, 0, 0, 0.1)'};
+            : 'var(--shadow-color)'};
   }
 
   &:disabled {
@@ -366,7 +366,7 @@ const Spinner = styled.div`
 const Modal = styled(motion.div)`
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(var(--scrim-rgb), 0.5);
   display: flex;
   align-items: center;
   justify-content: center;
