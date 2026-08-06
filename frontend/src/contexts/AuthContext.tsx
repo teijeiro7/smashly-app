@@ -168,17 +168,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       if (event === 'SIGNED_OUT' || !session) {
         clearAuth();
         setLoading(false);
+        readyResolveRef.current();
         return;
       }
 
       if (event === 'PASSWORD_RECOVERY') {
-        // A recovery link was just parsed from the URL: there is now a
-        // session that can call supabase.auth.updateUser({ password }), but
-        // this is NOT a normal login — don't route the user anywhere else,
-        // just flag it so UpdatePasswordPage can render its form.
         setHasSession(true);
         setIsPasswordRecovery(true);
         setLoading(false);
+        readyResolveRef.current();
         return;
       }
 
@@ -186,6 +184,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         setHasSession(true);
         const profile = await loadAndSetProfile(session.user.id);
         setLoading(false);
+        readyResolveRef.current();
 
         // Detect new Google user who needs to set a nickname
         const provider = session.user.app_metadata?.provider;

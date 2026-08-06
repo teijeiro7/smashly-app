@@ -78,7 +78,7 @@ class ErrorBoundary extends Component<Props, State> {
             <p
               style={{
                 fontSize: '1rem',
-                color: 'var(--text-muted)',
+                color: 'var(--text-muted, #94a3b8)',
                 margin: '1rem 0 1.5rem',
                 lineHeight: '1.6',
               }}
@@ -86,6 +86,24 @@ class ErrorBoundary extends Component<Props, State> {
               Ha ocurrido un error inesperado. Puedes intentar recargar la página o volver al
               inicio.
             </p>
+            {this.state.error?.message && (
+              <pre
+                style={{
+                  fontSize: '0.85rem',
+                  color: 'var(--danger, #ef4444)',
+                  background: 'rgba(239, 68, 68, 0.1)',
+                  padding: '0.75rem',
+                  borderRadius: '8px',
+                  overflowX: 'auto',
+                  textAlign: 'left',
+                  margin: '1rem 0',
+                  whiteSpace: 'pre-wrap',
+                  wordBreak: 'break-word',
+                }}
+              >
+                {this.state.error.message}
+              </pre>
+            )}
             <div
               style={{
                 display: 'flex',

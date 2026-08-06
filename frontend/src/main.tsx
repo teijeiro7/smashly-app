@@ -61,6 +61,7 @@ createRoot(document.getElementById('root')!).render(
     <ThemeProvider>
       <HelmetProvider>
         <QueryClientProvider client={queryClient}>
+          <GlobalStyles />
           <ErrorBoundary>
             <AuthProvider>
               <NotificationProvider>
@@ -69,7 +70,6 @@ createRoot(document.getElementById('root')!).render(
                     <ComparisonProvider>
                       <ListsProvider>
                         <AuthModalProvider>
-                          <GlobalStyles />
                           <InnerApp />
                         </AuthModalProvider>
                       </ListsProvider>
