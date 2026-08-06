@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { FiX, FiMinimize2, FiCpu, FiCheckCircle, FiAlertCircle } from 'react-icons/fi';
 import { useNavigate, useRouterState } from '@tanstack/react-router';
 import {
@@ -362,15 +362,7 @@ export const BackgroundTaskPopup: React.FC = () => {
   const { location } = useRouterState();
   const [minimized, setMinimized] = useState(true);
   const [showPopup, setShowPopup] = useState(false);
-  const [reducedMotion, setReducedMotion] = useState(false);
-
-  useEffect(() => {
-    const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
-    setReducedMotion(mq.matches);
-    const handler = (e: MediaQueryListEvent) => setReducedMotion(e.matches);
-    mq.addEventListener('change', handler);
-    return () => mq.removeEventListener('change', handler);
-  }, []);
+  const reducedMotion = useReducedMotion();
 
   // Mostrar popup cuando hay una tarea activa o completada recientemente
   useEffect(() => {
