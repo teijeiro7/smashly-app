@@ -326,10 +326,18 @@ const UserCollections: React.FC = () => {
   return (
     <Container>
       <TabsContainer>
-        <Tab $active={activeTab === 'lists'} onClick={() => setActiveTab('lists')}>
+        <Tab
+          $active={activeTab === 'lists'}
+          aria-selected={activeTab === 'lists'}
+          onClick={() => setActiveTab('lists')}
+        >
           <FiList size={16} /> Listas ({lists.length})
         </Tab>
-        <Tab $active={activeTab === 'comparisons'} onClick={() => setActiveTab('comparisons')}>
+        <Tab
+          $active={activeTab === 'comparisons'}
+          aria-selected={activeTab === 'comparisons'}
+          onClick={() => setActiveTab('comparisons')}
+        >
           <FiGitBranch size={16} /> Comparaciones ({comparisons.length})
         </Tab>
       </TabsContainer>

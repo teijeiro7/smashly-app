@@ -545,6 +545,7 @@ const SettingsContent: React.FC = () => {
         <TabsContainer>
           <Tab
             $active={activeTab === 'brands'}
+            aria-selected={activeTab === 'brands'}
             onClick={() => {
               setActiveTab('brands');
               setIsAdding(false);
@@ -554,6 +555,7 @@ const SettingsContent: React.FC = () => {
           </Tab>
           <Tab
             $active={activeTab === 'categories'}
+            aria-selected={activeTab === 'categories'}
             onClick={() => {
               setActiveTab('categories');
               setIsAdding(false);
@@ -563,6 +565,7 @@ const SettingsContent: React.FC = () => {
           </Tab>
           <Tab
             $active={activeTab === 'general'}
+            aria-selected={activeTab === 'general'}
             onClick={() => {
               setActiveTab('general');
               setIsAdding(false);

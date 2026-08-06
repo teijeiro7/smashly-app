@@ -230,10 +230,22 @@ const AuthModal: React.FC = () => {
                 </FormSubtitle>
 
                 <TabContainer>
-                  <Tab as='button' to='' $active={view === 'login'} onClick={openLogin}>
+                  <Tab
+                    as='button'
+                    to=''
+                    $active={view === 'login'}
+                    aria-selected={view === 'login'}
+                    onClick={openLogin}
+                  >
                     Iniciar Sesión
                   </Tab>
-                  <Tab as='button' to='' $active={view === 'register'} onClick={openRegister}>
+                  <Tab
+                    as='button'
+                    to=''
+                    $active={view === 'register'}
+                    aria-selected={view === 'register'}
+                    onClick={openRegister}
+                  >
                     Registrarse
                   </Tab>
                 </TabContainer>

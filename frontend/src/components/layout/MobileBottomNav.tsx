@@ -213,6 +213,7 @@ const MobileBottomNav = React.memo(() => {
                   key={item.to}
                   onClick={item.onClick}
                   $active={isActive}
+                  aria-current={isActive ? 'page' : undefined}
                   type='button'
                 >
                   {item.icon}
@@ -222,7 +223,12 @@ const MobileBottomNav = React.memo(() => {
             }
 
             return (
-              <NavItemLink key={item.to} to={item.to} $active={isActive}>
+              <NavItemLink
+                key={item.to}
+                to={item.to}
+                $active={isActive}
+                aria-current={isActive ? 'page' : undefined}
+              >
                 {item.icon}
                 <span>{item.label}</span>
               </NavItemLink>

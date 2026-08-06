@@ -419,7 +419,12 @@ const StoreCatalogManager: React.FC<StoreCatalogManagerProps> = ({ storeId }) =>
       {totalPages > 1 && (
         <PaginationRow>
           {Array.from({ length: totalPages }, (_, i) => i + 1).map(p => (
-            <PageButton key={p} $active={p === page} onClick={() => setPage(p)}>
+            <PageButton
+              key={p}
+              $active={p === page}
+              aria-current={p === page ? 'page' : undefined}
+              onClick={() => setPage(p)}
+            >
               {p}
             </PageButton>
           ))}

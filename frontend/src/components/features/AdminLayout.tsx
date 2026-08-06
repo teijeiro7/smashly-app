@@ -227,6 +227,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
               key={item.path}
               to={item.path}
               $active={location.pathname === item.path}
+              aria-current={location.pathname === item.path ? 'page' : undefined}
               onClick={handleNavClick}
             >
               <item.icon size={20} />
@@ -238,6 +239,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
           <NavItem
             to='/admin/users'
             $active={location.pathname === '/admin/users'}
+            aria-current={location.pathname === '/admin/users' ? 'page' : undefined}
             onClick={handleNavClick}
           >
             <FiUsers size={20} />
@@ -246,6 +248,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
           <NavItem
             to='/admin/stores'
             $active={location.pathname === '/admin/stores'}
+            aria-current={location.pathname === '/admin/stores' ? 'page' : undefined}
             onClick={handleNavClick}
           >
             <FiShoppingBag size={20} />
@@ -254,6 +257,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
           <NavItem
             to='/admin/settings'
             $active={location.pathname === '/admin/settings'}
+            aria-current={location.pathname === '/admin/settings' ? 'page' : undefined}
             onClick={handleNavClick}
           >
             <FiSettings size={20} />

@@ -103,6 +103,8 @@ export const ReviewForm: React.FC<ReviewFormProps> = ({
                 onMouseLeave={() => setHoveredRating(0)}
                 $active={star <= (hoveredRating || rating)}
                 $hovered={star <= hoveredRating}
+                aria-label={`${star} estrella${star > 1 ? 's' : ''}`}
+                aria-pressed={star <= rating}
               >
                 ★
               </StarButton>

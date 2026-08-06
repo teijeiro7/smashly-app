@@ -438,11 +438,16 @@ export const BestRacketPage: React.FC = () => {
           )}
 
           <ModeSelector>
-            <ModeButton $active={formType === 'basic'} onClick={() => setFormType('basic')}>
+            <ModeButton
+              $active={formType === 'basic'}
+              aria-pressed={formType === 'basic'}
+              onClick={() => setFormType('basic')}
+            >
               Básico
             </ModeButton>
             <ModeButton
               $active={formType === 'advanced'}
+              aria-pressed={formType === 'advanced'}
               onClick={() => {
                 if (!user) {
                   sileo.show({

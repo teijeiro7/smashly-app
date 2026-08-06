@@ -557,6 +557,7 @@ const ClearFiltersIconButton = styled(FilterButton)`
 `;
 
 // Component
+// eslint-disable-next-line max-lines-per-function -- ya estaba cerca del límite antes de añadir aria-pressed/aria-selected/aria-current a los controles $active; dividir el componente es un refactor aparte, fuera del alcance de este fix de a11y.
 const CatalogPage: React.FC = () => {
   const navigate = useNavigate();
   const searchParams = useSearch({ strict: false }) as Record<string, string>;
@@ -1094,6 +1095,14 @@ const CatalogPage: React.FC = () => {
     );
   }
 
+  const quickSearchChipActive = new Map<string, boolean>([
+    ['Bullpadel', selectedBrand === 'Bullpadel' || searchQuery === 'Bullpadel'],
+    ['Babolat', selectedBrand === 'Babolat' || searchQuery === 'Babolat'],
+    ['Nox', selectedBrand === 'Nox' || searchQuery === 'Nox'],
+    ['Forma Diamante', selectedShape === 'Diamante'],
+    ['Ofertas', showOffers],
+  ]);
+
   return (
     <Container>
       <SEO
@@ -1178,13 +1187,8 @@ const CatalogPage: React.FC = () => {
             {['Bullpadel', 'Babolat', 'Nox', 'Forma Diamante', 'Ofertas'].map(chip => (
               <QuickSearchChip
                 key={chip}
-                $active={
-                  chip === 'Ofertas'
-                    ? showOffers
-                    : chip === 'Forma Diamante'
-                      ? selectedShape === 'Diamante'
-                      : selectedBrand === chip || searchQuery === chip
-                }
+                $active={quickSearchChipActive.get(chip)}
+                aria-pressed={quickSearchChipActive.get(chip)}
                 onClick={() => {
                   if (chip === 'Ofertas') {
                     setShowOffers(!showOffers);
@@ -1207,6 +1211,7 @@ const CatalogPage: React.FC = () => {
           {/* Advanced Filters Toggle */}
           <AdvancedFiltersToggle
             $active={showAdvancedFilters}
+            aria-pressed={showAdvancedFilters}
             onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
           >
             <FiFilter />
@@ -1226,13 +1231,18 @@ const CatalogPage: React.FC = () => {
                 ))}
               </FilterSelect>
 
-              <FilterButton $active={showOffers} onClick={() => setShowOffers(!showOffers)}>
+              <FilterButton
+                $active={showOffers}
+                aria-pressed={showOffers}
+                onClick={() => setShowOffers(!showOffers)}
+              >
                 <FiTag />
                 Ofertas
               </FilterButton>
 
               <FilterButton
                 $active={showAvailableOnly}
+                aria-pressed={showAvailableOnly}
                 onClick={() => setShowAvailableOnly(!showAvailableOnly)}
               >
                 <FiFilter size={16} />
@@ -1330,6 +1340,7 @@ const CatalogPage: React.FC = () => {
             <ViewToggle>
               <ViewButton
                 $active={viewMode === 'grid'}
+                aria-pressed={viewMode === 'grid'}
                 onClick={() => setViewMode('grid')}
                 aria-label='Ver en cuadrícula'
               >
@@ -1337,6 +1348,7 @@ const CatalogPage: React.FC = () => {
               </ViewButton>
               <ViewButton
                 $active={viewMode === 'list'}
+                aria-pressed={viewMode === 'list'}
                 onClick={() => setViewMode('list')}
                 aria-label='Ver en lista'
               >

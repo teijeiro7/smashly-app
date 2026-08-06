@@ -647,16 +647,32 @@ const UserProfilePage: React.FC = () => {
 
       <MainContent>
         <NavigationTabs>
-          <NavTab $active={activeTab === 'profile'} onClick={() => setActiveTab('profile')}>
+          <NavTab
+            $active={activeTab === 'profile'}
+            aria-selected={activeTab === 'profile'}
+            onClick={() => setActiveTab('profile')}
+          >
             <FiUser size={18} /> Perfil
           </NavTab>
-          <NavTab $active={activeTab === 'activity'} onClick={() => setActiveTab('activity')}>
+          <NavTab
+            $active={activeTab === 'activity'}
+            aria-selected={activeTab === 'activity'}
+            onClick={() => setActiveTab('activity')}
+          >
             <FiActivity size={18} /> Mi Actividad
           </NavTab>
-          <NavTab $active={activeTab === 'collections'} onClick={() => setActiveTab('collections')}>
+          <NavTab
+            $active={activeTab === 'collections'}
+            aria-selected={activeTab === 'collections'}
+            onClick={() => setActiveTab('collections')}
+          >
             <FiList size={18} /> Mis Colecciones
           </NavTab>
-          <NavTab $active={activeTab === 'account'} onClick={() => setActiveTab('account')}>
+          <NavTab
+            $active={activeTab === 'account'}
+            aria-selected={activeTab === 'account'}
+            onClick={() => setActiveTab('account')}
+          >
             <FiSettings size={18} /> Cuenta
           </NavTab>
         </NavigationTabs>

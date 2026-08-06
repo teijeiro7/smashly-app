@@ -376,6 +376,7 @@ const MessagingPage: React.FC = () => {
               <ConversationItem
                 key={conv.id}
                 $active={conv.id === activeConvId}
+                aria-current={conv.id === activeConvId ? 'true' : undefined}
                 onClick={() => selectConversation(conv.id)}
               >
                 <ConvTop>
