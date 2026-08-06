@@ -67,7 +67,10 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
   try {
     const now = Date.now();
     if (metricsCache && metricsCache.expiresAt > now) {
-      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.writeHead(200, {
+        'Content-Type': 'application/json',
+        'Cache-Control': 'private, max-age=60, s-maxage=60, stale-while-revalidate=300',
+      });
       res.end(JSON.stringify({ success: true, data: metricsCache.data }));
       return;
     }
@@ -106,7 +109,10 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
 
     metricsCache = { data: metricsData, expiresAt: now + 60 * 1000 };
 
-    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.writeHead(200, {
+      'Content-Type': 'application/json',
+      'Cache-Control': 'private, max-age=60, s-maxage=60, stale-while-revalidate=300',
+    });
     res.end(
       JSON.stringify({
         success: true,
