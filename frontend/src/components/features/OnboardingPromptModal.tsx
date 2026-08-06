@@ -29,7 +29,7 @@ const Overlay = styled(motion.div)`
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.6);
+  background: var(--surface-overlay);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -43,7 +43,7 @@ const Modal = styled(motion.div)`
   padding: 2rem;
   max-width: 580px;
   width: 100%;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+  box-shadow: var(--shadow-xl);
   position: relative;
   max-height: 90vh;
   overflow-y: auto;

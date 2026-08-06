@@ -217,7 +217,7 @@ const MetricsSummary = styled.div`
   gap: 0.75rem 1rem;
   margin-top: 0.5rem;
   padding: 0.75rem 0;
-  border-top: 1px solid rgba(0, 0, 0, 0.05);
+  border-top: 1px solid var(--border);
 `;
 
 const MetricBadge = styled.div`

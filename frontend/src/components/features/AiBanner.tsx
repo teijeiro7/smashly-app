@@ -85,7 +85,7 @@ const FeatureItem = styled.div`
 const FeatureIcon = styled.div`
   width: 60px;
   height: 60px;
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(var(--on-brand-rgb), 0.2);
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -112,9 +112,11 @@ const CTAButton = styled.button<{ variant?: 'primary' | 'secondary' }>`
   padding: 1rem 2rem;
   border-radius: 12px;
   border: ${props =>
-    props.variant === 'secondary' ? '2px solid rgba(255, 255, 255, 0.3)' : 'none'};
+    props.variant === 'secondary' ? '2px solid rgba(var(--on-brand-rgb), 0.3)' : 'none'};
   background: ${props =>
-    props.variant === 'secondary' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(255, 255, 255, 0.25)'};
+    props.variant === 'secondary'
+      ? 'rgba(var(--on-brand-rgb), 0.1)'
+      : 'rgba(var(--on-brand-rgb), 0.25)'};
   color: var(--brand-on-surface);
   font-weight: 600;
   font-size: 1rem;
@@ -131,13 +133,17 @@ const CTAButton = styled.button<{ variant?: 'primary' | 'secondary' }>`
     backdrop-filter: none;
     -webkit-backdrop-filter: none;
     background: ${props =>
-      props.variant === 'secondary' ? 'rgba(255, 255, 255, 0.15)' : 'rgba(255, 255, 255, 0.35)'};
+      props.variant === 'secondary'
+        ? 'rgba(var(--on-brand-rgb), 0.15)'
+        : 'rgba(var(--on-brand-rgb), 0.35)'};
     transition: transform 0.1s ease;
   }
 
   &:hover {
     background: ${props =>
-      props.variant === 'secondary' ? 'rgba(255, 255, 255, 0.2)' : 'rgba(255, 255, 255, 0.4)'};
+      props.variant === 'secondary'
+        ? 'rgba(var(--on-brand-rgb), 0.2)'
+        : 'rgba(var(--on-brand-rgb), 0.4)'};
     transform: translateY(-2px);
   }
 

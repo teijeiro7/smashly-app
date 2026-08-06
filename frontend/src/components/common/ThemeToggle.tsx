@@ -13,7 +13,8 @@ const Button = styled.button<{ $variant: Variant }>`
   height: 40px;
   border-radius: 50%;
   background: transparent;
-  border: 1px solid ${p => (p.$variant === 'onBrand' ? 'rgba(255, 255, 255, 0.4)' : 'var(--text)')};
+  border: 1px solid
+    ${p => (p.$variant === 'onBrand' ? 'rgba(var(--on-brand-rgb), 0.4)' : 'var(--text)')};
   color: ${p => (p.$variant === 'onBrand' ? 'var(--brand-on-surface)' : 'var(--text)')};
   cursor: pointer;
   transition:
@@ -24,10 +25,10 @@ const Button = styled.button<{ $variant: Variant }>`
 
   &:hover {
     background: ${p =>
-      p.$variant === 'onBrand' ? 'rgba(255, 255, 255, 0.12)' : 'var(--primary-subtle)'};
+      p.$variant === 'onBrand' ? 'rgba(var(--on-brand-rgb), 0.12)' : 'var(--primary-subtle)'};
     color: ${p => (p.$variant === 'onBrand' ? 'var(--brand-on-surface)' : 'var(--primary)')};
     border-color: ${p =>
-      p.$variant === 'onBrand' ? 'rgba(255, 255, 255, 0.7)' : 'var(--primary)'};
+      p.$variant === 'onBrand' ? 'rgba(var(--on-brand-rgb), 0.7)' : 'var(--primary)'};
   }
 
   &:active {

@@ -9,6 +9,11 @@ import styled from 'styled-components';
 import { reviewService } from '../../services/reviewService';
 import type { Review, CreateReviewDTO, UpdateReviewDTO } from '../../types/review';
 
+// Star-rating gold has no matching semantic status token; kept fixed across
+// themes, same convention as other rating stars in the app.
+const STAR_ACTIVE_COLOR = '#FDB022';
+const STAR_ACTIVE_GLOW = 'rgba(253, 176, 34, 0.3)';
+
 interface ReviewFormProps {
   racketId: number;
   existingReview?: Review;
@@ -192,7 +197,7 @@ const ErrorBanner = styled.div`
   align-items: center;
   gap: 0.5rem;
   padding: 0.75rem 1rem;
-  background: rgba(220, 38, 38, 0.08);
+  background: var(--danger-subtle);
   border-left: 3px solid var(--danger);
   border-radius: 8px;
   margin-bottom: 1rem;
@@ -239,8 +244,8 @@ const StarButton = styled.button<{ $active: boolean; $hovered: boolean }>`
   font-size: 1.75rem;
   cursor: pointer;
   transition: all 0.15s;
-  color: ${props => (props.$active ? '#FDB022' : 'var(--border-strong)')};
-  filter: ${props => (props.$active ? 'drop-shadow(0 1px 3px rgba(253, 176, 34, 0.3))' : 'none')};
+  color: ${props => (props.$active ? STAR_ACTIVE_COLOR : 'var(--border-strong)')};
+  filter: ${props => (props.$active ? `drop-shadow(0 1px 3px ${STAR_ACTIVE_GLOW})` : 'none')};
   padding: 0.125rem;
   line-height: 1;
 
@@ -392,7 +397,7 @@ const SubmitButton = styled.button`
 const Spinner = styled.span`
   width: 1rem;
   height: 1rem;
-  border: 2px solid rgba(255, 255, 255, 0.3);
+  border: 2px solid rgba(var(--on-brand-rgb), 0.3);
   border-top-color: white;
   border-radius: 50%;
   animation: spin 0.6s linear infinite;

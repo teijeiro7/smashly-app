@@ -58,7 +58,7 @@ const SidebarOverlay = styled.div<{ $isOpen: boolean }>`
     display: block;
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.5);
+    background: rgba(var(--scrim-rgb), 0.5);
     z-index: 99;
     opacity: ${props => (props.$isOpen ? 1 : 0)};
     pointer-events: ${props => (props.$isOpen ? 'auto' : 'none')};

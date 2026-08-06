@@ -157,7 +157,7 @@ const IconButton = styled.button<{ $danger?: boolean }>`
   padding: 0.5rem;
   border: none;
   border-radius: 8px;
-  background: ${({ $danger }) => ($danger ? 'rgba(220, 38, 38, 0.10)' : 'var(--primary-subtle)')};
+  background: ${({ $danger }) => ($danger ? 'var(--danger-subtle)' : 'var(--primary-subtle)')};
   color: ${({ $danger }) => ($danger ? 'var(--danger)' : 'var(--primary-hover)')};
   cursor: pointer;
   display: flex;

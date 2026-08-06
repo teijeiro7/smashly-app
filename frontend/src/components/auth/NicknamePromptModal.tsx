@@ -9,7 +9,7 @@ const ModalOverlay = styled.div`
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
+  background: var(--surface-overlay);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -23,7 +23,7 @@ const ModalContainer = styled.div`
   padding: 2rem;
   max-width: 500px;
   width: 100%;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  box-shadow: var(--shadow-xl);
   animation: slideIn 0.3s ease-out;
 
   @keyframes slideIn {

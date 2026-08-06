@@ -4,6 +4,13 @@ import { motion } from 'framer-motion';
 import { FiStar, FiList, FiGitBranch, FiClock } from 'react-icons/fi';
 import { Link } from '@tanstack/react-router';
 import { formatRacketName } from '../../utils/textUtils';
+import { useTheme } from '../../contexts/ThemeContext';
+
+// No semantic token fits these two decorative per-category accent colors
+// (violet for lists, cyan for comparisons) — they're visual category
+// markers, not status indicators.
+const LISTS_ACCENT = { light: '#8b5cf6', dark: '#a78bfa' };
+const COMPARISONS_ACCENT = { light: '#06b6d4', dark: '#22d3ee' };
 
 const Container = styled.div`
   display: flex;
@@ -197,6 +204,10 @@ const ActivityStats: React.FC<ActivityStatsProps> = ({
   recentLists = [],
   recentComparisons = [],
 }) => {
+  const { resolved } = useTheme();
+  const isDark = resolved === 'dark';
+  const pick = (accent: { light: string; dark: string }) => (isDark ? accent.dark : accent.light);
+
   return (
     <Container>
       <StatsGrid>
@@ -208,16 +219,16 @@ const ActivityStats: React.FC<ActivityStatsProps> = ({
           <StatLabel>Reviews escritas</StatLabel>
         </StatCard>
 
-        <StatCard $color='#8b5cf6' whileHover={{ y: -4 }}>
-          <StatIcon color='#8b5cf6'>
+        <StatCard $color={pick(LISTS_ACCENT)} whileHover={{ y: -4 }}>
+          <StatIcon color={pick(LISTS_ACCENT)}>
             <FiList />
           </StatIcon>
           <StatValue>{stats.listsCount}</StatValue>
           <StatLabel>Listas creadas</StatLabel>
         </StatCard>
 
-        <StatCard $color='#06b6d4' whileHover={{ y: -4 }}>
-          <StatIcon color='#06b6d4'>
+        <StatCard $color={pick(COMPARISONS_ACCENT)} whileHover={{ y: -4 }}>
+          <StatIcon color={pick(COMPARISONS_ACCENT)}>
             <FiGitBranch />
           </StatIcon>
           <StatValue>{stats.comparisonsCount}</StatValue>
@@ -266,7 +277,7 @@ const ActivityStats: React.FC<ActivityStatsProps> = ({
             {recentLists.slice(0, 3).map(list => (
               <RecentItem key={list.id} to={`/lists/${list.id}`}>
                 <RecentItemInfo>
-                  <RecentItemIcon color='#8b5cf6'>
+                  <RecentItemIcon color={pick(LISTS_ACCENT)}>
                     <FiList size={16} />
                   </RecentItemIcon>
                   <RecentItemText>
@@ -294,7 +305,7 @@ const ActivityStats: React.FC<ActivityStatsProps> = ({
             {recentComparisons.slice(0, 3).map(comp => (
               <RecentItem key={comp.id} to={`/compare/${comp.id}`}>
                 <RecentItemInfo>
-                  <RecentItemIcon color='#06b6d4'>
+                  <RecentItemIcon color={pick(COMPARISONS_ACCENT)}>
                     <FiGitBranch size={16} />
                   </RecentItemIcon>
                   <RecentItemText>

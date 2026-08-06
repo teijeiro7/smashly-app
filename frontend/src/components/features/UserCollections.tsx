@@ -159,7 +159,7 @@ const ActionButton = styled(motion.button)<{ $danger?: boolean }>`
   justify-content: center;
   border: none;
   cursor: pointer;
-  background: ${props => (props.$danger ? 'rgba(220, 38, 38, 0.10)' : 'transparent')};
+  background: ${props => (props.$danger ? 'var(--danger-subtle)' : 'transparent')};
   color: ${props => (props.$danger ? 'var(--danger)' : 'var(--text-muted)')};
 
   &:hover {

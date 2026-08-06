@@ -169,9 +169,9 @@ const StatusBadge = styled.span<{ status: 'pending' | 'approved' | 'rejected' }>
       case 'approved':
         return 'var(--primary-subtle)';
       case 'rejected':
-        return 'rgba(220, 38, 38, 0.10)';
+        return 'var(--danger-subtle)';
       case 'pending':
-        return 'rgba(217, 119, 6, 0.10)';
+        return 'var(--accent-subtle)';
     }
   }};
   color: ${props => {
@@ -181,7 +181,7 @@ const StatusBadge = styled.span<{ status: 'pending' | 'approved' | 'rejected' }>
       case 'rejected':
         return 'var(--danger)';
       case 'pending':
-        return '#d97706';
+        return 'var(--accent-text)';
     }
   }};
 `;

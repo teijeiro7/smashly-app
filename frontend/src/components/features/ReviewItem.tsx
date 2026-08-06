@@ -9,9 +9,18 @@ import { Link, useRouterState } from '@tanstack/react-router';
 import { reviewService } from '../../services/reviewService';
 import type { ReviewComment, ReviewWithDetails } from '../../types/review';
 import { useAuth } from '../../contexts/AuthContext';
+import { useTheme } from '../../contexts/ThemeContext';
 import { ReviewForm } from './ReviewForm';
 import { FiHeart, FiMessageSquare } from 'react-icons/fi';
 import { formatBrandName, formatModelName, formatRacketName } from '../../utils/textUtils';
+
+// Decorative avatar fallback background — no semantic status token fits
+// (not tied to primary/info/danger/etc.), so it needs its own light/dark pair.
+const AVATAR_FALLBACK_BG = { light: '#e0e7ff', dark: '#1e2749' };
+
+// Star-rating gold has no matching semantic status token; kept fixed across
+// themes, same convention as other rating stars in the app.
+const STAR_FILLED_COLOR = '#FFC107';
 
 interface ReviewItemProps {
   review: ReviewWithDetails;
@@ -27,6 +36,8 @@ export const ReviewItem: React.FC<ReviewItemProps> = ({
   showProductInfo = true,
 }) => {
   const { user } = useAuth();
+  const { resolved } = useTheme();
+  const isDark = resolved === 'dark';
   const { location } = useRouterState();
   const containerRef = useRef<HTMLDivElement>(null);
   const [isEditing, setIsEditing] = useState(false);
@@ -194,7 +205,7 @@ export const ReviewItem: React.FC<ReviewItemProps> = ({
                 loading='lazy'
               />
             ) : (
-              <DefaultAvatar>
+              <DefaultAvatar $isDark={isDark}>
                 {review.user?.nickname ? review.user.nickname[0].toUpperCase() : 'U'}
               </DefaultAvatar>
             )}
@@ -518,13 +529,13 @@ const Avatar = styled.div`
   }
 `;
 
-const DefaultAvatar = styled.div`
+const DefaultAvatar = styled.div<{ $isDark?: boolean }>`
   width: 100%;
   height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #e0e7ff;
+  background: ${props => (props.$isDark ? AVATAR_FALLBACK_BG.dark : AVATAR_FALLBACK_BG.light)};
   color: var(--primary);
   font-size: 1.2rem;
   font-weight: 700;
@@ -543,7 +554,7 @@ const RatingRow = styled.div`
 `;
 
 const SmallStar = styled.span<{ filled: boolean }>`
-  color: ${p => (p.filled ? '#FFC107' : 'var(--border)')};
+  color: ${p => (p.filled ? STAR_FILLED_COLOR : 'var(--border)')};
 `;
 
 const DateText = styled.div`
@@ -611,7 +622,7 @@ const LikeButton = styled.button<{ liked: boolean }>`
   transition: all 0.2s;
 
   &:hover {
-    background: ${p => (p.liked ? 'rgba(239, 68, 68, 0.15)' : 'var(--surface-2)')};
+    background: ${p => (p.liked ? 'rgba(var(--danger-rgb), 0.15)' : 'var(--surface-2)')};
     border-color: ${p => (p.liked ? 'var(--danger-strong)' : 'var(--border)')};
   }
 `;

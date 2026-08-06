@@ -9,7 +9,7 @@ const Overlay = styled.div`
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
+  background: var(--surface-overlay);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -33,7 +33,7 @@ const ModalContainer = styled.div`
   width: 95%;
   max-height: 90vh;
   overflow-y: auto;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  box-shadow: var(--shadow-xl);
   animation: slideUp 0.3s ease;
 
   @keyframes slideUp {
@@ -510,10 +510,7 @@ const StoreProfileForm: React.FC<StoreProfileFormProps> = ({ store, isOpen, onCl
                 {form.gallery_images.map((url, i) => (
                   <GalleryUrlTag key={i}>
                     <span>{url}</span>
-                    <RemoveUrlButton
-                      onClick={() => removeGalleryUrl(i)}
-                      aria-label='Eliminar URL'
-                    >
+                    <RemoveUrlButton onClick={() => removeGalleryUrl(i)} aria-label='Eliminar URL'>
                       <FiTrash2 size={14} />
                     </RemoveUrlButton>
                   </GalleryUrlTag>
