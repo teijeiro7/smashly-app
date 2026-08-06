@@ -224,7 +224,7 @@ const RacketImage = styled.img`
   padding: 0.5rem;
 `;
 
-const RacketName = styled.h3`
+const RacketName = styled.h2`
   font-size: 0.875rem;
   font-weight: 600;
   color: var(--text);
@@ -539,7 +539,7 @@ const FavoritesSection = styled.div`
   margin-bottom: 1.5rem;
 `;
 
-const FavoritesTitle = styled.h3`
+const FavoritesTitle = styled.h2`
   font-size: 0.6875rem;
   font-weight: 600;
   color: var(--text-subtle);

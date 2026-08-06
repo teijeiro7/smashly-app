@@ -185,7 +185,7 @@ const FormSection = styled.div`
   }
 `;
 
-const SectionTitle = styled.h3`
+const SectionTitle = styled.h2`
   font-size: 1rem;
   font-weight: 600;
   color: var(--primary);

@@ -113,7 +113,7 @@ const CardHeader = styled.div`
   gap: 1rem;
 `;
 
-const CardTitle = styled.h3`
+const CardTitle = styled.h2`
   font-size: 1.0625rem;
   font-weight: 600;
   color: var(--text);

@@ -68,7 +68,7 @@ const CardHeader = styled.div`
   justify-content: space-between;
 `;
 
-const CardTitle = styled.h3`
+const CardTitle = styled.h2`
   font-size: 1rem;
   font-weight: 600;
   color: var(--primary);
@@ -130,7 +130,7 @@ const ListInfo = styled.div`
   flex: 1;
 `;
 
-const ListName = styled.h4`
+const ListName = styled.h3`
   font-size: 1rem;
   font-weight: 600;
   color: var(--primary);

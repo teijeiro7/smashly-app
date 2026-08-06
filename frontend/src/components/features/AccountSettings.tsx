@@ -38,7 +38,7 @@ const SectionIcon = styled.div<{ color: string }>`
   justify-content: center;
 `;
 
-const SectionTitle = styled.h3`
+const SectionTitle = styled.h2`
   font-size: 1rem;
   font-weight: 600;
   color: var(--primary);
@@ -103,7 +103,7 @@ const DangerZone = styled.div`
   margin-top: 1rem;
 `;
 
-const DangerTitle = styled.h4`
+const DangerTitle = styled.h3`
   font-size: 0.9375rem;
   font-weight: 600;
   color: var(--danger);

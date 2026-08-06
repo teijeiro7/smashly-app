@@ -852,7 +852,7 @@ const ComparisonOnlyCard = styled.div`
   align-items: center;
 `;
 
-const ComparisonOnlyTitle = styled.h3`
+const ComparisonOnlyTitle = styled.h2`
   font-size: 1.25rem;
   font-weight: 700;
   color: var(--color-gray-700);

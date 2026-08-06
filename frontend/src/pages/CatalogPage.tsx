@@ -455,7 +455,7 @@ const EmptyIcon = styled.div`
   opacity: 0.5;
 `;
 
-const EmptyTitle = styled.h3`
+const EmptyTitle = styled.h2`
   font-size: 1.25rem;
   font-weight: 700;
   color: var(--text);

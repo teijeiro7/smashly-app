@@ -63,7 +63,7 @@ const StatLabel = styled.div`
   margin-top: 0.5rem;
 `;
 
-const SectionTitle = styled.h3`
+const SectionTitle = styled.h2`
   font-size: 1.0625rem;
   font-weight: 600;
   color: var(--primary);

@@ -366,7 +366,7 @@ const ChartCard = styled.div`
   margin-top: 1rem;
 `;
 
-const ChartTitle = styled.h4`
+const ChartTitle = styled.h3`
   font-size: 1rem;
   font-weight: 700;
   color: var(--text);

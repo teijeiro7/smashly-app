@@ -97,7 +97,7 @@ const CardHeader = styled.div`
   margin-bottom: 1rem;
 `;
 
-const StoreName = styled.h3`
+const StoreName = styled.h2`
   margin: 0;
   font-size: 1.25rem;
   color: var(--primary);

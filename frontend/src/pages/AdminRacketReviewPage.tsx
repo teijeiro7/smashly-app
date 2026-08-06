@@ -68,7 +68,7 @@ const ConflictHeader = styled.div`
   border-bottom: 1px solid var(--border);
 `;
 
-const ConflictTitle = styled.h3`
+const ConflictTitle = styled.h2`
   font-size: 1.125rem;
   font-weight: 600;
   color: var(--text);
@@ -94,7 +94,7 @@ const RacketColumn = styled.div<{ type: 'existing' | 'new' }>`
   border: 1px solid ${props => (props.type === 'existing' ? 'var(--primary-subtle)' : 'var(--accent-subtle)')};
 `;
 
-const ColumnTitle = styled.h4`
+const ColumnTitle = styled.h3`
   font-size: 1rem;
   font-weight: 600;
   margin: 0 0 1rem 0;
@@ -217,7 +217,7 @@ const AdminRacketReviewPage: React.FC = () => {
       <Content>
         {conflicts.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '3rem', color: 'var(--text-muted)' }}>
-            <h3>🎉 No hay conflictos pendientes</h3>
+            <h2 style={{ fontSize: '1.125rem', fontWeight: 600 }}>🎉 No hay conflictos pendientes</h2>
             <p>Todas las palas están sincronizadas correctamente.</p>
           </div>
         ) : (
