@@ -387,7 +387,7 @@ export const RacketSearchInput: React.FC<RacketSearchInputProps> = ({
             placeholder={placeholder}
           />
           {query && (
-            <ClearButton onClick={handleClear}>
+            <ClearButton onClick={handleClear} aria-label='Limpiar búsqueda'>
               <FiX size={18} />
             </ClearButton>
           )}

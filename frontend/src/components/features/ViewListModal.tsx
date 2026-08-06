@@ -290,7 +290,7 @@ export const ViewListModal: React.FC<ViewListModalProps> = ({
                   {list.rackets?.length || 0} {list.rackets?.length === 1 ? 'pala' : 'palas'}
                 </RacketCount>
               </HeaderContent>
-              <CloseButton onClick={onClose}>
+              <CloseButton onClick={onClose} aria-label='Cerrar'>
                 <FiX size={24} />
               </CloseButton>
             </Header>

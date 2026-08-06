@@ -346,7 +346,7 @@ const OnboardingPromptModal: React.FC<OnboardingPromptModalProps> = ({ isOpen, o
             exit={{ scale: 0.96, opacity: 0, y: 12 }}
             transition={{ duration: 0.18, ease: 'easeOut' }}
           >
-            <CloseButton onClick={onClose}>
+            <CloseButton onClick={onClose} aria-label='Cerrar'>
               <FiX size={20} />
             </CloseButton>
 

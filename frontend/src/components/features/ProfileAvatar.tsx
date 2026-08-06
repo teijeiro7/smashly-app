@@ -205,6 +205,7 @@ const ProfileAvatar: React.FC<ProfileAvatarProps> = ({
           onClick={() => inputRef.current?.click()}
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.95 }}
+          aria-label='Cambiar foto de perfil'
         >
           <FiCamera size={16} />
         </UploadButton>

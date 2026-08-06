@@ -844,6 +844,7 @@ export const GlobalSearch: React.FC<GlobalSearchProps> = ({
                   onClick={clearSearch}
                   $isInHeader={isInHeader}
                   $isMobileContext={isMobileContext}
+                  aria-label='Limpiar búsqueda'
                 >
                   <FiX size={14} />
                 </ClearButton>
@@ -876,6 +877,7 @@ export const GlobalSearch: React.FC<GlobalSearchProps> = ({
                           size={12}
                           style={{ cursor: 'pointer', opacity: 0.6 }}
                           onClick={e => removeRecentSearch(e, q)}
+                          aria-label='Eliminar búsqueda reciente'
                         />
                       </RecentSearchItem>
                     ))}

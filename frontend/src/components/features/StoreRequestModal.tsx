@@ -186,7 +186,7 @@ const StoreRequestModal: React.FC<StoreRequestModalProps> = ({
   return (
     <Overlay onClick={onClose}>
       <ModalContainer onClick={e => e.stopPropagation()}>
-        <CloseButton onClick={onClose}>
+        <CloseButton onClick={onClose} aria-label='Cerrar'>
           <FiX size={24} />
         </CloseButton>
 

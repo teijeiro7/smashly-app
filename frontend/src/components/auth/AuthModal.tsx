@@ -217,7 +217,7 @@ const AuthModal: React.FC = () => {
             <LeftPanel $bgImage={bgImage}>{leftPanelContent}</LeftPanel>
 
             <RightPanel>
-              <CloseButton onClick={closeModal}>
+              <CloseButton onClick={closeModal} aria-label='Cerrar'>
                 <FiX size={20} />
               </CloseButton>
 

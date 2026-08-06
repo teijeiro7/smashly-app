@@ -562,7 +562,7 @@ export const EditProfileModal: React.FC<EditProfileModalProps> = ({
                 <FiUser />
                 Editar Perfil
               </Title>
-              <CloseButton onClick={handleClose} disabled={isSubmitting}>
+              <CloseButton onClick={handleClose} disabled={isSubmitting} aria-label='Cerrar'>
                 <FiX size={24} />
               </CloseButton>
             </Header>

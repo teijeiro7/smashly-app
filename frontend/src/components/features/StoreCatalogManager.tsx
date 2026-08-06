@@ -372,10 +372,14 @@ const StoreCatalogManager: React.FC<StoreCatalogManagerProps> = ({ storeId }) =>
                       value={editLink}
                       onChange={e => setEditLink(e.target.value)}
                     />
-                    <IconButton onClick={() => handleSaveEdit(item)} disabled={savingEdit}>
+                    <IconButton
+                      onClick={() => handleSaveEdit(item)}
+                      disabled={savingEdit}
+                      aria-label='Guardar'
+                    >
                       <FiSave />
                     </IconButton>
-                    <IconButton onClick={handleCancelEdit}>
+                    <IconButton onClick={handleCancelEdit} aria-label='Cancelar'>
                       <FiX />
                     </IconButton>
                   </EditRow>
@@ -393,10 +397,14 @@ const StoreCatalogManager: React.FC<StoreCatalogManagerProps> = ({ storeId }) =>
                       )}
                     </PriceSection>
                     <Actions>
-                      <IconButton onClick={() => handleStartEdit(item)}>
+                      <IconButton onClick={() => handleStartEdit(item)} aria-label='Editar'>
                         <FiEdit2 />
                       </IconButton>
-                      <IconButton $danger onClick={() => handleRemove(item.id)}>
+                      <IconButton
+                        $danger
+                        onClick={() => handleRemove(item.id)}
+                        aria-label='Eliminar'
+                      >
                         <FiTrash2 />
                       </IconButton>
                     </Actions>

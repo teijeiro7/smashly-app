@@ -207,7 +207,7 @@ export const PWAInstallPrompt: React.FC = () => {
             <Title>
               <FiDownload /> Instalar Smashly
             </Title>
-            <CloseButton onClick={dismissPrompt}>
+            <CloseButton onClick={dismissPrompt} aria-label='Cerrar'>
               <FiX size={20} />
             </CloseButton>
           </Header>

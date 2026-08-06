@@ -286,7 +286,7 @@ const RacketCRUDModal: React.FC<RacketCRUDModalProps> = ({ racket, onClose, onSa
       <Modal onClick={e => e.stopPropagation()}>
         <ModalHeader>
           <ModalTitle>{racket ? 'Editar Pala' : 'Nueva Pala'}</ModalTitle>
-          <CloseButton onClick={onClose}>
+          <CloseButton onClick={onClose} aria-label='Cerrar'>
             <FiX />
           </CloseButton>
         </ModalHeader>

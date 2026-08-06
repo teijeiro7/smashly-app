@@ -246,7 +246,7 @@ const MobileBottomNav = React.memo(() => {
               transition={{ type: 'spring', damping: 25, stiffness: 300 }}
               onClick={e => e.stopPropagation()}
             >
-              <CloseButton onClick={handleClosePopup}>
+              <CloseButton onClick={handleClosePopup} aria-label='Cerrar'>
                 <X size={20} />
               </CloseButton>
               <PopupTitle>
@@ -284,7 +284,7 @@ const MobileBottomNav = React.memo(() => {
               transition={{ type: 'spring', damping: 25, stiffness: 300 }}
               onClick={e => e.stopPropagation()}
             >
-              <CloseButton onClick={handleClosePopup}>
+              <CloseButton onClick={handleClosePopup} aria-label='Cerrar'>
                 <X size={20} />
               </CloseButton>
               <PopupTitle>

@@ -285,7 +285,7 @@ export const AddToListModal: React.FC<AddToListModalProps> = ({
                   <Title>Añadir a mis listas</Title>
                   <Subtitle>{racketName}</Subtitle>
                 </HeaderContent>
-                <CloseButton onClick={onClose}>
+                <CloseButton onClick={onClose} aria-label='Cerrar'>
                   <FiX size={24} />
                 </CloseButton>
               </Header>
