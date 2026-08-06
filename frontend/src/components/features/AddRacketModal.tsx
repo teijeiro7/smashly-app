@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { FiX, FiSearch, FiCheck, FiPackage } from 'react-icons/fi';
 import { sileo } from 'sileo';
 import catalogService, { CatalogSearchResult } from '../../services/catalogService';
+import { onActivationKeyDown } from '../../utils/a11y';
 
 const Overlay = styled.div`
   position: fixed;
@@ -343,7 +344,10 @@ const AddRacketModal: React.FC<AddRacketModalProps> = ({ storeId, isOpen, onClos
               <ResultRow
                 key={r.id}
                 $selected={r.id === selectedId}
+                role='button'
+                tabIndex={0}
                 onClick={() => handleSelect(r.id)}
+                onKeyDown={onActivationKeyDown(() => handleSelect(r.id))}
               >
                 {r.images?.[0] ? (
                   <ResultImg src={r.images[0]} alt={r.name} />

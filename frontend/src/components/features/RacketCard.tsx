@@ -14,6 +14,7 @@ import { Racket } from '../../types/racket';
 import { getLowestPrice } from '../../utils/priceUtils';
 import { racketImageUrl } from '../../utils/imageUrl';
 import { formatBrandName, formatModelName } from '../../utils/textUtils';
+import { onActivationKeyDown } from '../../utils/a11y';
 
 // Styled Components
 const RacketCardContainer = styled.li<{ $view: 'grid' | 'list'; $index: number }>`
@@ -294,7 +295,10 @@ const RacketCardComponent: React.FC<RacketCardProps> = memo(
       <RacketCardContainer
         $view={view}
         $index={index}
+        role='button'
+        tabIndex={0}
         onClick={() => onClick(racket)}
+        onKeyDown={onActivationKeyDown(() => onClick(racket))}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >

@@ -58,6 +58,7 @@ import {
 } from '../utils/seoSchemas';
 import { buildUrl } from '../config/seo';
 import { racketImageUrl } from '../utils/imageUrl';
+import { onActivationKeyDown } from '../utils/a11y';
 
 // --- Styled Components ---
 
@@ -1667,7 +1668,10 @@ const RacketDetailPage: React.FC = () => {
             src={racketImageUrl(racket.imagenes?.[selectedImageIndex] || racket.imagenes?.[0])}
             alt={formatRacketName(racket)}
             onError={handleImageError}
+            role='button'
+            tabIndex={0}
             onClick={() => setShowLightbox(true)}
+            onKeyDown={onActivationKeyDown(() => setShowLightbox(true))}
             loading='eager'
             fetchPriority='high'
             width={450}
@@ -1698,7 +1702,10 @@ const RacketDetailPage: React.FC = () => {
                         src={racketImageUrl(img)}
                         alt={`${formatRacketName(racket)} - imagen ${index + 1}`}
                         $isActive={index === selectedImageIndex}
+                        role='button'
+                        tabIndex={0}
                         onClick={() => setSelectedImageIndex(index)}
+                        onKeyDown={onActivationKeyDown(() => setSelectedImageIndex(index))}
                         onError={handleImageError}
                         loading='lazy'
                         width={70}

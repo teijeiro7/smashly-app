@@ -14,6 +14,7 @@ import {
   webPageSchema,
 } from '../utils/seoSchemas';
 import { allKeywords, buildUrl } from '../config/seo';
+import { onActivationKeyDown } from '../utils/a11y';
 
 const heroFadeIn = keyframes`
   from { opacity: 0; transform: translateY(30px); }
@@ -627,7 +628,12 @@ const HomePage: React.FC = () => {
           </TrustBar>
 
           <ScrollIndicator
+            role='button'
+            tabIndex={0}
             onClick={() => window.scrollTo({ top: window.innerHeight, behavior: 'smooth' })}
+            onKeyDown={onActivationKeyDown(() =>
+              window.scrollTo({ top: window.innerHeight, behavior: 'smooth' })
+            )}
           >
             <span>Descubre más</span>
             <div className='mouse'>

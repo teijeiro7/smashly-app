@@ -22,6 +22,7 @@ import { ListService } from '../services/listService';
 import { RecommendationService } from '../services/recommendationService';
 import { Recommendation } from '../types/recommendation';
 import CurrentRacketFinderModal from '../components/features/CurrentRacketFinderModal';
+import { onActivationKeyDown } from '../utils/a11y';
 
 const Container = styled.div`
   min-height: 100dvh;
@@ -681,7 +682,12 @@ export const PlayerDashboard: React.FC = () => {
               {favorites.map(racket => (
                 <RacketCard
                   key={racket.id}
+                  role='button'
+                  tabIndex={0}
                   onClick={() => navigate({ to: '/palas/$slug', params: { slug: racket.slug } })}
+                  onKeyDown={onActivationKeyDown(() =>
+                    navigate({ to: '/palas/$slug', params: { slug: racket.slug } })
+                  )}
                 >
                   {racket.imagenes?.[0] && (
                     <RacketImage
@@ -711,7 +717,12 @@ export const PlayerDashboard: React.FC = () => {
               {recentlyViewed.slice(0, 4).map(racket => (
                 <RacketCard
                   key={racket.id}
+                  role='button'
+                  tabIndex={0}
                   onClick={() => navigate({ to: '/racket-detail', search: { id: racket.id } })}
+                  onKeyDown={onActivationKeyDown(() =>
+                    navigate({ to: '/racket-detail', search: { id: racket.id } })
+                  )}
                 >
                   {racket.imagenes?.[0] && (
                     <RacketImage
@@ -738,7 +749,12 @@ export const PlayerDashboard: React.FC = () => {
               {offers.map(racket => (
                 <RacketCard
                   key={racket.id}
+                  role='button'
+                  tabIndex={0}
                   onClick={() => navigate({ to: '/palas/$slug', params: { slug: racket.slug } })}
+                  onKeyDown={onActivationKeyDown(() =>
+                    navigate({ to: '/palas/$slug', params: { slug: racket.slug } })
+                  )}
                 >
                   {racket.imagenes?.[0] && (
                     <RacketImage

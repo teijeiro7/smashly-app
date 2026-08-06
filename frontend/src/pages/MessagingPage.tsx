@@ -5,6 +5,7 @@ import { FaStore } from 'react-icons/fa';
 import { sileo } from 'sileo';
 import { supabase } from '../lib/supabase';
 import messagingService, { Conversation, Message } from '../services/messagingService';
+import { onActivationKeyDown } from '../utils/a11y';
 
 const Page = styled.div`
   height: calc(100dvh - 4rem);
@@ -377,7 +378,10 @@ const MessagingPage: React.FC = () => {
                 key={conv.id}
                 $active={conv.id === activeConvId}
                 aria-current={conv.id === activeConvId ? 'true' : undefined}
+                role='button'
+                tabIndex={0}
                 onClick={() => selectConversation(conv.id)}
+                onKeyDown={onActivationKeyDown(() => selectConversation(conv.id))}
               >
                 <ConvTop>
                   <ConvName>

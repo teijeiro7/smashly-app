@@ -21,6 +21,7 @@ import ComparisonTable from '../components/features/ComparisonTable';
 import SEO from '../components/seo/SEO';
 import { organizationSchema, webPageSchema, breadcrumbSchema } from '../utils/seoSchemas';
 import { buildUrl, allKeywords } from '../config/seo';
+import { onActivationKeyDown } from '../utils/a11y';
 
 const Container = styled.div`
   min-height: 100dvh;
@@ -1059,9 +1060,14 @@ const CompareRacketsPage: React.FC = () => {
                 return (
                   <SearchResultItem
                     key={racket.id}
+                    role='button'
+                    tabIndex={0}
                     onClick={() => {
                       if (!isAlreadySelected) handleAddRacket(racket);
                     }}
+                    onKeyDown={onActivationKeyDown(() => {
+                      if (!isAlreadySelected) handleAddRacket(racket);
+                    })}
                     style={{
                       opacity: isAlreadySelected ? 0.6 : 1,
                       cursor: isAlreadySelected ? 'default' : 'pointer',

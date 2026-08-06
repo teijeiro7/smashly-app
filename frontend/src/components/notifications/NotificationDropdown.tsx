@@ -15,11 +15,18 @@ import { useNotifications } from '../../contexts/NotificationContext';
 import { useTheme } from '../../contexts/ThemeContext';
 import { Notification, NotificationType } from '../../types/notification';
 import { useNavigate } from '@tanstack/react-router';
+import { onActivationKeyDown } from '../../utils/a11y';
 
 // No semantic token fits these two niche admin-only badge colors (indigo/purple),
 // so they get their own light/dark map instead of new global tokens.
-const NEW_USER_COLORS = { light: { bg: '#e0e7ff', fg: '#4f46e5' }, dark: { bg: '#312e81', fg: '#a5b4fc' } };
-const NEW_STORE_COLORS = { light: { bg: '#f3e8ff', fg: '#9333ea' }, dark: { bg: '#4c1d95', fg: '#d8b4fe' } };
+const NEW_USER_COLORS = {
+  light: { bg: '#e0e7ff', fg: '#4f46e5' },
+  dark: { bg: '#312e81', fg: '#a5b4fc' },
+};
+const NEW_STORE_COLORS = {
+  light: { bg: '#f3e8ff', fg: '#9333ea' },
+  dark: { bg: '#4c1d95', fg: '#d8b4fe' },
+};
 
 const DropdownContainer = styled.div`
   position: absolute;
@@ -396,7 +403,10 @@ export const NotificationDropdown: React.FC<NotificationDropdownProps> = ({ onCl
             <NotificationItem
               key={notification.id}
               isRead={notification.is_read}
+              role='button'
+              tabIndex={0}
               onClick={() => handleNotificationClick(notification)}
+              onKeyDown={onActivationKeyDown(() => handleNotificationClick(notification))}
             >
               <NotificationIcon type={notification.type} $isDark={isDark}>
                 {getNotificationIcon(notification.type)}
