@@ -307,7 +307,11 @@ const UpdatePasswordPage: React.FC = () => {
                 $hasError={!!error && error.includes('contraseña')}
                 disabled={loading || !isPasswordRecovery}
               />
-              <PasswordToggle type='button' onClick={() => setShowPassword(!showPassword)}>
+              <PasswordToggle
+                type='button'
+                onClick={() => setShowPassword(!showPassword)}
+                aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+              >
                 {showPassword ? <FiEyeOff /> : <FiEye />}
               </PasswordToggle>
             </InputWrapper>

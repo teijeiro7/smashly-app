@@ -833,7 +833,7 @@ const MyComparisonsPage: React.FC = () => {
             >
               <ModalHeader>
                 <ModalTitle>Comparación de Palas</ModalTitle>
-                <CloseButton onClick={() => setSelectedComparison(null)}>
+                <CloseButton onClick={() => setSelectedComparison(null)} aria-label='Cerrar'>
                   <FiX />
                 </CloseButton>
               </ModalHeader>

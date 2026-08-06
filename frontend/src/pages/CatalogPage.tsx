@@ -1156,7 +1156,10 @@ const CatalogPage: React.FC = () => {
                 onChange={e => setSearchQuery(e.target.value)}
               />
               {searchQuery && (
-                <ClearSearchIconButton onClick={() => setSearchQuery('')}>
+                <ClearSearchIconButton
+                  onClick={() => setSearchQuery('')}
+                  aria-label='Borrar búsqueda'
+                >
                   <FiX size={16} />
                 </ClearSearchIconButton>
               )}
@@ -1325,10 +1328,18 @@ const CatalogPage: React.FC = () => {
             </SortSelect>
 
             <ViewToggle>
-              <ViewButton $active={viewMode === 'grid'} onClick={() => setViewMode('grid')}>
+              <ViewButton
+                $active={viewMode === 'grid'}
+                onClick={() => setViewMode('grid')}
+                aria-label='Ver en cuadrícula'
+              >
                 <FiGrid />
               </ViewButton>
-              <ViewButton $active={viewMode === 'list'} onClick={() => setViewMode('list')}>
+              <ViewButton
+                $active={viewMode === 'list'}
+                onClick={() => setViewMode('list')}
+                aria-label='Ver en lista'
+              >
                 <FiList />
               </ViewButton>
             </ViewToggle>

@@ -1655,7 +1655,10 @@ const RacketDetailPage: React.FC = () => {
       <MainGrid>
         {/* Left: Gallery */}
         <GallerySection onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
-          <WishlistButton onClick={() => setShowAddToListModal(true)}>
+          <WishlistButton
+            onClick={() => setShowAddToListModal(true)}
+            aria-label='Guardar en mis listas'
+          >
             <FiHeart fill={showAddToListModal ? 'currentColor' : 'none'} />
           </WishlistButton>
           <MainImage
@@ -1681,7 +1684,10 @@ const RacketDetailPage: React.FC = () => {
                 }}
               >
                 <CarouselWrapper>
-                  <LeftScrollButton onClick={() => scrollCarousel('left')}>
+                  <LeftScrollButton
+                    onClick={() => scrollCarousel('left')}
+                    aria-label='Imagen anterior'
+                  >
                     <FiChevronLeft size={20} />
                   </LeftScrollButton>
 
@@ -1701,7 +1707,10 @@ const RacketDetailPage: React.FC = () => {
                     ))}
                   </CarouselTrack>
 
-                  <RightScrollButton onClick={() => scrollCarousel('right')}>
+                  <RightScrollButton
+                    onClick={() => scrollCarousel('right')}
+                    aria-label='Imagen siguiente'
+                  >
                     <FiChevronRight size={20} />
                   </RightScrollButton>
                 </CarouselWrapper>
@@ -1849,7 +1858,10 @@ const RacketDetailPage: React.FC = () => {
                         .map(w => (
                           <WatchItem key={w.id}>
                             <WatchItemLabel>↓ {w.target_price.toFixed(2)}€</WatchItemLabel>
-                            <WatchDeleteButton onClick={() => handleDeleteWatch(w.id)}>
+                            <WatchDeleteButton
+                              onClick={() => handleDeleteWatch(w.id)}
+                              aria-label='Eliminar alerta de precio'
+                            >
                               ✕
                             </WatchDeleteButton>
                           </WatchItem>

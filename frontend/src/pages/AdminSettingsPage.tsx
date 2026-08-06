@@ -676,6 +676,7 @@ const SettingsContent: React.FC = () => {
                               onClick={() => handleDeleteBrand(brand.name)}
                               whileHover={{ scale: 1.05 }}
                               whileTap={{ scale: 0.95 }}
+                              aria-label='Eliminar marca'
                             >
                               <FiTrash2 size={16} />
                             </IconButton>
@@ -783,6 +784,7 @@ const SettingsContent: React.FC = () => {
                               onClick={() => handleDeleteCategory(category.name)}
                               whileHover={{ scale: 1.05 }}
                               whileTap={{ scale: 0.95 }}
+                              aria-label='Eliminar categoría'
                             >
                               <FiTrash2 size={16} />
                             </IconButton>
