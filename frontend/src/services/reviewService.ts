@@ -45,12 +45,15 @@ export const reviewService = {
     const totalReviews = count ?? 0;
     const totalPages = Math.ceil(totalReviews / limit);
 
-    // Compute stats from rating distribution (limited to 100 ratings for perf)
-    const { data: ratingDist } = await supabase
-      .from('reviews')
-      .select('rating')
-      .eq('racket_id', racketId)
-      .limit(100);
+    // ratingDist and the session lookup don't depend on each other (or on
+    // the reviews page above) — only the likes lookup below needs both, so
+    // it's the only one that has to wait.
+    const [{ data: ratingDist }, { data: sessionData }] = await Promise.all([
+      // Compute stats from rating distribution (limited to 100 ratings for perf)
+      supabase.from('reviews').select('rating').eq('racket_id', racketId).limit(100),
+      supabase.auth.getSession(),
+    ]);
+    const session = sessionData.session;
 
     const dist = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 } as Record<number, number>;
     let ratingSum = 0;
@@ -61,9 +64,6 @@ export const reviewService = {
     const n = ratingDist?.length ?? 0;
 
     // Check if current user has liked the fetched reviews
-    const {
-      data: { session },
-    } = await supabase.auth.getSession();
     if (session) {
       const reviewIds = reviews.map(r => r.id);
       const { data: likes } = await supabase
