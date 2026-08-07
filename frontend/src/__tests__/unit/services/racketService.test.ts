@@ -132,10 +132,13 @@ describe('RacketService', () => {
       await expect(racketService.getAllRackets()).rejects.toThrow('Server error');
     });
 
-    it('queries rackets table without invalid discontinued column', async () => {
+    it('excludes discontinued rackets via IS NOT TRUE (discontinued is a real, nullable column)', async () => {
       await racketService.getAllRackets();
       const chain = supabase.from.mock.results[0].value;
-      expect(chain.not).not.toHaveBeenCalledWith('discontinued', 'is', true);
+      // `discontinued = false` would silently drop rows where the column is
+      // NULL (unknown status) instead of showing them, so this must be
+      // `not(discontinued, is, true)` rather than `eq(discontinued, false)`.
+      expect(chain.not).toHaveBeenCalledWith('discontinued', 'is', true);
       expect(chain.eq).not.toHaveBeenCalledWith('discontinued', false);
     });
   });
