@@ -20,7 +20,7 @@ const Overlay = styled(motion.div)`
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
+  background: var(--surface-overlay);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -38,7 +38,7 @@ const Modal = styled(motion.div)`
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  box-shadow: var(--shadow-xl);
 `;
 
 const Header = styled.div`
@@ -213,17 +213,17 @@ const ActionButton = styled.button<{ variant?: 'danger' | 'primary' }>`
   ${props =>
     props.variant === 'danger'
       ? `
-    background: rgba(220, 38, 38, 0.10);
+    background: var(--danger-subtle);
     color: var(--danger);
     &:hover {
       background: var(--danger-strong);
     }
   `
       : `
-    background: rgba(37, 99, 235, 0.10);
+    background: var(--info-subtle);
     color: var(--info);
     &:hover {
-      background: #bfdbfe;
+      background: rgba(var(--info-rgb), 0.2);
     }
   `}
 
@@ -290,7 +290,7 @@ export const ViewListModal: React.FC<ViewListModalProps> = ({
                   {list.rackets?.length || 0} {list.rackets?.length === 1 ? 'pala' : 'palas'}
                 </RacketCount>
               </HeaderContent>
-              <CloseButton onClick={onClose}>
+              <CloseButton onClick={onClose} aria-label='Cerrar'>
                 <FiX size={24} />
               </CloseButton>
             </Header>

@@ -15,7 +15,7 @@ export const SITE = {
   locale: 'es_ES',
   language: 'es',
   // Brand colors used in OG image and theme
-  themeColor: '#16a34a',
+  themeColor: '#15803d',
   backgroundColor: '#ffffff',
   // Brand identity
   foundingDate: '2025',

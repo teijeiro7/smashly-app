@@ -36,7 +36,7 @@ const HeaderContainer = styled.header`
   padding-top: env(safe-area-inset-top, 0);
   will-change: transform;
   transform: translateZ(0);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid rgba(var(--on-brand-rgb), 0.1);
 
   @media (max-width: 768px) {
     box-shadow: 0 2px 8px var(--shadow-color);
@@ -137,7 +137,7 @@ const MobileSearchButton = styled.button`
   opacity: 0.9;
 
   &:hover {
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(var(--on-brand-rgb), 0.1);
     opacity: 1;
   }
 
@@ -166,7 +166,7 @@ const MobileMenuDropdown = styled(motion.div)<{ $isOpen: boolean }>`
   max-height: min(85dvh, 720px);
   overflow-y: auto;
   height: auto;
-  border: 1px solid rgba(0, 0, 0, 0.04);
+  border: 1px solid var(--border);
   border-top: none;
 
   will-change: transform, opacity;
@@ -182,7 +182,7 @@ const MobileMenuDropdown = styled(motion.div)<{ $isOpen: boolean }>`
 
 const MobileSearchContainer = styled.div<{ $isOpen: boolean }>`
   padding: 1rem;
-  border-bottom: 1px solid rgba(229, 231, 235, 0.5);
+  border-bottom: 1px solid var(--border);
   transition: opacity 0.3s ease;
   overflow: visible;
   position: relative;
@@ -197,7 +197,7 @@ const MobileNavSection = styled.div`
   padding: 1.25rem 1rem;
 
   &:not(:last-child) {
-    border-bottom: 1px solid rgba(229, 231, 235, 0.5);
+    border-bottom: 1px solid var(--border);
   }
 `;
 
@@ -218,7 +218,7 @@ const NavLink = styled(Link)<{ $isActive: boolean; $isMobile?: boolean }>`
   border-radius: ${props => (props.$isMobile ? '10px' : '8px')};
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   background: ${props =>
-    props.$isActive && !props.$isMobile ? 'rgba(255, 255, 255, 0.1)' : 'transparent'};
+    props.$isActive && !props.$isMobile ? 'rgba(var(--on-brand-rgb), 0.1)' : 'transparent'};
   display: flex;
   align-items: center;
   gap: 12px;
@@ -241,7 +241,8 @@ const NavLink = styled(Link)<{ $isActive: boolean; $isMobile?: boolean }>`
   `}
 
   &:hover {
-    background: ${props => (props.$isMobile ? 'var(--surface-2)' : 'rgba(255, 255, 255, 0.08)')};
+    background: ${props =>
+      props.$isMobile ? 'var(--surface-2)' : 'rgba(var(--on-brand-rgb), 0.08)'};
     color: ${props => (props.$isMobile ? 'var(--primary-hover)' : 'var(--brand-on-surface)')};
     text-decoration: none;
     transform: ${props => (props.$isMobile ? 'translateX(3px)' : 'none')};
@@ -271,7 +272,7 @@ const MobileMenuButton = styled.button`
   opacity: 0.9;
 
   &:hover {
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(var(--on-brand-rgb), 0.1);
     opacity: 1;
   }
 
@@ -325,7 +326,7 @@ const LogoutButton = styled.button<{
   font-family: inherit;
 
   &:hover {
-    background: rgba(255, 255, 255, 0.08);
+    background: rgba(var(--on-brand-rgb), 0.08);
     color: var(--brand-on-surface);
     text-decoration: none;
   }
@@ -362,7 +363,7 @@ const AvatarButton = styled.button`
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  border: 2px solid rgba(255, 255, 255, 0.3);
+  border: 2px solid rgba(var(--on-brand-rgb), 0.3);
   background: var(--surface);
   cursor: pointer;
   overflow: hidden;
@@ -374,7 +375,7 @@ const AvatarButton = styled.button`
 
   &:hover {
     transform: scale(1.05);
-    border-color: rgba(255, 255, 255, 0.6);
+    border-color: rgba(var(--on-brand-rgb), 0.6);
     box-shadow: 0 2px 8px var(--shadow-color);
   }
 
@@ -408,7 +409,7 @@ const UserDropdown = styled.div<{ $isOpen: boolean }>`
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   z-index: 1000;
   overflow: hidden;
-  border: 1px solid rgba(0, 0, 0, 0.04);
+  border: 1px solid var(--border);
 
   &::before {
     content: '';
@@ -419,8 +420,8 @@ const UserDropdown = styled.div<{ $isOpen: boolean }>`
     height: 12px;
     background: var(--surface);
     transform: rotate(45deg);
-    border-left: 1px solid rgba(0, 0, 0, 0.04);
-    border-top: 1px solid rgba(0, 0, 0, 0.04);
+    border-left: 1px solid var(--border);
+    border-top: 1px solid var(--border);
   }
 `;
 
@@ -481,7 +482,7 @@ const DropdownItem = styled.button`
 
 const Divider = styled.div`
   height: 1px;
-  background: rgba(0, 0, 0, 0.06);
+  background: var(--border);
   margin: 0 12px;
 `;
 

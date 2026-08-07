@@ -396,12 +396,12 @@ const ViewButton = styled.button<{ $active: boolean }>`
   border: none;
   border-radius: 6px;
   background: ${props => (props.$active ? 'var(--primary-hover)' : 'transparent')};
-  color: ${props => (props.$active ? 'white' : 'var(--text-muted)')};
+  color: ${props => (props.$active ? 'var(--on-primary)' : 'var(--text-muted)')};
   cursor: pointer;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 
   &:hover {
-    color: ${props => (props.$active ? 'white' : 'var(--primary-hover)')};
+    color: ${props => (props.$active ? 'var(--on-primary)' : 'var(--primary-hover)')};
   }
 `;
 
@@ -455,7 +455,7 @@ const EmptyIcon = styled.div`
   opacity: 0.5;
 `;
 
-const EmptyTitle = styled.h3`
+const EmptyTitle = styled.h2`
   font-size: 1.25rem;
   font-weight: 700;
   color: var(--text);
@@ -471,7 +471,7 @@ const EmptyDescription = styled.p`
 
 const ClearFiltersButton = styled.button`
   background: var(--primary-hover);
-  color: white;
+  color: var(--on-primary);
   border: none;
   padding: 0.625rem 1.25rem;
   border-radius: 8px;
@@ -532,7 +532,7 @@ const PanelText = styled.div`
 
 const CompareButton = styled.button`
   background: var(--primary-hover);
-  color: white;
+  color: var(--on-primary);
   border: none;
   padding: 0.5rem 1rem;
   border-radius: 8px;
@@ -557,6 +557,7 @@ const ClearFiltersIconButton = styled(FilterButton)`
 `;
 
 // Component
+// eslint-disable-next-line max-lines-per-function -- ya estaba cerca del límite antes de añadir aria-pressed/aria-selected/aria-current a los controles $active; dividir el componente es un refactor aparte, fuera del alcance de este fix de a11y.
 const CatalogPage: React.FC = () => {
   const navigate = useNavigate();
   const searchParams = useSearch({ strict: false }) as Record<string, string>;
@@ -1094,6 +1095,14 @@ const CatalogPage: React.FC = () => {
     );
   }
 
+  const quickSearchChipActive = new Map<string, boolean>([
+    ['Bullpadel', selectedBrand === 'Bullpadel' || searchQuery === 'Bullpadel'],
+    ['Babolat', selectedBrand === 'Babolat' || searchQuery === 'Babolat'],
+    ['Nox', selectedBrand === 'Nox' || searchQuery === 'Nox'],
+    ['Forma Diamante', selectedShape === 'Diamante'],
+    ['Ofertas', showOffers],
+  ]);
+
   return (
     <Container>
       <SEO
@@ -1156,7 +1165,10 @@ const CatalogPage: React.FC = () => {
                 onChange={e => setSearchQuery(e.target.value)}
               />
               {searchQuery && (
-                <ClearSearchIconButton onClick={() => setSearchQuery('')}>
+                <ClearSearchIconButton
+                  onClick={() => setSearchQuery('')}
+                  aria-label='Borrar búsqueda'
+                >
                   <FiX size={16} />
                 </ClearSearchIconButton>
               )}
@@ -1175,13 +1187,8 @@ const CatalogPage: React.FC = () => {
             {['Bullpadel', 'Babolat', 'Nox', 'Forma Diamante', 'Ofertas'].map(chip => (
               <QuickSearchChip
                 key={chip}
-                $active={
-                  chip === 'Ofertas'
-                    ? showOffers
-                    : chip === 'Forma Diamante'
-                      ? selectedShape === 'Diamante'
-                      : selectedBrand === chip || searchQuery === chip
-                }
+                $active={quickSearchChipActive.get(chip)}
+                aria-pressed={quickSearchChipActive.get(chip)}
                 onClick={() => {
                   if (chip === 'Ofertas') {
                     setShowOffers(!showOffers);
@@ -1204,6 +1211,7 @@ const CatalogPage: React.FC = () => {
           {/* Advanced Filters Toggle */}
           <AdvancedFiltersToggle
             $active={showAdvancedFilters}
+            aria-pressed={showAdvancedFilters}
             onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
           >
             <FiFilter />
@@ -1223,13 +1231,18 @@ const CatalogPage: React.FC = () => {
                 ))}
               </FilterSelect>
 
-              <FilterButton $active={showOffers} onClick={() => setShowOffers(!showOffers)}>
+              <FilterButton
+                $active={showOffers}
+                aria-pressed={showOffers}
+                onClick={() => setShowOffers(!showOffers)}
+              >
                 <FiTag />
                 Ofertas
               </FilterButton>
 
               <FilterButton
                 $active={showAvailableOnly}
+                aria-pressed={showAvailableOnly}
                 onClick={() => setShowAvailableOnly(!showAvailableOnly)}
               >
                 <FiFilter size={16} />
@@ -1325,10 +1338,20 @@ const CatalogPage: React.FC = () => {
             </SortSelect>
 
             <ViewToggle>
-              <ViewButton $active={viewMode === 'grid'} onClick={() => setViewMode('grid')}>
+              <ViewButton
+                $active={viewMode === 'grid'}
+                aria-pressed={viewMode === 'grid'}
+                onClick={() => setViewMode('grid')}
+                aria-label='Ver en cuadrícula'
+              >
                 <FiGrid />
               </ViewButton>
-              <ViewButton $active={viewMode === 'list'} onClick={() => setViewMode('list')}>
+              <ViewButton
+                $active={viewMode === 'list'}
+                aria-pressed={viewMode === 'list'}
+                onClick={() => setViewMode('list')}
+                aria-label='Ver en lista'
+              >
                 <FiList />
               </ViewButton>
             </ViewToggle>

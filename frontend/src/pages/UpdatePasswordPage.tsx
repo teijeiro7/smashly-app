@@ -90,7 +90,7 @@ const Input = styled.input<{ $hasError?: boolean }>`
   width: 100%;
   padding: 0.75rem 1rem 0.75rem 2.75rem;
   border-radius: 12px;
-  border: 1.5px solid ${props => (props.$hasError ? '#fca5a5' : 'var(--border)')};
+  border: 1.5px solid ${props => (props.$hasError ? 'var(--danger)' : 'var(--border)')};
   background: ${props => (props.$hasError ? 'var(--danger-subtle)' : 'var(--surface)')};
   font-size: 1rem;
   transition:
@@ -102,7 +102,8 @@ const Input = styled.input<{ $hasError?: boolean }>`
     outline: none;
     border-color: ${props => (props.$hasError ? 'var(--error)' : 'var(--primary)')};
     box-shadow: 0 0 0 4px
-      ${props => (props.$hasError ? 'rgba(239, 68, 68, 0.1)' : 'rgba(22, 163, 74, 0.1)')};
+      ${props =>
+        props.$hasError ? 'rgba(var(--danger-rgb), 0.1)' : 'rgba(var(--primary-rgb-dark), 0.1)'};
   }
 
   &::placeholder {
@@ -149,7 +150,7 @@ const SubmitButton = styled.button`
   &:hover:not(:disabled) {
     background: var(--primary-hover);
     transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(22, 163, 74, 0.2);
+    box-shadow: 0 4px 12px rgba(var(--primary-rgb-dark), 0.2);
   }
 
   &:active:not(:disabled) {
@@ -307,7 +308,11 @@ const UpdatePasswordPage: React.FC = () => {
                 $hasError={!!error && error.includes('contraseña')}
                 disabled={loading || !isPasswordRecovery}
               />
-              <PasswordToggle type='button' onClick={() => setShowPassword(!showPassword)}>
+              <PasswordToggle
+                type='button'
+                onClick={() => setShowPassword(!showPassword)}
+                aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+              >
                 {showPassword ? <FiEyeOff /> : <FiEye />}
               </PasswordToggle>
             </InputWrapper>

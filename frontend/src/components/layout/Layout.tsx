@@ -39,7 +39,9 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       </a>
       <Header />
       <SubHeader />
-      <Main id='main-content'>{children}</Main>
+      <Main id='main-content' tabIndex={-1}>
+        {children}
+      </Main>
       <MobileBottomNav />
       <Footer />
     </LayoutContainer>

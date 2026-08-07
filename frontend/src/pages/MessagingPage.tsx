@@ -5,6 +5,7 @@ import { FaStore } from 'react-icons/fa';
 import { sileo } from 'sileo';
 import { supabase } from '../lib/supabase';
 import messagingService, { Conversation, Message } from '../services/messagingService';
+import { onActivationKeyDown } from '../utils/a11y';
 
 const Page = styled.div`
   height: calc(100dvh - 4rem);
@@ -107,7 +108,7 @@ const UnreadBadge = styled.span`
   height: 18px;
   padding: 0 4px;
   background: var(--primary);
-  color: white;
+  color: var(--on-primary);
   border-radius: 10px;
   font-size: 0.7rem;
   font-weight: 700;
@@ -157,7 +158,7 @@ const MessageBubble = styled.div<{ $mine: boolean }>`
   padding: 0.75rem 1rem;
   border-radius: ${({ $mine }) => ($mine ? '16px 16px 4px 16px' : '16px 16px 16px 4px')};
   background: ${({ $mine }) => ($mine ? 'var(--primary)' : 'var(--surface-2)')};
-  color: ${({ $mine }) => ($mine ? 'white' : 'var(--text)')};
+  color: ${({ $mine }) => ($mine ? 'var(--on-primary)' : 'var(--text)')};
   font-size: 0.9rem;
   line-height: 1.5;
   word-wrap: break-word;
@@ -165,7 +166,7 @@ const MessageBubble = styled.div<{ $mine: boolean }>`
 
 const MessageTime = styled.div<{ $mine: boolean }>`
   font-size: 0.7rem;
-  color: ${({ $mine }) => ($mine ? 'rgba(255,255,255,0.7)' : 'var(--text-subtle)')};
+  color: ${({ $mine }) => ($mine ? 'rgba(var(--on-primary-rgb), 0.7)' : 'var(--text-subtle)')};
   margin-top: 0.25rem;
   text-align: ${({ $mine }) => ($mine ? 'right' : 'left')};
 `;
@@ -198,7 +199,7 @@ const SendButton = styled.button`
   border: none;
   border-radius: 12px;
   background: var(--primary);
-  color: white;
+  color: var(--on-primary);
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -376,7 +377,11 @@ const MessagingPage: React.FC = () => {
               <ConversationItem
                 key={conv.id}
                 $active={conv.id === activeConvId}
+                aria-current={conv.id === activeConvId ? 'true' : undefined}
+                role='button'
+                tabIndex={0}
                 onClick={() => selectConversation(conv.id)}
+                onKeyDown={onActivationKeyDown(() => selectConversation(conv.id))}
               >
                 <ConvTop>
                   <ConvName>
@@ -399,7 +404,7 @@ const MessagingPage: React.FC = () => {
         {activeConv ? (
           <>
             <ChatHeader>
-              <BackButton onClick={() => setShowChat(false)}>
+              <BackButton onClick={() => setShowChat(false)} aria-label='Volver'>
                 <FiArrowLeft size={20} />
               </BackButton>
               <FaStore size={18} />
@@ -436,7 +441,11 @@ const MessagingPage: React.FC = () => {
                 onKeyDown={handleKeyDown}
                 placeholder='Escribe un mensaje...'
               />
-              <SendButton onClick={handleSend} disabled={!inputValue.trim() || sending}>
+              <SendButton
+                onClick={handleSend}
+                disabled={!inputValue.trim() || sending}
+                aria-label='Enviar mensaje'
+              >
                 <FiSend size={18} />
               </SendButton>
             </InputBar>

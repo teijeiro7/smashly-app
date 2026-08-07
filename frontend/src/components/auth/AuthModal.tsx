@@ -16,7 +16,7 @@ const Overlay = styled(motion.div)`
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.6);
+  background: var(--surface-overlay);
   // blurred background can be expensive during animation
   // backdrop-filter: blur(4px);
   display: flex;
@@ -51,7 +51,8 @@ const ModalContainer = styled(motion.div)`
 const LeftPanel = styled.div<{ $bgImage: string }>`
   flex: 1;
   background-image:
-    linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.6)), url(${props => props.$bgImage});
+    linear-gradient(rgba(var(--scrim-rgb), 0.4), rgba(var(--scrim-rgb), 0.6)),
+    url(${props => props.$bgImage});
   background-size: cover;
   background-position: center;
   display: flex;
@@ -84,7 +85,7 @@ const CloseButton = styled.button`
   position: absolute;
   top: 20px;
   right: 20px;
-  background: rgba(0, 0, 0, 0.05);
+  background: var(--surface-2);
   border: none;
   border-radius: 50%;
   width: 36px;
@@ -97,7 +98,7 @@ const CloseButton = styled.button`
   transition: background-color 0.2s;
 
   &:hover {
-    background: rgba(0, 0, 0, 0.1);
+    background: var(--surface-3);
   }
 
   svg {
@@ -217,7 +218,7 @@ const AuthModal: React.FC = () => {
             <LeftPanel $bgImage={bgImage}>{leftPanelContent}</LeftPanel>
 
             <RightPanel>
-              <CloseButton onClick={closeModal}>
+              <CloseButton onClick={closeModal} aria-label='Cerrar'>
                 <FiX size={20} />
               </CloseButton>
 
@@ -230,10 +231,22 @@ const AuthModal: React.FC = () => {
                 </FormSubtitle>
 
                 <TabContainer>
-                  <Tab as='button' to='' $active={view === 'login'} onClick={openLogin}>
+                  <Tab
+                    as='button'
+                    to=''
+                    $active={view === 'login'}
+                    aria-selected={view === 'login'}
+                    onClick={openLogin}
+                  >
                     Iniciar Sesión
                   </Tab>
-                  <Tab as='button' to='' $active={view === 'register'} onClick={openRegister}>
+                  <Tab
+                    as='button'
+                    to=''
+                    $active={view === 'register'}
+                    aria-selected={view === 'register'}
+                    onClick={openRegister}
+                  >
                     Registrarse
                   </Tab>
                 </TabContainer>

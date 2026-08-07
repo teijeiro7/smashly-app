@@ -43,12 +43,12 @@ const CheckboxField: React.FC<CheckboxFieldProps> = ({ label, checked, onChange,
     gap: isMobile ? '0.5rem' : '0.625rem',
     cursor: 'pointer',
     fontSize: isMobile ? '0.8125rem' : '0.875rem',
-    color: '#374151',
+    color: 'var(--text)',
   };
 
   const checkboxStyle: React.CSSProperties = {
     marginTop: '0.125rem',
-    accentColor: '#16a34a',
+    accentColor: 'var(--primary)',
     width: isMobile ? '0.875rem' : '1rem',
     height: isMobile ? '0.875rem' : '1rem',
     flexShrink: 0,

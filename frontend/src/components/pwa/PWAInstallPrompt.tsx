@@ -11,7 +11,7 @@ const PromptContainer = styled(motion.div)`
   z-index: 9999;
   background: var(--surface);
   border-radius: 16px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  box-shadow: var(--shadow-xl);
   padding: 20px;
   display: flex;
   flex-direction: column;
@@ -207,7 +207,7 @@ export const PWAInstallPrompt: React.FC = () => {
             <Title>
               <FiDownload /> Instalar Smashly
             </Title>
-            <CloseButton onClick={dismissPrompt}>
+            <CloseButton onClick={dismissPrompt} aria-label='Cerrar'>
               <FiX size={20} />
             </CloseButton>
           </Header>

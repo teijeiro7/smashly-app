@@ -167,7 +167,7 @@ const BulkReplaceButton = styled.button`
   border: none;
   border-radius: 6px;
   font-size: 0.8rem;
-  color: white;
+  color: var(--on-primary);
   cursor: pointer;
   align-self: flex-end;
   transition: all 0.2s;
@@ -283,8 +283,8 @@ const Badge = styled.span<{ variant: 'success' | 'warning' | 'default' }>`
         `;
       case 'warning':
         return `
-          background: #fef3c7;
-          color: #92400e;
+          background: var(--accent-subtle);
+          color: var(--accent-text);
         `;
       default:
         return `
@@ -314,9 +314,9 @@ const ActionButton = styled.button<{ variant?: 'edit' | 'delete' }>`
   ${props =>
     props.variant === 'edit'
       ? `
-        background: #eff6ff;
+        background: var(--info-subtle);
         color: var(--info);
-        &:hover { background: #dbeafe; }
+        &:hover { background: var(--info-subtle); }
       `
       : `
         background: var(--danger-subtle);

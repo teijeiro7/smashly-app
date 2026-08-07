@@ -13,7 +13,7 @@ type SupabaseMock = {
   mockData: any[];
 };
 
-const __mock = vi.hoisted((): SupabaseMock => {
+const hoistedMock = vi.hoisted((): SupabaseMock => {
   const mockData: any[] = [];
 
   function createQueryBuilder(data: any) {
@@ -67,11 +67,11 @@ const __mock = vi.hoisted((): SupabaseMock => {
 });
 
 vi.mock('../../../lib/supabase', () => ({
-  supabase: __mock.supabase,
+  supabase: hoistedMock.supabase,
 }));
 
 function mock(): SupabaseMock {
-  return __mock;
+  return hoistedMock;
 }
 
 describe('RecommendationService', () => {

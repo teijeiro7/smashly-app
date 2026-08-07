@@ -20,7 +20,7 @@ const SliderTrack = styled.div`
   height: 8px;
   background: var(--border);
   border-radius: 8px;
-  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+  box-shadow: inset 0 1px 3px var(--shadow-color);
 `;
 
 const SliderRange = styled.div<{ left: number; width: number }>`
@@ -59,7 +59,7 @@ const SliderInput = styled.input`
     border: 4px solid var(--primary);
     cursor: grab;
     pointer-events: auto;
-    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 3px 8px var(--shadow-color);
     transition: all 0.2s ease;
     box-sizing: border-box;
 
@@ -84,7 +84,7 @@ const SliderInput = styled.input`
     border: 4px solid var(--primary);
     cursor: grab;
     pointer-events: auto;
-    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 3px 8px var(--shadow-color);
     transition: all 0.2s ease;
     box-sizing: border-box;
 
@@ -108,13 +108,13 @@ const SliderInput = styled.input`
   &:focus::-webkit-slider-thumb {
     box-shadow:
       0 0 0 6px rgba(var(--primary-rgb), 0.15),
-      0 3px 8px rgba(0, 0, 0, 0.2);
+      0 3px 8px rgba(var(--scrim-rgb), 0.2);
   }
 
   &:focus::-moz-range-thumb {
     box-shadow:
       0 0 0 6px rgba(var(--primary-rgb), 0.15),
-      0 3px 8px rgba(0, 0, 0, 0.2);
+      0 3px 8px rgba(var(--scrim-rgb), 0.2);
   }
 `;
 

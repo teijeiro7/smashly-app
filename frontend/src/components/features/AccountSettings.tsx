@@ -27,6 +27,12 @@ const SectionHeader = styled.div`
   gap: 0.75rem;
 `;
 
+// Notifications section accent — violet, no matching semantic token in the
+// catalog (distinct from info/accent/error already used by sibling sections
+// above). Single hex works in both themes: ~4.2:1 against every surface
+// token in both light and dark, clearing the 3:1 non-text/icon threshold.
+const NOTIFICATIONS_ACCENT = '#8b5cf6';
+
 const SectionIcon = styled.div<{ color: string }>`
   width: 40px;
   height: 40px;
@@ -38,7 +44,7 @@ const SectionIcon = styled.div<{ color: string }>`
   justify-content: center;
 `;
 
-const SectionTitle = styled.h3`
+const SectionTitle = styled.h2`
   font-size: 1rem;
   font-weight: 600;
   color: var(--primary);
@@ -103,7 +109,7 @@ const DangerZone = styled.div`
   margin-top: 1rem;
 `;
 
-const DangerTitle = styled.h4`
+const DangerTitle = styled.h3`
   font-size: 0.9375rem;
   font-weight: 600;
   color: var(--danger);
@@ -237,7 +243,7 @@ const AccountSettings: React.FC<AccountSettingsProps> = ({ user }) => {
 
       <Section>
         <SectionHeader>
-          <SectionIcon color='#8b5cf6'>
+          <SectionIcon color={NOTIFICATIONS_ACCENT}>
             <FiBell size={20} />
           </SectionIcon>
           <SectionTitle>Notificaciones</SectionTitle>

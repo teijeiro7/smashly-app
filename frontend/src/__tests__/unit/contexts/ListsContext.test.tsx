@@ -28,11 +28,14 @@ function createWrapper() {
       queries: { retry: false, gcTime: 0 },
     },
   });
-  return ({ children }: { children: React.ReactNode }) => (
-    <QueryClientProvider client={queryClient}>
-      <ListsProvider>{children}</ListsProvider>
-    </QueryClientProvider>
-  );
+  function Wrapper({ children }: { children: React.ReactNode }) {
+    return (
+      <QueryClientProvider client={queryClient}>
+        <ListsProvider>{children}</ListsProvider>
+      </QueryClientProvider>
+    );
+  }
+  return Wrapper;
 }
 
 describe('ListsContext', () => {

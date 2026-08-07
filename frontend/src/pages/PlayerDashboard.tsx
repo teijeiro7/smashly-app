@@ -22,11 +22,12 @@ import { ListService } from '../services/listService';
 import { RecommendationService } from '../services/recommendationService';
 import { Recommendation } from '../types/recommendation';
 import CurrentRacketFinderModal from '../components/features/CurrentRacketFinderModal';
+import { onActivationKeyDown } from '../utils/a11y';
 
 const Container = styled.div`
   min-height: 100dvh;
   background:
-    radial-gradient(circle at top right, rgba(22, 163, 74, 0.08), transparent 40%),
+    radial-gradient(circle at top right, rgba(var(--primary-rgb), 0.08), transparent 40%),
     linear-gradient(135deg, var(--primary-faint) 0%, var(--surface) 100%);
   padding: 1rem;
   padding-bottom: calc(6.5rem + env(safe-area-inset-bottom, 0));
@@ -48,7 +49,7 @@ const HeroSection = styled.div`
   padding: clamp(1.25rem, 3vw, 3rem);
   margin-bottom: 2rem;
   box-shadow: 0 4px 20px var(--shadow-color);
-  border: 1px solid rgba(22, 163, 74, 0.15);
+  border: 1px solid rgba(var(--primary-rgb), 0.15);
   position: relative;
   overflow: hidden;
 
@@ -111,8 +112,8 @@ const Stat = styled.div`
   flex-direction: column;
 
   @media (max-width: 768px) {
-    background: rgba(22, 163, 74, 0.06);
-    border: 1px solid rgba(22, 163, 74, 0.15);
+    background: rgba(var(--primary-rgb), 0.06);
+    border: 1px solid rgba(var(--primary-rgb), 0.15);
     border-radius: 14px;
     padding: 0.875rem 1rem;
   }
@@ -176,7 +177,7 @@ const RacketCard = styled.div`
   border-radius: 16px;
   padding: 1rem;
   box-shadow: 0 2px 10px var(--shadow-color);
-  border: 1px solid rgba(22, 163, 74, 0.1);
+  border: 1px solid rgba(var(--primary-rgb), 0.1);
   transition:
     transform 0.3s ease,
     box-shadow 0.3s ease,
@@ -185,7 +186,7 @@ const RacketCard = styled.div`
 
   &:hover {
     transform: translateY(-5px);
-    box-shadow: 0 8px 24px rgba(22, 163, 74, 0.15);
+    box-shadow: 0 8px 24px rgba(var(--primary-rgb), 0.15);
     border-color: var(--primary);
   }
 `;
@@ -258,8 +259,8 @@ const RecommendationHero = styled.div`
   );
   border-radius: 24px;
   padding: clamp(1.25rem, 3vw, 2rem);
-  color: white;
-  box-shadow: 0 18px 45px rgba(15, 23, 42, 0.18);
+  color: var(--on-brand);
+  box-shadow: 0 18px 45px var(--shadow-color);
   display: grid;
   grid-template-columns: 1.6fr 1fr;
   gap: 1.25rem;
@@ -281,7 +282,7 @@ const Eyebrow = styled.span`
   font-size: 0.8125rem;
   text-transform: uppercase;
   letter-spacing: 0.14em;
-  color: rgba(255, 255, 255, 0.72);
+  color: rgba(var(--on-brand-rgb), 0.72);
 `;
 
 const RecommendationTitle = styled.h3`
@@ -293,7 +294,7 @@ const RecommendationTitle = styled.h3`
 const RecommendationText = styled.p`
   margin: 0;
   max-width: 62ch;
-  color: rgba(255, 255, 255, 0.86);
+  color: rgba(var(--on-brand-rgb), 0.86);
   line-height: 1.6;
 `;
 
@@ -306,8 +307,8 @@ const RecommendationMeta = styled.div`
 const MetaPill = styled.span`
   padding: 0.5rem 0.8rem;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.12);
-  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(var(--on-brand-rgb), 0.12);
+  border: 1px solid rgba(var(--on-brand-rgb), 0.14);
   font-size: 0.875rem;
 `;
 
@@ -326,7 +327,7 @@ const RecommendationActionButton = styled.button`
 
   &:hover {
     transform: translateY(-2px);
-    box-shadow: 0 12px 20px rgba(15, 23, 42, 0.15);
+    box-shadow: 0 12px 20px var(--shadow-color);
   }
 `;
 
@@ -340,8 +341,8 @@ const RecommendedRacketCard = styled.div`
   background: linear-gradient(180deg, var(--surface) 0%, var(--surface-2) 100%);
   border-radius: 20px;
   padding: 1rem;
-  border: 1px solid rgba(22, 163, 74, 0.12);
-  box-shadow: 0 8px 22px rgba(15, 23, 42, 0.05);
+  border: 1px solid rgba(var(--primary-rgb), 0.12);
+  box-shadow: 0 8px 22px var(--shadow-color);
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
@@ -464,7 +465,7 @@ const DetailLinkButton = styled(Link)`
   padding: 0.75rem 1rem;
   border-radius: 14px;
   background: var(--primary);
-  color: white;
+  color: var(--on-primary);
   font-weight: 700;
   text-decoration: none;
   transition:
@@ -475,13 +476,13 @@ const DetailLinkButton = styled(Link)`
   &:hover {
     transform: translateY(-1px);
     background: var(--primary-hover);
-    box-shadow: 0 10px 18px rgba(22, 163, 74, 0.2);
+    box-shadow: 0 10px 18px rgba(var(--primary-rgb), 0.2);
   }
 `;
 
 const ChangeDataCard = styled.div`
-  background: rgba(255, 255, 255, 0.12);
-  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(var(--on-brand-rgb), 0.12);
+  border: 1px solid rgba(var(--on-brand-rgb), 0.16);
   border-radius: 20px;
   padding: 1rem;
   display: flex;
@@ -681,7 +682,12 @@ export const PlayerDashboard: React.FC = () => {
               {favorites.map(racket => (
                 <RacketCard
                   key={racket.id}
+                  role='button'
+                  tabIndex={0}
                   onClick={() => navigate({ to: '/palas/$slug', params: { slug: racket.slug } })}
+                  onKeyDown={onActivationKeyDown(() =>
+                    navigate({ to: '/palas/$slug', params: { slug: racket.slug } })
+                  )}
                 >
                   {racket.imagenes?.[0] && (
                     <RacketImage
@@ -711,7 +717,12 @@ export const PlayerDashboard: React.FC = () => {
               {recentlyViewed.slice(0, 4).map(racket => (
                 <RacketCard
                   key={racket.id}
+                  role='button'
+                  tabIndex={0}
                   onClick={() => navigate({ to: '/racket-detail', search: { id: racket.id } })}
+                  onKeyDown={onActivationKeyDown(() =>
+                    navigate({ to: '/racket-detail', search: { id: racket.id } })
+                  )}
                 >
                   {racket.imagenes?.[0] && (
                     <RacketImage
@@ -738,7 +749,12 @@ export const PlayerDashboard: React.FC = () => {
               {offers.map(racket => (
                 <RacketCard
                   key={racket.id}
+                  role='button'
+                  tabIndex={0}
                   onClick={() => navigate({ to: '/palas/$slug', params: { slug: racket.slug } })}
+                  onKeyDown={onActivationKeyDown(() =>
+                    navigate({ to: '/palas/$slug', params: { slug: racket.slug } })
+                  )}
                 >
                   {racket.imagenes?.[0] && (
                     <RacketImage

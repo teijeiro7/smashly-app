@@ -1,4 +1,4 @@
-import { expect, vi } from "vitest";
+import { afterEach, expect, vi } from "vitest";
 import * as matchers from "@testing-library/jest-dom/matchers";
 
 // Extend Vitest's expect with jest-dom matchers
@@ -14,11 +14,26 @@ global.IntersectionObserver = vi.fn().mockImplementation(() => ({
 // Polyfill window.scrollTo
 global.scrollTo = vi.fn();
 
-// Polyfill window.matchMedia
+// Polyfill window.matchMedia with a configurable `matches` result per query,
+// so tests covering dark/auto theme resolution and reduced-motion can
+// actually exercise both branches instead of always hitting the light/no-op
+// one. Default is false (matches nothing) unless a test opts in.
+const mediaQueryMatches = new Map<string, boolean>();
+
+export function setMediaQueryMatches(query: string, matches: boolean): void {
+  mediaQueryMatches.set(query, matches);
+}
+
+afterEach(() => {
+  mediaQueryMatches.clear();
+});
+
 Object.defineProperty(window, 'matchMedia', {
   writable: true,
   value: vi.fn().mockImplementation(query => ({
-    matches: false,
+    get matches() {
+      return mediaQueryMatches.get(query) ?? false;
+    },
     media: query,
     onchange: null,
     addListener: vi.fn(),

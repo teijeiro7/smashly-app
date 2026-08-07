@@ -20,7 +20,7 @@ const Card = styled.div`
   padding: clamp(2rem, 5vw, 3rem);
   max-width: 480px;
   width: 100%;
-  box-shadow: 0 10px 40px rgba(22, 163, 74, 0.08);
+  box-shadow: 0 10px 40px rgba(var(--primary-rgb-dark), 0.08);
   border: 1px solid var(--primary-subtle);
   position: relative;
   overflow: hidden;
@@ -71,7 +71,7 @@ const PrimaryBtn = styled(Link)`
     background: var(--primary-hover);
     transform: translateY(-2px);
     text-decoration: none;
-    color: white;
+    color: var(--on-primary);
   }
 `;
 

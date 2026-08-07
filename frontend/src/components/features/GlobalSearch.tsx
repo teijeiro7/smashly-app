@@ -5,9 +5,17 @@ import { useNavigate } from '@tanstack/react-router';
 import styled from 'styled-components';
 import { useRackets } from '../../contexts/RacketsContext';
 import { useComparison } from '../../contexts/ComparisonContext';
+import { useTheme } from '../../contexts/ThemeContext';
 import racketService from '../../services/racketService';
 import { Racket } from '../../types/racket';
 import { toTitleCase, formatBrandName, formatRacketName } from '../../utils/textUtils';
+
+// No matching semantic token; kept as an explicit light/dark pair with the same hue.
+const CATEGORY_ACCENT = { light: '#0d9488', dark: '#2dd4bf' };
+const CATEGORY_ACCENT_SUBTLE = {
+  light: 'rgba(13, 148, 136, 0.10)',
+  dark: 'rgba(45, 212, 191, 0.16)',
+};
 
 const SearchContainer = styled.div`
   position: relative;
@@ -29,7 +37,7 @@ const SearchInputContainer = styled(motion.div)<{
   position: relative;
   background: ${props => {
     if (props.$isMobileContext) return 'var(--surface-2)';
-    if (props.$isInHeader) return 'rgba(255, 255, 255, 0.12)';
+    if (props.$isInHeader) return 'rgba(var(--on-brand-rgb), 0.12)';
     return 'var(--surface-2)';
   }};
   border-radius: 24px;
@@ -38,7 +46,7 @@ const SearchInputContainer = styled(motion.div)<{
   border: 1px solid
     ${props => {
       if (props.$isMobileContext) return 'var(--border)';
-      if (props.$isInHeader) return 'rgba(255, 255, 255, 0.15)';
+      if (props.$isInHeader) return 'rgba(var(--on-brand-rgb), 0.15)';
       return 'transparent';
     }};
   transition: all 0.2s ease;
@@ -46,7 +54,7 @@ const SearchInputContainer = styled(motion.div)<{
   &:hover {
     background: ${props => {
       if (props.$isMobileContext) return 'var(--surface-3)';
-      if (props.$isInHeader) return 'rgba(255, 255, 255, 0.16)';
+      if (props.$isInHeader) return 'rgba(var(--on-brand-rgb), 0.16)';
       return 'var(--surface-3)';
     }};
   }
@@ -54,17 +62,17 @@ const SearchInputContainer = styled(motion.div)<{
   &:focus-within {
     background: ${props => {
       if (props.$isMobileContext) return 'var(--surface)';
-      if (props.$isInHeader) return 'rgba(255, 255, 255, 0.2)';
+      if (props.$isInHeader) return 'rgba(var(--on-brand-rgb), 0.2)';
       return 'var(--surface)';
     }};
     border-color: ${props => {
       if (props.$isMobileContext) return 'var(--primary)';
-      if (props.$isInHeader) return 'rgba(255, 255, 255, 0.25)';
+      if (props.$isInHeader) return 'rgba(var(--on-brand-rgb), 0.25)';
       return 'rgba(var(--primary-rgb), 0.20)';
     }};
     box-shadow: ${props => {
       if (props.$isMobileContext) return '0 0 0 3px rgba(var(--primary-rgb), 0.20)';
-      if (props.$isInHeader) return '0 0 0 3px rgba(255, 255, 255, 0.1)';
+      if (props.$isInHeader) return '0 0 0 3px rgba(var(--on-brand-rgb), 0.1)';
       return '0 0 0 3px rgba(var(--primary-rgb), 0.10)';
     }};
   }
@@ -92,7 +100,7 @@ const SearchInput = styled.input<{ $isInHeader?: boolean; $isMobileContext?: boo
   &::placeholder {
     color: ${props => {
       if (props.$isMobileContext) return 'var(--text-subtle)';
-      if (props.$isInHeader) return 'rgba(255, 255, 255, 0.6)';
+      if (props.$isInHeader) return 'rgba(var(--on-brand-rgb), 0.6)';
       return 'var(--text-subtle)';
     }};
   }
@@ -113,9 +121,11 @@ const KbdBadge = styled.span<{ $isInHeader?: boolean }>`
   padding: 2px 6px;
   border-radius: 4px;
   pointer-events: none;
-  background: ${props => (props.$isInHeader ? 'rgba(255, 255, 255, 0.2)' : 'var(--surface-3)')};
-  color: ${props => (props.$isInHeader ? 'rgba(255, 255, 255, 0.85)' : 'var(--text-subtle)')};
-  border: 1px solid ${props => (props.$isInHeader ? 'rgba(255, 255, 255, 0.25)' : 'var(--border)')};
+  background: ${props =>
+    props.$isInHeader ? 'rgba(var(--on-brand-rgb), 0.2)' : 'var(--surface-3)'};
+  color: ${props => (props.$isInHeader ? 'rgba(var(--on-brand-rgb), 0.85)' : 'var(--text-subtle)')};
+  border: 1px solid
+    ${props => (props.$isInHeader ? 'rgba(var(--on-brand-rgb), 0.25)' : 'var(--border)')};
   font-family: inherit;
 
   @media (max-width: 600px) {
@@ -132,7 +142,7 @@ const ClearButton = styled.button<{ $isInHeader?: boolean; $isMobileContext?: bo
   border: none;
   color: ${props => {
     if (props.$isMobileContext) return 'var(--text-subtle)';
-    if (props.$isInHeader) return 'rgba(255, 255, 255, 0.7)';
+    if (props.$isInHeader) return 'rgba(var(--on-brand-rgb), 0.7)';
     return 'var(--text-subtle)';
   }};
   cursor: pointer;
@@ -146,7 +156,7 @@ const ClearButton = styled.button<{ $isInHeader?: boolean; $isMobileContext?: bo
   &:hover {
     background: ${props => {
       if (props.$isMobileContext) return 'var(--surface-3)';
-      if (props.$isInHeader) return 'rgba(255, 255, 255, 0.15)';
+      if (props.$isInHeader) return 'rgba(var(--on-brand-rgb), 0.15)';
       return 'var(--surface-3)';
     }};
     color: ${props => {
@@ -169,7 +179,7 @@ const SearchResultsDropdown = styled(motion.div)`
   right: 0;
   background: var(--surface);
   border-radius: 16px;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.14);
+  box-shadow: var(--shadow-lg);
   border: 1px solid var(--border);
   max-height: 440px;
   overflow: hidden;
@@ -182,7 +192,7 @@ const SearchResultsDropdown = styled(motion.div)`
     right: 0;
     max-height: 80vh;
     border-radius: 12px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    box-shadow: var(--shadow-md);
   }
 `;
 
@@ -246,7 +256,10 @@ const SearchResultItem = styled.div<{
   }
 `;
 
-const ResultIcon = styled.div<{ $variant?: 'racket' | 'brand' | 'category' }>`
+const ResultIcon = styled.div<{
+  $variant?: 'racket' | 'brand' | 'category';
+  $isDark?: boolean;
+}>`
   width: 36px;
   height: 36px;
   border-radius: 10px;
@@ -259,7 +272,7 @@ const ResultIcon = styled.div<{ $variant?: 'racket' | 'brand' | 'category' }>`
       case 'brand':
         return 'var(--primary-subtle)';
       case 'category':
-        return 'rgba(13, 148, 136, 0.10)';
+        return props.$isDark ? CATEGORY_ACCENT_SUBTLE.dark : CATEGORY_ACCENT_SUBTLE.light;
       default:
         return 'var(--surface-3)';
     }
@@ -269,7 +282,7 @@ const ResultIcon = styled.div<{ $variant?: 'racket' | 'brand' | 'category' }>`
       case 'brand':
         return 'var(--primary)';
       case 'category':
-        return '#0d9488';
+        return props.$isDark ? CATEGORY_ACCENT.dark : CATEGORY_ACCENT.light;
       default:
         return 'transparent';
     }
@@ -495,6 +508,8 @@ export const GlobalSearch: React.FC<GlobalSearchProps> = ({
   const navigate = useNavigate();
   const { rackets } = useRackets();
   const comparison = useComparison();
+  const { resolved } = useTheme();
+  const isDark = resolved === 'dark';
 
   const addRecentSearch = (query: string) => {
     if (!query.trim()) return;
@@ -844,6 +859,7 @@ export const GlobalSearch: React.FC<GlobalSearchProps> = ({
                   onClick={clearSearch}
                   $isInHeader={isInHeader}
                   $isMobileContext={isMobileContext}
+                  aria-label='Limpiar búsqueda'
                 >
                   <FiX size={14} />
                 </ClearButton>
@@ -876,6 +892,7 @@ export const GlobalSearch: React.FC<GlobalSearchProps> = ({
                           size={12}
                           style={{ cursor: 'pointer', opacity: 0.6 }}
                           onClick={e => removeRecentSearch(e, q)}
+                          aria-label='Eliminar búsqueda reciente'
                         />
                       </RecentSearchItem>
                     ))}
@@ -958,7 +975,7 @@ export const GlobalSearch: React.FC<GlobalSearchProps> = ({
                             $isFocused={isFocused}
                             onClick={() => handleCategorySelect(result.data as string)}
                           >
-                            <ResultIcon $variant='category'>
+                            <ResultIcon $variant='category' $isDark={isDark}>
                               <FiGrid size={16} />
                             </ResultIcon>
                             <ResultInfo>
