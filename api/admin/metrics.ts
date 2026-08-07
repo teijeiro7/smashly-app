@@ -2,52 +2,17 @@ import type { IncomingMessage, ServerResponse } from 'http';
 import { supabaseAdmin } from '../_lib/supabase';
 import { getAuthUser, isAdmin, unauthorized, forbidden, setCorsHeaders, handleOptions } from '../_lib/auth';
 
-async function getTableCount(table: string): Promise<number> {
-  const { count } = await supabaseAdmin.from(table).select('*', { count: 'exact', head: true });
-  return count || 0;
+interface DashboardMetrics {
+  totalUsers: number;
+  totalRackets: number;
+  totalStores: number;
+  totalReviews: number;
+  pendingRequests: number;
+  activeUsers: number;
+  totalFavorites: number;
 }
 
-async function getActiveUsersCount(): Promise<number> {
-  const thirtyDaysAgo = new Date();
-  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-  const { count } = await supabaseAdmin
-    .from('user_profiles')
-    .select('*', { count: 'exact', head: true })
-    .gte('updated_at', thirtyDaysAgo.toISOString());
-  return count || 0;
-}
-
-async function getVerifiedStoresCount(): Promise<number> {
-  const { count } = await supabaseAdmin
-    .from('stores')
-    .select('*', { count: 'exact', head: true })
-    .eq('status', 'verified');
-  return count || 0;
-}
-
-async function getPendingStoresCount(): Promise<number> {
-  const { count } = await supabaseAdmin
-    .from('stores')
-    .select('*', { count: 'exact', head: true })
-    .eq('status', 'pending');
-  return count || 0;
-}
-
-async function getFavoritesCount(): Promise<number> {
-  const { data: favLists } = await supabaseAdmin
-    .from('lists')
-    .select('id')
-    .eq('name', 'Favoritas');
-  if (!favLists?.length) return 0;
-  const listIds = favLists.map((l: any) => l.id);
-  const { count } = await supabaseAdmin
-    .from('list_rackets')
-    .select('*', { count: 'exact', head: true })
-    .in('list_id', listIds);
-  return count || 0;
-}
-
-let metricsCache: { data: any; expiresAt: number } | null = null;
+let metricsCache: { data: DashboardMetrics; expiresAt: number } | null = null;
 
 export default async function handler(req: IncomingMessage, res: ServerResponse): Promise<void> {
   setCorsHeaders(req, res);
@@ -75,37 +40,17 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
       return;
     }
 
-    const [
-      totalUsers,
-      totalRackets,
-      totalReviews,
-      activeUsers,
-      totalStores,
-      pendingRequests,
-      totalFavorites,
-    ] = await Promise.all([
-      getTableCount('user_profiles'),
-      getTableCount('rackets'),
-      getTableCount('reviews'),
-      getActiveUsersCount(),
-      getVerifiedStoresCount(),
-      getPendingStoresCount(),
-      getFavoritesCount(),
-    ]);
+    // Single RPC round-trip instead of 7 separate queries (and, for
+    // favorites, a 2-hop lists→list_rackets IN() query that grew linearly
+    // with the number of users). See
+    // supabase/migrations/20260807120000_admin_dashboard_perf.sql for the
+    // admin_dashboard_metrics() definition — it is guarded by is_admin()
+    // (or the service_role this client authenticates as), so it can't be
+    // called directly with a bare anon key.
+    const { data, error } = await supabaseAdmin.rpc('admin_dashboard_metrics');
+    if (error) throw error;
 
-    const metricsData = {
-      totalUsers,
-      totalRackets,
-      totalStores,
-      totalReviews,
-      pendingRequests,
-      activeUsers,
-      totalFavorites,
-      usersChange: 0,
-      racketsChange: 0,
-      reviewsChange: 0,
-      activeUsersChange: 0,
-    };
+    const metricsData = data as DashboardMetrics;
 
     metricsCache = { data: metricsData, expiresAt: now + 60 * 1000 };
 

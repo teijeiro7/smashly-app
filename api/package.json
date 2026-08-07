@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "private": true,
   "dependencies": {
-    "@supabase/supabase-js": "^2.50.0"
+    "@supabase/supabase-js": "^2.50.0",
+    "jose": "^5.10.0"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",

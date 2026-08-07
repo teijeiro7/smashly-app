@@ -60,7 +60,11 @@ describe('storeService', () => {
 
       (global.fetch as any).mockResolvedValueOnce({
         ok: true,
-        json: async () => mockStores,
+        json: async () => ({
+          success: true,
+          data: mockStores,
+          pagination: { page: 1, limit: 50, total: 2 },
+        }),
       });
 
       const result = await storeService.getAllStores();

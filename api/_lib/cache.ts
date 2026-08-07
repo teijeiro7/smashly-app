@@ -19,8 +19,8 @@ export function cacheGet<T>(key: string): T | null {
   return entry.value;
 }
 
-export function cacheSet<T>(key: string, value: T): void {
-  store.set(key, { value, expiresAt: Date.now() + TTL_MS });
+export function cacheSet<T>(key: string, value: T, ttlMs: number = TTL_MS): void {
+  store.set(key, { value, expiresAt: Date.now() + ttlMs });
 }
 
 /**
