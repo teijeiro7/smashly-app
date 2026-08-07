@@ -10,9 +10,11 @@
     "lint:fix": "cd frontend && pnpm lint:fix",
     "format": "cd frontend && pnpm format",
     "format:check": "cd frontend && pnpm format:check",
-    "quality:check": "pnpm typecheck:api && pnpm lint && pnpm format:check",
+    "check:color-literals": "cd frontend && pnpm check:color-literals",
+    "quality:check": "pnpm typecheck:api && pnpm lint && pnpm format:check && pnpm check:color-literals",
     "quality:fix": "pnpm lint:fix && pnpm format",
     "test:all": "cd frontend && pnpm test:unit",
+    "test:e2e:a11y": "cd frontend && pnpm test:e2e:a11y",
     "build:all": "pnpm typecheck:api && cd frontend && pnpm build",
     "record:demo": "node testing/scripts/record-demo.cjs"
   },

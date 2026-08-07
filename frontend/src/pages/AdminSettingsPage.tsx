@@ -662,7 +662,9 @@ const SettingsContent: React.FC = () => {
                           animate={{ opacity: 1, x: 0 }}
                         >
                           <ItemInfo>
-                            <ItemAvatar color={isDark ? BRAND_COLOR.dark : BRAND_COLOR.light}>{brand.name.charAt(0)}</ItemAvatar>
+                            <ItemAvatar color={isDark ? BRAND_COLOR.dark : BRAND_COLOR.light}>
+                              {brand.name.charAt(0)}
+                            </ItemAvatar>
                             <ItemDetails>
                               <ItemName>{brand.name}</ItemName>
                               <ItemMeta>
@@ -857,7 +859,9 @@ const SettingsContent: React.FC = () => {
 
                     <SettingsCard>
                       <SettingsRow>
-                        <SettingsIcon color={isDark ? WEBSITE_ICON_COLOR.dark : WEBSITE_ICON_COLOR.light}>
+                        <SettingsIcon
+                          color={isDark ? WEBSITE_ICON_COLOR.dark : WEBSITE_ICON_COLOR.light}
+                        >
                           <FiGlobe />
                         </SettingsIcon>
                         <SettingsInfo style={{ flex: 1 }}>

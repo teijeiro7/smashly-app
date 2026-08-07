@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { FiEdit2, FiCheck } from 'react-icons/fi';
 import Button from '../common/Button';
@@ -154,6 +154,13 @@ const NicknamePromptModal: React.FC<NicknamePromptModalProps> = ({
   const [isEditing, setIsEditing] = useState(false);
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const nicknameInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (isEditing) {
+      nicknameInputRef.current?.focus();
+    }
+  }, [isEditing]);
 
   if (!isOpen) return null;
 
@@ -233,6 +240,7 @@ const NicknamePromptModal: React.FC<NicknamePromptModalProps> = ({
           <Label htmlFor='nickname'>Tu Nickname</Label>
           <InputWrapper>
             <Input
+              ref={nicknameInputRef}
               id='nickname'
               type='text'
               value={nickname}
@@ -240,7 +248,6 @@ const NicknamePromptModal: React.FC<NicknamePromptModalProps> = ({
               disabled={!isEditing || isLoading}
               $hasError={!!error}
               placeholder='Elige tu nickname'
-              autoFocus={isEditing}
             />
             {!isEditing && (
               <EditButton onClick={handleEdit} disabled={isLoading} aria-label='Editar nickname'>

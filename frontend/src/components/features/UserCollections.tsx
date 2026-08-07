@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -257,6 +257,13 @@ const UserCollections: React.FC = () => {
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [newListName, setNewListName] = useState('');
   const [newListPublic, setNewListPublic] = useState(false);
+  const newListNameInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (showCreateForm) {
+      newListNameInputRef.current?.focus();
+    }
+  }, [showCreateForm]);
 
   useEffect(() => {
     loadData();
@@ -374,10 +381,10 @@ const UserCollections: React.FC = () => {
                       <FormGroup>
                         <FormLabel>Nombre de la lista</FormLabel>
                         <FormInput
+                          ref={newListNameInputRef}
                           placeholder='Ej: Mis favoritas'
                           value={newListName}
                           onChange={e => setNewListName(e.target.value)}
-                          autoFocus
                         />
                       </FormGroup>
                       <FormCheckbox>

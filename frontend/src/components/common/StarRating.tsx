@@ -62,7 +62,12 @@ export const StarRating: React.FC<StarRatingProps> = ({
     return (
       <StarContainer key={index}>
         <StarBackground $size={size} size={size} />
-        <StarForeground $size={size} size={size} $fillPercentage={fillPercentage} fill='var(--warning)' />
+        <StarForeground
+          $size={size}
+          size={size}
+          $fillPercentage={fillPercentage}
+          fill='var(--warning)'
+        />
       </StarContainer>
     );
   });

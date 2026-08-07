@@ -102,7 +102,8 @@ const Input = styled.input<{ $hasError?: boolean }>`
     outline: none;
     border-color: ${props => (props.$hasError ? 'var(--error)' : 'var(--primary)')};
     box-shadow: 0 0 0 4px
-      ${props => (props.$hasError ? 'rgba(var(--danger-rgb), 0.1)' : 'rgba(var(--primary-rgb), 0.1)')};
+      ${props =>
+        props.$hasError ? 'rgba(var(--danger-rgb), 0.1)' : 'rgba(var(--primary-rgb), 0.1)'};
   }
 
   &::placeholder {

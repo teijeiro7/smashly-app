@@ -44,6 +44,56 @@ jobs:
         continue-on-error: true
         run: pnpm test:all
 
+  a11y-e2e:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 11
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Playwright browsers
+        run: cd frontend && npx playwright install --with-deps chromium
+
+      - name: Build frontend
+        # VITE_SUPABASE_* must exist as repo secrets for this job to pass —
+        # the app throws on missing env vars as soon as a page mounts in the
+        # browser, so the axe pass below needs a real build, not just a
+        # type-check. Add them in repo Settings → Secrets before relying on
+        # this job; until then it's expected to fail the build step.
+        run: cd frontend && pnpm build
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+
+      - name: Axe pass — 16 public routes × 2 themes
+        # New gate, not yet proven green in CI (needs the secrets above).
+        # continue-on-error until a run confirms it passes, same posture as
+        # the unit-test step until it's verified reliable.
+        continue-on-error: true
+        run: pnpm test:e2e:a11y
+
+      - name: Upload Playwright report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: frontend/playwright-report/
+          retention-days: 7
+
   scrapers-tests:
     runs-on: ubuntu-latest
     timeout-minutes: 10

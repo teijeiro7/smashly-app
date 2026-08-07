@@ -63,10 +63,9 @@ vi.mock('@tanstack/react-router', () => ({
   useRouterState: () => ({ location: { hash: '' } }),
   Link: ({ to, search, children, className, ...props }: any) => {
     const qs = search
-      ? '?' +
-        Object.entries(search)
+      ? `?${Object.entries(search)
           .map(([key, value]) => `${key}=${encodeURIComponent(String(value))}`)
-          .join('&')
+          .join('&')}`
       : '';
     return (
       <a href={`${to}${qs}`} className={className} {...props}>

@@ -88,10 +88,12 @@ const ComparisonGrid = styled.div`
 `;
 
 const RacketColumn = styled.div<{ type: 'existing' | 'new' }>`
-  background: ${props => (props.type === 'existing' ? 'var(--primary-subtle)' : 'var(--accent-subtle)')};
+  background: ${props =>
+    props.type === 'existing' ? 'var(--primary-subtle)' : 'var(--accent-subtle)'};
   padding: 1rem;
   border-radius: 8px;
-  border: 1px solid ${props => (props.type === 'existing' ? 'var(--primary-subtle)' : 'var(--accent-subtle)')};
+  border: 1px solid
+    ${props => (props.type === 'existing' ? 'var(--primary-subtle)' : 'var(--accent-subtle)')};
 `;
 
 const ColumnTitle = styled.h3`
@@ -217,7 +219,9 @@ const AdminRacketReviewPage: React.FC = () => {
       <Content>
         {conflicts.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '3rem', color: 'var(--text-muted)' }}>
-            <h2 style={{ fontSize: '1.125rem', fontWeight: 600 }}>🎉 No hay conflictos pendientes</h2>
+            <h2 style={{ fontSize: '1.125rem', fontWeight: 600 }}>
+              🎉 No hay conflictos pendientes
+            </h2>
             <p>Todas las palas están sincronizadas correctamente.</p>
           </div>
         ) : (

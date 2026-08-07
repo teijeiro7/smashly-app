@@ -241,7 +241,8 @@ const NavLink = styled(Link)<{ $isActive: boolean; $isMobile?: boolean }>`
   `}
 
   &:hover {
-    background: ${props => (props.$isMobile ? 'var(--surface-2)' : 'rgba(var(--on-brand-rgb), 0.08)')};
+    background: ${props =>
+      props.$isMobile ? 'var(--surface-2)' : 'rgba(var(--on-brand-rgb), 0.08)'};
     color: ${props => (props.$isMobile ? 'var(--primary-hover)' : 'var(--brand-on-surface)')};
     text-decoration: none;
     transform: ${props => (props.$isMobile ? 'translateX(3px)' : 'none')};
