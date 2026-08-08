@@ -1030,8 +1030,12 @@ export const GlobalSearch: React.FC<GlobalSearchProps> = ({
                               </ResultSubtext>
                             </ResultInfo>
 
-                            {racket.solo_comparacion || !racket.precio_actual || racket.precio_actual <= 0 ? (
-                              <ResultPrice style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>
+                            {racket.solo_comparacion ||
+                            !racket.precio_actual ||
+                            racket.precio_actual <= 0 ? (
+                              <ResultPrice
+                                style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}
+                              >
                                 Solo comparación
                               </ResultPrice>
                             ) : (

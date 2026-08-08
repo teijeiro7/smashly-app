@@ -78,7 +78,7 @@ class ErrorBoundary extends Component<Props, State> {
             <p
               style={{
                 fontSize: '1rem',
-                color: 'var(--text-muted, #94a3b8)',
+                color: 'var(--text-muted)',
                 margin: '1rem 0 1.5rem',
                 lineHeight: '1.6',
               }}
@@ -90,8 +90,8 @@ class ErrorBoundary extends Component<Props, State> {
               <pre
                 style={{
                   fontSize: '0.85rem',
-                  color: 'var(--danger, #ef4444)',
-                  background: 'rgba(239, 68, 68, 0.1)',
+                  color: 'var(--danger)',
+                  background: 'var(--danger-subtle)',
                   padding: '0.75rem',
                   borderRadius: '8px',
                   overflowX: 'auto',

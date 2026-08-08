@@ -359,7 +359,13 @@ const RacketCardComponent: React.FC<RacketCardProps> = memo(
                 )}
               </>
             ) : (
-              <CurrentPrice style={!racket.precio_actual || racket.precio_actual <= 0 ? { color: 'var(--text-muted)', fontSize: '0.9rem' } : undefined}>
+              <CurrentPrice
+                style={
+                  !racket.precio_actual || racket.precio_actual <= 0
+                    ? { color: 'var(--text-muted)', fontSize: '0.9rem' }
+                    : undefined
+                }
+              >
                 {racket.precio_actual > 0 ? `${racket.precio_actual}€` : 'Solo comparación'}
               </CurrentPrice>
             )}
