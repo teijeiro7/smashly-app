@@ -60,7 +60,7 @@ const Hero = styled.div<{ $cover?: string }>`
 const HeroOverlay = styled.div`
   position: absolute;
   inset: 0;
-  background: linear-gradient(transparent 40%, rgba(0, 0, 0, 0.6));
+  background: linear-gradient(transparent 40%, rgba(var(--scrim-rgb), 0.6));
 `;
 
 const HeroContent = styled.div`
@@ -80,14 +80,17 @@ const Logo = styled.img`
   height: 100px;
   border-radius: 20px;
   object-fit: cover;
-  border: 4px solid white;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-  background: white;
+  /* Fixed white backing, like the product photo tile: a store logo can be
+     any color/transparency, so it needs a constant neutral frame regardless
+     of theme. */
+  border: 4px solid #ffffff;
+  box-shadow: 0 4px 20px var(--shadow-color);
+  background: #ffffff;
 `;
 
 const HeroText = styled.div`
-  color: white;
-  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  color: var(--on-brand);
+  text-shadow: 0 2px 8px rgba(var(--scrim-rgb), 0.3);
 `;
 
 const StoreTitle = styled.h1`
@@ -100,7 +103,7 @@ const StoreStatus = styled.span`
   display: inline-block;
   margin-top: 0.5rem;
   padding: 0.25rem 0.75rem;
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(var(--on-brand-rgb), 0.2);
   border-radius: 100px;
   font-size: 0.8rem;
   font-weight: 600;
@@ -370,7 +373,7 @@ const PublicStorePage: React.FC = () => {
               as='div'
               style={{
                 background: 'var(--primary)',
-                color: 'white',
+                color: 'var(--on-primary)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',

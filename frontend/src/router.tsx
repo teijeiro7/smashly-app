@@ -8,7 +8,7 @@ import {
   useSearch,
 } from '@tanstack/react-router';
 import React, { lazy, Suspense, useEffect } from 'react';
-import { AnimatePresence } from 'framer-motion';
+import { AnimatePresence, MotionConfig } from 'framer-motion';
 
 import Layout from './components/layout/Layout';
 import { FloatingCompareButton } from './components/common/FloatingCompareButton';
@@ -101,7 +101,7 @@ class LazyChunkErrorBoundary extends React.Component<
     if (this.state.hasError) {
       return (
         this.props.fallback ?? (
-          <div style={{ padding: '2rem', textAlign: 'center' }}>
+          <div role='alert' style={{ padding: '2rem', textAlign: 'center' }}>
             <p>
               Error loading page. <button onClick={this.handleRetry}>Retry</button>
             </p>
@@ -305,6 +305,9 @@ const NextParamHandler: React.FC = () => {
 // ──────────────────────────────────────────────────────────────────────────────
 // Root route — provides the main layout shell
 // ──────────────────────────────────────────────────────────────────────────────
+// Focuses <main> and announces the navigation to screen readers on every
+// route change — a SPA swaps content without the full-page load a screen
+// reader would otherwise use as its cue to re-orient.
 const RootOutlet: React.FC = () => {
   const pathname = useRouterState({ select: state => state.location.pathname });
 
@@ -326,7 +329,7 @@ const RootOutlet: React.FC = () => {
 
 const rootRoute = createRootRouteWithContext<RouterContext>()({
   component: () => (
-    <>
+    <MotionConfig reducedMotion='user'>
       <AuthModal />
       <NextParamHandler />
       <GoogleOnboardingHandler />
@@ -337,11 +340,11 @@ const rootRoute = createRootRouteWithContext<RouterContext>()({
         <BackgroundTaskPopup />
         <RootOutlet />
       </Layout>
-    </>
+    </MotionConfig>
   ),
   pendingComponent: () => <LoadingSpinner fullScreen text='Cargando...' />,
   errorComponent: ({ error }) => (
-    <div style={{ padding: '2rem', textAlign: 'center' }}>
+    <div role='alert' style={{ padding: '2rem', textAlign: 'center' }}>
       <h2>Algo salió mal</h2>
       <p>{error instanceof Error ? error.message : 'Error desconocido'}</p>
     </div>

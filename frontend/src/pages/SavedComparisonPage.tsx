@@ -14,7 +14,7 @@ import ComparisonTable from '../components/features/ComparisonTable';
 
 const Container = styled.div`
   min-height: 100vh;
-  background: linear-gradient(135deg, #f8faf8 0%, #e8f5e8 100%);
+  background: linear-gradient(135deg, var(--surface-2) 0%, var(--primary-faint) 100%);
   padding: 2rem;
   padding-bottom: 6rem;
 
@@ -113,7 +113,7 @@ const ResultSection = styled(motion.div)`
   background: var(--surface);
   border-radius: 24px;
   padding: 3rem;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 10px 40px var(--shadow-color);
   position: relative;
   overflow-x: hidden;
 
@@ -224,7 +224,7 @@ const LoadingContainer = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #f8faf8 0%, #e8f5e8 100%);
+  background: linear-gradient(135deg, var(--surface-2) 0%, var(--primary-faint) 100%);
 `;
 
 const LoadingSpinner = styled.div`
@@ -248,7 +248,7 @@ const ErrorContainer = styled.div`
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #f8faf8 0%, #e8f5e8 100%);
+  background: linear-gradient(135deg, var(--surface-2) 0%, var(--primary-faint) 100%);
   padding: 2rem;
   text-align: center;
 `;

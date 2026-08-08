@@ -5,7 +5,7 @@ import { Racket, ComparisonResult } from '../types/racket';
 // --- CONFIGURACIÓN DE DISEÑO ---
 const THEME = {
   colors: {
-    primary: [22, 163, 74], // #16a34a (Smashly Green)
+    primary: [18, 135, 60], // #12873c (Smashly Green)
     secondary: [31, 41, 55], // #1f2937 (Dark Gray)
     text: [55, 65, 81], // #374151
     lightGray: [243, 244, 246],

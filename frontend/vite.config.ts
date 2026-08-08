@@ -228,6 +228,8 @@ export default defineConfig(({ mode }) => ({
     globals: true,
     environment: 'jsdom',
     setupFiles: ['./test/setupTests.ts'],
+    // e2e/ holds Playwright specs (run via `pnpm test:e2e:a11y`), not vitest.
+    exclude: ['node_modules/**', 'e2e/**'],
     coverage: {
       provider: 'v8',
       reporter: ['lcov', 'text', 'json'],

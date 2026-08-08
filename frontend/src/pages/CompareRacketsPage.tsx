@@ -21,6 +21,7 @@ import ComparisonTable from '../components/features/ComparisonTable';
 import SEO from '../components/seo/SEO';
 import { organizationSchema, webPageSchema, breadcrumbSchema } from '../utils/seoSchemas';
 import { buildUrl, allKeywords } from '../config/seo';
+import { onActivationKeyDown } from '../utils/a11y';
 
 const Container = styled.div`
   min-height: 100dvh;
@@ -177,7 +178,7 @@ const SelectedRacketsContainer = styled.div`
 
 const SelectedRacketCard = styled(motion.div)`
   background: var(--surface);
-  border: 1px solid rgba(0, 0, 0, 0.06);
+  border: 1px solid var(--shadow-color);
   border-radius: 16px;
   padding: 1rem;
   position: relative;
@@ -224,7 +225,7 @@ const RacketImage = styled.img`
   padding: 0.5rem;
 `;
 
-const RacketName = styled.h3`
+const RacketName = styled.h2`
   font-size: 0.875rem;
   font-weight: 600;
   color: var(--text);
@@ -249,7 +250,7 @@ const EmptySlot = styled.div`
   transition:
     border-color 0.2s ease,
     background-color 0.2s ease;
-  background: rgba(0, 0, 0, 0.01);
+  background: var(--shadow-color);
 
   &:hover {
     border-color: rgba(var(--primary-rgb-dark), 0.4);
@@ -261,7 +262,7 @@ const EmptySlot = styled.div`
 const CompareButton = styled.button`
   width: 100%;
   background: var(--primary-hover);
-  color: white;
+  color: var(--on-primary);
   border: none;
   padding: 1rem;
   min-height: 48px;
@@ -473,7 +474,7 @@ const ModalOverlay = styled(motion.div)`
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.65);
+  background: rgba(var(--scrim-rgb), 0.65);
   z-index: 1000;
   display: flex;
   align-items: center;
@@ -506,7 +507,7 @@ const ModalContent = styled(motion.div)`
   }
 
   &::-webkit-scrollbar-thumb {
-    background-color: rgba(0, 0, 0, 0.1);
+    background-color: var(--shadow-color);
     border-radius: 4px;
   }
 `;
@@ -539,7 +540,7 @@ const FavoritesSection = styled.div`
   margin-bottom: 1.5rem;
 `;
 
-const FavoritesTitle = styled.h3`
+const FavoritesTitle = styled.h2`
   font-size: 0.6875rem;
   font-weight: 600;
   color: var(--text-subtle);
@@ -1059,9 +1060,14 @@ const CompareRacketsPage: React.FC = () => {
                 return (
                   <SearchResultItem
                     key={racket.id}
+                    role='button'
+                    tabIndex={0}
                     onClick={() => {
                       if (!isAlreadySelected) handleAddRacket(racket);
                     }}
+                    onKeyDown={onActivationKeyDown(() => {
+                      if (!isAlreadySelected) handleAddRacket(racket);
+                    })}
                     style={{
                       opacity: isAlreadySelected ? 0.6 : 1,
                       cursor: isAlreadySelected ? 'default' : 'pointer',

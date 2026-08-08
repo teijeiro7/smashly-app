@@ -71,6 +71,7 @@ import {
 } from '../utils/seoSchemas';
 import { buildUrl } from '../config/seo';
 import { racketImageUrl } from '../utils/imageUrl';
+import { onActivationKeyDown } from '../utils/a11y';
 
 // --- Styled Components ---
 
@@ -668,7 +669,7 @@ const SaveBadge = styled.div`
   display: flex;
   align-items: center;
   gap: 4px;
-  box-shadow: 0 2px 4px rgba(220, 38, 38, 0.1);
+  box-shadow: 0 2px 4px rgba(var(--danger-rgb), 0.1);
 `;
 
 const UpdatedTime = styled.div`
@@ -686,7 +687,7 @@ const PrimaryButton = styled.a`
   width: 100%;
   padding: 1rem 1.25rem;
   background: var(--color-primary);
-  color: white;
+  color: var(--on-primary);
   border-radius: 8px;
   font-weight: 700;
   font-size: 1.125rem;
@@ -706,7 +707,7 @@ const PrimaryButton = styled.a`
     left: -100%;
     width: 100%;
     height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    background: linear-gradient(90deg, transparent, rgba(var(--on-brand-rgb), 0.2), transparent);
     transition: left 0.5s;
   }
 
@@ -714,7 +715,7 @@ const PrimaryButton = styled.a`
     background: var(--color-primary-dark);
     transform: translateY(-2px);
     box-shadow: 0 6px 16px rgba(var(--primary-rgb-dark), 0.4);
-    color: white;
+    color: var(--on-primary);
     text-decoration: none;
 
     &::before {
@@ -792,7 +793,7 @@ const WatchInput = styled.input`
 const WatchSaveButton = styled.button`
   padding: 0.625rem 1rem;
   background: var(--color-primary);
-  color: white;
+  color: var(--on-primary);
   border: none;
   border-radius: 8px;
   font-weight: 600;
@@ -847,7 +848,7 @@ const WatchDeleteButton = styled.button`
 const WatchMessage = styled.div<{ $error?: boolean }>`
   font-size: 0.8125rem;
   margin-top: 0.5rem;
-  color: ${props => (props.$error ? 'var(--color-error)' : 'var(--color-success, #16a34a)')};
+  color: ${props => (props.$error ? 'var(--color-error)' : 'var(--color-success)')};
 `;
 
 const ComparisonOnlyCard = styled.div`
@@ -865,7 +866,7 @@ const ComparisonOnlyCard = styled.div`
   align-items: center;
 `;
 
-const ComparisonOnlyTitle = styled.h3`
+const ComparisonOnlyTitle = styled.h2`
   font-size: 1.25rem;
   font-weight: 700;
   color: var(--color-gray-700);
@@ -881,8 +882,8 @@ const ComparisonOnlyText = styled.p`
 `;
 
 const ComparisonOnlyBadge = styled.div`
-  background: var(--text-muted);
-  color: white;
+  background: var(--surface-inverse);
+  color: var(--on-brand);
   padding: 0.5rem 1rem;
   border-radius: 8px;
   font-size: 0.8125rem;
@@ -954,7 +955,7 @@ const SpecCard = styled.div`
 
     ${SpecIconWrapper} {
       background: var(--color-primary);
-      color: white;
+      color: var(--on-primary);
       transform: scale(1.05);
     }
   }
@@ -1108,7 +1109,7 @@ const BestPriceBadge = styled.span`
   top: 0.75rem;
   right: 1rem;
   background: var(--brand-surface-hover);
-  color: white;
+  color: var(--on-brand);
   font-size: 0.625rem;
   font-weight: 700;
   text-transform: uppercase;
@@ -1241,7 +1242,7 @@ const StickyCTA = styled.a`
   gap: 0.5rem;
   padding: 0.875rem 1.5rem;
   background: var(--color-primary);
-  color: white;
+  color: var(--on-primary);
   border-radius: 10px;
   font-weight: 700;
   font-size: 0.95rem;
@@ -1256,7 +1257,7 @@ const StickyCTA = styled.a`
     background: var(--color-primary-dark);
     transform: scale(1.02);
     text-decoration: none;
-    color: white;
+    color: var(--on-primary);
   }
 
   &:active {
@@ -1604,7 +1605,7 @@ const RacketDetailPage: React.FC = () => {
                 alignItems: 'center',
                 gap: '0.5rem',
                 background: 'var(--primary-hover)',
-                color: 'white',
+                color: 'var(--on-primary)',
                 padding: '0.75rem 1.5rem',
                 borderRadius: '10px',
                 fontWeight: 600,
@@ -1678,7 +1679,10 @@ const RacketDetailPage: React.FC = () => {
       <MainGrid>
         {/* Left: Gallery */}
         <GallerySection onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
-          <WishlistButton onClick={() => setShowAddToListModal(true)}>
+          <WishlistButton
+            onClick={() => setShowAddToListModal(true)}
+            aria-label='Guardar en mis listas'
+          >
             <FiHeart fill={showAddToListModal ? 'currentColor' : 'none'} />
           </WishlistButton>
           <MainImage
@@ -1691,7 +1695,10 @@ const RacketDetailPage: React.FC = () => {
             )}
             alt={formatRacketName(racket)}
             onError={handleImageError}
+            role='button'
+            tabIndex={0}
             onClick={() => setShowLightbox(true)}
+            onKeyDown={onActivationKeyDown(() => setShowLightbox(true))}
             loading='eager'
             fetchPriority='high'
             width={450}
@@ -1708,7 +1715,10 @@ const RacketDetailPage: React.FC = () => {
                 }}
               >
                 <CarouselWrapper>
-                  <LeftScrollButton onClick={() => scrollCarousel('left')}>
+                  <LeftScrollButton
+                    onClick={() => scrollCarousel('left')}
+                    aria-label='Imagen anterior'
+                  >
                     <FiChevronLeft size={20} />
                   </LeftScrollButton>
 
@@ -1719,7 +1729,10 @@ const RacketDetailPage: React.FC = () => {
                         src={racketImageUrl(img, undefined, 140)}
                         alt={`${formatRacketName(racket)} - imagen ${index + 1}`}
                         $isActive={index === selectedImageIndex}
+                        role='button'
+                        tabIndex={0}
                         onClick={() => setSelectedImageIndex(index)}
+                        onKeyDown={onActivationKeyDown(() => setSelectedImageIndex(index))}
                         onError={handleImageError}
                         loading='lazy'
                         width={70}
@@ -1728,7 +1741,10 @@ const RacketDetailPage: React.FC = () => {
                     ))}
                   </CarouselTrack>
 
-                  <RightScrollButton onClick={() => scrollCarousel('right')}>
+                  <RightScrollButton
+                    onClick={() => scrollCarousel('right')}
+                    aria-label='Imagen siguiente'
+                  >
                     <FiChevronRight size={20} />
                   </RightScrollButton>
                 </CarouselWrapper>
@@ -1876,7 +1892,10 @@ const RacketDetailPage: React.FC = () => {
                         .map(w => (
                           <WatchItem key={w.id}>
                             <WatchItemLabel>↓ {w.target_price.toFixed(2)}€</WatchItemLabel>
-                            <WatchDeleteButton onClick={() => handleDeleteWatch(w.id)}>
+                            <WatchDeleteButton
+                              onClick={() => handleDeleteWatch(w.id)}
+                              aria-label='Eliminar alerta de precio'
+                            >
                               ✕
                             </WatchDeleteButton>
                           </WatchItem>

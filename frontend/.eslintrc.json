@@ -9,6 +9,7 @@
     "plugin:@typescript-eslint/recommended",
     "plugin:react/recommended",
     "plugin:react-hooks/recommended",
+    "plugin:jsx-a11y/recommended",
     "prettier"
   ],
   "parser": "@typescript-eslint/parser",
@@ -19,7 +20,7 @@
       "jsx": true
     }
   },
-  "plugins": ["@typescript-eslint", "react", "react-hooks"],
+  "plugins": ["@typescript-eslint", "react", "react-hooks", "jsx-a11y"],
   "settings": {
     "react": {
       "version": "detect"
@@ -140,5 +141,5 @@
     "prefer-arrow-callback": "error",
     "prefer-template": "error"
   },
-  "ignorePatterns": ["dist/", "node_modules/", "*.js", "vite.config.ts", "src/__mocks__/**", "src/types/**", "src/vite-env.d.ts", "src/__tests__/**"]
+  "ignorePatterns": ["dist/", "node_modules/", "*.js", "vite.config.ts", "src/__mocks__/**", "src/types/**", "src/vite-env.d.ts"]
 }

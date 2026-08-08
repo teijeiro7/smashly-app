@@ -163,6 +163,9 @@ export const PadelMarketLogo: React.FC<IconProps> = ({ size = 24 }) => (
     fill='none'
     xmlns='http://www.w3.org/2000/svg'
   >
+    {/* Store logo mark is self-contained (own fixed background) like a real
+        brand logo, so its colors are intentionally not theme tokens. */}
+    <rect width='250' height='100' rx='4' fill='#ffffff' />
     <g>
       {/* Stylized padel ball icon */}
       <path
@@ -217,7 +220,7 @@ export const PadelProShopLogo: React.FC<IconProps> = ({ size = 24 }) => (
       fontFamily='Arial, sans-serif'
       fontSize='20'
       fontWeight='400'
-      fill='var(--surface)'
+      fill='var(--on-brand)'
     >
       Padel
     </text>
@@ -227,7 +230,7 @@ export const PadelProShopLogo: React.FC<IconProps> = ({ size = 24 }) => (
       fontFamily='Arial, sans-serif'
       fontSize='24'
       fontWeight='700'
-      fill='var(--surface)'
+      fill='var(--on-brand)'
     >
       PRO<tspan fill='var(--surface)'>Shop</tspan>
     </text>

@@ -12,6 +12,7 @@ import {
 } from 'recharts';
 import styled from 'styled-components';
 import racketService, { PriceHistoryResult } from '../../services/racketService';
+import { useTheme } from '../../contexts/ThemeContext';
 
 // ── Styled components ────────────────────────────────────────────────────────
 
@@ -64,7 +65,7 @@ const PriceBadge = styled.span<{ variant: 'low' | 'neutral' | 'high' }>`
     variant === 'low'
       ? 'var(--primary-subtle)'
       : variant === 'high'
-        ? 'rgba(220, 38, 38, 0.10)'
+        ? 'var(--danger-subtle)'
         : 'var(--surface-3)'};
   color: ${({ variant }) =>
     variant === 'low'
@@ -112,10 +113,13 @@ const EmptyState = styled.div`
 
 const STORE_COLORS: Record<string, string> = {
   padelmarket: 'var(--primary)',
-  padelnuestro: '#2563eb',
-  padelproshop: '#d97706',
-  otras: '#8b5cf6', // Agregado: color para tiendas restantes
+  padelnuestro: 'var(--info)',
+  padelproshop: 'var(--accent)',
 };
+
+// No hay token de catálogo para este morado categórico del gráfico ("otras
+// tiendas"); se resuelve por tema con useTheme() dentro del componente.
+const OTHER_STORE_COLOR = { light: '#8b5cf6', dark: '#a78bfa' };
 
 const STORE_LABELS: Record<string, string> = {
   padelmarket: 'Padel Market',
@@ -160,6 +164,14 @@ export const PriceHistoryChart: React.FC<PriceHistoryChartProps> = ({ racketId, 
   const [days, setDays] = useState(90);
   const [historyData, setHistoryData] = useState<PriceHistoryResult | null>(null);
   const [loading, setLoading] = useState(true);
+  const { resolved } = useTheme();
+  const storeColors = useMemo<Record<string, string>>(
+    () => ({
+      ...STORE_COLORS,
+      otras: resolved === 'dark' ? OTHER_STORE_COLOR.dark : OTHER_STORE_COLOR.light,
+    }),
+    [resolved]
+  );
 
   // Fetch al montar y cuando cambie la ventana de días
   useEffect(() => {
@@ -309,28 +321,20 @@ export const PriceHistoryChart: React.FC<PriceHistoryChartProps> = ({ racketId, 
                     >
                       <stop
                         offset='5%'
-                        stopColor={STORE_COLORS[s.store] || 'var(--text-muted)'}
+                        stopColor={storeColors[s.store] || 'var(--text-muted)'}
                         stopOpacity={0.15}
                       />
                       <stop
                         offset='95%'
-                        stopColor={STORE_COLORS[s.store] || 'var(--text-muted)'}
+                        stopColor={storeColors[s.store] || 'var(--text-muted)'}
                         stopOpacity={0}
                       />
                     </linearGradient>
                   ))}
                 {/* Gradiente para "otras" tiendas */}
                 <linearGradient id='grad-otras' x1='0' y1='0' x2='0' y2='1'>
-                  <stop
-                    offset='5%'
-                    stopColor={STORE_COLORS['otras'] || '#8b5cf6'}
-                    stopOpacity={0.15}
-                  />
-                  <stop
-                    offset='95%'
-                    stopColor={STORE_COLORS['otras'] || '#8b5cf6'}
-                    stopOpacity={0}
-                  />
+                  <stop offset='5%' stopColor={storeColors.otras} stopOpacity={0.15} />
+                  <stop offset='95%' stopColor={storeColors.otras} stopOpacity={0} />
                 </linearGradient>
               </defs>
 
@@ -353,7 +357,7 @@ export const PriceHistoryChart: React.FC<PriceHistoryChartProps> = ({ racketId, 
                 contentStyle={{
                   borderRadius: '12px',
                   border: 'none',
-                  boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
+                  boxShadow: 'var(--shadow-lg)',
                   fontSize: '0.8rem',
                 }}
                 formatter={(value, name) => [
@@ -375,7 +379,7 @@ export const PriceHistoryChart: React.FC<PriceHistoryChartProps> = ({ racketId, 
                     key={s.store}
                     type='monotone'
                     dataKey={dataKey}
-                    stroke={STORE_COLORS[dataKey] || 'var(--text-muted)'}
+                    stroke={storeColors[dataKey] || 'var(--text-muted)'}
                     strokeWidth={2.5}
                     fill={`url(#grad-${dataKey})`}
                     fillOpacity={1}

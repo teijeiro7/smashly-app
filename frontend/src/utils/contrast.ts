@@ -45,8 +45,8 @@ export function contrastRatio(a: string, b: string): number {
  * `alpha` is 0..1 (how visible the foreground is over the background).
  */
 export function blend(foreground: string, background: string, alpha: number): string {
-  const fg = parseHex(foreground)!;
-  const bg = parseHex(background)!;
+  const fg = parseHex(foreground);
+  const bg = parseHex(background);
   if (!fg || !bg) throw new Error('Invalid color for blend');
 
   const mix = (f: number, b: number) => Math.round(f * alpha + b * (1 - alpha));

@@ -10,12 +10,19 @@ import { racketImageUrl } from '../../utils/imageUrl';
 import { formatRacketName } from '../../utils/textUtils';
 import type { ReviewWithDetails } from '../../types/review';
 import { ReviewItem } from './ReviewItem';
+import { useTheme } from '../../contexts/ThemeContext';
+
+// No semantic token fits this decorative hover-accent (indigo), so it gets
+// its own light/dark map instead of a new global token.
+const REVIEW_CARD_HOVER_ACCENT = { light: '#667eea', dark: '#818cf8' };
 
 interface UserReviewsProps {
   userId: string;
 }
 
 export const UserReviews: React.FC<UserReviewsProps> = ({ userId }) => {
+  const { resolved } = useTheme();
+  const isDark = resolved === 'dark';
   const [reviews, setReviews] = useState<ReviewWithDetails[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -94,7 +101,11 @@ export const UserReviews: React.FC<UserReviewsProps> = ({ userId }) => {
           {/* Vista de galería compacta */}
           <GalleryGrid>
             {reviews.map(review => (
-              <ReviewCard key={review.id} onClick={() => setSelectedReview(review)}>
+              <ReviewCard
+                key={review.id}
+                $isDark={isDark}
+                onClick={() => setSelectedReview(review)}
+              >
                 {/* Imagen de la pala */}
                 <RacketImageContainer>
                   {review.racket?.imagenes?.[0] ? (
@@ -212,7 +223,7 @@ const GalleryGrid = styled.div`
   }
 `;
 
-const ReviewCard = styled.div`
+const ReviewCard = styled.div<{ $isDark: boolean }>`
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 12px;
@@ -224,7 +235,8 @@ const ReviewCard = styled.div`
   &:hover {
     transform: translateY(-4px);
     box-shadow: 0 8px 16px var(--shadow-color);
-    border-color: #667eea;
+    border-color: ${props =>
+      props.$isDark ? REVIEW_CARD_HOVER_ACCENT.dark : REVIEW_CARD_HOVER_ACCENT.light};
   }
 `;
 
@@ -304,7 +316,7 @@ const ModalOverlay = styled.div`
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.7);
+  background: var(--surface-overlay);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -347,8 +359,8 @@ const CloseButton = styled.button`
 
   &:hover {
     background: var(--surface-2);
-    border-color: #d32f2f;
-    color: #d32f2f;
+    border-color: var(--danger);
+    color: var(--danger);
     transform: rotate(90deg);
   }
 `;
@@ -363,8 +375,8 @@ const LoadingMessage = styled.div`
 const ErrorMessage = styled.div`
   text-align: center;
   padding: 2rem;
-  color: #d32f2f;
-  background: #ffebee;
+  color: var(--danger);
+  background: var(--danger-subtle);
   border-radius: 8px;
   font-size: 1rem;
 `;

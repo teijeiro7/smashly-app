@@ -42,7 +42,7 @@ const AnalysisCard = styled.div`
   box-shadow:
     0 4px 6px -1px var(--shadow-color),
     0 2px 4px -1px var(--shadow-color);
-  border: 1px solid rgba(0, 0, 0, 0.06);
+  border: 1px solid var(--border);
   overflow: hidden;
 `;
 

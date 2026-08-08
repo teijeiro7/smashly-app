@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -68,7 +68,7 @@ const CardHeader = styled.div`
   justify-content: space-between;
 `;
 
-const CardTitle = styled.h3`
+const CardTitle = styled.h2`
   font-size: 1rem;
   font-weight: 600;
   color: var(--primary);
@@ -130,7 +130,7 @@ const ListInfo = styled.div`
   flex: 1;
 `;
 
-const ListName = styled.h4`
+const ListName = styled.h3`
   font-size: 1rem;
   font-weight: 600;
   color: var(--primary);
@@ -159,7 +159,7 @@ const ActionButton = styled(motion.button)<{ $danger?: boolean }>`
   justify-content: center;
   border: none;
   cursor: pointer;
-  background: ${props => (props.$danger ? 'rgba(220, 38, 38, 0.10)' : 'transparent')};
+  background: ${props => (props.$danger ? 'var(--danger-subtle)' : 'transparent')};
   color: ${props => (props.$danger ? 'var(--danger)' : 'var(--text-muted)')};
 
   &:hover {
@@ -257,6 +257,13 @@ const UserCollections: React.FC = () => {
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [newListName, setNewListName] = useState('');
   const [newListPublic, setNewListPublic] = useState(false);
+  const newListNameInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (showCreateForm) {
+      newListNameInputRef.current?.focus();
+    }
+  }, [showCreateForm]);
 
   useEffect(() => {
     loadData();
@@ -326,10 +333,18 @@ const UserCollections: React.FC = () => {
   return (
     <Container>
       <TabsContainer>
-        <Tab $active={activeTab === 'lists'} onClick={() => setActiveTab('lists')}>
+        <Tab
+          $active={activeTab === 'lists'}
+          aria-selected={activeTab === 'lists'}
+          onClick={() => setActiveTab('lists')}
+        >
           <FiList size={16} /> Listas ({lists.length})
         </Tab>
-        <Tab $active={activeTab === 'comparisons'} onClick={() => setActiveTab('comparisons')}>
+        <Tab
+          $active={activeTab === 'comparisons'}
+          aria-selected={activeTab === 'comparisons'}
+          onClick={() => setActiveTab('comparisons')}
+        >
           <FiGitBranch size={16} /> Comparaciones ({comparisons.length})
         </Tab>
       </TabsContainer>
@@ -366,10 +381,10 @@ const UserCollections: React.FC = () => {
                       <FormGroup>
                         <FormLabel>Nombre de la lista</FormLabel>
                         <FormInput
+                          ref={newListNameInputRef}
                           placeholder='Ej: Mis favoritas'
                           value={newListName}
                           onChange={e => setNewListName(e.target.value)}
-                          autoFocus
                         />
                       </FormGroup>
                       <FormCheckbox>

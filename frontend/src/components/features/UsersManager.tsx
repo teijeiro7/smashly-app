@@ -169,10 +169,10 @@ const RoleBadge = styled.span<{ role: 'Admin' | 'Player' | 'Store' }>`
   gap: 0.25rem;
   background: ${props =>
     props.role === 'Admin'
-      ? 'rgba(220, 38, 38, 0.10)'
+      ? 'var(--danger-subtle)'
       : props.role === 'Store'
-        ? 'rgba(34, 197, 94, 0.10)'
-        : 'rgba(37, 99, 235, 0.10)'};
+        ? 'var(--primary-subtle)'
+        : 'var(--info-subtle)'};
   color: ${props =>
     props.role === 'Admin'
       ? 'var(--danger)'

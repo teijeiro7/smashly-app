@@ -16,6 +16,12 @@ import { useQuery } from '@tanstack/react-query';
 import { Link } from '@tanstack/react-router';
 import { AdminService, Activity } from '../../services/adminService';
 import { SkeletonBase } from '../common/SkeletonLoader';
+import { useTheme } from '../../contexts/ThemeContext';
+
+// No matching semantic tokens; kept as explicit light/dark pairs with the same hues.
+const VIOLET_ACCENT = { light: '#8b5cf6', dark: '#a78bfa' };
+const PINK_ACCENT = { light: '#ec4899', dark: '#f472b6' };
+const ROSE_ACCENT = { light: '#f43f5e', dark: '#fb7185' };
 
 const DashboardContainer = styled.div`
   padding: 2rem;
@@ -185,7 +191,7 @@ const ActivityItem = styled.div`
   }
 `;
 
-const ActivityIcon = styled.div<{ type: string }>`
+const ActivityIcon = styled.div<{ type: string; $isDark?: boolean }>`
   width: 36px;
   height: 36px;
   border-radius: 10px;
@@ -196,17 +202,18 @@ const ActivityIcon = styled.div<{ type: string }>`
   flex-shrink: 0;
 
   ${props => {
+    const violet = props.$isDark ? VIOLET_ACCENT.dark : VIOLET_ACCENT.light;
     switch (props.type) {
       case 'user':
         return 'background: var(--info)15; color: var(--info);';
       case 'racket':
-        return 'background: #8b5cf615; color: #8b5cf6;';
+        return `background: ${violet}15; color: ${violet};`;
       case 'review':
         return 'background: var(--accent)15; color: var(--accent);';
       case 'store':
         return 'background: var(--primary-subtle); color: var(--primary);';
       default:
-        return 'background: rgba(100, 116, 139, 0.10); color: var(--text-muted);';
+        return 'background: var(--surface-3); color: var(--text-muted);';
     }
   }}
 `;
@@ -354,6 +361,8 @@ const AdminDashboard: React.FC = () => {
     queryFn: () => AdminService.getDashboardMetrics(),
     staleTime: 60_000,
   });
+  const { resolved } = useTheme();
+  const isDark = resolved === 'dark';
 
   const { data: activities = [] } = useQuery({
     queryKey: ['admin', 'recent-activity'],
@@ -410,9 +419,9 @@ const AdminDashboard: React.FC = () => {
               <StatLabel>Total Usuarios</StatLabel>
             </StatCard>
 
-            <StatCard $accent='#8b5cf6'>
+            <StatCard $accent={isDark ? VIOLET_ACCENT.dark : VIOLET_ACCENT.light}>
               <StatHeader>
-                <StatIcon color='#8b5cf6'>
+                <StatIcon color={isDark ? VIOLET_ACCENT.dark : VIOLET_ACCENT.light}>
                   <FiPackage />
                 </StatIcon>
               </StatHeader>
@@ -432,9 +441,9 @@ const AdminDashboard: React.FC = () => {
           </>
         )}
 
-        <StatCard $accent={conflictsCount > 0 ? 'var(--accent)' : '#10b981'}>
+        <StatCard $accent={conflictsCount > 0 ? 'var(--accent)' : 'var(--success)'}>
           <StatHeader>
-            <StatIcon color={conflictsCount > 0 ? 'var(--accent)' : '#10b981'}>
+            <StatIcon color={conflictsCount > 0 ? 'var(--accent)' : 'var(--success)'}>
               {conflictsCount > 0 ? <FiAlertTriangle /> : <FiCheck />}
             </StatIcon>
           </StatHeader>
@@ -454,7 +463,9 @@ const AdminDashboard: React.FC = () => {
             <ActivityList>
               {activities.slice(0, 6).map(activity => (
                 <ActivityItem key={activity.id}>
-                  <ActivityIcon type={activity.type}>{getActivityIcon(activity.type)}</ActivityIcon>
+                  <ActivityIcon type={activity.type} $isDark={isDark}>
+                    {getActivityIcon(activity.type)}
+                  </ActivityIcon>
                   <ActivityContent>
                     <ActivityTitle>{activity.title}</ActivityTitle>
                     <ActivityTime>
@@ -471,15 +482,18 @@ const AdminDashboard: React.FC = () => {
         <div>
           <SectionTitle>Acciones Rápidas</SectionTitle>
           <QuickActions>
-            <QuickActionCard to='/admin/rackets' $color='#8b5cf6'>
-              <QuickActionIcon color='#8b5cf6'>
+            <QuickActionCard
+              to='/admin/rackets'
+              $color={isDark ? VIOLET_ACCENT.dark : VIOLET_ACCENT.light}
+            >
+              <QuickActionIcon color={isDark ? VIOLET_ACCENT.dark : VIOLET_ACCENT.light}>
                 <FiPackage />
               </QuickActionIcon>
               <QuickActionText>
                 <QuickActionTitle>Gestionar Palas</QuickActionTitle>
                 <QuickActionDesc>CRUD completo</QuickActionDesc>
               </QuickActionText>
-              <FiArrowRight size={16} color='#8b5cf6' />
+              <FiArrowRight size={16} color={isDark ? VIOLET_ACCENT.dark : VIOLET_ACCENT.light} />
             </QuickActionCard>
 
             <QuickActionCard to='/admin/rackets/review' $color='var(--accent)'>
@@ -538,19 +552,25 @@ const AdminDashboard: React.FC = () => {
             </CardHeader>
             <CardContent>
               <StatsRow style={{ marginBottom: 0 }}>
-                <StatCard $accent='#ec4899' style={{ padding: '1rem' }}>
+                <StatCard
+                  $accent={isDark ? PINK_ACCENT.dark : PINK_ACCENT.light}
+                  style={{ padding: '1rem' }}
+                >
                   <StatValue style={{ fontSize: '1.5rem' }}>
                     {(metrics?.totalReviews ?? 0).toLocaleString()}
                   </StatValue>
                   <StatLabel>Reviews</StatLabel>
                 </StatCard>
-                <StatCard $accent='#10b981' style={{ padding: '1rem' }}>
+                <StatCard $accent='var(--success)' style={{ padding: '1rem' }}>
                   <StatValue style={{ fontSize: '1.5rem' }}>
                     {(metrics?.activeUsers ?? 0).toLocaleString()}
                   </StatValue>
                   <StatLabel>Activos</StatLabel>
                 </StatCard>
-                <StatCard $accent='#f43f5e' style={{ padding: '1rem' }}>
+                <StatCard
+                  $accent={isDark ? ROSE_ACCENT.dark : ROSE_ACCENT.light}
+                  style={{ padding: '1rem' }}
+                >
                   <StatValue style={{ fontSize: '1.5rem' }}>
                     {(metrics?.totalFavorites ?? 0).toLocaleString()}
                   </StatValue>

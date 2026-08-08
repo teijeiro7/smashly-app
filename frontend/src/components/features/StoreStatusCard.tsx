@@ -26,14 +26,14 @@ const IconBox = styled.div<{ $status: string }>`
     $status === 'verified'
       ? 'var(--primary-subtle)'
       : $status === 'rejected'
-        ? 'rgba(220, 38, 38, 0.10)'
-        : 'rgba(217, 119, 6, 0.10)'};
+        ? 'var(--danger-subtle)'
+        : 'var(--accent-subtle)'};
   color: ${({ $status }) =>
     $status === 'verified'
       ? 'var(--primary-hover)'
       : $status === 'rejected'
         ? 'var(--danger)'
-        : '#d97706'};
+        : 'var(--accent)'};
 `;
 
 const Content = styled.div`
@@ -51,7 +51,7 @@ const StatusLabel = styled.div<{ $status: string }>`
       ? 'var(--primary-hover)'
       : $status === 'rejected'
         ? 'var(--danger)'
-        : '#d97706'};
+        : 'var(--accent)'};
 `;
 
 const Title = styled.h3`
@@ -71,7 +71,7 @@ const Message = styled.p`
 const ReasonBox = styled.div`
   margin-top: 0.75rem;
   padding: 0.75rem 1rem;
-  background: rgba(220, 38, 38, 0.06);
+  background: rgba(var(--danger-rgb), 0.06);
   border-radius: 10px;
   font-size: 0.875rem;
   color: var(--danger);

@@ -144,7 +144,7 @@ const ResultsDropdown = styled(motion.div)`
   right: 0;
   background: var(--surface);
   border-radius: 12px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  box-shadow: var(--shadow-lg);
   border: 1px solid var(--border);
   max-height: 320px;
   overflow-y: auto;
@@ -387,7 +387,7 @@ export const RacketSearchInput: React.FC<RacketSearchInputProps> = ({
             placeholder={placeholder}
           />
           {query && (
-            <ClearButton onClick={handleClear}>
+            <ClearButton onClick={handleClear} aria-label='Limpiar búsqueda'>
               <FiX size={18} />
             </ClearButton>
           )}

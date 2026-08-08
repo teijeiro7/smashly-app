@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { FiX, FiSearch, FiCheck, FiPackage } from 'react-icons/fi';
 import { sileo } from 'sileo';
 import catalogService, { CatalogSearchResult } from '../../services/catalogService';
+import { onActivationKeyDown } from '../../utils/a11y';
 
 const Overlay = styled.div`
   position: fixed;
@@ -10,7 +11,7 @@ const Overlay = styled.div`
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
+  background: var(--surface-overlay);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -34,7 +35,7 @@ const Modal = styled.div`
   max-height: 85vh;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  box-shadow: var(--shadow-xl);
   animation: slideUp 0.3s ease;
   @keyframes slideUp {
     from {
@@ -343,7 +344,10 @@ const AddRacketModal: React.FC<AddRacketModalProps> = ({ storeId, isOpen, onClos
               <ResultRow
                 key={r.id}
                 $selected={r.id === selectedId}
+                role='button'
+                tabIndex={0}
                 onClick={() => handleSelect(r.id)}
+                onKeyDown={onActivationKeyDown(() => handleSelect(r.id))}
               >
                 {r.images?.[0] ? (
                   <ResultImg src={r.images[0]} alt={r.name} />

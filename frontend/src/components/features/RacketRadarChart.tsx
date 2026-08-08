@@ -73,7 +73,7 @@ const CustomTooltip = memo(({ active, payload, metrics }: any) => {
         background: 'var(--surface)',
         padding: '12px',
         borderRadius: '8px',
-        boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+        boxShadow: 'var(--shadow-lg)',
         border: '1px solid var(--border)',
       }}
     >

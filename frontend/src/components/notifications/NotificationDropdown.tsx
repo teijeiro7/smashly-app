@@ -12,8 +12,21 @@ import {
   FiCheck,
 } from 'react-icons/fi';
 import { useNotifications } from '../../contexts/NotificationContext';
+import { useTheme } from '../../contexts/ThemeContext';
 import { Notification, NotificationType } from '../../types/notification';
 import { useNavigate } from '@tanstack/react-router';
+import { onActivationKeyDown } from '../../utils/a11y';
+
+// No semantic token fits these two niche admin-only badge colors (indigo/purple),
+// so they get their own light/dark map instead of new global tokens.
+const NEW_USER_COLORS = {
+  light: { bg: '#e0e7ff', fg: '#4f46e5' },
+  dark: { bg: '#312e81', fg: '#a5b4fc' },
+};
+const NEW_STORE_COLORS = {
+  light: { bg: '#f3e8ff', fg: '#9333ea' },
+  dark: { bg: '#4c1d95', fg: '#d8b4fe' },
+};
 
 const DropdownContainer = styled.div`
   position: absolute;
@@ -21,7 +34,7 @@ const DropdownContainer = styled.div`
   right: 0;
   background: var(--surface);
   border-radius: 12px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 10px 40px var(--shadow-color);
   width: 360px;
   max-height: 480px;
   display: flex;
@@ -104,7 +117,7 @@ const NotificationItem = styled.div<{ isRead: boolean }>`
   }
 `;
 
-const NotificationIcon = styled.div<{ type: NotificationType }>`
+const NotificationIcon = styled.div<{ type: NotificationType; $isDark: boolean }>`
   width: 40px;
   height: 40px;
   border-radius: 50%;
@@ -118,19 +131,19 @@ const NotificationIcon = styled.div<{ type: NotificationType }>`
         return 'var(--primary-subtle)';
       case 'comparison_complete':
       case 'recommendation_complete':
-        return '#dbeafe';
+        return 'var(--info-subtle)';
       case 'review':
-        return '#fef3c7';
+        return 'var(--accent-subtle)';
       case 'admin_update':
         return 'var(--danger-subtle)';
       case 'new_user':
-        return '#e0e7ff';
+        return props.$isDark ? NEW_USER_COLORS.dark.bg : NEW_USER_COLORS.light.bg;
       case 'new_store':
-        return '#f3e8ff';
+        return props.$isDark ? NEW_STORE_COLORS.dark.bg : NEW_STORE_COLORS.light.bg;
       case 'store_status':
-        return '#d1fae5';
+        return 'var(--primary-subtle)';
       case 'review_reply':
-        return '#e0f2fe';
+        return 'var(--info-subtle)';
       default:
         return 'var(--surface-3)';
     }
@@ -141,19 +154,19 @@ const NotificationIcon = styled.div<{ type: NotificationType }>`
         return 'var(--primary)';
       case 'comparison_complete':
       case 'recommendation_complete':
-        return '#2563eb';
+        return 'var(--info)';
       case 'review':
-        return '#d97706';
+        return 'var(--accent)';
       case 'admin_update':
         return 'var(--danger)';
       case 'new_user':
-        return '#4f46e5';
+        return props.$isDark ? NEW_USER_COLORS.dark.fg : NEW_USER_COLORS.light.fg;
       case 'new_store':
-        return '#9333ea';
+        return props.$isDark ? NEW_STORE_COLORS.dark.fg : NEW_STORE_COLORS.light.fg;
       case 'store_status':
-        return '#16a34a';
+        return 'var(--primary)';
       case 'review_reply':
-        return '#0284c7';
+        return 'var(--info)';
       default:
         return 'var(--text-muted)';
     }
@@ -326,6 +339,8 @@ export const NotificationDropdown: React.FC<NotificationDropdownProps> = ({ onCl
   const navigate = useNavigate();
   const { notifications, unreadCount, markAsRead, markAllAsRead, deleteNotification } =
     useNotifications();
+  const { resolved } = useTheme();
+  const isDark = resolved === 'dark';
 
   const handleNotificationClick = async (notification: Notification) => {
     if (!notification.is_read) {
@@ -356,7 +371,7 @@ export const NotificationDropdown: React.FC<NotificationDropdownProps> = ({ onCl
             <span
               style={{
                 background: 'var(--primary)',
-                color: 'white',
+                color: 'var(--on-primary)',
                 fontSize: '0.75rem',
                 padding: '2px 8px',
                 borderRadius: '12px',
@@ -388,9 +403,12 @@ export const NotificationDropdown: React.FC<NotificationDropdownProps> = ({ onCl
             <NotificationItem
               key={notification.id}
               isRead={notification.is_read}
+              role='button'
+              tabIndex={0}
               onClick={() => handleNotificationClick(notification)}
+              onKeyDown={onActivationKeyDown(() => handleNotificationClick(notification))}
             >
-              <NotificationIcon type={notification.type}>
+              <NotificationIcon type={notification.type} $isDark={isDark}>
                 {getNotificationIcon(notification.type)}
               </NotificationIcon>
               <NotificationContent>

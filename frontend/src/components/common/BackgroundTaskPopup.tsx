@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { FiX, FiMinimize2, FiCpu, FiCheckCircle, FiAlertCircle } from 'react-icons/fi';
 import { useNavigate, useRouterState } from '@tanstack/react-router';
 import {
@@ -18,7 +18,7 @@ const PopupContainer = styled(motion.div)<{ $minimized: boolean }>`
   height: ${props => (props.$minimized ? '80px' : 'auto')};
   background: var(--surface);
   border-radius: ${props => (props.$minimized ? '50%' : '20px')};
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  box-shadow: var(--shadow-lg);
   z-index: 1000;
   overflow: hidden;
   border: ${props => (props.$minimized ? 'none' : '2px solid var(--border)')};
@@ -50,7 +50,7 @@ const CircularProgress = styled.svg<{ $status: string }>`
   }
 
   .background {
-    stroke: rgba(229, 231, 235, 0.3);
+    stroke: var(--border);
   }
 
   .progress {
@@ -194,7 +194,7 @@ const HeaderActions = styled.div`
 `;
 
 const IconButton = styled.button`
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(var(--on-brand-rgb), 0.2);
   border: none;
   color: var(--brand-on-surface);
   padding: 8px;
@@ -206,7 +206,7 @@ const IconButton = styled.button`
   transition: all 0.2s;
 
   &:hover {
-    background: rgba(255, 255, 255, 0.3);
+    background: rgba(var(--on-brand-rgb), 0.3);
   }
 `;
 
@@ -362,15 +362,7 @@ export const BackgroundTaskPopup: React.FC = () => {
   const { location } = useRouterState();
   const [minimized, setMinimized] = useState(true);
   const [showPopup, setShowPopup] = useState(false);
-  const [reducedMotion, setReducedMotion] = useState(false);
-
-  useEffect(() => {
-    const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
-    setReducedMotion(mq.matches);
-    const handler = (e: MediaQueryListEvent) => setReducedMotion(e.matches);
-    mq.addEventListener('change', handler);
-    return () => mq.removeEventListener('change', handler);
-  }, []);
+  const reducedMotion = useReducedMotion();
 
   // Mostrar popup cuando hay una tarea activa o completada recientemente
   useEffect(() => {
@@ -601,10 +593,7 @@ export const BackgroundTaskPopup: React.FC = () => {
                 </HeaderTitle>
               </HeaderLeft>
               <HeaderActions>
-                <IconButton
-                  onClick={handleToggleMinimize}
-                  aria-label={minimized ? 'Expandir panel' : 'Minimizar panel'}
-                >
+                <IconButton onClick={handleToggleMinimize} aria-label='Minimizar panel'>
                   <FiMinimize2 size={16} />
                 </IconButton>
                 {visibleTask.status !== 'running' && (

@@ -18,7 +18,7 @@ const AvatarWrapper = styled(motion.div)<{ $size?: number }>`
   position: relative;
   background: linear-gradient(135deg, rgba(var(--primary-rgb), 0.2), rgba(var(--primary-rgb), 0.1));
   border: 3px solid var(--surface);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 20px var(--shadow-color);
 `;
 
 const AvatarImage = styled.img`
@@ -57,7 +57,7 @@ const UploadButton = styled(motion.button)`
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 2px 8px var(--shadow-color);
 
   &:hover {
     background: var(--brand-surface-hover);
@@ -71,7 +71,7 @@ const HiddenInput = styled.input`
 const Overlay = styled(motion.div)`
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.7);
+  background: rgba(var(--scrim-rgb), 0.7);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -205,6 +205,7 @@ const ProfileAvatar: React.FC<ProfileAvatarProps> = ({
           onClick={() => inputRef.current?.click()}
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.95 }}
+          aria-label='Cambiar foto de perfil'
         >
           <FiCamera size={16} />
         </UploadButton>
