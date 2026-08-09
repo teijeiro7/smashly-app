@@ -12,6 +12,9 @@ import { supabase } from '../lib/supabase';
 import { queryClient } from '../lib/queryClient';
 import { UserProfile } from '../services/userProfileService';
 import { logger } from '../utils/logger';
+import { withTimeout } from '../utils/withTimeout';
+
+const GET_SESSION_TIMEOUT_MS = 8000;
 
 interface AuthContextType {
   user: UserProfile | null;
@@ -107,11 +110,19 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [isSigningOut, setIsSigningOut] = useState<boolean>(false);
 
   const readyResolveRef = useRef<() => void>(() => {});
-  const readyRef = useRef<Promise<void>>(
-    new Promise<void>(resolve => {
+  // Built lazily on first render only. `useRef(new Promise(...))` would
+  // re-evaluate that argument on EVERY render — useRef keeps the first
+  // promise, but the `resolve` captured in readyResolveRef gets rebound to
+  // each new throwaway one. Any re-render before the session settled then
+  // orphaned the promise the router guards were already awaiting: resolving
+  // it hit the throwaway, `ready` never settled, and every beforeLoad hung
+  // forever (blank screen, no error).
+  const readyRef = useRef<Promise<void> | null>(null);
+  if (readyRef.current === null) {
+    readyRef.current = new Promise<void>(resolve => {
       readyResolveRef.current = resolve;
-    })
-  );
+    });
+  }
 
   const loadAndSetProfile = useCallback(async (userId: string): Promise<UserProfile | null> => {
     const profile = await fetchProfile(userId);
@@ -137,8 +148,20 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   useEffect(() => {
     let mounted = true;
 
-    supabase.auth
-      .getSession()
+    // supabase-js serializes getSession() through a single-tab lock (see
+    // lib/supabase.ts's `processLock` comment) whose queue can stall forever
+    // if one call in it never settles — neither resolving nor rejecting, so
+    // the .catch() below wouldn't fire either. withTimeout bounds the wait
+    // so a stuck lock can't freeze `ready` (and therefore every router
+    // beforeLoad guard awaiting it) forever.
+    withTimeout(supabase.auth.getSession(), GET_SESSION_TIMEOUT_MS, () => {
+      logger.warn(
+        `getSession() did not settle within ${GET_SESSION_TIMEOUT_MS}ms — proceeding as no session`
+      );
+      return { data: { session: null }, error: null } as Awaited<
+        ReturnType<typeof supabase.auth.getSession>
+      >;
+    })
       .then(({ data: { session } }) => {
         if (!mounted) return;
         if (session?.user) {
@@ -168,17 +191,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       if (event === 'SIGNED_OUT' || !session) {
         clearAuth();
         setLoading(false);
+        readyResolveRef.current();
         return;
       }
 
       if (event === 'PASSWORD_RECOVERY') {
-        // A recovery link was just parsed from the URL: there is now a
-        // session that can call supabase.auth.updateUser({ password }), but
-        // this is NOT a normal login — don't route the user anywhere else,
-        // just flag it so UpdatePasswordPage can render its form.
         setHasSession(true);
         setIsPasswordRecovery(true);
         setLoading(false);
+        readyResolveRef.current();
         return;
       }
 
@@ -186,6 +207,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         setHasSession(true);
         const profile = await loadAndSetProfile(session.user.id);
         setLoading(false);
+        readyResolveRef.current();
 
         // Detect new Google user who needs to set a nickname
         const provider = session.user.app_metadata?.provider;
@@ -386,7 +408,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       clearGoogleBlockError,
       isAuthenticated: hasSession,
       isPasswordRecovery,
-      ready: readyRef.current,
+      // Non-null by construction: the lazy-init block above runs on every
+      // render before this point.
+      ready: readyRef.current!,
       isSigningOut,
     }),
     [

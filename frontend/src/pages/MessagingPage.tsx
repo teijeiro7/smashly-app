@@ -404,7 +404,7 @@ const MessagingPage: React.FC = () => {
         {activeConv ? (
           <>
             <ChatHeader>
-              <BackButton onClick={() => setShowChat(false)} aria-label='Volver'>
+              <BackButton onClick={() => setShowChat(false)} aria-label='Volver a conversaciones'>
                 <FiArrowLeft size={20} />
               </BackButton>
               <FaStore size={18} />

@@ -9,7 +9,7 @@ const shimmer = keyframes`
   }
 `;
 
-const SkeletonBase = styled.div`
+export const SkeletonBase = styled.div`
   background: linear-gradient(
     90deg,
     var(--surface-3) 0%,

@@ -510,7 +510,10 @@ const StoreProfileForm: React.FC<StoreProfileFormProps> = ({ store, isOpen, onCl
                 {form.gallery_images.map((url, i) => (
                   <GalleryUrlTag key={i}>
                     <span>{url}</span>
-                    <RemoveUrlButton onClick={() => removeGalleryUrl(i)} aria-label='Eliminar URL'>
+                    <RemoveUrlButton
+                      onClick={() => removeGalleryUrl(i)}
+                      aria-label={`Eliminar imagen ${i + 1} de la galería`}
+                    >
                       <FiTrash2 size={14} />
                     </RemoveUrlButton>
                   </GalleryUrlTag>

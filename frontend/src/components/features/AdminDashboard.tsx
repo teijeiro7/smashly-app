@@ -1,10 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 import {
   FiUsers,
   FiShoppingBag,
   FiPackage,
-  FiTrendingUp,
   FiActivity,
   FiStar,
   FiAlertTriangle,
@@ -13,9 +12,10 @@ import {
   FiClock,
   FiSettings,
 } from 'react-icons/fi';
-import { sileo } from 'sileo';
+import { useQuery } from '@tanstack/react-query';
 import { Link } from '@tanstack/react-router';
-import { AdminService, AdminMetrics, Activity } from '../../services/adminService';
+import { AdminService, Activity } from '../../services/adminService';
+import { SkeletonBase } from '../common/SkeletonLoader';
 import { useTheme } from '../../contexts/ThemeContext';
 
 // No matching semantic tokens; kept as explicit light/dark pairs with the same hues.
@@ -112,18 +112,6 @@ const StatIcon = styled.div<{ color: string }>`
   align-items: center;
   justify-content: center;
   font-size: 1.25rem;
-`;
-
-const StatTrend = styled.div<{ positive: boolean }>`
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
-  font-size: 0.8125rem;
-  font-weight: 600;
-  color: ${props => (props.positive ? 'var(--primary)' : 'var(--error)')};
-  background: ${props => (props.positive ? 'var(--primary-subtle)' : 'var(--danger-subtle)')};
-  padding: 0.25rem 0.5rem;
-  border-radius: 6px;
 `;
 
 const StatValue = styled.div`
@@ -316,13 +304,32 @@ const AlertBadge = styled.div<{ count: number }>`
   margin-left: 0.5rem;
 `;
 
-const LoadingContainer = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 4rem;
-  color: var(--text-muted);
+const StatCardSkeletonValue = styled(SkeletonBase)`
+  width: 60%;
+  height: 2rem;
+  margin-bottom: 0.5rem;
 `;
+
+const StatCardSkeletonLabel = styled(SkeletonBase)`
+  width: 80%;
+  height: 0.875rem;
+`;
+
+const StatCardSkeletonIcon = styled(SkeletonBase)`
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+`;
+
+const StatCardSkeleton: React.FC = () => (
+  <StatCard $accent='var(--border)'>
+    <StatHeader>
+      <StatCardSkeletonIcon />
+    </StatHeader>
+    <StatCardSkeletonValue />
+    <StatCardSkeletonLabel />
+  </StatCard>
+);
 
 const formatRelativeTime = (dateString: string): string => {
   const date = new Date(dateString);
@@ -344,56 +351,32 @@ const formatRelativeTime = (dateString: string): string => {
 };
 
 const AdminDashboard: React.FC = () => {
-  const [metrics, setMetrics] = useState<AdminMetrics | null>(null);
-  const [activities, setActivities] = useState<Activity[]>([]);
-  const [conflictsCount, setConflictsCount] = useState<number>(0);
-  const [loading, setLoading] = useState(true);
+  // Three independent queries instead of one Promise.all — a failure in any
+  // one (e.g. conflicts-count timing out) no longer blanks the whole page;
+  // each query keeps its own loading/error state and the other two render
+  // normally. staleTime keeps repeated visits to /admin instant instead of
+  // re-firing all three requests every time.
+  const { data: metrics } = useQuery({
+    queryKey: ['admin', 'metrics'],
+    queryFn: () => AdminService.getDashboardMetrics(),
+    staleTime: 60_000,
+  });
   const { resolved } = useTheme();
   const isDark = resolved === 'dark';
 
-  useEffect(() => {
-    loadDashboardData();
-  }, []);
+  const { data: activities = [] } = useQuery({
+    queryKey: ['admin', 'recent-activity'],
+    queryFn: () => AdminService.getRecentActivity(10).catch(() => [] as Activity[]),
+    staleTime: 60_000,
+  });
 
-  const loadDashboardData = async () => {
-    try {
-      const [metricsData, activitiesData, conflictsData] = await Promise.all([
-        AdminService.getDashboardMetrics(),
-        AdminService.getRecentActivity(10),
-        AdminService.getRacketConflicts(),
-      ]);
-
-      setMetrics(metricsData);
-      setActivities(activitiesData);
-      setConflictsCount(conflictsData.length);
-    } catch (error: any) {
-      console.error('Error loading dashboard data:', error);
-
-      if (error.message.includes('404')) {
-        sileo.error({
-          title: 'Error',
-          description:
-            'El servidor backend necesita reiniciarse para cargar las nuevas rutas de administración',
-        });
-      } else {
-        sileo.error({
-          title: 'Error',
-          description:
-            'Error al cargar los datos del dashboard. Verifica que el backend esté corriendo.',
-        });
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  if (loading) {
-    return <LoadingContainer>Cargando métricas...</LoadingContainer>;
-  }
-
-  if (!metrics) {
-    return <LoadingContainer>No se pudieron cargar las métricas</LoadingContainer>;
-  }
+  const { data: conflictsCount = 0 } = useQuery({
+    queryKey: ['admin', 'conflicts-count'],
+    // AdminService.getRacketConflictsCount() already catches internally and
+    // resolves 0 on failure — never rejects.
+    queryFn: () => AdminService.getRacketConflictsCount(),
+    staleTime: 60_000,
+  });
 
   const getActivityIcon = (type: Activity['type']) => {
     switch (type) {
@@ -418,45 +401,45 @@ const AdminDashboard: React.FC = () => {
       </WelcomeSection>
 
       <StatsRow>
-        <StatCard $accent='var(--info)'>
-          <StatHeader>
-            <StatIcon color='var(--info)'>
-              <FiUsers />
-            </StatIcon>
-            <StatTrend positive={metrics.usersChange > 0}>
-              <FiTrendingUp size={12} />
-              {metrics.usersChange > 0 ? '+' : ''}
-              {metrics.usersChange}%
-            </StatTrend>
-          </StatHeader>
-          <StatValue>{metrics.totalUsers.toLocaleString()}</StatValue>
-          <StatLabel>Total Usuarios</StatLabel>
-        </StatCard>
+        {!metrics ? (
+          <>
+            <StatCardSkeleton />
+            <StatCardSkeleton />
+            <StatCardSkeleton />
+          </>
+        ) : (
+          <>
+            <StatCard $accent='var(--info)'>
+              <StatHeader>
+                <StatIcon color='var(--info)'>
+                  <FiUsers />
+                </StatIcon>
+              </StatHeader>
+              <StatValue>{metrics.totalUsers.toLocaleString()}</StatValue>
+              <StatLabel>Total Usuarios</StatLabel>
+            </StatCard>
 
-        <StatCard $accent={isDark ? VIOLET_ACCENT.dark : VIOLET_ACCENT.light}>
-          <StatHeader>
-            <StatIcon color={isDark ? VIOLET_ACCENT.dark : VIOLET_ACCENT.light}>
-              <FiPackage />
-            </StatIcon>
-            <StatTrend positive={metrics.racketsChange > 0}>
-              <FiTrendingUp size={12} />
-              {metrics.racketsChange > 0 ? '+' : ''}
-              {metrics.racketsChange}%
-            </StatTrend>
-          </StatHeader>
-          <StatValue>{metrics.totalRackets.toLocaleString()}</StatValue>
-          <StatLabel>Palas Registradas</StatLabel>
-        </StatCard>
+            <StatCard $accent={isDark ? VIOLET_ACCENT.dark : VIOLET_ACCENT.light}>
+              <StatHeader>
+                <StatIcon color={isDark ? VIOLET_ACCENT.dark : VIOLET_ACCENT.light}>
+                  <FiPackage />
+                </StatIcon>
+              </StatHeader>
+              <StatValue>{metrics.totalRackets.toLocaleString()}</StatValue>
+              <StatLabel>Palas Registradas</StatLabel>
+            </StatCard>
 
-        <StatCard $accent='var(--primary)'>
-          <StatHeader>
-            <StatIcon color='var(--primary)'>
-              <FiShoppingBag />
-            </StatIcon>
-          </StatHeader>
-          <StatValue>{metrics.totalStores}</StatValue>
-          <StatLabel>Tiendas Asociadas</StatLabel>
-        </StatCard>
+            <StatCard $accent='var(--primary)'>
+              <StatHeader>
+                <StatIcon color='var(--primary)'>
+                  <FiShoppingBag />
+                </StatIcon>
+              </StatHeader>
+              <StatValue>{metrics.totalStores}</StatValue>
+              <StatLabel>Tiendas Asociadas</StatLabel>
+            </StatCard>
+          </>
+        )}
 
         <StatCard $accent={conflictsCount > 0 ? 'var(--accent)' : 'var(--success)'}>
           <StatHeader>
@@ -574,13 +557,13 @@ const AdminDashboard: React.FC = () => {
                   style={{ padding: '1rem' }}
                 >
                   <StatValue style={{ fontSize: '1.5rem' }}>
-                    {metrics.totalReviews.toLocaleString()}
+                    {(metrics?.totalReviews ?? 0).toLocaleString()}
                   </StatValue>
                   <StatLabel>Reviews</StatLabel>
                 </StatCard>
                 <StatCard $accent='var(--success)' style={{ padding: '1rem' }}>
                   <StatValue style={{ fontSize: '1.5rem' }}>
-                    {metrics.activeUsers.toLocaleString()}
+                    {(metrics?.activeUsers ?? 0).toLocaleString()}
                   </StatValue>
                   <StatLabel>Activos</StatLabel>
                 </StatCard>
@@ -589,12 +572,14 @@ const AdminDashboard: React.FC = () => {
                   style={{ padding: '1rem' }}
                 >
                   <StatValue style={{ fontSize: '1.5rem' }}>
-                    {metrics.totalFavorites.toLocaleString()}
+                    {(metrics?.totalFavorites ?? 0).toLocaleString()}
                   </StatValue>
                   <StatLabel>Favoritos</StatLabel>
                 </StatCard>
                 <StatCard $accent='var(--accent)' style={{ padding: '1rem' }}>
-                  <StatValue style={{ fontSize: '1.5rem' }}>{metrics.pendingRequests}</StatValue>
+                  <StatValue style={{ fontSize: '1.5rem' }}>
+                    {metrics?.pendingRequests ?? 0}
+                  </StatValue>
                   <StatLabel>Pendientes</StatLabel>
                 </StatCard>
               </StatsRow>

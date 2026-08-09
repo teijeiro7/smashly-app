@@ -2,7 +2,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useAuthModal } from '@/contexts/AuthModalContext';
 import { Racket } from '@/types/racket';
 
-import React, { useEffect, useState, useRef, useCallback } from 'react';
+import React, { useEffect, useMemo, useState, useRef, useCallback, lazy, Suspense } from 'react';
 import {
   FiExternalLink,
   FiLoader,
@@ -18,10 +18,9 @@ import {
 } from 'react-icons/fi';
 
 import { Link, useParams } from '@tanstack/react-router';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import styled from 'styled-components';
 import Button from '../components/common/Button';
-import { AddToListModal } from '../components/features/AddToListModal';
-import { ProductReviews } from '../components/features/ProductReviews';
 import racketService from '../services/racketService';
 import { RacketViewService } from '../services/racketViewService';
 import priceWatchService, { PriceWatch } from '../services/priceWatchService';
@@ -32,8 +31,6 @@ import {
   formatModelName,
   formatRacketName,
 } from '../utils/textUtils';
-import { EditRacketModal } from '../components/admin/EditRacketModal';
-import { PriceHistoryChart } from '../components/features/PriceHistoryChart';
 import { RacketDetailSkeleton } from '../components/common/SkeletonLoader';
 import { ImageLightbox } from '../components/common/ImageLightbox';
 import { useReviewStats } from '../hooks/useReviewStats';
@@ -48,8 +45,24 @@ import {
   StoreLabel,
 } from '../components/common/SpecIcons';
 import { useComparison } from '../contexts/ComparisonContext';
-import RacketRadarChart from '../components/features/RacketRadarChart';
+import RacketRadarChartLazy from '../components/features/RacketRadarChartLazy';
 import SEO from '../components/seo/SEO';
+
+// Deferred behind auth-gated sections (or opened on demand) so anonymous
+// visitors — who never reach these — don't pull recharts/framer-motion into
+// the chunk RacketDetailPage ships on first paint.
+const AddToListModal = lazy(() =>
+  import('../components/features/AddToListModal').then(m => ({ default: m.AddToListModal }))
+);
+const EditRacketModal = lazy(() =>
+  import('../components/admin/EditRacketModal').then(m => ({ default: m.EditRacketModal }))
+);
+const PriceHistoryChart = lazy(() =>
+  import('../components/features/PriceHistoryChart').then(m => ({ default: m.PriceHistoryChart }))
+);
+const ProductReviews = lazy(() =>
+  import('../components/features/ProductReviews').then(m => ({ default: m.ProductReviews }))
+);
 import {
   organizationSchema,
   productSchema,
@@ -1334,10 +1347,8 @@ const RacketDetailPage: React.FC = () => {
   const { isAuthenticated } = useAuth();
   const { openLogin, openRegister } = useAuthModal();
   const { addRacket, isRacketInComparison } = useComparison();
+  const queryClient = useQueryClient();
 
-  const [racket, setRacket] = useState<Racket | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
   const [showAddToListModal, setShowAddToListModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
@@ -1357,39 +1368,38 @@ const RacketDetailPage: React.FC = () => {
     target.src = '/placeholder-racket.svg';
   };
 
+  // ── Load racket data ──────────────────────────────────────────────
+  // Seeds from the catalog's already-populated ['rackets','all'] cache (see
+  // RacketsContext, staleTime 30min) when navigating from a card — the page
+  // paints immediately with that data while the slug-keyed query (all
+  // columns, matches the router loader's queryKey) revalidates in the
+  // background. Direct URL entry has no seed, so it falls through to the
+  // real fetch and the skeleton below.
+  const catalogSeed = queryClient
+    .getQueryData<Racket[]>(['rackets', 'all'])
+    ?.find(r => r.slug === slug);
+
+  const {
+    data: racket,
+    isLoading: loading,
+    error: queryError,
+  } = useQuery<Racket | null, Error>({
+    queryKey: ['racket', 'slug', slug],
+    queryFn: () => racketService.getRacketBySlug(slug),
+    enabled: !!slug,
+    staleTime: 1000 * 60 * 5,
+    placeholderData: catalogSeed,
+  });
+
+  const handleRacketUpdate = useCallback(
+    (updated: Racket) => {
+      queryClient.setQueryData(['racket', 'slug', slug], updated);
+    },
+    [queryClient, slug]
+  );
+
   // Obtener estadísticas de reviews
   const { stats: reviewStats, loading: reviewStatsLoading } = useReviewStats(racket?.id);
-
-  // ── Load racket data ──────────────────────────────────────────────
-  const loadRacket = useCallback(async () => {
-    if (!slug) {
-      setError('Racket not found');
-      setLoading(false);
-      return;
-    }
-
-    try {
-      setError(null);
-      setLoading(true);
-      const foundRacket = await racketService.getRacketBySlug(slug);
-
-      if (foundRacket) {
-        setRacket(foundRacket);
-        setError(null);
-      } else {
-        setError('Racket not found');
-      }
-    } catch (err: any) {
-      console.error('Error loading racket:', err);
-      setError(err.message || 'Error loading racket');
-    } finally {
-      setLoading(false);
-    }
-  }, [slug]);
-
-  useEffect(() => {
-    loadRacket();
-  }, [loadRacket]);
 
   useEffect(() => {
     if (racket?.id && isAuthenticated) {
@@ -1452,17 +1462,26 @@ const RacketDetailPage: React.FC = () => {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [selectedImageIndex, racket]);
 
-  // Sticky price bar on scroll (mobile only)
+  // Sticky price bar on scroll (mobile only) — rAF-throttled, and only
+  // touches state when the visibility actually flips, instead of dispatching
+  // a setState (and re-render) on every scroll/resize tick.
+  const showStickyBarRef = useRef(false);
   useEffect(() => {
-    const handleScroll = () => {
-      const scrollY = window.scrollY;
-      const priceCardPosition = 600; // Approximate position where price card is off screen
+    let rafId: number | null = null;
 
-      if (scrollY > priceCardPosition && window.innerWidth <= 768) {
-        setShowStickyBar(true);
-      } else {
-        setShowStickyBar(false);
-      }
+    const handleScroll = () => {
+      if (rafId !== null) return;
+      rafId = requestAnimationFrame(() => {
+        rafId = null;
+        const scrollY = window.scrollY;
+        const priceCardPosition = 600; // Approximate position where price card is off screen
+        const next = scrollY > priceCardPosition && window.innerWidth <= 768;
+
+        if (next !== showStickyBarRef.current) {
+          showStickyBarRef.current = next;
+          setShowStickyBar(next);
+        }
+      });
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
@@ -1471,6 +1490,7 @@ const RacketDetailPage: React.FC = () => {
     return () => {
       window.removeEventListener('scroll', handleScroll);
       window.removeEventListener('resize', handleScroll);
+      if (rafId !== null) cancelAnimationFrame(rafId);
     };
   }, []);
 
@@ -1517,9 +1537,14 @@ const RacketDetailPage: React.FC = () => {
     ];
   }, [racket]);
 
+  // Memoized so a re-render triggered by unrelated state (sticky bar,
+  // gallery index, watch form) doesn't re-walk the store list.
+  const lowestPrice = useMemo(() => (racket ? getLowestPrice(racket) : null), [racket]);
+  const allPrices = useMemo(() => (racket ? getAllStorePrices(racket) : []), [racket]);
+
   if (loading) return <RacketDetailSkeleton />;
 
-  if (error || !racket) {
+  if (queryError || !racket) {
     return (
       <div
         style={{
@@ -1563,7 +1588,7 @@ const RacketDetailPage: React.FC = () => {
               fontSize: '1rem',
             }}
           >
-            {error || 'No hemos podido encontrar la pala que buscas.'}
+            {queryError?.message || 'No hemos podido encontrar la pala que buscas.'}
           </p>
           <div
             style={{
@@ -1634,8 +1659,6 @@ const RacketDetailPage: React.FC = () => {
     );
   }
 
-  const lowestPrice = getLowestPrice(racket);
-  const allPrices = getAllStorePrices(racket);
   const availablePrices = allPrices.filter(p => p.available);
   const productUrl = buildUrl(`/palas/${racket.slug}`);
 
@@ -1665,7 +1688,11 @@ const RacketDetailPage: React.FC = () => {
           <MainImage
             key={selectedImageIndex}
             $entering={slideDirectionRef.current}
-            src={racketImageUrl(racket.imagenes?.[selectedImageIndex] || racket.imagenes?.[0])}
+            src={racketImageUrl(
+              racket.imagenes?.[selectedImageIndex] || racket.imagenes?.[0],
+              undefined,
+              450
+            )}
             alt={formatRacketName(racket)}
             onError={handleImageError}
             role='button'
@@ -1699,7 +1726,7 @@ const RacketDetailPage: React.FC = () => {
                     {racket.imagenes.map((img, index) => (
                       <Thumbnail
                         key={index}
-                        src={racketImageUrl(img)}
+                        src={racketImageUrl(img, undefined, 140)}
                         alt={`${formatRacketName(racket)} - imagen ${index + 1}`}
                         $isActive={index === selectedImageIndex}
                         role='button'
@@ -1969,10 +1996,12 @@ const RacketDetailPage: React.FC = () => {
         {/* Lower Right: Price History - Only show for authenticated users */}
         {isAuthenticated && (
           <div>
-            <PriceHistoryChart
-              racketId={racket.id!}
-              currentPrice={lowestPrice?.price || racket.precio_actual || 0}
-            />
+            <Suspense fallback={null}>
+              <PriceHistoryChart
+                racketId={racket.id!}
+                currentPrice={lowestPrice?.price || racket.precio_actual || 0}
+              />
+            </Suspense>
           </div>
         )}
       </LowerGrid>
@@ -1983,7 +2012,7 @@ const RacketDetailPage: React.FC = () => {
           <PerformanceContainer>
             <PerformanceGrid>
               <ChartWrapper>
-                <RacketRadarChart metrics={radarData} />
+                <RacketRadarChartLazy metrics={radarData} />
               </ChartWrapper>
               <ProgressWrapper>
                 <ProgressBarContainer>
@@ -2086,7 +2115,9 @@ const RacketDetailPage: React.FC = () => {
       {/* Reviews - Only show for authenticated users */}
       {isAuthenticated && (
         <div style={{ maxWidth: '1400px', margin: '3rem auto', padding: '0 2rem' }}>
-          <ProductReviews racketId={racket.id!} />
+          <Suspense fallback={null}>
+            <ProductReviews racketId={racket.id!} />
+          </Suspense>
         </div>
       )}
 
@@ -2116,19 +2147,23 @@ const RacketDetailPage: React.FC = () => {
       )}
 
       {/* Modals */}
-      <AddToListModal
-        isOpen={showAddToListModal}
-        onClose={() => setShowAddToListModal(false)}
-        racketId={racket.id || 0}
-        racketName={`${racket.marca} ${racket.modelo}`}
-      />
-      {showEditModal && (
-        <EditRacketModal
-          isOpen={showEditModal}
-          onClose={() => setShowEditModal(false)}
-          racket={racket}
-          onUpdate={setRacket}
+      <Suspense fallback={null}>
+        <AddToListModal
+          isOpen={showAddToListModal}
+          onClose={() => setShowAddToListModal(false)}
+          racketId={racket.id || 0}
+          racketName={`${racket.marca} ${racket.modelo}`}
         />
+      </Suspense>
+      {showEditModal && (
+        <Suspense fallback={null}>
+          <EditRacketModal
+            isOpen={showEditModal}
+            onClose={() => setShowEditModal(false)}
+            racket={racket}
+            onUpdate={handleRacketUpdate}
+          />
+        </Suspense>
       )}
 
       {/* Image Lightbox */}

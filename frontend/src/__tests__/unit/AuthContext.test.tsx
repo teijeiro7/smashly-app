@@ -233,3 +233,58 @@ test('signIn returns friendly error on invalid credentials', async () => {
     expect(screen.getByTestId('error').textContent).toMatch('Credenciales inválidas');
   });
 });
+
+test('ready resolves even when the provider re-renders before the session settles', async () => {
+  // Regression: `ready` is the promise every router beforeLoad guard awaits
+  // before deciding whether to let a request through. It used to be built
+  // with `useRef(new Promise(...))` — whose argument React re-evaluates on
+  // EVERY render, rebinding the captured `resolve` to a fresh throwaway
+  // promise while `readyRef.current` kept the original. Any re-render before
+  // the session settled (StrictMode, or any of this provider's own setState
+  // calls) therefore orphaned the promise the guards were already awaiting:
+  // it never resolved, requireAdmin hung forever, the router never finished
+  // its initial load, and RouterProvider rendered null — a black screen with
+  // an empty #root and no error anywhere.
+  let releaseSession: (value: unknown) => void = () => {};
+  const pendingSession = new Promise(resolve => {
+    releaseSession = resolve;
+  });
+  const { supabase } = await import('../../lib/supabase');
+  (supabase.auth.getSession as any).mockImplementationOnce(() => pendingSession);
+
+  let capturedReady: Promise<void> | undefined;
+  const ReadyProbe: React.FC = () => {
+    const { ready } = useAuth();
+    // Capture what a guard would have grabbed on the very first render.
+    if (!capturedReady) capturedReady = ready;
+    return null;
+  };
+
+  const { rerender } = render(
+    <AuthProvider>
+      <ReadyProbe />
+    </AuthProvider>
+  );
+
+  // Re-render while getSession() is still in flight.
+  rerender(
+    <AuthProvider>
+      <ReadyProbe />
+      <span />
+    </AuthProvider>
+  );
+
+  await act(async () => {
+    releaseSession({ data: { session: mockSession } });
+    await pendingSession;
+  });
+
+  // Fail fast instead of hanging the suite if the promise was orphaned.
+  const timedOut = Symbol('timed-out');
+  const outcome = await Promise.race([
+    capturedReady!.then(() => 'resolved'),
+    new Promise(resolve => setTimeout(() => resolve(timedOut), 1000)),
+  ]);
+
+  expect(outcome).toBe('resolved');
+});

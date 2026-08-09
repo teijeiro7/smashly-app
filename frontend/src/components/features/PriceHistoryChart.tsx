@@ -190,13 +190,17 @@ export const PriceHistoryChart: React.FC<PriceHistoryChartProps> = ({ racketId, 
     };
   }, [racketId, days]);
 
-  // Determinar el precio más bajo y más alto globales para el badge
+  // Determinar el precio más bajo y más alto globales para el badge.
+  // `reduce` instead of `Math.min(...prices)`/`Math.max(...prices)` — the
+  // spread blows the call-stack argument limit on long price histories.
   const { globalMin, globalMax } = useMemo(() => {
     if (!historyData || historyData.combined.length === 0) {
       return { globalMin: null, globalMax: null };
     }
     const prices = historyData.combined.map(p => p.price);
-    return { globalMin: Math.min(...prices), globalMax: Math.max(...prices) };
+    const globalMin = prices.reduce((min, p) => (p < min ? p : min), prices[0]);
+    const globalMax = prices.reduce((max, p) => (p > max ? p : max), prices[0]);
+    return { globalMin, globalMax };
   }, [historyData]);
 
   // Construir datos para Recharts: un punto por fecha con precio de cada tienda
@@ -206,45 +210,38 @@ export const PriceHistoryChart: React.FC<PriceHistoryChartProps> = ({ racketId, 
   const chartData = useMemo(() => {
     if (!historyData || historyData.stores.length === 0) return null;
 
-    // Combinar todos los timestamps únicos
+    // Un Map<fecha, precio> por tienda en una sola pasada — evita el
+    // `.find()` anidado (O(fechas × historial)) al construir cada punto.
+    const priceByDateByStore = new Map<string, Map<string, number>>();
     const allDates = new Set<string>();
-    historyData.stores.forEach(s => s.history.forEach(p => allDates.add(p.date)));
+
+    historyData.stores.forEach(s => {
+      const priceByDate = new Map<string, number>();
+      s.history.forEach(p => {
+        priceByDate.set(p.date, p.price);
+        allDates.add(p.date);
+      });
+      priceByDateByStore.set(s.store, priceByDate);
+    });
+
     const sortedDates = Array.from(allDates).sort();
 
-    // Agregar tiendas no-main a "otras"
-    const otherStorePrices: Record<string, Record<string, number>> = {};
-
-    // Para cada fecha, obtener el precio de cada tienda (o null si no hay dato)
     return sortedDates.map(date => {
       const point: Record<string, any> = { date: formatDate(date) };
+      let otras: number | null = null;
 
       historyData.stores.forEach(s => {
-        const match = s.history.find(p => p.date === date);
-        const price = match ? match.price : null;
+        const price = priceByDateByStore.get(s.store)?.get(date) ?? null;
 
         if (MAIN_STORES.includes(s.store)) {
           point[s.store] = price;
-        } else {
-          // Acumular en "otras"
-          if (!otherStorePrices[date]) otherStorePrices[date] = {};
-          if (price !== null) {
-            // Si ya hay un precio para esa fecha en "otras", mantener el más bajo
-            if (otherStorePrices[date]['otras'] !== undefined) {
-              otherStorePrices[date]['otras'] = Math.min(otherStorePrices[date]['otras'], price);
-            } else {
-              otherStorePrices[date]['otras'] = price;
-            }
-          }
+        } else if (price !== null) {
+          // Acumular en "otras", quedándonos con el más bajo de ese día
+          otras = otras === null ? price : Math.min(otras, price);
         }
       });
 
-      // Asignar precios de "otras"
-      if (otherStorePrices[date]) {
-        point['otras'] = otherStorePrices[date]['otras'] ?? null;
-      } else {
-        point['otras'] = null;
-      }
-
+      point['otras'] = otras;
       return point;
     });
   }, [historyData]);

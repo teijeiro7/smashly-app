@@ -132,14 +132,12 @@ describe('RacketService', () => {
       await expect(racketService.getAllRackets()).rejects.toThrow('Server error');
     });
 
-    it('excludes discontinued rackets without dropping NULL ones', async () => {
-      // Must be not.is.true, never eq.false: `discontinued = false` is NULL
-      // for a NULL column, so eq.false would silently drop those rows from
-      // the whole catalog instead of showing them.
+    it('excludes discontinued rackets via IS NOT TRUE (discontinued is a real, nullable column)', async () => {
       await racketService.getAllRackets();
-
-      // `from()` builds a fresh chain per call — grab the one it just returned.
       const chain = supabase.from.mock.results[0].value;
+      // `discontinued = false` would silently drop rows where the column is
+      // NULL (unknown status) instead of showing them, so this must be
+      // `not(discontinued, is, true)` rather than `eq(discontinued, false)`.
       expect(chain.not).toHaveBeenCalledWith('discontinued', 'is', true);
       expect(chain.eq).not.toHaveBeenCalledWith('discontinued', false);
     });

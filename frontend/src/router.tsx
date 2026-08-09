@@ -17,11 +17,13 @@ import NicknamePromptModal from './components/auth/NicknamePromptModal';
 import { useAuth } from './contexts/AuthContext';
 import { useAuthModal } from './contexts/AuthModalContext';
 import { supabase } from './lib/supabase';
+import { queryClient } from './lib/queryClient';
 import racketService from './services/racketService';
 import { RouteLoadingFallback, CatalogSkeleton } from './components/common/LoadingFallbacks';
 import { PWAInstallPrompt } from './components/pwa/PWAInstallPrompt';
 import { BackgroundTaskPopup } from './components/common/BackgroundTaskPopup';
 import LoadingSpinner from './components/common/LoadingSpinner';
+import ErrorBoundary from './components/ErrorBoundary';
 import { logger } from './utils/logger';
 import { sileo } from 'sileo';
 
@@ -314,14 +316,14 @@ const RootOutlet: React.FC = () => {
   }, [pathname]);
 
   return (
-    <>
+    <ErrorBoundary>
       <div aria-live='polite' className='sr-only'>
         Página actualizada
       </div>
       <AnimatePresence mode='wait'>
         <Outlet key={pathname} />
       </AnimatePresence>
-    </>
+    </ErrorBoundary>
   );
 };
 
@@ -411,6 +413,16 @@ const catalogRoute = createRoute({
 const racketDetailRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/palas/$slug',
+  // Preloads the same queryKey RacketDetailPage's useQuery reads — with
+  // defaultPreload: 'intent' below, hovering a card that links here fires
+  // this before the click, so the page renders with data already in cache.
+  loader: async ({ params }) => {
+    await queryClient.ensureQueryData({
+      queryKey: ['racket', 'slug', params.slug],
+      queryFn: () => racketService.getRacketBySlug(params.slug),
+      staleTime: 1000 * 60 * 5,
+    });
+  },
   component: () => (
     <LazyRoute>
       <RacketDetailPage />

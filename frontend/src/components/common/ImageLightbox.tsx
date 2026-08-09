@@ -224,7 +224,7 @@ export const ImageLightbox: React.FC<ImageLightboxProps> = ({
               if (currentIndex < images.length - 1) onNavigate(currentIndex + 1);
             }}
             disabled={currentIndex === images.length - 1}
-            aria-label='Siguiente imagen'
+            aria-label='Imagen siguiente'
           >
             <FiChevronRight size={24} />
           </NavigationButton>

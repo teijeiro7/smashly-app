@@ -28,8 +28,6 @@ export interface AdminMetrics {
   pendingRequests: number;
   activeUsers: number;
   totalFavorites: number;
-  usersChange: number;
-  racketsChange: number;
 }
 
 export interface AdminUser {
@@ -298,6 +296,26 @@ export class AdminService {
     });
 
     return handleApiResponse<Activity[]>(response);
+  }
+
+  /**
+   * Obtiene la cantidad de conflictos de palas pendientes de revisión (optimizado)
+   */
+  static async getRacketConflictsCount(): Promise<number> {
+    try {
+      const response = await fetch(
+        buildApiUrl(API_ENDPOINTS.ADMIN.CONFLICTS, { countOnly: 'true' }),
+        {
+          method: 'GET',
+          headers: await getAuthHeaders(),
+        }
+      );
+
+      const res = await handleApiResponse<{ count: number }>(response);
+      return res?.count ?? 0;
+    } catch {
+      return 0;
+    }
   }
 
   /**

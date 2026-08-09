@@ -32,15 +32,19 @@ async function handleGetAll(req: IncomingMessage, res: ServerResponse): Promise<
     if (!(await isAdmin(user.id))) return forbidden(res);
   }
 
-  const query = supabaseAdmin.from('stores').select('*');
+  const page = Math.max(parseInt(url.searchParams.get('page') || '1', 10) || 1, 1);
+  const limit = Math.min(Math.max(parseInt(url.searchParams.get('limit') || '50', 10) || 50, 1), 200);
+  const from = (page - 1) * limit;
+
+  let query = supabaseAdmin.from('stores').select('*', { count: 'exact' });
 
   if (verified === 'true') {
-    query.eq('status', 'verified');
+    query = query.eq('status', 'verified');
   } else if (verified === 'false') {
-    query.eq('status', 'pending');
+    query = query.eq('status', 'pending');
   }
 
-  const { data, error } = await query;
+  const { data, error, count } = await query.range(from, from + limit - 1);
 
   if (error) {
     res.writeHead(500, { 'Content-Type': 'application/json' });
@@ -48,8 +52,21 @@ async function handleGetAll(req: IncomingMessage, res: ServerResponse): Promise<
     return;
   }
 
-  res.writeHead(200, { 'Content-Type': 'application/json' });
-  res.end(JSON.stringify(data));
+  // Bug fix: this previously res.end(JSON.stringify(data)) — a bare array —
+  // while adminService.ts::handleApiResponse always expects {success, data},
+  // so every call (AdminService.getStoreRequests()) threw. Match the shape
+  // every other admin endpoint already uses.
+  res.writeHead(200, {
+    'Content-Type': 'application/json',
+    'Cache-Control': 'private, max-age=30, stale-while-revalidate=120',
+  });
+  res.end(
+    JSON.stringify({
+      success: true,
+      data: data || [],
+      pagination: { page, limit, total: count ?? 0 },
+    })
+  );
 }
 
 async function handleCreate(req: IncomingMessage, res: ServerResponse): Promise<void> {

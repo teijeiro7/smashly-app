@@ -1,10 +1,32 @@
 import type { IncomingMessage, ServerResponse } from 'http';
+import { jwtVerify } from 'jose';
 import { supabaseAdmin, supabaseAnon } from './supabase';
+import { cacheGet, cacheSet } from './cache';
 
 export interface AuthUser {
   id: string;
   email?: string;
 }
+
+// This project's Supabase instance signs JWTs with the legacy HS256 shared
+// secret (confirmed by decoding the anon key header: {"alg":"HS256"} — there
+// is no "sb_publishable_..." key, i.e. no asymmetric JWT signing keys /
+// JWKS in use here). Verifying locally with that secret avoids the network
+// round-trip that supabaseAnon.auth.getUser(token) makes on every request.
+const JWT_SECRET = process.env.SUPABASE_JWT_SECRET;
+const jwtSecretKey = JWT_SECRET ? new TextEncoder().encode(JWT_SECRET) : null;
+if (!jwtSecretKey) {
+  // Logged once at module load (cold start) so it shows up clearly in
+  // Vercel logs — every request will otherwise silently pay for the
+  // auth.getUser() network round-trip without anyone noticing why.
+  console.warn(
+    '[auth] SUPABASE_JWT_SECRET no está definida — usando supabaseAnon.auth.getUser() ' +
+      '(round-trip de red) en lugar de verificación local del JWT. Configura ' +
+      'SUPABASE_JWT_SECRET (Project Settings > API > JWT Secret en Supabase) para evitarlo.'
+  );
+}
+
+const ADMIN_ROLE_CACHE_TTL_MS = 60 * 1000;
 
 /** Parse JSON body from request */
 export async function readBody(req: IncomingMessage): Promise<any> {
@@ -24,20 +46,53 @@ export async function getAuthUser(req: IncomingMessage): Promise<AuthUser | null
   const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : null;
   if (!token) return null;
 
-  const { data: { user }, error } = await supabaseAnon.auth.getUser(token);
-  if (error || !user) return null;
+  // Fallback: no JWT secret configured, verify via Supabase's Auth API
+  // (network round-trip) exactly like before.
+  if (!jwtSecretKey) {
+    const { data: { user }, error } = await supabaseAnon.auth.getUser(token);
+    if (error || !user) return null;
+    return { id: user.id, email: user.email };
+  }
 
-  return { id: user.id, email: user.email };
+  // Local verification: same failure behavior as the network path above
+  // (invalid signature, expired, wrong audience → null → caller returns 401).
+  try {
+    const { payload } = await jwtVerify(token, jwtSecretKey, {
+      algorithms: ['HS256'],
+      audience: 'authenticated',
+    });
+    if (typeof payload.sub !== 'string') return null;
+    return { id: payload.sub, email: typeof payload.email === 'string' ? payload.email : undefined };
+  } catch {
+    return null;
+  }
 }
 
-/** Verify user is admin by checking user_profiles.role = 'Admin' */
+/**
+ * Verify user is admin by checking user_profiles.role = 'Admin'.
+ *
+ * The role is ALWAYS read from the database, never from the JWT payload —
+ * user_metadata/app_metadata in a Supabase JWT can be influenced by the
+ * user themselves (see supabase/migrations/20260728000001_fix_role_privilege_escalation.sql,
+ * a real privilege-escalation bug that existed for exactly this reason).
+ * Trusting a "role" claim on the token instead of this query would reopen
+ * that hole. The DB lookup result is cached per user id for 60s (in-memory,
+ * per warm Vercel instance — see api/_lib/cache.ts) since /admin fires this
+ * check on every one of several parallel requests.
+ */
 export async function isAdmin(userId: string): Promise<boolean> {
+  const cacheKey = `admin-role:${userId}`;
+  const cached = cacheGet<boolean>(cacheKey);
+  if (cached !== null) return cached;
+
   const { data } = await supabaseAdmin
     .from('user_profiles')
     .select('role')
     .eq('id', userId)
     .single();
-  return data?.role === 'Admin';
+  const result = data?.role === 'Admin';
+  cacheSet(cacheKey, result, ADMIN_ROLE_CACHE_TTL_MS);
+  return result;
 }
 
 /**

@@ -166,12 +166,27 @@ function mapDbToFrontend(raw: any): Racket {
   } as Racket;
 }
 
+// Columns actually consumed by catalog/list views (cards, filters, price badges).
+// Excludes description/specs/search_document (~1.3MB of the ~2.3MB row payload)
+// and per-store link/timestamp columns only needed on the detail page.
+// NOTE: view_count, testea_*, and peso are NOT real columns on `rackets` — do
+// not add them here, they will 400 the query (see git history: dc3c898/38f252e).
+const CATALOG_SELECT_FIELDS = `
+  id, slug, name, brand, model, images, on_offer, created_at, updated_at, discontinued, comparison_only, store_id,
+  characteristics_balance, characteristics_core, characteristics_face, characteristics_format,
+  characteristics_hardness, characteristics_game_level, characteristics_shape, characteristics_game_type,
+  padelnuestro_actual_price, padelnuestro_original_price, padelnuestro_discount_percentage,
+  padelmarket_actual_price, padelmarket_original_price, padelmarket_discount_percentage,
+  padelproshop_actual_price, padelproshop_original_price, padelproshop_discount_percentage,
+  radar_potencia, radar_control, radar_manejabilidad, radar_punto_dulce, radar_salida_bola
+`.trim();
+
 // ── Service ───────────────────────────────────────────────────────────────────
 const racketService = {
   async getAllRackets(): Promise<Racket[]> {
     const { data, error } = await supabase
       .from('rackets')
-      .select('*')
+      .select(CATALOG_SELECT_FIELDS)
       // not.is.true rather than eq.false: `discontinued = false` evaluates to
       // NULL for a NULL column and would drop the row from the catalog
       // silently. NULL means "not known to be discontinued" — it must show.
@@ -191,7 +206,8 @@ const racketService = {
     const from = page * limit;
     const { data, error } = await supabase
       .from('rackets')
-      .select('*')
+      .select(CATALOG_SELECT_FIELDS)
+      .not('discontinued', 'is', true)
       .order('name')
       .range(from, from + limit - 1);
 
@@ -244,37 +260,50 @@ const racketService = {
     const limit = pagination?.limit ?? 50;
     const from = page * limit;
 
-    let q = supabase.from('rackets').select('*', { count: 'exact' });
+    let q = supabase
+      .from('rackets')
+      .select(CATALOG_SELECT_FIELDS, { count: 'exact' })
+      .not('discontinued', 'is', true);
 
     if (query) {
+      // search_document is a generated concatenation of name+brand+model+specs,
+      // backed by the rackets_search_trgm GIN index — one ILIKE per word (ANDed
+      // by chaining .ilike calls) hits that index instead of the 3-column OR
+      // fan-out that used to force a sequential scan.
       const words = query.trim().split(/\s+/).filter(Boolean);
       words.forEach(word => {
-        q = q.or(`name.ilike.%${word}%,brand.ilike.%${word}%,model.ilike.%${word}%`);
+        q = q.ilike('search_document', `%${word}%`);
       });
     }
 
     if (filters) {
+      // Filter keys map to the real English column names on `rackets` — the
+      // Spanish `caracteristicas_*` names used here previously don't exist on
+      // this table (that's the mapper's frontend-facing shape, not the DB
+      // schema) and made every filtered search 400.
       const filterMap: Record<string, string> = {
         brand: 'brand',
         marca: 'brand',
-        shape: 'caracteristicas_forma',
-        forma: 'caracteristicas_forma',
-        balance: 'caracteristicas_balance',
-        core: 'caracteristicas_nucleo',
-        nucleo: 'caracteristicas_nucleo',
-        face: 'caracteristicas_cara',
-        cara: 'caracteristicas_cara',
-        hardness: 'caracteristicas_dureza',
-        dureza: 'caracteristicas_dureza',
-        game_type: 'caracteristicas_tipo_de_juego',
-        level: 'caracteristicas_nivel_de_juego',
-        nivel: 'caracteristicas_nivel_de_juego',
+        shape: 'characteristics_shape',
+        forma: 'characteristics_shape',
+        balance: 'characteristics_balance',
+        core: 'characteristics_core',
+        nucleo: 'characteristics_core',
+        face: 'characteristics_face',
+        cara: 'characteristics_face',
+        hardness: 'characteristics_hardness',
+        dureza: 'characteristics_hardness',
+        game_type: 'characteristics_game_type',
+        level: 'characteristics_game_level',
+        nivel: 'characteristics_game_level',
         on_sale: 'on_offer',
       };
       for (const [key, value] of Object.entries(filters)) {
-        if (!value) continue;
-        const col = filterMap[key] ?? key;
-        q = q.eq(col, value);
+        // Only forward filters with a known column mapping — an unmapped key
+        // (e.g. CatalogPage's `available_only`/`most_viewed`, which aren't
+        // columns) would otherwise be used verbatim as a column name and 400.
+        if (!value || !(key in filterMap)) continue;
+        q = q.eq(filterMap[key], value);
       }
     }
 
@@ -291,7 +320,8 @@ const racketService = {
   async getRacketsByBrand(marca: string): Promise<Racket[]> {
     const { data, error } = await supabase
       .from('rackets')
-      .select('*')
+      .select(CATALOG_SELECT_FIELDS)
+      .not('discontinued', 'is', true)
       .eq('brand', marca)
       .order('name');
 
@@ -301,25 +331,41 @@ const racketService = {
 
   async getBestsellerRackets(): Promise<Racket[]> {
     // es_bestseller does not exist in DB — return top rackets by name
-    const { data, error } = await supabase.from('rackets').select('*').order('name').limit(20);
+    const { data, error } = await supabase
+      .from('rackets')
+      .select(CATALOG_SELECT_FIELDS)
+      .not('discontinued', 'is', true)
+      .order('name')
+      .limit(20);
 
     if (error) throw new Error(error.message);
     return (data ?? []).map(mapDbToFrontend);
   },
 
-  async getRacketsOnSale(): Promise<Racket[]> {
-    const { data, error } = await supabase
+  async getRacketsOnSale(limit?: number): Promise<Racket[]> {
+    let query = supabase
       .from('rackets')
-      .select('*')
+      .select(CATALOG_SELECT_FIELDS)
       .eq('on_offer', true)
+      .not('discontinued', 'is', true)
       .order('name');
+
+    if (limit) {
+      query = query.limit(limit);
+    }
+
+    const { data, error } = await query;
 
     if (error) throw new Error(error.message);
     return (data ?? []).map(mapDbToFrontend);
   },
 
   async getUniqueBrands(): Promise<string[]> {
-    const { data, error } = await supabase.from('rackets').select('brand').order('brand');
+    const { data, error } = await supabase
+      .from('rackets')
+      .select('brand')
+      .not('discontinued', 'is', true)
+      .order('brand');
 
     if (error) throw new Error(error.message);
     const brands = [...new Set((data ?? []).map((r: any) => r.brand).filter(Boolean))];
@@ -333,9 +379,16 @@ const racketService = {
     brands: number;
   }> {
     const [totalRes, onSaleRes, brandsRes] = await Promise.all([
-      supabase.from('rackets').select('*', { count: 'exact', head: true }),
-      supabase.from('rackets').select('*', { count: 'exact', head: true }).eq('on_offer', true),
-      supabase.from('rackets').select('brand'),
+      supabase
+        .from('rackets')
+        .select('*', { count: 'exact', head: true })
+        .not('discontinued', 'is', true),
+      supabase
+        .from('rackets')
+        .select('*', { count: 'exact', head: true })
+        .eq('on_offer', true)
+        .not('discontinued', 'is', true),
+      supabase.from('rackets').select('brand').not('discontinued', 'is', true),
     ]);
 
     const uniqueBrands = new Set((brandsRes.data ?? []).map((r: any) => r.brand).filter(Boolean));

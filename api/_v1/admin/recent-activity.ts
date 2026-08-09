@@ -38,7 +38,10 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
   try {
     const activities = await loadRecentActivity(limit);
 
-    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.writeHead(200, {
+      'Content-Type': 'application/json',
+      'Cache-Control': 'private, max-age=30, stale-while-revalidate=120',
+    });
     res.end(JSON.stringify({ success: true, data: activities }));
   } catch (err: any) {
     console.error('[recent-activity] error:', err);

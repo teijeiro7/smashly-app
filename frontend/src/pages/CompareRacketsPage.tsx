@@ -1035,7 +1035,7 @@ const CompareRacketsPage: React.FC = () => {
                 setSearchQuery('');
                 setShowSearchResults(false);
               }}
-              aria-label='Borrar búsqueda'
+              aria-label='Limpiar búsqueda'
               style={{
                 position: 'absolute',
                 right: '1rem',
@@ -1218,7 +1218,7 @@ const CompareRacketsPage: React.FC = () => {
             >
               <RemoveButton
                 onClick={() => handleRemoveRacket(racket.id!)}
-                aria-label='Quitar pala de la comparación'
+                aria-label={`Quitar ${formatRacketName(racket)} de la comparación`}
               >
                 <FiX />
               </RemoveButton>
@@ -1272,7 +1272,7 @@ const CompareRacketsPage: React.FC = () => {
                   setComparisonMetrics(null);
                   setSelectedRackets([]);
                 }}
-                aria-label='Cerrar'
+                aria-label='Cerrar comparación'
               >
                 <FiX size={24} />
               </CloseButton>

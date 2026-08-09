@@ -188,7 +188,9 @@ const ListPage: React.FC = () => {
         {!list.rackets || list.rackets.length === 0 ? (
           <EmptyState>
             <FiList size={48} style={{ marginBottom: '1rem', opacity: 0.2 }} />
-            <h2 style={{ fontSize: '1.17em', fontWeight: 'bold' }}>Esta lista está vacía</h2>
+            <h2 style={{ fontSize: 'clamp(1.25rem, 2vw + 0.5rem, 1.75rem)', fontWeight: 600 }}>
+              Esta lista está vacía
+            </h2>
             <p>Empieza a añadir palas desde el catálogo para verlas aquí.</p>
             <Link
               to='/catalog'
