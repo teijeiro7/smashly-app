@@ -3,6 +3,9 @@
  * Configuración centralizada para las llamadas a la API REST
  */
 import { supabase } from '../lib/supabase';
+import { withTimeout } from '../utils/withTimeout';
+
+const GET_SESSION_TIMEOUT_MS = 8000;
 
 // URL base de la API
 // Por defecto, usa el mismo origen que sirve la SPA (evita CSP y mixed content)
@@ -98,15 +101,28 @@ export const buildApiUrl = (endpoint: string, params?: Record<string, any>): str
  * (`getAuthUser`) espera en el servidor.
  */
 export const getAuthHeaders = async (): Promise<HeadersInit> => {
+  // getSession()/refreshSession() share a single-tab lock with every other
+  // auth call in the app (see lib/supabase.ts's `processLock` comment); if
+  // that lock's queue ever stalls, this would otherwise hang forever with no
+  // error — silently blocking every API call. withTimeout bounds it: on
+  // timeout, headers come back without a token and the request 401s
+  // normally instead of never firing at all.
   let {
     data: { session },
-  } = await supabase.auth.getSession();
+  } = await withTimeout(supabase.auth.getSession(), GET_SESSION_TIMEOUT_MS, () => ({
+    data: { session: null },
+    error: null,
+  }));
 
   // If session token is expired or expiring within 60 seconds, refresh it
   if (session?.expires_at) {
     const nowInSeconds = Math.floor(Date.now() / 1000);
     if (session.expires_at - nowInSeconds < 60) {
-      const { data: refreshData } = await supabase.auth.refreshSession();
+      const { data: refreshData } = await withTimeout(
+        supabase.auth.refreshSession(),
+        GET_SESSION_TIMEOUT_MS,
+        () => ({ data: { session: null, user: null }, error: null })
+      );
       if (refreshData?.session) {
         session = refreshData.session;
       }
