@@ -812,7 +812,7 @@ export const PlayerDashboard: React.FC = () => {
                     <RacketPosition>#{index + 1}</RacketPosition>
                     <RacketImageWrap>
                       {racket.image ? (
-                        <RacketImageSmall src={racket.image} alt={racket.name} />
+                        <RacketImageSmall src={racketImageUrl(racket.image)} alt={racket.name} />
                       ) : null}
                     </RacketImageWrap>
                     <RecommendedRacketBody>

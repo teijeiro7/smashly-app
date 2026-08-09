@@ -2,6 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { RecommendationResult as ResultType } from '../../types/recommendation';
 import { Link } from '@tanstack/react-router';
+import { racketImageUrl } from '../../utils/imageUrl';
 
 const ResultContainer = styled.div`
   max-width: 1200px;
@@ -430,7 +431,7 @@ export const RecommendationResult: React.FC<Props> = ({
             </RacketHeader>
 
             <RacketContent>
-              {racket.image && <RacketImage src={racket.image} alt={racket.name} />}
+              {racket.image && <RacketImage src={racketImageUrl(racket.image)} alt={racket.name} />}
 
               {/* Biomechanical Safety */}
               {racket.biomechanical_safety && (
