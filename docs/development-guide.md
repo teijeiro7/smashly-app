@@ -153,7 +153,7 @@ Para el mantenimiento del servidor remoto y el despliegue en el entorno externo:
 ![API Documentation](../public/images/readme-images/api-documentation.png)
 
 📄 **Documentación disponible en:**
-👉 [https://codeurjc-students.github.io/2025-Smashlyapp/](https://codeurjc-students.github.io/2025-Smashlyapp/)
+👉 [https://github.com/teijeiro7/smashly-app](https://github.com/teijeiro7/smashly-app)
 
 ---
 
@@ -217,8 +217,8 @@ Para el mantenimiento del servidor remoto y el despliegue en el entorno externo:
 ### 📂 **Clonado y requisitos**
 
 ```bash
-git clone https://github.com/codeurjc-students/2025-Smashlyapp.git
-cd 2025-Smashlyapp
+git clone https://github.com/teijeiro7/smashly-app.git
+cd smashly-app
 ```
 
 **Requisitos locales:**
@@ -323,6 +323,6 @@ mvn test -Dtest.browser=chrome -Dtest.headless=true \
 
 <div align="center">
 
-_Smashly © 2025 — Trabajo Fin de Grado_
+_Smashly © 2025_
 
 </div>

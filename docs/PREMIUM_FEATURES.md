@@ -1,6 +1,6 @@
 # Smashly Premium — Ideas de Funcionalidades
 
-> Documento de referencia para la estrategia de monetización post-TFG.
+> Documento de referencia para la estrategia de monetización.
 > Infraestructura base ya lista: `ContentLock`, `BlurTeaser`, RBAC, OpenRouter, RAG, embeddings, price_history.
 
 ---

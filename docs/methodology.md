@@ -9,5 +9,5 @@ The project is developed **iteratively**, in phases that guarantee continuous an
 | 🐳 Phase 3 | **Basic functionality and Docker setup** | 15 December 2025 | - | - |
 | ⚡ Phase 4 | **Intermediate functionality** | 1 March 2026 | - | - |
 | 🚀 Phase 5 | **Advanced functionality** | 15 April 2026 | - | - |
-| 📖 Phase 6 | **TFG Memory** | 15 May 2026 | - | - |
-| 🎓 Phase 7 | **Final Presentation and Defense** | 15 June 2026 | - | - |
+| 📖 Phase 6 | **Technical documentation** | 15 May 2026 | - | - |
+| 🚀 Phase 7 | **Deployment and launch** | 15 June 2026 | - | - |
