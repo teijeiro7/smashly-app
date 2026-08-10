@@ -1,28 +1,41 @@
 import {
   createRouter,
   createRoute,
-  createRootRoute,
+  createRootRouteWithContext,
   Outlet,
   redirect,
-  Navigate,
+  useRouterState,
+  useSearch,
 } from '@tanstack/react-router';
-import React, { lazy, Suspense } from 'react';
-import { AnimatePresence } from 'framer-motion';
+import React, { lazy, Suspense, useEffect } from 'react';
+import { AnimatePresence, MotionConfig } from 'framer-motion';
 
 import Layout from './components/layout/Layout';
-import { ScrollToTop } from './components/common/ScrollToTop';
 import { FloatingCompareButton } from './components/common/FloatingCompareButton';
 import AuthModal from './components/auth/AuthModal';
 import NicknamePromptModal from './components/auth/NicknamePromptModal';
 import { useAuth } from './contexts/AuthContext';
 import { useAuthModal } from './contexts/AuthModalContext';
 import { supabase } from './lib/supabase';
+import { queryClient } from './lib/queryClient';
+import racketService from './services/racketService';
 import { RouteLoadingFallback, CatalogSkeleton } from './components/common/LoadingFallbacks';
 import { PWAInstallPrompt } from './components/pwa/PWAInstallPrompt';
 import { BackgroundTaskPopup } from './components/common/BackgroundTaskPopup';
 import LoadingSpinner from './components/common/LoadingSpinner';
+import ErrorBoundary from './components/ErrorBoundary';
 import { logger } from './utils/logger';
 import { sileo } from 'sileo';
+
+// ──────────────────────────────────────────────────────────────────────────────
+// Router context — the AuthProvider value is injected by main.tsx so guards
+// read live auth state instead of running their own Supabase queries.
+// ──────────────────────────────────────────────────────────────────────────────
+type AuthCtx = ReturnType<typeof useAuth>;
+
+export interface RouterContext {
+  auth: AuthCtx;
+}
 
 // ──────────────────────────────────────────────────────────────────────────────
 // Lazy page components
@@ -88,7 +101,7 @@ class LazyChunkErrorBoundary extends React.Component<
     if (this.state.hasError) {
       return (
         this.props.fallback ?? (
-          <div style={{ padding: '2rem', textAlign: 'center' }}>
+          <div role='alert' style={{ padding: '2rem', textAlign: 'center' }}>
             <p>
               Error loading page. <button onClick={this.handleRetry}>Retry</button>
             </p>
@@ -109,49 +122,119 @@ const LazyRoute: React.FC<{ children: React.ReactNode; fallback?: React.ReactNod
   </LazyChunkErrorBoundary>
 );
 
-// ──────────────────────────────────────────────────────────────────────────────
-// Auth helpers for beforeLoad guards
-// ──────────────────────────────────────────────────────────────────────────────
-async function requireAuth() {
-  const {
-    data: { session },
-  } = await supabase.auth.getSession();
-  if (!session) throw redirect({ to: '/' });
-  return session;
+/** Builds `{ [key]: value }` only when `value` is a string, `{}` otherwise —
+ * used so every validateSearch key comes out optional (`key?: string`)
+ * rather than required-but-possibly-undefined (`key: string | undefined`).
+ * TanStack only lets a caller omit `search` entirely when every key in the
+ * route's search schema is optional; the latter shape looks optional at the
+ * value level but the key is still mandatory, which made `search` required
+ * on every navigate/Link to these routes across the app. */
+function pickString<K extends string>(
+  obj: Record<string, unknown>,
+  key: K
+): Partial<Record<K, string>> {
+  const value = obj[key];
+  return typeof value === 'string' ? ({ [key]: value } as Partial<Record<K, string>>) : {};
 }
 
-async function requireAdmin() {
-  const session = await requireAuth();
-  const { data } = await supabase
-    .from('user_profiles')
-    .select('role')
-    .eq('id', session.user.id)
-    .single();
-  if (data?.role?.toLowerCase() !== 'admin') {
-    throw redirect({ to: '/error' as any });
+// ──────────────────────────────────────────────────────────────────────────────
+// Auth helpers for beforeLoad guards
+//
+// All four read from `context.auth` (the live AuthProvider value, injected by
+// main.tsx) instead of querying Supabase directly — one shared source of
+// truth with the rest of the app, and no query fired on every `intent`
+// preload hover. `context.auth.ready` is awaited first so a hard refresh on
+// a protected route never races the pre-hydration flash of
+// `isAuthenticated: false` (that race is what let a hard refresh on /admin
+// bounce a genuinely logged-in Admin out).
+// ──────────────────────────────────────────────────────────────────────────────
+// Exported (not just used internally) so the guard logic can be unit-tested
+// with a mocked `auth` object instead of only through a live browser — see
+// frontend/src/__tests__/unit/router.guards.test.ts.
+export const normalizeRole = (role?: string | null): string | undefined =>
+  role?.toLowerCase() ?? undefined;
+
+/** The user's role, normalized — retries once via refreshUserProfile() if the
+ * session is valid but the profile row didn't load (RLS hiccup, cold start).
+ * Returns undefined only if the retry also comes back empty. */
+export async function resolveRole(auth: AuthCtx): Promise<string | undefined> {
+  const direct = normalizeRole(auth.user?.role);
+  if (direct) return direct;
+  const refreshed = await auth.refreshUserProfile();
+  return normalizeRole(refreshed?.role);
+}
+
+export async function ensureAuthenticated(auth: AuthCtx, next: string): Promise<void> {
+  await auth.ready;
+  if (!auth.isAuthenticated) {
+    // A sign-out just cleared the session and is navigating to '/' — carrying
+    // `?next=` would reopen the login modal the moment the user logged out.
+    if (auth.isSigningOut) {
+      throw redirect({ to: '/' });
+    }
+    throw redirect({ to: '/', search: { next } });
   }
 }
 
-async function requireStoreOwner() {
-  const session = await requireAuth();
-  const { data } = await supabase
-    .from('user_profiles')
-    .select('role')
-    .eq('id', session.user.id)
-    .single();
-  if (data?.role !== 'Store') {
+export async function requireAuth({
+  context,
+  location,
+}: {
+  context: RouterContext;
+  location: { href: string };
+}): Promise<void> {
+  await ensureAuthenticated(context.auth, location.href);
+}
+
+export async function requireAdmin({
+  context,
+  location,
+}: {
+  context: RouterContext;
+  location: { href: string };
+}): Promise<void> {
+  await ensureAuthenticated(context.auth, location.href);
+  const role = await resolveRole(context.auth);
+  if (role === undefined) {
+    throw redirect({ to: '/error', search: { type: 'auth' } });
+  }
+  if (role !== 'admin') {
+    throw redirect({ to: '/error', search: { type: 'forbidden' } });
+  }
+}
+
+export async function requireStoreOwner({
+  context,
+  location,
+}: {
+  context: RouterContext;
+  location: { href: string };
+}): Promise<void> {
+  await ensureAuthenticated(context.auth, location.href);
+  const role = await resolveRole(context.auth);
+  if (role === undefined) {
+    throw redirect({ to: '/error', search: { type: 'auth' } });
+  }
+  if (role !== 'store') {
     throw redirect({ to: '/dashboard' });
   }
 }
 
-async function redirectStoreOwnerToDashboard() {
-  const session = await requireAuth();
-  const { data } = await supabase
-    .from('user_profiles')
-    .select('role')
-    .eq('id', session.user.id)
-    .single();
-  if (data?.role === 'Store') {
+/** `/dashboard`'s own guard: bounce Store-role accounts to their own
+ * dashboard. Deliberately lenient on an unreadable role (falls through to
+ * PlayerDashboard rather than /error) — this route isn't gating membership
+ * in a role, it only redirects a specific one elsewhere, so a transient
+ * profile-fetch hiccup shouldn't block a legitimate Player. */
+export async function redirectStoreOwnerToDashboard({
+  context,
+  location,
+}: {
+  context: RouterContext;
+  location: { href: string };
+}): Promise<void> {
+  await ensureAuthenticated(context.auth, location.href);
+  const role = await resolveRole(context.auth);
+  if (role === 'store') {
     throw redirect({ to: '/store/dashboard' });
   }
 }
@@ -181,23 +264,6 @@ const GoogleOnboardingHandler: React.FC = () => {
   );
 };
 
-// Auth modal redirects (legacy /login and /register URLs)
-const LoginRedirect: React.FC = () => {
-  const { openLogin } = useAuthModal();
-  React.useEffect(() => {
-    openLogin();
-  }, [openLogin]);
-  return <Navigate to='/' />;
-};
-
-const RegisterRedirect: React.FC = () => {
-  const { openRegister } = useAuthModal();
-  React.useEffect(() => {
-    openRegister();
-  }, [openRegister]);
-  return <Navigate to='/' />;
-};
-
 // ──────────────────────────────────────────────────────────────────────────────
 // Google block error handler (store_owner cannot use Google login)
 // ──────────────────────────────────────────────────────────────────────────────
@@ -213,31 +279,80 @@ const GoogleBlockHandler: React.FC = () => {
 };
 
 // ──────────────────────────────────────────────────────────────────────────────
+// `?next=` handler — mounted at root so it fires regardless of which public
+// route a guard redirected to. Opens the login modal automatically when a
+// rejected navigation left a `next` destination in the URL.
+// ──────────────────────────────────────────────────────────────────────────────
+const NextParamHandler: React.FC = () => {
+  const { openLogin } = useAuthModal();
+  const { isAuthenticated, ready } = useAuth();
+  const search = useSearch({ strict: false }) as { next?: string };
+
+  useEffect(() => {
+    if (!search.next || isAuthenticated) return;
+    let cancelled = false;
+    ready.then(() => {
+      if (!cancelled) openLogin();
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [search.next, isAuthenticated, ready, openLogin]);
+
+  return null;
+};
+
+// ──────────────────────────────────────────────────────────────────────────────
 // Root route — provides the main layout shell
 // ──────────────────────────────────────────────────────────────────────────────
-const rootRoute = createRootRoute({
+// Focuses <main> and announces the navigation to screen readers on every
+// route change — a SPA swaps content without the full-page load a screen
+// reader would otherwise use as its cue to re-orient.
+const RootOutlet: React.FC = () => {
+  const pathname = useRouterState({ select: state => state.location.pathname });
+
+  useEffect(() => {
+    document.getElementById('main-content')?.focus();
+  }, [pathname]);
+
+  return (
+    <ErrorBoundary>
+      <div aria-live='polite' className='sr-only'>
+        Página actualizada
+      </div>
+      <AnimatePresence mode='wait'>
+        <Outlet key={pathname} />
+      </AnimatePresence>
+    </ErrorBoundary>
+  );
+};
+
+const rootRoute = createRootRouteWithContext<RouterContext>()({
   component: () => (
-    <>
-      <ScrollToTop />
+    <MotionConfig reducedMotion='user'>
       <AuthModal />
+      <NextParamHandler />
       <GoogleOnboardingHandler />
       <GoogleBlockHandler />
       <PWAInstallPrompt />
       <Layout>
         <FloatingCompareButton />
         <BackgroundTaskPopup />
-        <AnimatePresence mode='wait'>
-          <Outlet />
-        </AnimatePresence>
+        <RootOutlet />
       </Layout>
-    </>
+    </MotionConfig>
   ),
   pendingComponent: () => <LoadingSpinner fullScreen text='Cargando...' />,
   errorComponent: ({ error }) => (
-    <div style={{ padding: '2rem', textAlign: 'center' }}>
+    <div role='alert' style={{ padding: '2rem', textAlign: 'center' }}>
       <h2>Algo salió mal</h2>
       <p>{error instanceof Error ? error.message : 'Error desconocido'}</p>
     </div>
+  ),
+  notFoundComponent: () => (
+    <LazyRoute>
+      <NotFoundPage />
+    </LazyRoute>
   ),
 });
 
@@ -247,6 +362,22 @@ const rootRoute = createRootRoute({
 const indexRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/',
+  validateSearch: (search: Record<string, unknown>) => ({
+    ...pickString(search, 'next'),
+  }),
+  // Landing dispatcher: an authenticated user's "home" is their role's
+  // dashboard, decided here (before HomePage ever mounts) instead of via a
+  // useEffect inside HomePage — that used to race the initial profile fetch
+  // and leave Admins looking at the marketing page. Deliberately lenient on
+  // an unreadable role (stays on HomePage) — '/' isn't a permission gate.
+  beforeLoad: async ({ context }) => {
+    await context.auth.ready;
+    if (!context.auth.isAuthenticated) return;
+    const role = await resolveRole(context.auth);
+    if (role === 'admin') throw redirect({ to: '/admin' });
+    if (role === 'store') throw redirect({ to: '/store/dashboard' });
+    if (role === 'player') throw redirect({ to: '/dashboard' });
+  },
   component: () => (
     <LazyRoute>
       <HomePage />
@@ -257,6 +388,21 @@ const indexRoute = createRoute({
 const catalogRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/catalog',
+  validateSearch: (search: Record<string, unknown>) => ({
+    ...pickString(search, 'search'),
+    ...pickString(search, 'brand'),
+    ...pickString(search, 'shape'),
+    ...pickString(search, 'balance'),
+    ...pickString(search, 'core'),
+    ...pickString(search, 'face'),
+    ...pickString(search, 'level'),
+    ...pickString(search, 'gameType'),
+    ...pickString(search, 'hardness'),
+    ...pickString(search, 'offers'),
+    ...pickString(search, 'mostViewed'),
+    ...pickString(search, 'sort'),
+    ...pickString(search, 'availableOnly'),
+  }),
   component: () => (
     <LazyRoute fallback={<CatalogSkeleton />}>
       <CatalogPage />
@@ -266,12 +412,48 @@ const catalogRoute = createRoute({
 
 const racketDetailRoute = createRoute({
   getParentRoute: () => rootRoute,
-  path: '/racket-detail',
+  path: '/palas/$slug',
+  // Preloads the same queryKey RacketDetailPage's useQuery reads — with
+  // defaultPreload: 'intent' below, hovering a card that links here fires
+  // this before the click, so the page renders with data already in cache.
+  loader: async ({ params }) => {
+    await queryClient.ensureQueryData({
+      queryKey: ['racket', 'slug', params.slug],
+      queryFn: () => racketService.getRacketBySlug(params.slug),
+      staleTime: 1000 * 60 * 5,
+    });
+  },
   component: () => (
     <LazyRoute>
       <RacketDetailPage />
     </LazyRoute>
   ),
+});
+
+// Legacy `/racket-detail?id=` links (shared/indexed pre-migration) redirect
+// permanently to the canonical slug route. `reviewId` (deep-link to a
+// specific review from a notification, see NotificationDropdown.tsx) is
+// preserved across the redirect so that flow keeps working.
+const racketDetailLegacyRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/racket-detail',
+  validateSearch: (search: Record<string, unknown>) => ({
+    ...(typeof search.id === 'string' || typeof search.id === 'number' ? { id: search.id } : {}),
+    ...pickString(search, 'name'),
+    ...pickString(search, 'reviewId'),
+  }),
+  beforeLoad: async ({ search }) => {
+    const numericId = Number(search.id);
+    if (!numericId) throw redirect({ to: '/catalog' });
+    const racket = await racketService.getRacketById(numericId);
+    if (!racket?.slug) throw redirect({ to: '/catalog' });
+    throw redirect({
+      to: '/palas/$slug',
+      params: { slug: racket.slug },
+      ...(search.reviewId ? { search: { reviewId: search.reviewId } } : {}),
+      replace: true,
+    });
+  },
 });
 
 const bestRacketRoute = createRoute({
@@ -374,12 +556,6 @@ const updatePasswordRoute = createRoute({
   ),
 });
 
-const loginRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: '/login',
-  component: LoginRedirect,
-});
-
 const publicStoreRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/store/$slug',
@@ -388,12 +564,6 @@ const publicStoreRoute = createRoute({
       <PublicStorePage />
     </LazyRoute>
   ),
-});
-
-const registerRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: '/register',
-  component: RegisterRedirect,
 });
 
 // ──────────────────────────────────────────────────────────────────────────────
@@ -447,6 +617,9 @@ const profileRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/profile',
   beforeLoad: requireAuth,
+  validateSearch: (search: Record<string, unknown>) => ({
+    ...pickString(search, 'tab'),
+  }),
   component: () => (
     <LazyRoute>
       <UserProfilePage />
@@ -540,6 +713,10 @@ const adminSettingsRoute = createRoute({
 const errorRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/error',
+  validateSearch: (search: Record<string, unknown>) => ({
+    ...pickString(search, 'type'),
+    ...pickString(search, 'message'),
+  }),
   component: () => (
     <LazyRoute>
       <ErrorPage />
@@ -547,9 +724,15 @@ const errorRoute = createRoute({
   ),
 });
 
+// Splat route — `$` (not `*`) is TanStack's actual wildcard segment syntax;
+// `*` parses as a literal path segment, so this never matched anything and
+// every unknown URL fell through to the router's bare built-in "Not Found"
+// text instead of NotFoundPage. `notFoundComponent` on the root route above
+// is a second safety net for `notFound()` thrown from a loader/beforeLoad,
+// which this splat route does not catch.
 const notFoundRoute = createRoute({
   getParentRoute: () => rootRoute,
-  path: '*',
+  path: '$',
   component: () => (
     <LazyRoute>
       <NotFoundPage />
@@ -564,6 +747,7 @@ const routeTree = rootRoute.addChildren([
   indexRoute,
   catalogRoute,
   racketDetailRoute,
+  racketDetailLegacyRoute,
   bestRacketRoute,
   compareRoute,
   compareRacketsRoute,
@@ -574,12 +758,10 @@ const routeTree = rootRoute.addChildren([
   privacyRoute,
   forgotPasswordRoute,
   updatePasswordRoute,
-  loginRoute,
-  registerRoute,
+  publicStoreRoute,
   // Protected
   dashboardRoute,
   storeDashboardRoute,
-  publicStoreRoute,
   messagingRoute,
   myComparisonsRoute,
   profileRoute,
@@ -598,6 +780,7 @@ const routeTree = rootRoute.addChildren([
 
 export const router = createRouter({
   routeTree,
+  context: { auth: undefined! },
   defaultPreload: 'intent',
   scrollRestoration: true,
 });

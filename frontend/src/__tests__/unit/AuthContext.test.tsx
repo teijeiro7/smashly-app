@@ -1,6 +1,5 @@
-import React from 'react';
+import React, { act } from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
-import { act } from 'react';
 import userEvent from '@testing-library/user-event';
 import { AuthProvider, useAuth } from '../../contexts/AuthContext';
 import { vi } from 'vitest';
@@ -73,7 +72,7 @@ vi.mock('../../lib/supabase', () => ({
 }));
 
 const AuthActionsProbe: React.FC = () => {
-  const { signIn, signOut, isAuthenticated, userProfile } = useAuth();
+  const { signIn, signOut, isAuthenticated, isSigningOut, userProfile } = useAuth();
   return (
     <div>
       <button data-testid='login' onClick={() => signIn('User@Test.com', 'secret')}>
@@ -83,6 +82,7 @@ const AuthActionsProbe: React.FC = () => {
         Logout
       </button>
       <div data-testid='status'>{isAuthenticated ? 'yes' : 'no'}</div>
+      <div data-testid='signingOut'>{isSigningOut ? 'true' : 'false'}</div>
       <div data-testid='nickname'>{userProfile?.nickname || ''}</div>
     </div>
   );
@@ -168,6 +168,31 @@ test('signOut clears session and resets authenticated state', async () => {
   });
 });
 
+test('signOut sets isSigningOut while the logout is settling, so guards redirect clean', async () => {
+  render(
+    <AuthProvider>
+      <AuthActionsProbe />
+    </AuthProvider>
+  );
+
+  await act(async () => {
+    await userEvent.click(screen.getByTestId('login'));
+  });
+  await waitFor(() => expect(screen.getByTestId('status').textContent).toBe('yes'));
+  expect(screen.getByTestId('signingOut').textContent).toBe('false');
+
+  await act(async () => {
+    await userEvent.click(screen.getByTestId('logout'));
+  });
+
+  // Right after signOut the session is cleared but the flag is still set —
+  // exactly the state the guards need to skip the `?next=` login-modal bounce.
+  await waitFor(() => {
+    expect(screen.getByTestId('status').textContent).toBe('no');
+    expect(screen.getByTestId('signingOut').textContent).toBe('true');
+  });
+});
+
 test('signIn returns friendly error on invalid credentials', async () => {
   mock.signInResult = {
     data: { user: null, session: null },
@@ -207,4 +232,59 @@ test('signIn returns friendly error on invalid credentials', async () => {
   await waitFor(() => {
     expect(screen.getByTestId('error').textContent).toMatch('Credenciales inválidas');
   });
+});
+
+test('ready resolves even when the provider re-renders before the session settles', async () => {
+  // Regression: `ready` is the promise every router beforeLoad guard awaits
+  // before deciding whether to let a request through. It used to be built
+  // with `useRef(new Promise(...))` — whose argument React re-evaluates on
+  // EVERY render, rebinding the captured `resolve` to a fresh throwaway
+  // promise while `readyRef.current` kept the original. Any re-render before
+  // the session settled (StrictMode, or any of this provider's own setState
+  // calls) therefore orphaned the promise the guards were already awaiting:
+  // it never resolved, requireAdmin hung forever, the router never finished
+  // its initial load, and RouterProvider rendered null — a black screen with
+  // an empty #root and no error anywhere.
+  let releaseSession: (value: unknown) => void = () => {};
+  const pendingSession = new Promise(resolve => {
+    releaseSession = resolve;
+  });
+  const { supabase } = await import('../../lib/supabase');
+  (supabase.auth.getSession as any).mockImplementationOnce(() => pendingSession);
+
+  let capturedReady: Promise<void> | undefined;
+  const ReadyProbe: React.FC = () => {
+    const { ready } = useAuth();
+    // Capture what a guard would have grabbed on the very first render.
+    if (!capturedReady) capturedReady = ready;
+    return null;
+  };
+
+  const { rerender } = render(
+    <AuthProvider>
+      <ReadyProbe />
+    </AuthProvider>
+  );
+
+  // Re-render while getSession() is still in flight.
+  rerender(
+    <AuthProvider>
+      <ReadyProbe />
+      <span />
+    </AuthProvider>
+  );
+
+  await act(async () => {
+    releaseSession({ data: { session: mockSession } });
+    await pendingSession;
+  });
+
+  // Fail fast instead of hanging the suite if the promise was orphaned.
+  const timedOut = Symbol('timed-out');
+  const outcome = await Promise.race([
+    capturedReady!.then(() => 'resolved'),
+    new Promise(resolve => setTimeout(() => resolve(timedOut), 1000)),
+  ]);
+
+  expect(outcome).toBe('resolved');
 });

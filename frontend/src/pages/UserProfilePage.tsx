@@ -14,7 +14,7 @@ import {
   FiCalendar,
 } from 'react-icons/fi';
 import { GiTennisRacket } from 'react-icons/gi';
-import { Link, useNavigate, useSearch } from '@tanstack/react-router';
+import { Link, useSearch } from '@tanstack/react-router';
 import { useAuth } from '../contexts/AuthContext';
 import { getAuthHeaders } from '../config/api';
 import { UserProfileService } from '../services/userProfileService';
@@ -67,7 +67,7 @@ const BackLink = styled(Link)`
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  color: rgba(255, 255, 255, 0.7);
+  color: rgba(var(--on-brand-rgb), 0.7);
   text-decoration: none;
   font-size: 0.875rem;
   font-weight: 500;
@@ -75,7 +75,7 @@ const BackLink = styled(Link)`
   transition: color 0.2s ease;
 
   &:hover {
-    color: white;
+    color: var(--on-brand);
   }
 `;
 
@@ -93,7 +93,7 @@ const ProfileHeader = styled.div`
 
 const ProfileInfo = styled.div`
   flex: 1;
-  color: white;
+  color: var(--on-brand);
 `;
 
 const UserName = styled.h1`
@@ -154,11 +154,11 @@ const NavTab = styled.button<{ $active: boolean }>`
   transition: all 0.2s ease;
   white-space: nowrap;
   background: ${props => (props.$active ? 'var(--primary)' : 'transparent')};
-  color: ${props => (props.$active ? 'white' : 'var(--text-muted)')};
+  color: ${props => (props.$active ? 'var(--on-primary)' : 'var(--text-muted)')};
 
   &:hover {
     background: ${props => (props.$active ? 'var(--primary)' : 'var(--surface-3)')};
-    color: ${props => (props.$active ? 'white' : 'var(--primary)')};
+    color: ${props => (props.$active ? 'var(--on-primary)' : 'var(--primary)')};
   }
 `;
 
@@ -185,7 +185,7 @@ const FormSection = styled.div`
   }
 `;
 
-const SectionTitle = styled.h3`
+const SectionTitle = styled.h2`
   font-size: 1rem;
   font-weight: 600;
   color: var(--primary);
@@ -231,7 +231,7 @@ const FormInput = styled.input`
   &:focus {
     outline: none;
     border-color: var(--primary);
-    box-shadow: 0 0 0 3px rgba(15, 23, 42, 0.1);
+    box-shadow: 0 0 0 3px var(--shadow-color);
   }
 
   &:disabled {
@@ -256,7 +256,7 @@ const FormSelect = styled.select`
   &:focus {
     outline: none;
     border-color: var(--primary);
-    box-shadow: 0 0 0 3px rgba(15, 23, 42, 0.1);
+    box-shadow: 0 0 0 3px var(--shadow-color);
   }
 
   &:disabled {
@@ -278,7 +278,7 @@ const FormTextarea = styled.textarea`
   &:focus {
     outline: none;
     border-color: var(--primary);
-    box-shadow: 0 0 0 3px rgba(15, 23, 42, 0.1);
+    box-shadow: 0 0 0 3px var(--shadow-color);
   }
 
   &:disabled {
@@ -349,7 +349,7 @@ const Button = styled(motion.button)<{ $primary?: boolean }>`
   border: none;
   transition: all 0.2s ease;
   background: ${props => (props.$primary ? 'var(--primary)' : 'var(--surface-3)')};
-  color: ${props => (props.$primary ? 'white' : 'var(--text-muted)')};
+  color: ${props => (props.$primary ? 'var(--on-primary)' : 'var(--text-muted)')};
 
   &:hover {
     background: ${props => (props.$primary ? 'var(--primary-hover)' : 'var(--border)')};
@@ -371,8 +371,8 @@ const SmallButton = styled(Button)`
 `;
 
 const InfoCard = styled.div`
-  background: #f0f9ff;
-  border: 1px solid #bae6fd;
+  background: var(--info-subtle);
+  border: 1px solid var(--info-subtle);
   border-radius: 12px;
   padding: 1rem;
   margin-bottom: 1.5rem;
@@ -382,14 +382,14 @@ const InfoCard = styled.div`
 `;
 
 const InfoIcon = styled.div`
-  color: #0369a1;
+  color: var(--info-text);
   flex-shrink: 0;
   margin-top: 0.125rem;
 `;
 
 const InfoText = styled.p`
   font-size: 0.875rem;
-  color: #0369a1;
+  color: var(--info-text);
   margin: 0;
   line-height: 1.5;
 `;
@@ -423,8 +423,7 @@ interface UserProfileFormData {
 }
 
 const UserProfilePage: React.FC = () => {
-  const { user, userProfile, refreshUserProfile, loading } = useAuth();
-  const navigate = useNavigate();
+  const { user, userProfile, refreshUserProfile } = useAuth();
   const searchParams = useSearch({ strict: false }) as Record<string, string>;
   const [activeTab, setActiveTab] = useState<TabType>('profile');
   const [saving, setSaving] = useState(false);
@@ -477,14 +476,8 @@ const UserProfilePage: React.FC = () => {
     }
   }, [userProfile]);
 
-  useEffect(() => {
-    // No redirigir mientras está cargando la sesión
-    if (loading) return;
-
-    if (!user) {
-      navigate({ to: '/login' });
-    }
-  }, [user, navigate, loading]);
+  // No in-page auth guard needed: the router's requireAuth beforeLoad on
+  // /profile already keeps an anonymous user from ever mounting this page.
 
   useEffect(() => {
     if (activeTab === 'activity') {
@@ -654,16 +647,32 @@ const UserProfilePage: React.FC = () => {
 
       <MainContent>
         <NavigationTabs>
-          <NavTab $active={activeTab === 'profile'} onClick={() => setActiveTab('profile')}>
+          <NavTab
+            $active={activeTab === 'profile'}
+            aria-selected={activeTab === 'profile'}
+            onClick={() => setActiveTab('profile')}
+          >
             <FiUser size={18} /> Perfil
           </NavTab>
-          <NavTab $active={activeTab === 'activity'} onClick={() => setActiveTab('activity')}>
+          <NavTab
+            $active={activeTab === 'activity'}
+            aria-selected={activeTab === 'activity'}
+            onClick={() => setActiveTab('activity')}
+          >
             <FiActivity size={18} /> Mi Actividad
           </NavTab>
-          <NavTab $active={activeTab === 'collections'} onClick={() => setActiveTab('collections')}>
+          <NavTab
+            $active={activeTab === 'collections'}
+            aria-selected={activeTab === 'collections'}
+            onClick={() => setActiveTab('collections')}
+          >
             <FiList size={18} /> Mis Colecciones
           </NavTab>
-          <NavTab $active={activeTab === 'account'} onClick={() => setActiveTab('account')}>
+          <NavTab
+            $active={activeTab === 'account'}
+            aria-selected={activeTab === 'account'}
+            onClick={() => setActiveTab('account')}
+          >
             <FiSettings size={18} /> Cuenta
           </NavTab>
         </NavigationTabs>

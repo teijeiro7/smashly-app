@@ -1,5 +1,4 @@
 import React from 'react';
-import { useRouterState } from '@tanstack/react-router';
 import styled from 'styled-components';
 import Footer from './Footer';
 import Header from './Header';
@@ -30,20 +29,21 @@ const Main = styled.main`
 `;
 
 const Layout: React.FC<LayoutProps> = ({ children }) => {
-  const { location } = useRouterState();
-  const isAuthPage = ['/login', '/register'].includes(location.pathname);
-
+  // Login/register no longer have their own routes — they're always a modal
+  // over whatever page is underneath, so the chrome never needs to hide.
   return (
     <LayoutContainer>
       {/* Skip-to-content: visible only on keyboard focus (WCAG 2.1 AA - criterion 2.4.1) */}
       <a href='#main-content' className='skip-to-content'>
         Saltar al contenido principal
       </a>
-      {!isAuthPage && <Header />}
-      {!isAuthPage && <SubHeader />}
-      <Main id='main-content'>{children}</Main>
-      {!isAuthPage && <MobileBottomNav />}
-      {!isAuthPage && <Footer />}
+      <Header />
+      <SubHeader />
+      <Main id='main-content' tabIndex={-1}>
+        {children}
+      </Main>
+      <MobileBottomNav />
+      <Footer />
     </LayoutContainer>
   );
 };

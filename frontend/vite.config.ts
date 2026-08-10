@@ -2,6 +2,7 @@ import { defineConfig } from 'vitest/config';
 import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
 import { ViteImageOptimizer } from 'vite-plugin-image-optimizer';
+import viteCompression from 'vite-plugin-compression';
 import path from 'path';
 
 export default defineConfig(({ mode }) => ({
@@ -121,6 +122,12 @@ export default defineConfig(({ mode }) => ({
         enabled: false,
       },
     }),
+    ...(mode === 'production'
+      ? [
+          viteCompression({ algorithm: 'brotliCompress', ext: '.br' }),
+          viteCompression({ algorithm: 'gzip', ext: '.gz' }),
+        ]
+      : []),
   ],
   publicDir: path.resolve(__dirname, '../public'),
   resolve: {
@@ -221,6 +228,8 @@ export default defineConfig(({ mode }) => ({
     globals: true,
     environment: 'jsdom',
     setupFiles: ['./test/setupTests.ts'],
+    // e2e/ holds Playwright specs (run via `pnpm test:e2e:a11y`), not vitest.
+    exclude: ['node_modules/**', 'e2e/**'],
     coverage: {
       provider: 'v8',
       reporter: ['lcov', 'text', 'json'],

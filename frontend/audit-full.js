@@ -26,7 +26,7 @@ async function auditPage(page) {
   console.log(`🔍 ${page.name}...`);
   
   try {
-    execSync(`npx lighthouse ${url} --preset=perf --throttling.cpuSlowdownMultiplier=4 --throttling.rttMs=40 --throttling.downloadThroughputKbps=100000 --throttling.uploadThroughputKbps=50000 --output=json --output-path=${outputFile} --quiet --chrome-flags="--headless" --emulated-form-factor=mobile`, {
+    execSync(`npx lighthouse ${url} --throttling.cpuSlowdownMultiplier=4 --throttling.rttMs=40 --throttling.downloadThroughputKbps=100000 --throttling.uploadThroughputKbps=50000 --output=json --output-path=${outputFile} --quiet --chrome-flags="--headless" --emulated-form-factor=mobile`, {
       stdio: 'pipe',
       timeout: 180000
     });

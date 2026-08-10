@@ -9,6 +9,7 @@ from typing import Dict, List, Optional
 from .base_scraper import (
     BaseScraper, Product, normalize_specs, normalize_spec_name, is_junior_racket,
     FetchOutcome, FetchResult, ScraperGone, sync_fetch_with_retry, ssl_ctx,
+    browser_headers,
 )
 
 
@@ -23,11 +24,9 @@ class PadelProShopScraper(BaseScraper):
         """Fetch a single page of products from the Shopify JSON API (sync)."""
         time.sleep(random.uniform(2.0, 4.0))
         api_url = f"https://padelproshop.com{collection_path}/products.json?limit=250&page={page_num}"
-        req = urllib.request.Request(api_url, headers={
-            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
-            'Accept': 'application/json',
-            'Accept-Language': 'es-ES,es;q=0.9',
-        })
+        req = urllib.request.Request(api_url, headers=browser_headers(
+            origin="https://padelproshop.com/", accept="application/json",
+        ))
 
         def _once():
             with urllib.request.urlopen(req, timeout=30, context=ssl_ctx()) as resp:
@@ -43,11 +42,9 @@ class PadelProShopScraper(BaseScraper):
         """Fetch a single product's full data from the Shopify JSON API (sync)."""
         time.sleep(random.uniform(3.0, 5.0))
         api_url = f"https://padelproshop.com/products/{handle}.json"
-        req = urllib.request.Request(api_url, headers={
-            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
-            'Accept': 'application/json',
-            'Accept-Language': 'es-ES,es;q=0.9',
-        })
+        req = urllib.request.Request(api_url, headers=browser_headers(
+            origin="https://padelproshop.com/", accept="application/json",
+        ))
 
         def _once():
             with urllib.request.urlopen(req, timeout=30, context=ssl_ctx()) as resp:
@@ -259,7 +256,10 @@ class PadelProShopScraper(BaseScraper):
         # Si no se encontró Forma en el JSON (body_html), intentamos descargar el HTML completo
         if 'Forma' not in specs:
             try:
-                req = urllib.request.Request(url, headers={'User-Agent': self.user_agent})
+                req = urllib.request.Request(url, headers=browser_headers(
+                    origin="https://padelproshop.com/",
+                    accept="text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+                ))
 
                 def _fetch_full_html():
                     with urllib.request.urlopen(req, timeout=15, context=ssl_ctx()) as resp:

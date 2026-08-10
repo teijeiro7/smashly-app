@@ -14,6 +14,7 @@ import {
   webPageSchema,
 } from '../utils/seoSchemas';
 import { allKeywords, buildUrl } from '../config/seo';
+import { onActivationKeyDown } from '../utils/a11y';
 
 const heroFadeIn = keyframes`
   from { opacity: 0; transform: translateY(30px); }
@@ -52,8 +53,8 @@ const HeroSection = styled.section`
     right: 0;
     bottom: 0;
     background:
-      radial-gradient(circle at 20% 50%, rgba(255, 255, 255, 0.06) 0%, transparent 50%),
-      radial-gradient(circle at 80% 50%, rgba(255, 255, 255, 0.06) 0%, transparent 50%),
+      radial-gradient(circle at 20% 50%, rgba(var(--on-brand-rgb), 0.06) 0%, transparent 50%),
+      radial-gradient(circle at 80% 50%, rgba(var(--on-brand-rgb), 0.06) 0%, transparent 50%),
       radial-gradient(circle at 50% 100%, rgba(var(--brand-rgb), 0.2) 0%, transparent 60%);
     pointer-events: none;
   }
@@ -68,7 +69,7 @@ const HeroSection = styled.section`
     background: linear-gradient(
       135deg,
       transparent 40%,
-      rgba(255, 255, 255, 0.02) 50%,
+      rgba(var(--on-brand-rgb), 0.02) 50%,
       transparent 60%
     );
     transform: rotate(-15deg);
@@ -219,7 +220,7 @@ const TrustItem = styled.div`
   align-items: center;
   gap: 8px;
   font-size: clamp(0.8rem, 1.5vw, 0.9rem);
-  color: rgba(255, 255, 255, 0.9);
+  color: rgba(var(--on-brand-rgb), 0.9);
   font-weight: 600;
 
   @media (max-width: 480px) {
@@ -255,7 +256,7 @@ const ScrollIndicator = styled.div`
   span {
     font-size: 0.75rem;
     font-weight: 600;
-    color: rgba(255, 255, 255, 0.6);
+    color: rgba(var(--on-brand-rgb), 0.6);
     margin-bottom: 8px;
     letter-spacing: 0.1em;
     text-transform: uppercase;
@@ -264,7 +265,7 @@ const ScrollIndicator = styled.div`
   .mouse {
     width: 24px;
     height: 40px;
-    border: 2px solid rgba(255, 255, 255, 0.4);
+    border: 2px solid rgba(var(--on-brand-rgb), 0.4);
     border-radius: 12px;
     position: relative;
   }
@@ -272,7 +273,7 @@ const ScrollIndicator = styled.div`
   .wheel {
     width: 4px;
     height: 8px;
-    background: rgba(255, 255, 255, 0.6);
+    background: rgba(var(--on-brand-rgb), 0.6);
     border-radius: 2px;
     position: absolute;
     top: 8px;
@@ -357,7 +358,7 @@ const StepNumber = styled.div`
   width: 48px;
   height: 48px;
   background: var(--primary-hover);
-  color: white;
+  color: var(--on-primary);
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -493,7 +494,7 @@ const FeatureVisualIcon = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  color: white;
+  color: var(--on-primary);
   font-size: 32px;
   box-shadow: 0 10px 15px -3px rgba(var(--primary-rgb-dark), 0.3);
 `;
@@ -627,7 +628,12 @@ const HomePage: React.FC = () => {
           </TrustBar>
 
           <ScrollIndicator
+            role='button'
+            tabIndex={0}
             onClick={() => window.scrollTo({ top: window.innerHeight, behavior: 'smooth' })}
+            onKeyDown={onActivationKeyDown(() =>
+              window.scrollTo({ top: window.innerHeight, behavior: 'smooth' })
+            )}
           >
             <span>Descubre más</span>
             <div className='mouse'>

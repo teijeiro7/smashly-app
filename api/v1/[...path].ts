@@ -20,6 +20,7 @@ import type { IncomingMessage, ServerResponse } from 'http';
  * explicitly below.
  */
 import adminRacketConflicts from '../_v1/admin/rackets/conflicts';
+import adminRacketResolve from '../_v1/admin/rackets/[id]/resolve';
 import adminRecentActivity from '../_v1/admin/recent-activity';
 import analyticsStore from '../_v1/analytics/store';
 import analyticsStoreTimeline from '../_v1/analytics/store/[id]/timeline';
@@ -34,6 +35,7 @@ import storesCatalogSearch from '../_v1/stores/catalog/[storeId]/search';
 import storesCatalogPriceId from '../_v1/stores/catalog/[storeId]/[priceId]';
 import storesCatalogStoreId from '../_v1/stores/catalog/[storeId]';
 import storesById from '../_v1/stores/[id]';
+import usersMeActivity from '../_v1/users/me/activity';
 
 type Req = IncomingMessage & { query?: any };
 
@@ -48,6 +50,10 @@ export default async function handler(req: Req, res: ServerResponse): Promise<vo
   }
   if (segments.length === 3 && a === 'admin' && b === 'rackets' && c === 'conflicts') {
     return adminRacketConflicts(req, res);
+  }
+  if (segments.length === 4 && a === 'admin' && b === 'rackets' && d === 'resolve') {
+    req.query = { ...req.query, id: c };
+    return adminRacketResolve(req, res);
   }
 
   // analytics/*
@@ -98,6 +104,11 @@ export default async function handler(req: Req, res: ServerResponse): Promise<vo
   if (segments.length === 2 && a === 'stores') {
     req.query = { ...req.query, id: b };
     return storesById(req, res);
+  }
+
+  // users/me/activity
+  if (segments.length === 3 && a === 'users' && b === 'me' && c === 'activity') {
+    return usersMeActivity(req, res);
   }
 
   res.writeHead(404, { 'Content-Type': 'application/json' });

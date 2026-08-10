@@ -114,11 +114,11 @@ const CategoryButton = styled.button<{ $isActive: boolean }>`
   background: ${props =>
     props.$isActive
       ? 'linear-gradient(135deg, var(--primary-hover) 0%, var(--success) 100%)'
-      : 'white'};
+      : 'var(--surface)'};
   border: 2px solid ${props => (props.$isActive ? 'var(--primary-hover)' : 'var(--border)')};
   font-size: 0.8125rem;
   font-weight: ${props => (props.$isActive ? '600' : '500')};
-  color: ${props => (props.$isActive ? 'white' : 'var(--text-muted)')};
+  color: ${props => (props.$isActive ? 'var(--on-primary)' : 'var(--text-muted)')};
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   white-space: nowrap;
@@ -127,7 +127,7 @@ const CategoryButton = styled.button<{ $isActive: boolean }>`
   box-shadow: ${props =>
     props.$isActive
       ? '0 4px 14px rgba(var(--primary-rgb-dark), 0.3)'
-      : '0 2px 4px rgba(0, 0, 0, 0.05)'};
+      : '0 2px 4px var(--shadow-color)'};
 
   &::before {
     content: '';
@@ -136,7 +136,7 @@ const CategoryButton = styled.button<{ $isActive: boolean }>`
     left: -100%;
     width: 100%;
     height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    background: linear-gradient(90deg, transparent, rgba(var(--on-primary-rgb), 0.2), transparent);
     transition: left 0.5s;
   }
 
@@ -147,7 +147,7 @@ const CategoryButton = styled.button<{ $isActive: boolean }>`
         ? 'linear-gradient(135deg, var(--success) 0%, var(--success) 100%)'
         : 'var(--surface-2)'};
     border-color: ${props => (props.$isActive ? 'var(--success)' : 'var(--primary-hover)')};
-    color: ${props => (props.$isActive ? 'white' : 'var(--primary-hover)')};
+    color: ${props => (props.$isActive ? 'var(--on-primary)' : 'var(--primary-hover)')};
     box-shadow: ${props =>
       props.$isActive
         ? '0 8px 25px rgba(var(--primary-rgb-dark), 0.4)'
@@ -282,7 +282,7 @@ const ContactIconContainer = styled.div`
   width: clamp(4rem, 12vw, 5rem);
   height: clamp(4rem, 12vw, 5rem);
   border-radius: 50%;
-  background: #f0f9ff;
+  background: var(--info-subtle);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -293,7 +293,7 @@ const ContactIconContainer = styled.div`
   }
 `;
 
-const ContactTitle = styled.h3`
+const ContactTitle = styled.h2`
   font-size: clamp(1.125rem, 3vw, 1.25rem);
   font-weight: 700;
   color: var(--text);
@@ -328,7 +328,7 @@ const ContactButton = styled.button`
 `;
 
 const ContactButtonText = styled.span`
-  color: white;
+  color: var(--on-primary);
   font-size: 0.875rem;
   font-weight: 600;
 `;

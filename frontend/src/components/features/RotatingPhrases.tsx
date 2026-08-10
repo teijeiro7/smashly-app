@@ -94,7 +94,7 @@ const RotatingPhrases: React.FC<RotatingPhrasesProps> = ({ phrases }) => {
   }, [phrases.length]);
 
   return (
-    <RotatingContainer aria-live='polite'>
+    <RotatingContainer aria-hidden='true'>
       <PhraseSpan key={displayIndex} $isExiting={isExiting}>
         {phrases[displayIndex]}
       </PhraseSpan>

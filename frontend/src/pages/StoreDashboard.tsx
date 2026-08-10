@@ -21,11 +21,16 @@ import StoreProfileForm from '../components/features/StoreProfileForm';
 import StoreCatalogManager from '../components/features/StoreCatalogManager';
 import { sileo } from 'sileo';
 import analyticsService, { type TimelineResponse } from '../services/analyticsService';
+import { useTheme } from '../contexts/ThemeContext';
+
+// No semantic token fits this decorative indigo accent stripe, so it gets
+// its own light/dark value instead of a new global token.
+const STRIPE_ACCENT_COLOR = { light: '#6366f1', dark: '#818cf8' };
 
 const Container = styled.div`
   min-height: 100dvh;
   background:
-    radial-gradient(circle at top right, rgba(59, 130, 246, 0.08), transparent 40%),
+    radial-gradient(circle at top right, rgba(var(--info-rgb), 0.08), transparent 40%),
     linear-gradient(135deg, var(--primary-faint) 0%, var(--surface) 100%);
   padding: 1rem;
   padding-bottom: calc(6.5rem + env(safe-area-inset-bottom, 0));
@@ -41,13 +46,13 @@ const MaxWidth = styled.div`
   margin: 0 auto;
 `;
 
-const HeroSection = styled.div`
+const HeroSection = styled.div<{ $isDark: boolean }>`
   background: linear-gradient(135deg, var(--surface) 60%, var(--primary-faint) 100%);
   border-radius: 24px;
   padding: clamp(1.25rem, 3vw, 3rem);
   margin-bottom: 2rem;
   box-shadow: 0 4px 20px var(--shadow-color);
-  border: 1px solid rgba(59, 130, 246, 0.15);
+  border: 1px solid rgba(var(--info-rgb), 0.15);
   position: relative;
   overflow: hidden;
 
@@ -58,7 +63,8 @@ const HeroSection = styled.div`
     left: 0;
     right: 0;
     height: 4px;
-    background: linear-gradient(90deg, var(--primary), #6366f1);
+    background: ${props =>
+      `linear-gradient(90deg, var(--primary), ${props.$isDark ? STRIPE_ACCENT_COLOR.dark : STRIPE_ACCENT_COLOR.light})`};
     border-radius: 24px 24px 0 0;
   }
 `;
@@ -349,7 +355,7 @@ const ChangeBadge = styled.span<{ positive: boolean }>`
   display: inline-flex;
   align-items: center;
   gap: 0.125rem;
-  color: ${({ positive }) => (positive ? 'var(--success, #22c55e)' : 'var(--danger, #ef4444)')};
+  color: ${({ positive }) => (positive ? 'var(--success)' : 'var(--danger)')};
 `;
 
 const ChartCard = styled.div`
@@ -360,7 +366,7 @@ const ChartCard = styled.div`
   margin-top: 1rem;
 `;
 
-const ChartTitle = styled.h4`
+const ChartTitle = styled.h3`
   font-size: 1rem;
   font-weight: 700;
   color: var(--text);
@@ -489,9 +495,11 @@ function renderTimelineChart(
           <YAxis hide domain={['dataMin - 1', 'dataMax + 1']} />
           <Tooltip
             contentStyle={{
+              background: 'var(--surface)',
+              color: 'var(--text)',
               borderRadius: '12px',
               border: 'none',
-              boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
+              boxShadow: '0 4px 20px var(--shadow-color)',
               fontSize: '0.8rem',
             }}
             labelFormatter={(label: any) => {
@@ -523,6 +531,8 @@ function renderTimelineChart(
 
 export const StoreDashboard: React.FC = () => {
   const navigate = useNavigate();
+  const { resolved } = useTheme();
+  const isDark = resolved === 'dark';
   const [store, setStore] = useState<Store | null>(null);
   const [loading, setLoading] = useState(true);
   const [showEditForm, setShowEditForm] = useState(false);
@@ -741,7 +751,7 @@ export const StoreDashboard: React.FC = () => {
   return (
     <Container>
       <MaxWidth>
-        <HeroSection>
+        <HeroSection $isDark={isDark}>
           <Greeting>¡Hola, {store.store_name}!</Greeting>
           <SubGreeting>Panel de gestión de tu tienda en Smashly</SubGreeting>
         </HeroSection>

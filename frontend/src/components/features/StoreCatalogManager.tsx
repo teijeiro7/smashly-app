@@ -157,7 +157,7 @@ const IconButton = styled.button<{ $danger?: boolean }>`
   padding: 0.5rem;
   border: none;
   border-radius: 8px;
-  background: ${({ $danger }) => ($danger ? 'rgba(220, 38, 38, 0.10)' : 'var(--primary-subtle)')};
+  background: ${({ $danger }) => ($danger ? 'var(--danger-subtle)' : 'var(--primary-subtle)')};
   color: ${({ $danger }) => ($danger ? 'var(--danger)' : 'var(--primary-hover)')};
   cursor: pointer;
   display: flex;
@@ -372,10 +372,14 @@ const StoreCatalogManager: React.FC<StoreCatalogManagerProps> = ({ storeId }) =>
                       value={editLink}
                       onChange={e => setEditLink(e.target.value)}
                     />
-                    <IconButton onClick={() => handleSaveEdit(item)} disabled={savingEdit}>
+                    <IconButton
+                      onClick={() => handleSaveEdit(item)}
+                      disabled={savingEdit}
+                      aria-label='Guardar'
+                    >
                       <FiSave />
                     </IconButton>
-                    <IconButton onClick={handleCancelEdit}>
+                    <IconButton onClick={handleCancelEdit} aria-label='Cancelar'>
                       <FiX />
                     </IconButton>
                   </EditRow>
@@ -393,10 +397,14 @@ const StoreCatalogManager: React.FC<StoreCatalogManagerProps> = ({ storeId }) =>
                       )}
                     </PriceSection>
                     <Actions>
-                      <IconButton onClick={() => handleStartEdit(item)}>
+                      <IconButton onClick={() => handleStartEdit(item)} aria-label='Editar'>
                         <FiEdit2 />
                       </IconButton>
-                      <IconButton $danger onClick={() => handleRemove(item.id)}>
+                      <IconButton
+                        $danger
+                        onClick={() => handleRemove(item.id)}
+                        aria-label='Eliminar'
+                      >
                         <FiTrash2 />
                       </IconButton>
                     </Actions>
@@ -411,7 +419,12 @@ const StoreCatalogManager: React.FC<StoreCatalogManagerProps> = ({ storeId }) =>
       {totalPages > 1 && (
         <PaginationRow>
           {Array.from({ length: totalPages }, (_, i) => i + 1).map(p => (
-            <PageButton key={p} $active={p === page} onClick={() => setPage(p)}>
+            <PageButton
+              key={p}
+              $active={p === page}
+              aria-current={p === page ? 'page' : undefined}
+              onClick={() => setPage(p)}
+            >
               {p}
             </PageButton>
           ))}

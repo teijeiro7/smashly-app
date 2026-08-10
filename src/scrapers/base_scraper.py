@@ -59,11 +59,14 @@ def sync_fetch_with_retry(
     label: str = "",
     max_retries: int = 4,
     base_delay: float = 3.0,
+    max_wait: float = 30.0,
 ) -> T:
     """
     Runs `fetch_once()` (a single urllib call), retrying on 429/403/5xx and
     network errors with exponential backoff + jitter. Respects the
-    `Retry-After` header when the store sends one.
+    `Retry-After` header when the store sends one, but never sleeps longer
+    than `max_wait` — a store/CF that throttles us for a minute must not eat
+    the whole CI timeout retrying one URL.
 
     Raises `ScraperGone` on HTTP 404 (caller should map to FetchOutcome.GONE).
     Raises the underlying exception once retries are exhausted (caller
@@ -77,7 +80,7 @@ def sync_fetch_with_retry(
             if e.code == 404:
                 raise ScraperGone(f"404 for {label}") from e
             if e.code in _RETRYABLE_HTTP_CODES and attempt < max_retries - 1:
-                wait = _retry_wait(e, attempt, base_delay)
+                wait = _retry_wait(e, attempt, base_delay, max_wait)
                 print(f"    ⚠️  [{label}] HTTP {e.code}, retry {attempt + 1}/{max_retries} in {wait:.1f}s")
                 time.sleep(wait)
                 last_exc = e
@@ -86,7 +89,7 @@ def sync_fetch_with_retry(
             raise
         except urllib.error.URLError as e:
             if attempt < max_retries - 1:
-                wait = base_delay * (2 ** attempt) + random.uniform(0, 1.5)
+                wait = min(base_delay * (2 ** attempt) + random.uniform(0, 1.5), max_wait)
                 print(f"    ⚠️  [{label}] network error, retry {attempt + 1}/{max_retries} in {wait:.1f}s: {e.reason}")
                 time.sleep(wait)
                 last_exc = e
@@ -98,7 +101,7 @@ def sync_fetch_with_retry(
     raise RuntimeError(f"sync_fetch_with_retry exhausted retries with no exception for {label}")
 
 
-def _retry_wait(e: "urllib.error.HTTPError", attempt: int, base_delay: float) -> float:
+def _retry_wait(e: "urllib.error.HTTPError", attempt: int, base_delay: float, max_wait: float = 30.0) -> float:
     retry_after = e.headers.get("Retry-After") if e.headers else None
     if retry_after:
         try:
@@ -107,7 +110,37 @@ def _retry_wait(e: "urllib.error.HTTPError", attempt: int, base_delay: float) ->
             wait = base_delay * (2 ** attempt)
     else:
         wait = base_delay * (2 ** attempt)
+    wait = min(wait, max_wait)
     return wait + random.uniform(0, wait * 0.3)
+
+
+def browser_headers(*, origin: str, accept: str) -> Dict[str, str]:
+    """Full Chrome-like header set for a request.
+
+    Cloudflare's bot management flags bare urllib requests (UA + Accept only).
+    Sending the complete browser fingerprint — sec-ch-ua, sec-fetch-*, Referer
+    — is what a real visitor's request looks like and reliably passes where the
+    minimal headers get an instant 429/403.
+    """
+    return {
+        "User-Agent": (
+            "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
+            "AppleWebKit/537.36 (KHTML, like Gecko) "
+            "Chrome/124.0.0.0 Safari/537.36"
+        ),
+        "Accept": accept,
+        "Accept-Language": "es-ES,es;q=0.9,en;q=0.8",
+        "Sec-CH-UA": '"Chromium";v="124", "Google Chrome";v="124", "Not-A.Brand";v="99"',
+        "Sec-CH-UA-Mobile": "?0",
+        "Sec-CH-UA-Platform": '"macOS"',
+        "Sec-Fetch-Dest": "document",
+        "Sec-Fetch-Mode": "navigate",
+        "Sec-Fetch-Site": "same-origin",
+        "Sec-Fetch-User": "?1",
+        "Upgrade-Insecure-Requests": "1",
+        "Referer": origin,
+        "Connection": "keep-alive",
+    }
 
 
 def ssl_ctx() -> ssl.SSLContext:

@@ -6,6 +6,7 @@ export interface RecentlyViewedRacket {
   marca: string;
   imagenes?: string[];
   precio_actual?: number;
+  solo_comparacion?: boolean;
   viewed_at: string;
 }
 

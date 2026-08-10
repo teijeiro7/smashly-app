@@ -37,7 +37,7 @@ const FeaturesContainer = styled(motion.div)`
   background: var(--surface);
   border-radius: 16px;
   padding: 2rem;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-lg);
 `;
 
 const SectionTitle = styled.h3`

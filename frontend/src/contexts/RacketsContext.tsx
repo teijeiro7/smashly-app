@@ -39,6 +39,9 @@ export const RacketsProvider: React.FC<RacketsProviderProps> = ({ children }) =>
     queryFn: () => racketService.getAllRackets(),
     staleTime: 1000 * 60 * 30, // 30 min — replaces ETag/localStorage weekly expiry
     gcTime: 1000 * 60 * 60, // 1 hour in cache
+    // Catalog only changes when sync_catalog runs (daily); a tab focus isn't a
+    // reason to re-download the whole table.
+    refetchOnWindowFocus: false,
   });
 
   const fetchRackets = useCallback(async () => {

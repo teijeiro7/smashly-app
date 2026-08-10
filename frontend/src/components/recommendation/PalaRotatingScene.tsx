@@ -59,7 +59,7 @@ const ShadowOverlay = styled.div<{ $isPaused: boolean }>`
   bottom: 60px;
   width: 140px;
   height: 20px;
-  background: rgba(0, 0, 0, 0.15);
+  background: rgba(var(--scrim-rgb), 0.15);
   border-radius: 50%;
   filter: blur(10px);
   z-index: -1;
@@ -153,7 +153,7 @@ export const PalaRotatingScene: React.FC<PalaRotatingSceneProps> = ({ isComplete
             rx='85'
             ry='85'
             fill='none'
-            stroke='rgba(255,255,255,0.2)'
+            stroke='rgba(var(--on-primary-rgb),0.2)'
             strokeWidth='2'
           />
 
@@ -163,11 +163,11 @@ export const PalaRotatingScene: React.FC<PalaRotatingSceneProps> = ({ isComplete
             rx='40'
             ry='40'
             fill='none'
-            stroke='rgba(255,255,255,0.15)'
+            stroke='rgba(var(--on-primary-rgb),0.15)'
             strokeWidth='1'
           />
 
-          <circle cx='100' cy='100' r='20' fill='rgba(0,0,0,0.1)' />
+          <circle cx='100' cy='100' r='20' fill='rgba(var(--scrim-rgb),0.1)' />
 
           <rect x='90' y='195' width='20' height='70' rx='4' fill='url(#gripGradient)' />
 
@@ -175,19 +175,19 @@ export const PalaRotatingScene: React.FC<PalaRotatingSceneProps> = ({ isComplete
 
           <path
             d='M 60 60 Q 100 80 140 60'
-            stroke='rgba(255,255,255,0.3)'
+            stroke='rgba(var(--on-primary-rgb),0.3)'
             strokeWidth='2'
             fill='none'
           />
           <path
             d='M 50 100 Q 100 120 150 100'
-            stroke='rgba(255,255,255,0.2)'
+            stroke='rgba(var(--on-primary-rgb),0.2)'
             strokeWidth='1'
             fill='none'
           />
           <path
             d='M 60 140 Q 100 160 140 140'
-            stroke='rgba(255,255,255,0.2)'
+            stroke='rgba(var(--on-primary-rgb),0.2)'
             strokeWidth='1'
             fill='none'
           />

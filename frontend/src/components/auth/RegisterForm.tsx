@@ -114,7 +114,9 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess, onLoginClick }) 
   const [showOnboardingModal, setShowOnboardingModal] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
 
-  const redirectTo = searchParams['redirect'] || '/';
+  // See LoginForm.tsx for why only a same-app `/`-prefixed path is honored.
+  const next = searchParams['next'];
+  const safeNext = next && next.startsWith('/') && !next.startsWith('//') ? next : undefined;
 
   const form = useForm({
     defaultValues: {
@@ -173,8 +175,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess, onLoginClick }) 
             description: `Cuenta creada pero el registro de tienda falló: ${storeError.message}`,
           });
           setTimeout(() => {
-            if (onSuccess) onSuccess();
-            else navigate({ to: '/login' });
+            onSuccess?.();
           }, 3000);
         }
       } else {
@@ -197,8 +198,8 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess, onLoginClick }) 
 
   const handleModalClose = () => {
     setShowStoreModal(false);
-    if (onSuccess) onSuccess();
-    else navigate({ to: redirectTo as any });
+    if (safeNext) navigate({ to: safeNext as any });
+    onSuccess?.();
   };
 
   const handleGoogleSignIn = async () => {
@@ -217,8 +218,8 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess, onLoginClick }) 
 
   const handleOnboardingClose = () => {
     setShowOnboardingModal(false);
-    if (onSuccess) onSuccess();
-    else navigate({ to: '/' });
+    if (safeNext) navigate({ to: safeNext as any });
+    onSuccess?.();
   };
 
   return (

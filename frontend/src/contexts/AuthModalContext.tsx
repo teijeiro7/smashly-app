@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useCallback, ReactNode } from 'react';
 
 type AuthView = 'login' | 'register';
 
@@ -17,23 +17,23 @@ export const AuthModalProvider: React.FC<{ children: ReactNode }> = ({ children 
   const [isOpen, setIsOpen] = useState(false);
   const [view, setView] = useState<AuthView>('login');
 
-  const openLogin = () => {
+  const openLogin = useCallback(() => {
     setView('login');
     setIsOpen(true);
-  };
+  }, []);
 
-  const openRegister = () => {
+  const openRegister = useCallback(() => {
     setView('register');
     setIsOpen(true);
-  };
+  }, []);
 
-  const closeModal = () => {
+  const closeModal = useCallback(() => {
     setIsOpen(false);
-  };
+  }, []);
 
-  const toggleView = () => {
+  const toggleView = useCallback(() => {
     setView(prev => (prev === 'login' ? 'register' : 'login'));
-  };
+  }, []);
 
   return (
     <AuthModalContext.Provider

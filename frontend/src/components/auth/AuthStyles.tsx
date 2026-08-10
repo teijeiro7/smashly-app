@@ -34,7 +34,7 @@ export const Tab = styled(Link)<{ $active?: boolean }>`
   font-weight: 600;
   color: ${props => (props.$active ? 'var(--text)' : 'var(--text-muted)')};
   background: ${props => (props.$active ? 'var(--surface)' : 'transparent')};
-  box-shadow: ${props => (props.$active ? '0 1px 3px rgba(0,0,0,0.1)' : 'none')};
+  box-shadow: ${props => (props.$active ? 'var(--shadow-sm)' : 'none')};
   transition: all 0.2s ease;
 
   &:hover {

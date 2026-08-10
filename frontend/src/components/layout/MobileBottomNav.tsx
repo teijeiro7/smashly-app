@@ -18,7 +18,7 @@ const NavShell = styled.nav`
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   border-top: 1px solid var(--primary-faint);
-  box-shadow: 0 -12px 30px rgba(17, 24, 39, 0.08);
+  box-shadow: 0 -12px 30px var(--shadow-color);
   will-change: transform;
   transform: translateZ(0);
 
@@ -92,7 +92,7 @@ const PopupOverlay = styled(motion.div)`
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(var(--scrim-rgb), 0.5);
   z-index: 500;
   display: flex;
   align-items: flex-end;
@@ -107,7 +107,7 @@ const PopupCard = styled(motion.div)`
   padding: 1.5rem;
   width: 100%;
   max-width: 400px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 20px 60px var(--shadow-color);
 `;
 
 const PopupTitle = styled.h3`
@@ -152,11 +152,14 @@ const CloseButton = styled.button`
 const MobileBottomNav = React.memo(() => {
   const { location } = useRouterState();
   const navigate = useNavigate();
-  const { user, isAuthenticated, userProfile } = useAuth();
+  const { isAuthenticated, userProfile } = useAuth();
   const { openLogin } = useAuthModal();
   const [showPopup, setShowPopup] = useState<'none' | 'login' | 'onboarding' | null>(null);
 
-  const homePath = isAuthenticated && user?.role?.toLowerCase() === 'player' ? '/dashboard' : '/';
+  // '/' itself dispatches to the right role home via the router's beforeLoad
+  // (see indexRoute in router.tsx) — no need to duplicate that mapping here.
+  const homePath = '/';
+  const HOME_PAGES = ['/', '/dashboard', '/store/dashboard', '/admin'];
 
   const hasCompleteProfile = userProfile?.game_level && userProfile.game_level !== '';
 
@@ -181,7 +184,9 @@ const MobileBottomNav = React.memo(() => {
 
   const handleGoToOnboarding = () => {
     setShowPopup(null);
-    navigate({ to: '/onboarding' as any });
+    // No dedicated /onboarding route — completing the profile (game_level,
+    // preferences) happens on /profile itself.
+    navigate({ to: '/profile' });
   };
 
   const items = [
@@ -199,7 +204,7 @@ const MobileBottomNav = React.memo(() => {
           {items.map(item => {
             const isActive =
               location.pathname === item.to ||
-              (item.to === homePath && location.pathname === '/') ||
+              (item.to === homePath && HOME_PAGES.includes(location.pathname)) ||
               (item.to === '/profile' && location.pathname.startsWith('/profile'));
 
             if (item.onClick) {
@@ -208,6 +213,7 @@ const MobileBottomNav = React.memo(() => {
                   key={item.to}
                   onClick={item.onClick}
                   $active={isActive}
+                  aria-current={isActive ? 'page' : undefined}
                   type='button'
                 >
                   {item.icon}
@@ -217,7 +223,12 @@ const MobileBottomNav = React.memo(() => {
             }
 
             return (
-              <NavItemLink key={item.to} to={item.to} $active={isActive}>
+              <NavItemLink
+                key={item.to}
+                to={item.to}
+                $active={isActive}
+                aria-current={isActive ? 'page' : undefined}
+              >
                 {item.icon}
                 <span>{item.label}</span>
               </NavItemLink>
@@ -241,7 +252,7 @@ const MobileBottomNav = React.memo(() => {
               transition={{ type: 'spring', damping: 25, stiffness: 300 }}
               onClick={e => e.stopPropagation()}
             >
-              <CloseButton onClick={handleClosePopup}>
+              <CloseButton onClick={handleClosePopup} aria-label='Cerrar'>
                 <X size={20} />
               </CloseButton>
               <PopupTitle>
@@ -279,7 +290,7 @@ const MobileBottomNav = React.memo(() => {
               transition={{ type: 'spring', damping: 25, stiffness: 300 }}
               onClick={e => e.stopPropagation()}
             >
-              <CloseButton onClick={handleClosePopup}>
+              <CloseButton onClick={handleClosePopup} aria-label='Cerrar'>
                 <X size={20} />
               </CloseButton>
               <PopupTitle>

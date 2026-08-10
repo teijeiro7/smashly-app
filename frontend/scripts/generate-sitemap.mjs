@@ -6,10 +6,8 @@
  * the ~800-racket catalog (and every racket detail page) was entirely
  * unindexed. Runs as a prebuild step (see frontend/package.json "build").
  *
- * Slug/URL scheme must stay in sync with buildRacketUrl() in
- * src/config/seo.ts — this intentionally duplicates that logic rather than
- * importing it, since this script runs standalone via plain Node (no
- * TS/Vite transform) before the rest of the build.
+ * Racket URLs use `rackets.slug` straight from the DB (no local slugify —
+ * see src/config/seo.ts for the route/indexability source of truth).
  */
 import { createClient } from '@supabase/supabase-js';
 import { writeFileSync } from 'node:fs';
@@ -31,20 +29,6 @@ const STATIC_PAGES = [
   { path: '/privacy-policy', changefreq: 'yearly', priority: '0.2' },
 ];
 
-// Mirrors slugify() in src/config/seo.ts.
-function slugify(text) {
-  return text
-    .toString()
-    .normalize('NFD')
-    .replace(/[̀-ͯ]/g, '')
-    .toLowerCase()
-    .trim()
-    .replace(/[^a-z0-9\s-]/g, '')
-    .replace(/\s+/g, '-')
-    .replace(/-+/g, '-')
-    .replace(/^-+|-+$/g, '');
-}
-
 function escapeXml(value) {
   return String(value)
     .replace(/&/g, '&amp;')
@@ -64,8 +48,7 @@ function staticUrlEntry(page) {
 }
 
 function racketUrlEntry(racket) {
-  const slug = slugify(racket.name || '');
-  const loc = `${SITE_URL}/racket-detail?id=${racket.id}&name=${encodeURIComponent(slug)}`;
+  const loc = `${SITE_URL}/palas/${racket.slug}`;
   return `  <url>
     <loc>${escapeXml(loc)}</loc>
     <lastmod>${TODAY}</lastmod>
@@ -83,7 +66,7 @@ async function fetchAllRackets(supabase) {
   for (let from = 0; ; from += PAGE) {
     const { data, error } = await supabase
       .from('rackets')
-      .select('id, name')
+      .select('id, slug')
       .eq('discontinued', false)
       .order('id', { ascending: true })
       .range(from, from + PAGE - 1);

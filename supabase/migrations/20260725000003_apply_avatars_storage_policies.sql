@@ -1,4 +1,11 @@
 -- ============================================================
+-- SUPERSEDED — never applied to production (routing/auth audit 2026-07-30
+-- found it missing an UPDATE policy, needed for upsert-in-place avatar
+-- re-uploads). See 20260730090637_close_rackets_and_avatars_rls.sql for
+-- the version that was actually applied. Left in place only as a
+-- historical record of intent; do not apply this file.
+-- ============================================================
+--
 -- Apply avatars storage policies (audit S11)
 --
 -- 20260621000001_enable_rls.sql drafted these as SQL comments, pending

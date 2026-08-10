@@ -1,7 +1,7 @@
 import { GlobalStyles } from '@styles/GlobalStyles';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { RouterProvider } from '@tanstack/react-router';
-import { StrictMode } from 'react';
+import { StrictMode, useEffect } from 'react';
 import { createRoot } from 'react-dom/client';
 import 'sileo/styles.css';
 import SmashlyToaster from './components/common/SmashlyToaster';
@@ -9,7 +9,7 @@ import { HelmetProvider } from 'react-helmet-async';
 import { registerSW } from 'virtual:pwa-register';
 import * as Sentry from '@sentry/react';
 import ErrorBoundary from './components/ErrorBoundary';
-import { AuthProvider } from './contexts/AuthContext';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { AuthModalProvider } from './contexts/AuthModalContext';
 import { BackgroundTasksProvider } from './contexts/BackgroundTasksContext';
 import { ComparisonProvider } from './contexts/ComparisonContext';
@@ -20,6 +20,29 @@ import { ThemeProvider } from './contexts/ThemeContext';
 import { queryClient } from './lib/queryClient';
 
 import { router } from './router';
+
+/**
+ * Bridges AuthContext into the router: guards read `context.auth` instead of
+ * querying Supabase themselves, and `router.invalidate()` re-runs every
+ * active beforeLoad whenever auth state changes — so signing out on a
+ * protected route sends you out immediately (instead of leaving the page
+ * mounted until the next manual navigation), and signing in re-evaluates the
+ * `/` landing redirect.
+ */
+const InnerApp = () => {
+  const auth = useAuth();
+
+  useEffect(() => {
+    router.invalidate();
+  }, [auth.isAuthenticated, auth.user?.role]);
+
+  return (
+    <>
+      <RouterProvider router={router} context={{ auth }} />
+      <SmashlyToaster />
+    </>
+  );
+};
 
 Sentry.init({
   dsn: import.meta.env.VITE_SENTRY_DSN,
@@ -38,6 +61,7 @@ createRoot(document.getElementById('root')!).render(
     <ThemeProvider>
       <HelmetProvider>
         <QueryClientProvider client={queryClient}>
+          <GlobalStyles />
           <ErrorBoundary>
             <AuthProvider>
               <NotificationProvider>
@@ -46,9 +70,7 @@ createRoot(document.getElementById('root')!).render(
                     <ComparisonProvider>
                       <ListsProvider>
                         <AuthModalProvider>
-                          <GlobalStyles />
-                          <RouterProvider router={router} />
-                          <SmashlyToaster />
+                          <InnerApp />
                         </AuthModalProvider>
                       </ListsProvider>
                     </ComparisonProvider>

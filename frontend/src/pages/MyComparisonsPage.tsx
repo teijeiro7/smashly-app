@@ -13,11 +13,10 @@ import {
   FiCopy,
   FiCheck,
 } from 'react-icons/fi';
-import { Link, useNavigate } from '@tanstack/react-router';
+import { Link } from '@tanstack/react-router';
 import comparisonService, { SavedComparison } from '../services/comparisonService';
 import racketService from '../services/racketService';
 import { Racket } from '../types/racket';
-import { useAuth } from '../contexts/AuthContext';
 import { sileo } from 'sileo';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -153,14 +152,14 @@ const CompareButton = styled(Link)`
   min-height: 48px;
   padding: 0.75rem 1.5rem;
   background: linear-gradient(135deg, var(--primary) 0%, var(--success) 100%);
-  color: white;
+  color: var(--on-primary);
   text-decoration: none;
   border-radius: 8px;
   font-weight: 600;
   transition: all 0.3s ease;
 
   &:hover {
-    color: white;
+    color: var(--on-primary);
     text-decoration: none;
     transform: translateY(-2px);
     box-shadow: 0 8px 25px rgba(var(--primary-rgb), 0.4);
@@ -272,7 +271,7 @@ const ActionButton = styled.button<{ variant?: 'primary' | 'danger' }>`
     props.variant === 'danger'
       ? 'var(--danger)'
       : props.variant === 'primary'
-        ? 'white'
+        ? 'var(--on-primary)'
         : 'var(--text)'};
 
   &:hover {
@@ -280,10 +279,10 @@ const ActionButton = styled.button<{ variant?: 'primary' | 'danger' }>`
     box-shadow: 0 4px 12px
       ${props =>
         props.variant === 'danger'
-          ? 'rgba(220, 38, 38, 0.3)'
+          ? 'rgba(var(--danger-rgb), 0.3)'
           : props.variant === 'primary'
             ? 'rgba(var(--primary-rgb), 0.4)'
-            : 'rgba(0, 0, 0, 0.1)'};
+            : 'var(--shadow-color)'};
   }
 
   &:disabled {
@@ -367,7 +366,7 @@ const Spinner = styled.div`
 const Modal = styled(motion.div)`
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(var(--scrim-rgb), 0.5);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -495,8 +494,6 @@ const ModalBody = styled.div`
 `;
 
 const MyComparisonsPage: React.FC = () => {
-  const { isAuthenticated } = useAuth();
-  const navigate = useNavigate();
   const [allComparisons, setAllComparisons] = useState<SavedComparison[]>([]);
   const [displayedComparisons, setDisplayedComparisons] = useState<SavedComparison[]>([]);
   const [loading, setLoading] = useState(true);
@@ -512,14 +509,12 @@ const MyComparisonsPage: React.FC = () => {
 
   const ITEMS_PER_PAGE = 9;
 
+  // No in-page auth guard needed: the router's requireAuth beforeLoad on
+  // /comparisons already keeps an anonymous user from ever mounting this page.
   useEffect(() => {
-    if (!isAuthenticated) {
-      navigate({ to: '/login' });
-      return;
-    }
-
     loadComparisons();
-  }, [isAuthenticated, navigate]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const loadComparisons = async () => {
     try {
@@ -838,7 +833,7 @@ const MyComparisonsPage: React.FC = () => {
             >
               <ModalHeader>
                 <ModalTitle>Comparación de Palas</ModalTitle>
-                <CloseButton onClick={() => setSelectedComparison(null)}>
+                <CloseButton onClick={() => setSelectedComparison(null)} aria-label='Cerrar'>
                   <FiX />
                 </CloseButton>
               </ModalHeader>

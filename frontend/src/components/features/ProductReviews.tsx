@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import { Link } from '@tanstack/react-router';
 import { reviewService } from '../../services/reviewService';
 import type { ReviewsResponse } from '../../types/review';
 import { ReviewItem } from './ReviewItem';
 import { ReviewForm } from './ReviewForm';
 import { useAuth } from '../../contexts/AuthContext';
+import { useAuthModal } from '../../contexts/AuthModalContext';
 
 interface ProductReviewsProps {
   racketId: number;
@@ -13,6 +13,7 @@ interface ProductReviewsProps {
 
 export const ProductReviews: React.FC<ProductReviewsProps> = ({ racketId }) => {
   const { user } = useAuth();
+  const { openLogin } = useAuthModal();
   const [reviewsData, setReviewsData] = useState<ReviewsResponse | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [page, setPage] = useState(1);
@@ -134,7 +135,7 @@ export const ProductReviews: React.FC<ProductReviewsProps> = ({ racketId }) => {
                   {showForm ? 'Cancel' : 'Write a Review'}
                 </WriteReviewButton>
               )}
-              {!user && <LoginPrompt to='/login'>Log in to write a review</LoginPrompt>}
+              {!user && <LoginPrompt onClick={openLogin}>Log in to write a review</LoginPrompt>}
             </WriteActionArea>
           </SummaryCard>
 
@@ -179,7 +180,9 @@ export const ProductReviews: React.FC<ProductReviewsProps> = ({ racketId }) => {
                 </WriteReviewButton>
               )}
               {!user && (
-                <LoginPrompt to='/login'>Inicia sesión para escribir una valoración</LoginPrompt>
+                <LoginPrompt onClick={openLogin}>
+                  Inicia sesión para escribir una valoración
+                </LoginPrompt>
               )}
             </div>
           </EmptyStateBanner>
@@ -279,11 +282,11 @@ const StarsContainer = styled.div`
   display: flex;
   gap: 4px;
   font-size: 1.5rem;
-  color: #ffc107;
+  color: var(--warning-text);
 `;
 
 const StarIcon = styled.span<{ filled: boolean }>`
-  color: ${p => (p.filled ? '#FFC107' : 'var(--border)')};
+  color: ${p => (p.filled ? 'var(--warning-text)' : 'var(--border)')};
 `;
 
 const TotalReviews = styled.div`
@@ -324,7 +327,7 @@ const BarTrack = styled.div`
 
 const BarFill = styled.div<{ width: number }>`
   height: 100%;
-  background: #ffc107;
+  background: var(--warning);
   width: ${p => p.width}%;
   border-radius: 99px;
   transition: width 0.5s ease-out;
@@ -344,7 +347,7 @@ const WriteActionArea = styled.div`
 const WriteReviewButton = styled.button`
   width: 100%;
   padding: 1rem;
-  background: #ecfdf5;
+  background: var(--primary-faint);
   color: var(--success);
   font-weight: 700;
   font-size: 1rem;
@@ -354,9 +357,9 @@ const WriteReviewButton = styled.button`
   transition: all 0.2s;
 
   &:hover {
-    background: #d1fae5;
+    background: var(--primary-subtle);
     transform: translateY(-1px);
-    box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.1);
+    box-shadow: var(--shadow-md);
   }
 
   &:active {
@@ -364,7 +367,7 @@ const WriteReviewButton = styled.button`
   }
 `;
 
-const LoginPrompt = styled(Link)`
+const LoginPrompt = styled.button`
   display: block;
   width: 100%;
   padding: 1rem;
@@ -373,6 +376,8 @@ const LoginPrompt = styled(Link)`
   color: var(--text);
   font-weight: 600;
   border-radius: 12px;
+  border: none;
+  cursor: pointer;
   text-decoration: none;
   transition: background 0.2s;
 
@@ -407,7 +412,7 @@ const EmptyStateBanner = styled.div`
   justify-content: space-between;
   gap: 2rem;
   margin: 2rem 0;
-  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.08);
+  box-shadow: 0 4px 12px rgba(var(--primary-rgb), 0.08);
 
   @media (max-width: 768px) {
     flex-direction: column;
@@ -419,7 +424,7 @@ const EmptyStateBanner = styled.div`
 const EmptyStateIcon = styled.div`
   font-size: 2.5rem;
   line-height: 1;
-  filter: drop-shadow(0 2px 4px rgba(16, 185, 129, 0.2));
+  filter: drop-shadow(0 2px 4px rgba(var(--primary-rgb), 0.2));
   flex-shrink: 0;
 `;
 

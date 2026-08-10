@@ -86,6 +86,24 @@ class ErrorBoundary extends Component<Props, State> {
               Ha ocurrido un error inesperado. Puedes intentar recargar la página o volver al
               inicio.
             </p>
+            {this.state.error?.message && (
+              <pre
+                style={{
+                  fontSize: '0.85rem',
+                  color: 'var(--danger)',
+                  background: 'var(--danger-subtle)',
+                  padding: '0.75rem',
+                  borderRadius: '8px',
+                  overflowX: 'auto',
+                  textAlign: 'left',
+                  margin: '1rem 0',
+                  whiteSpace: 'pre-wrap',
+                  wordBreak: 'break-word',
+                }}
+              >
+                {this.state.error.message}
+              </pre>
+            )}
             <div
               style={{
                 display: 'flex',

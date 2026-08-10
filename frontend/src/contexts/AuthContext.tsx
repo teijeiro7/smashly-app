@@ -5,12 +5,16 @@ import React, {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from 'react';
 import { supabase } from '../lib/supabase';
 import { queryClient } from '../lib/queryClient';
 import { UserProfile } from '../services/userProfileService';
 import { logger } from '../utils/logger';
+import { withTimeout } from '../utils/withTimeout';
+
+const GET_SESSION_TIMEOUT_MS = 8000;
 
 interface AuthContextType {
   user: UserProfile | null;
@@ -31,7 +35,7 @@ interface AuthContextType {
   ) => Promise<{ data: UserProfile | null; error: string | null; errorCode?: string }>;
   signInWithGoogle: () => Promise<{ data: UserProfile | null; error: string | null }>;
   signOut: () => Promise<{ error: string | null }>;
-  refreshUserProfile: () => Promise<void>;
+  refreshUserProfile: () => Promise<UserProfile | null>;
   clearGoogleOnboarding: () => void;
   clearGoogleBlockError: () => void;
   isAuthenticated: boolean;
@@ -40,6 +44,17 @@ interface AuthContextType {
    * parsing the URL hash itself, since by the time that (lazy-loaded) page
    * mounts, supabase-js has usually already consumed and stripped the hash. */
   isPasswordRecovery: boolean;
+  /** Resolves once the initial getSession() call has settled (success or
+   * failure) — the router's beforeLoad guards await this so they never run
+   * against the pre-hydration flash of `isAuthenticated: false`, which would
+   * otherwise bounce a genuinely logged-in user out of a protected route on
+   * every hard refresh. */
+  ready: Promise<void>;
+  /** True while a sign-out is in flight (local state already cleared, server
+   * revocation still running in the background). Guards use this to redirect
+   * to a clean '/' — without `?next=` — so the login modal never reopens the
+   * instant the user logs out. */
+  isSigningOut: boolean;
 }
 
 interface AuthProviderProps {
@@ -92,6 +107,22 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     suggestedNickname: string;
   } | null>(null);
   const [googleBlockError, setGoogleBlockError] = useState<string | null>(null);
+  const [isSigningOut, setIsSigningOut] = useState<boolean>(false);
+
+  const readyResolveRef = useRef<() => void>(() => {});
+  // Built lazily on first render only. `useRef(new Promise(...))` would
+  // re-evaluate that argument on EVERY render — useRef keeps the first
+  // promise, but the `resolve` captured in readyResolveRef gets rebound to
+  // each new throwaway one. Any re-render before the session settled then
+  // orphaned the promise the router guards were already awaiting: resolving
+  // it hit the throwaway, `ready` never settled, and every beforeLoad hung
+  // forever (blank screen, no error).
+  const readyRef = useRef<Promise<void> | null>(null);
+  if (readyRef.current === null) {
+    readyRef.current = new Promise<void>(resolve => {
+      readyResolveRef.current = resolve;
+    });
+  }
 
   const loadAndSetProfile = useCallback(async (userId: string): Promise<UserProfile | null> => {
     const profile = await fetchProfile(userId);
@@ -117,17 +148,31 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   useEffect(() => {
     let mounted = true;
 
-    supabase.auth
-      .getSession()
+    // supabase-js serializes getSession() through a single-tab lock (see
+    // lib/supabase.ts's `processLock` comment) whose queue can stall forever
+    // if one call in it never settles — neither resolving nor rejecting, so
+    // the .catch() below wouldn't fire either. withTimeout bounds the wait
+    // so a stuck lock can't freeze `ready` (and therefore every router
+    // beforeLoad guard awaiting it) forever.
+    withTimeout(supabase.auth.getSession(), GET_SESSION_TIMEOUT_MS, () => {
+      logger.warn(
+        `getSession() did not settle within ${GET_SESSION_TIMEOUT_MS}ms — proceeding as no session`
+      );
+      return { data: { session: null }, error: null } as Awaited<
+        ReturnType<typeof supabase.auth.getSession>
+      >;
+    })
       .then(({ data: { session } }) => {
         if (!mounted) return;
         if (session?.user) {
           setHasSession(true);
           loadAndSetProfile(session.user.id).finally(() => {
             if (mounted) setLoading(false);
+            readyResolveRef.current();
           });
         } else {
           setLoading(false);
+          readyResolveRef.current();
         }
       })
       .catch(error => {
@@ -135,6 +180,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         // fail as "no session" rather than hang the whole app on a spinner.
         logger.warn('Could not restore session:', error);
         if (mounted) setLoading(false);
+        readyResolveRef.current();
       });
 
     const {
@@ -145,17 +191,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       if (event === 'SIGNED_OUT' || !session) {
         clearAuth();
         setLoading(false);
+        readyResolveRef.current();
         return;
       }
 
       if (event === 'PASSWORD_RECOVERY') {
-        // A recovery link was just parsed from the URL: there is now a
-        // session that can call supabase.auth.updateUser({ password }), but
-        // this is NOT a normal login — don't route the user anywhere else,
-        // just flag it so UpdatePasswordPage can render its form.
         setHasSession(true);
         setIsPasswordRecovery(true);
         setLoading(false);
+        readyResolveRef.current();
         return;
       }
 
@@ -163,6 +207,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         setHasSession(true);
         const profile = await loadAndSetProfile(session.user.id);
         setLoading(false);
+        readyResolveRef.current();
 
         // Detect new Google user who needs to set a nickname
         const provider = session.user.app_metadata?.provider;
@@ -319,22 +364,32 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     // scope: 'local' — sign out of THIS browser only. The default ('global')
     // revokes every session for the user, so logging out on your phone would
     // also kick you out on your laptop.
-    const { error } = await supabase.auth.signOut({ scope: 'local' });
+    setIsSigningOut(true);
     clearAuth();
     // Drop any cached React Query data (profile, lists, conversations, ...)
     // so a different account signing in on the same device/tab never sees
     // a flash of the previous user's data before it refetches.
     queryClient.clear();
-    return { error: error?.message ?? null };
+    // Never block the UI on the server-side revocation round-trip: it can
+    // take seconds and the page feels frozen while it's awaited. scope
+    // 'local' only blacklists this browser's refresh token, which supabase-js
+    // removes from local storage when the call resolves, so the backgrounded
+    // call leaves no dangling server-side session.
+    void supabase.auth.signOut({ scope: 'local' });
+    // Once the logout navigation has settled, restore the normal
+    // `?next=` login-modal behavior for anonymous visits to protected routes.
+    window.setTimeout(() => setIsSigningOut(false), 5000);
+    return { error: null };
   }, [clearAuth]);
 
-  const refreshUserProfile = useCallback(async (): Promise<void> => {
+  const refreshUserProfile = useCallback(async (): Promise<UserProfile | null> => {
     const {
       data: { session },
     } = await supabase.auth.getSession();
     if (session?.user) {
-      await loadAndSetProfile(session.user.id);
+      return loadAndSetProfile(session.user.id);
     }
+    return null;
   }, [loadAndSetProfile]);
 
   const value = useMemo<AuthContextType>(
@@ -353,12 +408,17 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       clearGoogleBlockError,
       isAuthenticated: hasSession,
       isPasswordRecovery,
+      // Non-null by construction: the lazy-init block above runs on every
+      // render before this point.
+      ready: readyRef.current!,
+      isSigningOut,
     }),
     [
       user,
       userProfile,
       hasSession,
       isPasswordRecovery,
+      isSigningOut,
       loading,
       pendingGoogleOnboarding,
       googleBlockError,

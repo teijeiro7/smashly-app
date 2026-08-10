@@ -1,4 +1,5 @@
 import type { IncomingMessage, ServerResponse } from 'http';
+import { setCorsHeaders, handleOptions } from '../_lib/auth';
 import { generateContent } from '../_lib/ai';
 import { getAllRackets, getCatalogVersion } from '../_lib/racket-service';
 import { filterRacketsWithScores, assessBiomechanicalSafety } from '../_lib/racket-filter';
@@ -119,15 +120,9 @@ function readBody(req: IncomingMessage): Promise<any> {
 }
 
 export default async function handler(req: IncomingMessage, res: ServerResponse): Promise<void> {
-  res.setHeader('Access-Control-Allow-Origin', process.env.FRONTEND_URL || '*');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  setCorsHeaders(req, res);
 
-  if (req.method === 'OPTIONS') {
-    res.writeHead(204);
-    res.end();
-    return;
-  }
+  if (handleOptions(req, res)) return;
 
   if (req.method !== 'POST') {
     res.writeHead(405, { 'Content-Type': 'application/json' });

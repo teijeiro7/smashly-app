@@ -1,13 +1,26 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import styled from 'styled-components';
 import { Link } from '@tanstack/react-router';
-import { FiArrowLeft, FiEdit2, FiTrash2, FiSearch, FiPackage, FiTag, FiX } from 'react-icons/fi';
+import {
+  FiArrowLeft,
+  FiEdit2,
+  FiTrash2,
+  FiSearch,
+  FiPackage,
+  FiTag,
+  FiX,
+  FiChevronLeft,
+  FiChevronRight,
+} from 'react-icons/fi';
 import { Racket } from '@/types/racket';
 import { racketImageUrl } from '../utils/imageUrl';
 import { formatBrandName, formatRacketName } from '../utils/textUtils';
 import racketService from '@/services/racketService';
 import { EditRacketModal } from '@/components/admin/EditRacketModal';
+import { useDebounce } from '@/hooks/useDebounce';
 import { sileo } from 'sileo';
+
+const PAGE_SIZE = 50;
 
 const PageContainer = styled.div`
   min-height: 100vh;
@@ -167,7 +180,7 @@ const BulkReplaceButton = styled.button`
   border: none;
   border-radius: 6px;
   font-size: 0.8rem;
-  color: white;
+  color: var(--on-primary);
   cursor: pointer;
   align-self: flex-end;
   transition: all 0.2s;
@@ -283,8 +296,8 @@ const Badge = styled.span<{ variant: 'success' | 'warning' | 'default' }>`
         `;
       case 'warning':
         return `
-          background: #fef3c7;
-          color: #92400e;
+          background: var(--accent-subtle);
+          color: var(--accent-text);
         `;
       default:
         return `
@@ -314,9 +327,9 @@ const ActionButton = styled.button<{ variant?: 'edit' | 'delete' }>`
   ${props =>
     props.variant === 'edit'
       ? `
-        background: #eff6ff;
+        background: var(--info-subtle);
         color: var(--info);
-        &:hover { background: #dbeafe; }
+        &:hover { background: var(--info-subtle); }
       `
       : `
         background: var(--danger-subtle);
@@ -362,11 +375,52 @@ const Stat = styled.div`
   }
 `;
 
+const PaginationBar = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 1.5rem 0;
+`;
+
+const PageButton = styled.button`
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.5rem 1rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text);
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover:not(:disabled) {
+    background: var(--surface-3);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+`;
+
+const PageIndicator = styled.span`
+  font-size: 0.875rem;
+  color: var(--text-muted);
+`;
+
 const AdminRacketsPage: React.FC = () => {
   const [rackets, setRackets] = useState<Racket[]>([]);
-  const [filteredRackets, setFilteredRackets] = useState<Racket[]>([]);
+  // null = unknown total (unfiltered getRacketsWithPagination doesn't return
+  // a count) — pagination then falls back to a "got a full page" heuristic.
+  const [totalCount, setTotalCount] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(0);
   const [searchQuery, setSearchQuery] = useState('');
+  const debouncedSearchQuery = useDebounce(searchQuery, 400);
   const [editingRacket, setEditingRacket] = useState<Racket | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
@@ -377,7 +431,11 @@ const AdminRacketsPage: React.FC = () => {
   const [filterNivel, setFilterNivel] = useState('');
   const [filterOferta, setFilterOferta] = useState('');
 
-  // Obtener valores únicos para los filtros
+  // ponytail: filter dropdown options are page-scoped now (previously
+  // computed from a full 1333-row download). Wire a distinct-values
+  // endpoint if an incomplete brand/shape/level list becomes a real
+  // complaint — for now this avoids re-introducing the full-table fetch
+  // pagination was added to remove.
   const uniqueMarcas = useMemo(() => {
     const marcas = new Set(rackets.map(r => r.marca).filter(Boolean));
     return Array.from(marcas).sort();
@@ -393,6 +451,16 @@ const AdminRacketsPage: React.FC = () => {
     return Array.from(niveles).sort();
   }, [rackets]);
 
+  // Oferta no tiene equivalente server-side limpio (on_offer=false excluiría
+  // filas NULL que sí deben contarse como "sin oferta") — se sigue aplicando
+  // en cliente, pero ahora solo sobre la página actual, no sobre las 1333
+  // palas.
+  const filteredRackets = useMemo(() => {
+    if (filterOferta === 'oferta') return rackets.filter(r => r.en_oferta === true);
+    if (filterOferta === 'no-oferta') return rackets.filter(r => r.en_oferta !== true);
+    return rackets;
+  }, [rackets, filterOferta]);
+
   const clearFilters = () => {
     setFilterMarca('');
     setFilterForma('');
@@ -402,59 +470,44 @@ const AdminRacketsPage: React.FC = () => {
   };
 
   const hasActiveFilters = filterMarca || filterForma || filterNivel || filterOferta || searchQuery;
+  const hasServerQuery = Boolean(
+    debouncedSearchQuery.trim() || filterMarca || filterForma || filterNivel
+  );
+
+  // Cualquier cambio de búsqueda/filtro server-side vuelve a la primera página.
+  useEffect(() => {
+    setPage(0);
+  }, [debouncedSearchQuery, filterMarca, filterForma, filterNivel]);
 
   useEffect(() => {
     loadRackets();
-  }, []);
-
-  useEffect(() => {
-    let result = [...rackets];
-
-    // Filtro por búsqueda
-    if (searchQuery.trim() !== '') {
-      const query = searchQuery.toLowerCase();
-      result = result.filter(
-        r =>
-          r.marca?.toLowerCase().includes(query) ||
-          r.modelo?.toLowerCase().includes(query) ||
-          r.nombre?.toLowerCase().includes(query)
-      );
-    }
-
-    // Filtro por marca
-    if (filterMarca) {
-      result = result.filter(r => r.marca === filterMarca);
-    }
-
-    // Filtro por forma
-    if (filterForma) {
-      result = result.filter(r => r.caracteristicas_forma === filterForma);
-    }
-
-    // Filtro por nivel
-    if (filterNivel) {
-      result = result.filter(r => r.caracteristicas_nivel_de_juego === filterNivel);
-    }
-
-    // Filtro por oferta
-    if (filterOferta === 'oferta') {
-      result = result.filter(r => r.en_oferta === true);
-    } else if (filterOferta === 'no-oferta') {
-      result = result.filter(r => r.en_oferta !== true);
-    }
-
-    setFilteredRackets(result);
-  }, [searchQuery, rackets, filterMarca, filterForma, filterNivel, filterOferta]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [page, debouncedSearchQuery, filterMarca, filterForma, filterNivel]);
 
   const loadRackets = async () => {
     try {
       setLoading(true);
-      const data = await racketService.getAllRackets();
-      console.log('API Response:', data);
-      const racketsArray = Array.isArray(data) ? data : [];
-      console.log('Rackets array:', racketsArray);
-      setRackets(racketsArray);
-      setFilteredRackets(racketsArray);
+      if (hasServerQuery) {
+        const filters: Record<string, string> = {};
+        if (filterMarca) filters.marca = filterMarca;
+        if (filterForma) filters.forma = filterForma;
+        if (filterNivel) filters.nivel = filterNivel;
+
+        const { data, pagination } = await racketService.searchRackets(
+          debouncedSearchQuery,
+          filters,
+          {
+            page,
+            limit: PAGE_SIZE,
+          }
+        );
+        setRackets(data);
+        setTotalCount(pagination?.total ?? null);
+      } else {
+        const data = await racketService.getRacketsWithPagination(page, PAGE_SIZE);
+        setRackets(data);
+        setTotalCount(null);
+      }
     } catch (error) {
       console.error('Error loading rackets:', error);
       sileo.error({ title: 'Error', description: 'Error al cargar las palas' });
@@ -463,6 +516,10 @@ const AdminRacketsPage: React.FC = () => {
     }
   };
 
+  const hasNextPage =
+    totalCount !== null ? (page + 1) * PAGE_SIZE < totalCount : rackets.length === PAGE_SIZE;
+  const hasPrevPage = page > 0;
+
   const handleEdit = (racket: Racket) => {
     setEditingRacket(racket);
     setIsEditModalOpen(true);
@@ -470,7 +527,6 @@ const AdminRacketsPage: React.FC = () => {
 
   const handleUpdate = (updatedRacket: Racket) => {
     setRackets(prev => prev.map(r => (r.id === updatedRacket.id ? updatedRacket : r)));
-    setFilteredRackets(prev => prev.map(r => (r.id === updatedRacket.id ? updatedRacket : r)));
   };
 
   const handleDelete = async (racket: Racket) => {
@@ -484,7 +540,6 @@ const AdminRacketsPage: React.FC = () => {
     try {
       await racketService.deleteRacket(racket.id);
       setRackets(prev => prev.filter(r => r.id !== racket.id));
-      setFilteredRackets(prev => prev.filter(r => r.id !== racket.id));
       sileo.success({ title: 'Éxito', description: 'Pala eliminada correctamente' });
     } catch (error) {
       console.error('Error deleting racket:', error);
@@ -547,7 +602,7 @@ const AdminRacketsPage: React.FC = () => {
           <BackButton to='/admin'>
             <FiArrowLeft /> Volver
           </BackButton>
-          <Title>Gestión de Palas ({rackets.length})</Title>
+          <Title>Gestión de Palas{totalCount !== null ? ` (${totalCount})` : ''}</Title>
         </HeaderLeft>
         <SearchContainer>
           <SearchIcon>
@@ -641,7 +696,8 @@ const AdminRacketsPage: React.FC = () => {
         )}
 
         <ResultsInfo>
-          {filteredRackets.length} de {rackets.length} palas
+          {filteredRackets.length} palas en esta página
+          {totalCount !== null ? ` de ${totalCount} total` : ''}
         </ResultsInfo>
       </FiltersContainer>
 
@@ -649,7 +705,7 @@ const AdminRacketsPage: React.FC = () => {
         <StatsBar>
           <Stat>
             <FiPackage size={16} />
-            <span>{rackets.length}</span> Total Palas
+            <span>{rackets.length}</span> En esta página
           </Stat>
           <Stat>
             <FiTag size={16} />
@@ -775,6 +831,19 @@ const AdminRacketsPage: React.FC = () => {
             </tbody>
           </Table>
         </TableContainer>
+
+        <PaginationBar>
+          <PageButton
+            onClick={() => setPage(p => Math.max(p - 1, 0))}
+            disabled={!hasPrevPage || loading}
+          >
+            <FiChevronLeft size={16} /> Anterior
+          </PageButton>
+          <PageIndicator>Página {page + 1}</PageIndicator>
+          <PageButton onClick={() => setPage(p => p + 1)} disabled={!hasNextPage || loading}>
+            Siguiente <FiChevronRight size={16} />
+          </PageButton>
+        </PaginationBar>
       </Content>
 
       {editingRacket && (

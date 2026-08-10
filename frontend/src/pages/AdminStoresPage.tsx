@@ -1,7 +1,5 @@
 import React from 'react';
 import styled from 'styled-components';
-import { useAuth } from '../contexts/AuthContext';
-import { Navigate } from '@tanstack/react-router';
 import AdminLayout from '../components/features/AdminLayout';
 import StoreRequestsManager from '../components/features/StoreRequestsManager';
 
@@ -26,28 +24,9 @@ const PageSubtitle = styled.p`
   font-size: 1rem;
 `;
 
-const LoadingContainer = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 400px;
-`;
-
+// No in-page auth/role guard needed: the router's requireAdmin beforeLoad on
+// /admin/stores already keeps a non-admin from ever mounting this page.
 const AdminStoresPage: React.FC = () => {
-  const { user, loading } = useAuth();
-
-  if (loading) {
-    return (
-      <LoadingContainer>
-        <div>Cargando...</div>
-      </LoadingContainer>
-    );
-  }
-
-  if (!user || user.role?.toLowerCase() !== 'admin') {
-    return <Navigate to='/profile' replace />;
-  }
-
   return (
     <AdminLayout>
       <PageHeader>

@@ -2,7 +2,6 @@ import React from 'react';
 import { Book, Compass, House, Stack } from '@phosphor-icons/react';
 import { Link, useRouterState } from '@tanstack/react-router';
 import styled from 'styled-components';
-import { useAuth } from '../../contexts/AuthContext';
 
 const SubHeaderContainer = styled.div`
   background: var(--surface);
@@ -93,19 +92,22 @@ const NavText = styled.span`
 
 const SubHeader: React.FC = () => {
   const { location } = useRouterState();
-  const { user, isAuthenticated } = useAuth();
 
   const isActive = (path: string) => location.pathname === path;
 
-  // Determine home path based on user authentication
-  const homePath = isAuthenticated && user?.role?.toLowerCase() === 'player' ? '/dashboard' : '/';
+  // '/' itself dispatches to the right role home via the router's beforeLoad
+  // (see indexRoute in router.tsx), so "Inicio" always points there — no
+  // need to duplicate the role→path mapping here. "Active" covers every
+  // role's actual home page so the highlight doesn't disappear once the
+  // redirect has landed.
+  const HOME_PAGES = ['/', '/dashboard', '/store/dashboard', '/admin'];
 
   const navigationItems = [
     {
-      to: homePath,
+      to: '/' as const,
       icon: <House />,
       text: 'Inicio',
-      isActive: isActive(homePath) || (homePath === '/dashboard' && isActive('/')),
+      isActive: HOME_PAGES.includes(location.pathname),
     },
     {
       to: '/catalog',

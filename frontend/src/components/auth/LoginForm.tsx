@@ -43,7 +43,12 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, onRegisterClick }) => 
   const [showPassword, setShowPassword] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
 
-  const redirectTo = searchParams['redirect'] || '/';
+  // `next` is populated by a router guard redirecting an anonymous user away
+  // from a protected route (see requireAuth in router.tsx) — only an
+  // internal app path starting with `/` is ever honored, guarding against a
+  // crafted `?next=//evil.com` protocol-relative URL.
+  const next = searchParams['next'];
+  const safeNext = next && next.startsWith('/') && !next.startsWith('//') ? next : undefined;
 
   const form = useForm({
     defaultValues: { email: '', password: '' },
@@ -54,8 +59,12 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, onRegisterClick }) => 
         return;
       }
       sileo.success({ title: 'Éxito', description: '¡Bienvenido de nuevo!' });
-      if (onSuccess) onSuccess();
-      else navigate({ to: redirectTo as any });
+      // Modal auth closes over the current page; when a guard sent the user
+      // here with `next`, follow through to their original destination —
+      // otherwise router.invalidate() would re-run indexRoute's beforeLoad
+      // and land them on their role's default home instead.
+      if (safeNext) navigate({ to: safeNext as any });
+      onSuccess?.();
     },
   });
 

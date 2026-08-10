@@ -17,7 +17,7 @@ const Overlay = styled.div`
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.95);
+  background: rgba(var(--scrim-rgb), 0.95);
   z-index: 9999;
   display: flex;
   align-items: center;
@@ -38,17 +38,17 @@ const CloseButton = styled.button`
   position: absolute;
   top: 2rem;
   right: 2rem;
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(var(--on-brand-rgb), 0.1);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(var(--on-brand-rgb), 0.2);
 
   @media (hover: none) and (pointer: coarse) {
     backdrop-filter: none;
     -webkit-backdrop-filter: none;
-    background: rgba(255, 255, 255, 0.2);
+    background: rgba(var(--on-brand-rgb), 0.2);
   }
-  color: white;
+  color: var(--on-brand);
   width: 48px;
   height: 48px;
   border-radius: 50%;
@@ -60,7 +60,7 @@ const CloseButton = styled.button`
   z-index: 10001;
 
   &:hover {
-    background: rgba(255, 255, 255, 0.2);
+    background: rgba(var(--on-brand-rgb), 0.2);
     transform: scale(1.1);
   }
 `;
@@ -70,17 +70,17 @@ const NavigationButton = styled.button<{ direction: 'left' | 'right' }>`
   top: 50%;
   ${props => (props.direction === 'left' ? 'left: 2rem' : 'right: 2rem')};
   transform: translateY(-50%);
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(var(--on-brand-rgb), 0.1);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(var(--on-brand-rgb), 0.2);
 
   @media (hover: none) and (pointer: coarse) {
     backdrop-filter: none;
     -webkit-backdrop-filter: none;
-    background: rgba(255, 255, 255, 0.2);
+    background: rgba(var(--on-brand-rgb), 0.2);
   }
-  color: white;
+  color: var(--on-brand);
   width: 56px;
   height: 56px;
   border-radius: 50%;
@@ -92,7 +92,7 @@ const NavigationButton = styled.button<{ direction: 'left' | 'right' }>`
   z-index: 10001;
 
   &:hover {
-    background: rgba(255, 255, 255, 0.2);
+    background: rgba(var(--on-brand-rgb), 0.2);
     transform: translateY(-50%) scale(1.1);
   }
 
@@ -146,17 +146,17 @@ const Counter = styled.div`
   bottom: 2rem;
   left: 50%;
   transform: translateX(-50%);
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(var(--on-brand-rgb), 0.1);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(var(--on-brand-rgb), 0.2);
 
   @media (hover: none) and (pointer: coarse) {
     backdrop-filter: none;
     -webkit-backdrop-filter: none;
-    background: rgba(255, 255, 255, 0.2);
+    background: rgba(var(--on-brand-rgb), 0.2);
   }
-  color: white;
+  color: var(--on-brand);
   padding: 0.5rem 1rem;
   border-radius: 99px;
   font-size: 0.875rem;
@@ -200,7 +200,7 @@ export const ImageLightbox: React.FC<ImageLightboxProps> = ({
 
   return (
     <Overlay onClick={onClose}>
-      <CloseButton onClick={onClose}>
+      <CloseButton onClick={onClose} aria-label='Cerrar'>
         <FiX size={24} />
       </CloseButton>
 
@@ -213,6 +213,7 @@ export const ImageLightbox: React.FC<ImageLightboxProps> = ({
               if (currentIndex > 0) onNavigate(currentIndex - 1);
             }}
             disabled={currentIndex === 0}
+            aria-label='Imagen anterior'
           >
             <FiChevronLeft size={24} />
           </NavigationButton>
@@ -224,6 +225,7 @@ export const ImageLightbox: React.FC<ImageLightboxProps> = ({
               if (currentIndex < images.length - 1) onNavigate(currentIndex + 1);
             }}
             disabled={currentIndex === images.length - 1}
+            aria-label='Imagen siguiente'
           >
             <FiChevronRight size={24} />
           </NavigationButton>

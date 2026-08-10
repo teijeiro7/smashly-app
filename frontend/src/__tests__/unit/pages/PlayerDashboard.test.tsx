@@ -43,6 +43,7 @@ vi.mock('../../../services/listService', () => ({
 vi.mock('../../../services/racketService', () => ({
   default: {
     getAllRackets: vi.fn().mockResolvedValue([]),
+    getRacketsOnSale: vi.fn().mockResolvedValue([]),
   },
 }));
 
@@ -61,11 +62,18 @@ vi.mock('../../../services/recommendationService', () => ({
 vi.mock('@tanstack/react-router', () => ({
   useNavigate: () => mocks.mockNavigate,
   useRouterState: () => ({ location: { hash: '' } }),
-  Link: ({ to, children, className, ...props }: any) => (
-    <a href={to} className={className} {...props}>
-      {children}
-    </a>
-  ),
+  Link: ({ to, search, children, className, ...props }: any) => {
+    const qs = search
+      ? `?${Object.entries(search)
+          .map(([key, value]) => `${key}=${encodeURIComponent(String(value))}`)
+          .join('&')}`
+      : '';
+    return (
+      <a href={`${to}${qs}`} className={className} {...props}>
+        {children}
+      </a>
+    );
+  },
 }));
 
 const recommendation = {
@@ -155,5 +163,45 @@ describe('PlayerDashboard recommendation cards', () => {
         within(link.parentElement as HTMLElement).getByRole('link', { name: /ver detalle/i })
       ).toBe(link);
     });
+  });
+});
+
+describe('PlayerDashboard offers filtering and price display', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mocks.mockGetLast.mockResolvedValue(null);
+  });
+
+  it('filters out rackets with price 0 or solo_comparacion from Offers section', async () => {
+    const racketService = (await import('../../../services/racketService')).default;
+    vi.mocked(racketService.getRacketsOnSale).mockResolvedValue([
+      {
+        id: 1,
+        slug: 'bullpadel-xplo-2025',
+        nombre: 'Bullpadel Xplo 2025',
+        marca: 'Bullpadel',
+        precio_actual: 0,
+        en_oferta: true,
+        solo_comparacion: true,
+      },
+      {
+        id: 2,
+        slug: 'drop-shot-prime-attack-2026',
+        nombre: 'Drop Shot Prime Attack 2026',
+        marca: 'Drop Shot',
+        precio_actual: 209.95,
+        en_oferta: true,
+        solo_comparacion: false,
+      },
+    ] as any);
+
+    render(<PlayerDashboard />);
+
+    await waitFor(() => {
+      expect(screen.getByText('Ofertas que te pueden interesar')).toBeInTheDocument();
+    });
+
+    expect(screen.getByText('Drop Shot Prime Attack 2026')).toBeInTheDocument();
+    expect(screen.queryByText('Bullpadel Xplo 2025')).not.toBeInTheDocument();
   });
 });

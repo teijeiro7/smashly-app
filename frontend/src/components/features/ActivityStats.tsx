@@ -4,6 +4,13 @@ import { motion } from 'framer-motion';
 import { FiStar, FiList, FiGitBranch, FiClock } from 'react-icons/fi';
 import { Link } from '@tanstack/react-router';
 import { formatRacketName } from '../../utils/textUtils';
+import { useTheme } from '../../contexts/ThemeContext';
+
+// No semantic token fits these two decorative per-category accent colors
+// (violet for lists, cyan for comparisons) — they're visual category
+// markers, not status indicators.
+const LISTS_ACCENT = { light: '#8b5cf6', dark: '#a78bfa' };
+const COMPARISONS_ACCENT = { light: '#06b6d4', dark: '#22d3ee' };
 
 const Container = styled.div`
   display: flex;
@@ -63,7 +70,7 @@ const StatLabel = styled.div`
   margin-top: 0.5rem;
 `;
 
-const SectionTitle = styled.h3`
+const SectionTitle = styled.h2`
   font-size: 1.0625rem;
   font-weight: 600;
   color: var(--primary);
@@ -161,7 +168,7 @@ interface ActivityStatsProps {
     id: number;
     rating: number;
     created_at: string;
-    rackets?: { nombre: string; marca: string };
+    rackets?: { nombre: string; marca: string; slug: string };
   }>;
   recentLists?: Array<{
     id: string;
@@ -197,6 +204,10 @@ const ActivityStats: React.FC<ActivityStatsProps> = ({
   recentLists = [],
   recentComparisons = [],
 }) => {
+  const { resolved } = useTheme();
+  const isDark = resolved === 'dark';
+  const pick = (accent: { light: string; dark: string }) => (isDark ? accent.dark : accent.light);
+
   return (
     <Container>
       <StatsGrid>
@@ -208,16 +219,16 @@ const ActivityStats: React.FC<ActivityStatsProps> = ({
           <StatLabel>Reviews escritas</StatLabel>
         </StatCard>
 
-        <StatCard $color='#8b5cf6' whileHover={{ y: -4 }}>
-          <StatIcon color='#8b5cf6'>
+        <StatCard $color={pick(LISTS_ACCENT)} whileHover={{ y: -4 }}>
+          <StatIcon color={pick(LISTS_ACCENT)}>
             <FiList />
           </StatIcon>
           <StatValue>{stats.listsCount}</StatValue>
           <StatLabel>Listas creadas</StatLabel>
         </StatCard>
 
-        <StatCard $color='#06b6d4' whileHover={{ y: -4 }}>
-          <StatIcon color='#06b6d4'>
+        <StatCard $color={pick(COMPARISONS_ACCENT)} whileHover={{ y: -4 }}>
+          <StatIcon color={pick(COMPARISONS_ACCENT)}>
             <FiGitBranch />
           </StatIcon>
           <StatValue>{stats.comparisonsCount}</StatValue>
@@ -234,7 +245,8 @@ const ActivityStats: React.FC<ActivityStatsProps> = ({
             {recentReviews.slice(0, 3).map(review => (
               <RecentItem
                 key={review.id}
-                to={`/racket/${review.rackets?.nombre?.toLowerCase().replace(/\s+/g, '-')}`}
+                to='/palas/$slug'
+                params={{ slug: review.rackets?.slug ?? '' } as any}
               >
                 <RecentItemInfo>
                   <RecentItemIcon color='var(--accent)'>
@@ -249,7 +261,9 @@ const ActivityStats: React.FC<ActivityStatsProps> = ({
                 </RecentItemInfo>
               </RecentItem>
             ))}
-            <ViewAllLink to='/profile?tab=reviews'>Ver todas las reviews</ViewAllLink>
+            <ViewAllLink to='/profile' search={{ tab: 'reviews' } as any}>
+              Ver todas las reviews
+            </ViewAllLink>
           </RecentList>
         </>
       )}
@@ -263,7 +277,7 @@ const ActivityStats: React.FC<ActivityStatsProps> = ({
             {recentLists.slice(0, 3).map(list => (
               <RecentItem key={list.id} to={`/lists/${list.id}`}>
                 <RecentItemInfo>
-                  <RecentItemIcon color='#8b5cf6'>
+                  <RecentItemIcon color={pick(LISTS_ACCENT)}>
                     <FiList size={16} />
                   </RecentItemIcon>
                   <RecentItemText>
@@ -275,7 +289,9 @@ const ActivityStats: React.FC<ActivityStatsProps> = ({
                 </RecentItemInfo>
               </RecentItem>
             ))}
-            <ViewAllLink to='/profile?tab=lists'>Ver todas las listas</ViewAllLink>
+            <ViewAllLink to='/profile' search={{ tab: 'lists' } as any}>
+              Ver todas las listas
+            </ViewAllLink>
           </RecentList>
         </>
       )}
@@ -289,7 +305,7 @@ const ActivityStats: React.FC<ActivityStatsProps> = ({
             {recentComparisons.slice(0, 3).map(comp => (
               <RecentItem key={comp.id} to={`/compare/${comp.id}`}>
                 <RecentItemInfo>
-                  <RecentItemIcon color='#06b6d4'>
+                  <RecentItemIcon color={pick(COMPARISONS_ACCENT)}>
                     <FiGitBranch size={16} />
                   </RecentItemIcon>
                   <RecentItemText>
@@ -301,7 +317,9 @@ const ActivityStats: React.FC<ActivityStatsProps> = ({
                 </RecentItemInfo>
               </RecentItem>
             ))}
-            <ViewAllLink to='/profile?tab=comparisons'>Ver todas las comparaciones</ViewAllLink>
+            <ViewAllLink to='/profile' search={{ tab: 'comparisons' } as any}>
+              Ver todas las comparaciones
+            </ViewAllLink>
           </RecentList>
         </>
       )}

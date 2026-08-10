@@ -12,6 +12,7 @@ import {
 } from 'recharts';
 import styled from 'styled-components';
 import racketService, { PriceHistoryResult } from '../../services/racketService';
+import { useTheme } from '../../contexts/ThemeContext';
 
 // ── Styled components ────────────────────────────────────────────────────────
 
@@ -64,7 +65,7 @@ const PriceBadge = styled.span<{ variant: 'low' | 'neutral' | 'high' }>`
     variant === 'low'
       ? 'var(--primary-subtle)'
       : variant === 'high'
-        ? 'rgba(220, 38, 38, 0.10)'
+        ? 'var(--danger-subtle)'
         : 'var(--surface-3)'};
   color: ${({ variant }) =>
     variant === 'low'
@@ -112,10 +113,13 @@ const EmptyState = styled.div`
 
 const STORE_COLORS: Record<string, string> = {
   padelmarket: 'var(--primary)',
-  padelnuestro: '#2563eb',
-  padelproshop: '#d97706',
-  otras: '#8b5cf6', // Agregado: color para tiendas restantes
+  padelnuestro: 'var(--info)',
+  padelproshop: 'var(--accent)',
 };
+
+// No hay token de catálogo para este morado categórico del gráfico ("otras
+// tiendas"); se resuelve por tema con useTheme() dentro del componente.
+const OTHER_STORE_COLOR = { light: '#8b5cf6', dark: '#a78bfa' };
 
 const STORE_LABELS: Record<string, string> = {
   padelmarket: 'Padel Market',
@@ -160,6 +164,14 @@ export const PriceHistoryChart: React.FC<PriceHistoryChartProps> = ({ racketId, 
   const [days, setDays] = useState(90);
   const [historyData, setHistoryData] = useState<PriceHistoryResult | null>(null);
   const [loading, setLoading] = useState(true);
+  const { resolved } = useTheme();
+  const storeColors = useMemo<Record<string, string>>(
+    () => ({
+      ...STORE_COLORS,
+      otras: resolved === 'dark' ? OTHER_STORE_COLOR.dark : OTHER_STORE_COLOR.light,
+    }),
+    [resolved]
+  );
 
   // Fetch al montar y cuando cambie la ventana de días
   useEffect(() => {
@@ -178,13 +190,17 @@ export const PriceHistoryChart: React.FC<PriceHistoryChartProps> = ({ racketId, 
     };
   }, [racketId, days]);
 
-  // Determinar el precio más bajo y más alto globales para el badge
+  // Determinar el precio más bajo y más alto globales para el badge.
+  // `reduce` instead of `Math.min(...prices)`/`Math.max(...prices)` — the
+  // spread blows the call-stack argument limit on long price histories.
   const { globalMin, globalMax } = useMemo(() => {
     if (!historyData || historyData.combined.length === 0) {
       return { globalMin: null, globalMax: null };
     }
     const prices = historyData.combined.map(p => p.price);
-    return { globalMin: Math.min(...prices), globalMax: Math.max(...prices) };
+    const globalMin = prices.reduce((min, p) => (p < min ? p : min), prices[0]);
+    const globalMax = prices.reduce((max, p) => (p > max ? p : max), prices[0]);
+    return { globalMin, globalMax };
   }, [historyData]);
 
   // Construir datos para Recharts: un punto por fecha con precio de cada tienda
@@ -194,45 +210,38 @@ export const PriceHistoryChart: React.FC<PriceHistoryChartProps> = ({ racketId, 
   const chartData = useMemo(() => {
     if (!historyData || historyData.stores.length === 0) return null;
 
-    // Combinar todos los timestamps únicos
+    // Un Map<fecha, precio> por tienda en una sola pasada — evita el
+    // `.find()` anidado (O(fechas × historial)) al construir cada punto.
+    const priceByDateByStore = new Map<string, Map<string, number>>();
     const allDates = new Set<string>();
-    historyData.stores.forEach(s => s.history.forEach(p => allDates.add(p.date)));
+
+    historyData.stores.forEach(s => {
+      const priceByDate = new Map<string, number>();
+      s.history.forEach(p => {
+        priceByDate.set(p.date, p.price);
+        allDates.add(p.date);
+      });
+      priceByDateByStore.set(s.store, priceByDate);
+    });
+
     const sortedDates = Array.from(allDates).sort();
 
-    // Agregar tiendas no-main a "otras"
-    const otherStorePrices: Record<string, Record<string, number>> = {};
-
-    // Para cada fecha, obtener el precio de cada tienda (o null si no hay dato)
     return sortedDates.map(date => {
       const point: Record<string, any> = { date: formatDate(date) };
+      let otras: number | null = null;
 
       historyData.stores.forEach(s => {
-        const match = s.history.find(p => p.date === date);
-        const price = match ? match.price : null;
+        const price = priceByDateByStore.get(s.store)?.get(date) ?? null;
 
         if (MAIN_STORES.includes(s.store)) {
           point[s.store] = price;
-        } else {
-          // Acumular en "otras"
-          if (!otherStorePrices[date]) otherStorePrices[date] = {};
-          if (price !== null) {
-            // Si ya hay un precio para esa fecha en "otras", mantener el más bajo
-            if (otherStorePrices[date]['otras'] !== undefined) {
-              otherStorePrices[date]['otras'] = Math.min(otherStorePrices[date]['otras'], price);
-            } else {
-              otherStorePrices[date]['otras'] = price;
-            }
-          }
+        } else if (price !== null) {
+          // Acumular en "otras", quedándonos con el más bajo de ese día
+          otras = otras === null ? price : Math.min(otras, price);
         }
       });
 
-      // Asignar precios de "otras"
-      if (otherStorePrices[date]) {
-        point['otras'] = otherStorePrices[date]['otras'] ?? null;
-      } else {
-        point['otras'] = null;
-      }
-
+      point['otras'] = otras;
       return point;
     });
   }, [historyData]);
@@ -312,28 +321,20 @@ export const PriceHistoryChart: React.FC<PriceHistoryChartProps> = ({ racketId, 
                     >
                       <stop
                         offset='5%'
-                        stopColor={STORE_COLORS[s.store] || 'var(--text-muted)'}
+                        stopColor={storeColors[s.store] || 'var(--text-muted)'}
                         stopOpacity={0.15}
                       />
                       <stop
                         offset='95%'
-                        stopColor={STORE_COLORS[s.store] || 'var(--text-muted)'}
+                        stopColor={storeColors[s.store] || 'var(--text-muted)'}
                         stopOpacity={0}
                       />
                     </linearGradient>
                   ))}
                 {/* Gradiente para "otras" tiendas */}
                 <linearGradient id='grad-otras' x1='0' y1='0' x2='0' y2='1'>
-                  <stop
-                    offset='5%'
-                    stopColor={STORE_COLORS['otras'] || '#8b5cf6'}
-                    stopOpacity={0.15}
-                  />
-                  <stop
-                    offset='95%'
-                    stopColor={STORE_COLORS['otras'] || '#8b5cf6'}
-                    stopOpacity={0}
-                  />
+                  <stop offset='5%' stopColor={storeColors.otras} stopOpacity={0.15} />
+                  <stop offset='95%' stopColor={storeColors.otras} stopOpacity={0} />
                 </linearGradient>
               </defs>
 
@@ -356,7 +357,7 @@ export const PriceHistoryChart: React.FC<PriceHistoryChartProps> = ({ racketId, 
                 contentStyle={{
                   borderRadius: '12px',
                   border: 'none',
-                  boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
+                  boxShadow: 'var(--shadow-lg)',
                   fontSize: '0.8rem',
                 }}
                 formatter={(value, name) => [
@@ -378,7 +379,7 @@ export const PriceHistoryChart: React.FC<PriceHistoryChartProps> = ({ racketId, 
                     key={s.store}
                     type='monotone'
                     dataKey={dataKey}
-                    stroke={STORE_COLORS[dataKey] || 'var(--text-muted)'}
+                    stroke={storeColors[dataKey] || 'var(--text-muted)'}
                     strokeWidth={2.5}
                     fill={`url(#grad-${dataKey})`}
                     fillOpacity={1}

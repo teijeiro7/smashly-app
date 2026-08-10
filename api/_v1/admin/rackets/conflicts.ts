@@ -33,16 +33,38 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
   if (!user) return unauthorized(res);
   if (!(await isAdmin(user.id))) return forbidden(res);
 
-  try {
-    const conflicts = await detectConflicts();
+  const urlObj = new URL(req.url || '', `http://${req.headers.host}`);
+  const countOnly = urlObj.searchParams.get('countOnly') === 'true';
 
-    res.writeHead(200, { 'Content-Type': 'application/json' });
-    res.end(JSON.stringify({ success: true, data: conflicts }));
+  try {
+    const conflicts = await getCachedOrFreshConflicts();
+
+    res.writeHead(200, {
+      'Content-Type': 'application/json',
+      'Cache-Control': 'private, max-age=30, stale-while-revalidate=120',
+    });
+    if (countOnly) {
+      res.end(JSON.stringify({ success: true, data: { count: conflicts.length } }));
+    } else {
+      res.end(JSON.stringify({ success: true, data: conflicts }));
+    }
   } catch (err: any) {
     console.error('[rackets/conflicts] error:', err);
     res.writeHead(500, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify({ error: 'Error detecting conflicts', details: err?.message }));
   }
+}
+
+let conflictsCache: { data: ConflictGroup[]; expiresAt: number } | null = null;
+
+async function getCachedOrFreshConflicts(): Promise<ConflictGroup[]> {
+  const now = Date.now();
+  if (conflictsCache && conflictsCache.expiresAt > now) {
+    return conflictsCache.data;
+  }
+  const data = await detectConflicts();
+  conflictsCache = { data, expiresAt: now + 5 * 60 * 1000 };
+  return data;
 }
 
 const VARIANT_SUFFIXES = ['fdb', 'woman', 'w', 'light', 'lite', 'junior', 'jr', 'xtra', 'ctrl', 'motion'];

@@ -80,7 +80,7 @@ export const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
   fullScreen = false,
 }) => {
   return (
-    <SpinnerContainer $size={size} $fullScreen={fullScreen}>
+    <SpinnerContainer role='status' aria-label={text} $size={size} $fullScreen={fullScreen}>
       <Spinner $size={size} />
       {text && <LoadingText $size={size}>{text}</LoadingText>}
     </SpinnerContainer>

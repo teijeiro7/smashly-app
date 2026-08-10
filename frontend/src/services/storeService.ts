@@ -89,7 +89,10 @@ const storeService = {
       throw new Error(error.error || 'Error al obtener las tiendas');
     }
 
-    return response.json();
+    // api/_v1/stores/index.ts responds {success, data, pagination} (fixed —
+    // it used to res.end a bare array, which never matched this contract).
+    const json = await response.json();
+    return json.data ?? [];
   },
 
   /**

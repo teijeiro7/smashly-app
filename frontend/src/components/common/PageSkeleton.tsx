@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import styled from 'styled-components';
-import { motion } from 'framer-motion';
+import { motion, useReducedMotion } from 'framer-motion';
 
 const shimmer = (reduced: boolean) => `
   @keyframes shimmer {
@@ -103,19 +103,10 @@ interface PageSkeletonProps {
 }
 
 export const PageSkeleton: React.FC<PageSkeletonProps> = ({ count = 6, showHeader = true }) => {
-  const [reducedMotion, setReducedMotion] = useState(false);
-
-  useEffect(() => {
-    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
-    setReducedMotion(mediaQuery.matches);
-
-    const handler = (e: MediaQueryListEvent) => setReducedMotion(e.matches);
-    mediaQuery.addEventListener('change', handler);
-    return () => mediaQuery.removeEventListener('change', handler);
-  }, []);
+  const reducedMotion = !!useReducedMotion();
 
   return (
-    <SkeletonContainer>
+    <SkeletonContainer role='status' aria-label='Cargando contenido...'>
       {showHeader && (
         <SkeletonHeader>
           <SkeletonTitle $reduced={reducedMotion} />

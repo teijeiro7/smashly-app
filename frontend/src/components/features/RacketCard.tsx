@@ -14,6 +14,7 @@ import { Racket } from '../../types/racket';
 import { getLowestPrice } from '../../utils/priceUtils';
 import { racketImageUrl } from '../../utils/imageUrl';
 import { formatBrandName, formatModelName } from '../../utils/textUtils';
+import { onActivationKeyDown } from '../../utils/a11y';
 
 // Styled Components
 const RacketCardContainer = styled.li<{ $view: 'grid' | 'list'; $index: number }>`
@@ -216,7 +217,7 @@ const MetricsSummary = styled.div`
   gap: 0.75rem 1rem;
   margin-top: 0.5rem;
   padding: 0.75rem 0;
-  border-top: 1px solid rgba(0, 0, 0, 0.05);
+  border-top: 1px solid var(--border);
 `;
 
 const MetricBadge = styled.div`
@@ -294,7 +295,10 @@ const RacketCardComponent: React.FC<RacketCardProps> = memo(
       <RacketCardContainer
         $view={view}
         $index={index}
+        role='button'
+        tabIndex={0}
         onClick={() => onClick(racket)}
+        onKeyDown={onActivationKeyDown(() => onClick(racket))}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
@@ -355,8 +359,14 @@ const RacketCardComponent: React.FC<RacketCardProps> = memo(
                 )}
               </>
             ) : (
-              <CurrentPrice>
-                {racket.precio_actual > 0 ? `${racket.precio_actual}€` : 'Consultar'}
+              <CurrentPrice
+                style={
+                  !racket.precio_actual || racket.precio_actual <= 0
+                    ? { color: 'var(--text-muted)', fontSize: '0.9rem' }
+                    : undefined
+                }
+              >
+                {racket.precio_actual > 0 ? `${racket.precio_actual}€` : 'Solo comparación'}
               </CurrentPrice>
             )}
           </PriceContainer>

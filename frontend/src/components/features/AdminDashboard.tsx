@@ -1,10 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 import {
   FiUsers,
   FiShoppingBag,
   FiPackage,
-  FiTrendingUp,
   FiActivity,
   FiStar,
   FiAlertTriangle,
@@ -13,9 +12,16 @@ import {
   FiClock,
   FiSettings,
 } from 'react-icons/fi';
-import { sileo } from 'sileo';
+import { useQuery } from '@tanstack/react-query';
 import { Link } from '@tanstack/react-router';
-import { AdminService, AdminMetrics, Activity } from '../../services/adminService';
+import { AdminService, Activity } from '../../services/adminService';
+import { SkeletonBase } from '../common/SkeletonLoader';
+import { useTheme } from '../../contexts/ThemeContext';
+
+// No matching semantic tokens; kept as explicit light/dark pairs with the same hues.
+const VIOLET_ACCENT = { light: '#8b5cf6', dark: '#a78bfa' };
+const PINK_ACCENT = { light: '#ec4899', dark: '#f472b6' };
+const ROSE_ACCENT = { light: '#f43f5e', dark: '#fb7185' };
 
 const DashboardContainer = styled.div`
   padding: 2rem;
@@ -108,18 +114,6 @@ const StatIcon = styled.div<{ color: string }>`
   font-size: 1.25rem;
 `;
 
-const StatTrend = styled.div<{ positive: boolean }>`
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
-  font-size: 0.8125rem;
-  font-weight: 600;
-  color: ${props => (props.positive ? 'var(--primary)' : 'var(--error)')};
-  background: ${props => (props.positive ? 'var(--primary-subtle)' : 'rgba(239, 68, 68, 0.10)')};
-  padding: 0.25rem 0.5rem;
-  border-radius: 6px;
-`;
-
 const StatValue = styled.div`
   font-size: 2rem;
   font-weight: 700;
@@ -197,7 +191,7 @@ const ActivityItem = styled.div`
   }
 `;
 
-const ActivityIcon = styled.div<{ type: string }>`
+const ActivityIcon = styled.div<{ type: string; $isDark?: boolean }>`
   width: 36px;
   height: 36px;
   border-radius: 10px;
@@ -208,17 +202,18 @@ const ActivityIcon = styled.div<{ type: string }>`
   flex-shrink: 0;
 
   ${props => {
+    const violet = props.$isDark ? VIOLET_ACCENT.dark : VIOLET_ACCENT.light;
     switch (props.type) {
       case 'user':
         return 'background: var(--info)15; color: var(--info);';
       case 'racket':
-        return 'background: #8b5cf615; color: #8b5cf6;';
+        return `background: ${violet}15; color: ${violet};`;
       case 'review':
         return 'background: var(--accent)15; color: var(--accent);';
       case 'store':
         return 'background: var(--primary-subtle); color: var(--primary);';
       default:
-        return 'background: rgba(100, 116, 139, 0.10); color: var(--text-muted);';
+        return 'background: var(--surface-3); color: var(--text-muted);';
     }
   }}
 `;
@@ -309,13 +304,32 @@ const AlertBadge = styled.div<{ count: number }>`
   margin-left: 0.5rem;
 `;
 
-const LoadingContainer = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 4rem;
-  color: var(--text-muted);
+const StatCardSkeletonValue = styled(SkeletonBase)`
+  width: 60%;
+  height: 2rem;
+  margin-bottom: 0.5rem;
 `;
+
+const StatCardSkeletonLabel = styled(SkeletonBase)`
+  width: 80%;
+  height: 0.875rem;
+`;
+
+const StatCardSkeletonIcon = styled(SkeletonBase)`
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+`;
+
+const StatCardSkeleton: React.FC = () => (
+  <StatCard $accent='var(--border)'>
+    <StatHeader>
+      <StatCardSkeletonIcon />
+    </StatHeader>
+    <StatCardSkeletonValue />
+    <StatCardSkeletonLabel />
+  </StatCard>
+);
 
 const formatRelativeTime = (dateString: string): string => {
   const date = new Date(dateString);
@@ -337,54 +351,32 @@ const formatRelativeTime = (dateString: string): string => {
 };
 
 const AdminDashboard: React.FC = () => {
-  const [metrics, setMetrics] = useState<AdminMetrics | null>(null);
-  const [activities, setActivities] = useState<Activity[]>([]);
-  const [conflictsCount, setConflictsCount] = useState<number>(0);
-  const [loading, setLoading] = useState(true);
+  // Three independent queries instead of one Promise.all — a failure in any
+  // one (e.g. conflicts-count timing out) no longer blanks the whole page;
+  // each query keeps its own loading/error state and the other two render
+  // normally. staleTime keeps repeated visits to /admin instant instead of
+  // re-firing all three requests every time.
+  const { data: metrics } = useQuery({
+    queryKey: ['admin', 'metrics'],
+    queryFn: () => AdminService.getDashboardMetrics(),
+    staleTime: 60_000,
+  });
+  const { resolved } = useTheme();
+  const isDark = resolved === 'dark';
 
-  useEffect(() => {
-    loadDashboardData();
-  }, []);
+  const { data: activities = [] } = useQuery({
+    queryKey: ['admin', 'recent-activity'],
+    queryFn: () => AdminService.getRecentActivity(10).catch(() => [] as Activity[]),
+    staleTime: 60_000,
+  });
 
-  const loadDashboardData = async () => {
-    try {
-      const [metricsData, activitiesData, conflictsData] = await Promise.all([
-        AdminService.getDashboardMetrics(),
-        AdminService.getRecentActivity(10),
-        AdminService.getRacketConflicts(),
-      ]);
-
-      setMetrics(metricsData);
-      setActivities(activitiesData);
-      setConflictsCount(conflictsData.length);
-    } catch (error: any) {
-      console.error('Error loading dashboard data:', error);
-
-      if (error.message.includes('404')) {
-        sileo.error({
-          title: 'Error',
-          description:
-            'El servidor backend necesita reiniciarse para cargar las nuevas rutas de administración',
-        });
-      } else {
-        sileo.error({
-          title: 'Error',
-          description:
-            'Error al cargar los datos del dashboard. Verifica que el backend esté corriendo.',
-        });
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  if (loading) {
-    return <LoadingContainer>Cargando métricas...</LoadingContainer>;
-  }
-
-  if (!metrics) {
-    return <LoadingContainer>No se pudieron cargar las métricas</LoadingContainer>;
-  }
+  const { data: conflictsCount = 0 } = useQuery({
+    queryKey: ['admin', 'conflicts-count'],
+    // AdminService.getRacketConflictsCount() already catches internally and
+    // resolves 0 on failure — never rejects.
+    queryFn: () => AdminService.getRacketConflictsCount(),
+    staleTime: 60_000,
+  });
 
   const getActivityIcon = (type: Activity['type']) => {
     switch (type) {
@@ -409,49 +401,49 @@ const AdminDashboard: React.FC = () => {
       </WelcomeSection>
 
       <StatsRow>
-        <StatCard $accent='var(--info)'>
-          <StatHeader>
-            <StatIcon color='var(--info)'>
-              <FiUsers />
-            </StatIcon>
-            <StatTrend positive={metrics.usersChange > 0}>
-              <FiTrendingUp size={12} />
-              {metrics.usersChange > 0 ? '+' : ''}
-              {metrics.usersChange}%
-            </StatTrend>
-          </StatHeader>
-          <StatValue>{metrics.totalUsers.toLocaleString()}</StatValue>
-          <StatLabel>Total Usuarios</StatLabel>
-        </StatCard>
+        {!metrics ? (
+          <>
+            <StatCardSkeleton />
+            <StatCardSkeleton />
+            <StatCardSkeleton />
+          </>
+        ) : (
+          <>
+            <StatCard $accent='var(--info)'>
+              <StatHeader>
+                <StatIcon color='var(--info)'>
+                  <FiUsers />
+                </StatIcon>
+              </StatHeader>
+              <StatValue>{metrics.totalUsers.toLocaleString()}</StatValue>
+              <StatLabel>Total Usuarios</StatLabel>
+            </StatCard>
 
-        <StatCard $accent='#8b5cf6'>
-          <StatHeader>
-            <StatIcon color='#8b5cf6'>
-              <FiPackage />
-            </StatIcon>
-            <StatTrend positive={metrics.racketsChange > 0}>
-              <FiTrendingUp size={12} />
-              {metrics.racketsChange > 0 ? '+' : ''}
-              {metrics.racketsChange}%
-            </StatTrend>
-          </StatHeader>
-          <StatValue>{metrics.totalRackets.toLocaleString()}</StatValue>
-          <StatLabel>Palas Registradas</StatLabel>
-        </StatCard>
+            <StatCard $accent={isDark ? VIOLET_ACCENT.dark : VIOLET_ACCENT.light}>
+              <StatHeader>
+                <StatIcon color={isDark ? VIOLET_ACCENT.dark : VIOLET_ACCENT.light}>
+                  <FiPackage />
+                </StatIcon>
+              </StatHeader>
+              <StatValue>{metrics.totalRackets.toLocaleString()}</StatValue>
+              <StatLabel>Palas Registradas</StatLabel>
+            </StatCard>
 
-        <StatCard $accent='var(--primary)'>
-          <StatHeader>
-            <StatIcon color='var(--primary)'>
-              <FiShoppingBag />
-            </StatIcon>
-          </StatHeader>
-          <StatValue>{metrics.totalStores}</StatValue>
-          <StatLabel>Tiendas Asociadas</StatLabel>
-        </StatCard>
+            <StatCard $accent='var(--primary)'>
+              <StatHeader>
+                <StatIcon color='var(--primary)'>
+                  <FiShoppingBag />
+                </StatIcon>
+              </StatHeader>
+              <StatValue>{metrics.totalStores}</StatValue>
+              <StatLabel>Tiendas Asociadas</StatLabel>
+            </StatCard>
+          </>
+        )}
 
-        <StatCard $accent={conflictsCount > 0 ? 'var(--accent)' : '#10b981'}>
+        <StatCard $accent={conflictsCount > 0 ? 'var(--accent)' : 'var(--success)'}>
           <StatHeader>
-            <StatIcon color={conflictsCount > 0 ? 'var(--accent)' : '#10b981'}>
+            <StatIcon color={conflictsCount > 0 ? 'var(--accent)' : 'var(--success)'}>
               {conflictsCount > 0 ? <FiAlertTriangle /> : <FiCheck />}
             </StatIcon>
           </StatHeader>
@@ -466,25 +458,14 @@ const AdminDashboard: React.FC = () => {
         <Card>
           <CardHeader>
             <CardTitle>Actividad Reciente</CardTitle>
-            <Link
-              to={'/admin/activity' as any}
-              style={{
-                fontSize: '0.875rem',
-                color: 'var(--primary)',
-                textDecoration: 'none',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.25rem',
-              }}
-            >
-              Ver todo <FiArrowRight size={14} />
-            </Link>
           </CardHeader>
           <CardContent>
             <ActivityList>
               {activities.slice(0, 6).map(activity => (
                 <ActivityItem key={activity.id}>
-                  <ActivityIcon type={activity.type}>{getActivityIcon(activity.type)}</ActivityIcon>
+                  <ActivityIcon type={activity.type} $isDark={isDark}>
+                    {getActivityIcon(activity.type)}
+                  </ActivityIcon>
                   <ActivityContent>
                     <ActivityTitle>{activity.title}</ActivityTitle>
                     <ActivityTime>
@@ -501,15 +482,18 @@ const AdminDashboard: React.FC = () => {
         <div>
           <SectionTitle>Acciones Rápidas</SectionTitle>
           <QuickActions>
-            <QuickActionCard to='/admin/rackets' $color='#8b5cf6'>
-              <QuickActionIcon color='#8b5cf6'>
+            <QuickActionCard
+              to='/admin/rackets'
+              $color={isDark ? VIOLET_ACCENT.dark : VIOLET_ACCENT.light}
+            >
+              <QuickActionIcon color={isDark ? VIOLET_ACCENT.dark : VIOLET_ACCENT.light}>
                 <FiPackage />
               </QuickActionIcon>
               <QuickActionText>
                 <QuickActionTitle>Gestionar Palas</QuickActionTitle>
                 <QuickActionDesc>CRUD completo</QuickActionDesc>
               </QuickActionText>
-              <FiArrowRight size={16} color='#8b5cf6' />
+              <FiArrowRight size={16} color={isDark ? VIOLET_ACCENT.dark : VIOLET_ACCENT.light} />
             </QuickActionCard>
 
             <QuickActionCard to='/admin/rackets/review' $color='var(--accent)'>
@@ -568,26 +552,34 @@ const AdminDashboard: React.FC = () => {
             </CardHeader>
             <CardContent>
               <StatsRow style={{ marginBottom: 0 }}>
-                <StatCard $accent='#ec4899' style={{ padding: '1rem' }}>
+                <StatCard
+                  $accent={isDark ? PINK_ACCENT.dark : PINK_ACCENT.light}
+                  style={{ padding: '1rem' }}
+                >
                   <StatValue style={{ fontSize: '1.5rem' }}>
-                    {metrics.totalReviews.toLocaleString()}
+                    {(metrics?.totalReviews ?? 0).toLocaleString()}
                   </StatValue>
                   <StatLabel>Reviews</StatLabel>
                 </StatCard>
-                <StatCard $accent='#10b981' style={{ padding: '1rem' }}>
+                <StatCard $accent='var(--success)' style={{ padding: '1rem' }}>
                   <StatValue style={{ fontSize: '1.5rem' }}>
-                    {metrics.activeUsers.toLocaleString()}
+                    {(metrics?.activeUsers ?? 0).toLocaleString()}
                   </StatValue>
                   <StatLabel>Activos</StatLabel>
                 </StatCard>
-                <StatCard $accent='#f43f5e' style={{ padding: '1rem' }}>
+                <StatCard
+                  $accent={isDark ? ROSE_ACCENT.dark : ROSE_ACCENT.light}
+                  style={{ padding: '1rem' }}
+                >
                   <StatValue style={{ fontSize: '1.5rem' }}>
-                    {metrics.totalFavorites.toLocaleString()}
+                    {(metrics?.totalFavorites ?? 0).toLocaleString()}
                   </StatValue>
                   <StatLabel>Favoritos</StatLabel>
                 </StatCard>
                 <StatCard $accent='var(--accent)' style={{ padding: '1rem' }}>
-                  <StatValue style={{ fontSize: '1.5rem' }}>{metrics.pendingRequests}</StatValue>
+                  <StatValue style={{ fontSize: '1.5rem' }}>
+                    {metrics?.pendingRequests ?? 0}
+                  </StatValue>
                   <StatLabel>Pendientes</StatLabel>
                 </StatCard>
               </StatsRow>
