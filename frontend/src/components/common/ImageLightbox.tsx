@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import styled from 'styled-components';
 import { FiX, FiChevronLeft, FiChevronRight } from 'react-icons/fi';
+import { racketImageUrl } from '../../utils/imageUrl';
 
 interface ImageLightboxProps {
   images: string[];
@@ -236,7 +237,10 @@ export const ImageLightbox: React.FC<ImageLightboxProps> = ({
       )}
 
       <ImageContainer onClick={e => e.stopPropagation()}>
-        <LightboxImage src={images[currentIndex]} alt={`${alt} - imagen ${currentIndex + 1}`} />
+        <LightboxImage
+          src={racketImageUrl(images[currentIndex])}
+          alt={`${alt} - imagen ${currentIndex + 1}`}
+        />
       </ImageContainer>
     </Overlay>
   );
