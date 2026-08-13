@@ -11,7 +11,6 @@ export const SmashlyToaster: React.FC = () => {
       position='top-center'
       theme={isDark ? 'dark' : 'light'}
       options={{
-        fill: 'var(--surface)',
         duration: 4000,
       }}
     />
