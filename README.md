@@ -101,8 +101,7 @@ Conoce Smashly en acción:
 
 ## 👥 Créditos
 
-**Smashly © 2025** — Trabajo de Fin de Grado  
-Ingeniería del Software — Universidad Rey Juan Carlos
+**Smashly © 2025**
 
 ---
 

@@ -47,14 +47,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/codeurjc-students/2025-Smashlyapp.git"
+    "url": "git+https://github.com/teijeiro7/smashly-app.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "commonjs",
   "bugs": {
-    "url": "https://github.com/codeurjc-students/2025-Smashlyapp/issues"
+    "url": "https://github.com/teijeiro7/smashly-app/issues"
   },
-  "homepage": "https://github.com/codeurjc-students/2025-Smashlyapp#readme"
+  "homepage": "https://github.com/teijeiro7/smashly-app#readme"
 }

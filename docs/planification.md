@@ -18,6 +18,6 @@ La gestión temporal del proyecto ha sido cuidadosamente planificada siguiendo u
 
 - **🤖 Fase 5: Integración de IA y Funcionalidades Avanzadas**: Implementación del sistema de recomendaciones basado en Gemini AI, algoritmos RAG y funcionalidades de alta complejidad técnica.
 
-- **📚 Fase 6: Documentación y Memoria Técnica**: Elaboración de la documentación completa del proyecto, incluyendo memoria técnica, manual de usuario y documentación de APIs.
+- **📚 Fase 6: Documentación Técnica**: Elaboración de la documentación completa del proyecto, incluyendo manual de usuario y documentación de APIs.
 
-- **🎓 Fase 7: Presentación y Defensa**: Preparación y presentación del proyecto ante el tribunal evaluador, incluyendo demostración práctica del sistema desarrollado.
+- **🚀 Fase 7: Despliegue y Lanzamiento**: Preparación y puesta en producción de la aplicación, incluyendo demostración práctica del sistema desarrollado.

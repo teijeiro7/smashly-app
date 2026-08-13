@@ -49,8 +49,8 @@ El proyecto se desarrolla **iterativamente**, en fases que garantizan progreso c
 | 🐳 **Fase 3** | Funcionalidad básica y configuración Docker | 15 Diciembre 2025 | 16 Octubre 2025 | 15 Diciembre 2025 |
 | ⚡ **Fase 4** | Funcionalidad intermedia | 1 Marzo 2026 | 16 Diciembre 2025 | - |
 | 🚀 **Fase 5** | Funcionalidad avanzada | 15 Abril 2026 | 2 Marzo 2026 | - |
-| 📖 **Fase 6** | Memoria del TFG | 15 Mayo 2026 | 16 Abril 2026 | - |
-| 🎓 **Fase 7** | Presentación y defensa final | 15 Junio 2026 | 16 Mayo 2026 | - |
+| 📖 **Fase 6** | Documentación técnica | 15 Mayo 2026 | 16 Abril 2026 | - |
+| 🚀 **Fase 7** | Despliegue y lanzamiento | 15 Junio 2026 | 16 Mayo 2026 | - |
 
 ### 🔄 Metodología de Desarrollo
 
