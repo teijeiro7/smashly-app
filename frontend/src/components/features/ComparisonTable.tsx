@@ -174,12 +174,12 @@ const RacketValueMobile = styled.span`
 const normalizeString = (str: string): string =>
   str.toLowerCase().replace(/\s+/g, ' ').replace(/\d{4}/g, '').trim();
 
-const findMatchingValue = (row: any, racketName: string): any => {
+const findMatchingValue = (row: any, racketName: string, columnIndex: number): any => {
   const normalizedRacketName = normalizeString(racketName);
   const racketKey = racketName.split(' ')[0].toLowerCase();
+  const keys = Object.keys(row).filter(k => k !== 'feature');
 
-  for (const key of Object.keys(row)) {
-    if (key === 'feature') continue;
+  for (const key of keys) {
     const normalizedKey = normalizeString(key);
     if (normalizedKey === normalizedRacketName) return row[key];
     if (normalizedKey.includes(racketKey) || racketKey.includes(normalizedKey)) return row[key];
@@ -187,16 +187,23 @@ const findMatchingValue = (row: any, racketName: string): any => {
     const nameParts = normalizedRacketName.split(' ');
     if (keyParts.some(p => nameParts.some(n => n.includes(p) || p.includes(n)))) return row[key];
   }
-  return null;
+  // Fallback: the AI names its own columns freely, so a slight spelling/naming
+  // drift can make every match above miss even though the data is right there.
+  // The columns are always written in the same racket order as the prompt, so
+  // position is a reliable last resort instead of showing a false "no data".
+  return keys[columnIndex] !== undefined ? row[keys[columnIndex]] : null;
 };
 
 const EXCLUDED_FEATURES = ['peso', 'weight'];
 
 const isPriceRow = (feature: string) => /precio|price/i.test(feature);
 
+// metric.racketId is the racket's POSITION in the comparison request (0/1/2 —
+// see api/comparison.ts), not its database id, so it indexes `rackets`
+// directly rather than being looked up with `.find(r => r.id === ...)`.
 const getRacketPrice = (metric: RacketComparisonData, rackets?: Racket[]): string | null => {
   if (!rackets) return null;
-  const racket = rackets.find(r => r.id === metric.racketId);
+  const racket = rackets[metric.racketId];
   if (!racket) return null;
   const price = racket.precio_actual;
   return price ? `${price.toFixed(2)} €` : null;
@@ -249,8 +256,9 @@ const ComparisonTable: React.FC<ComparisonTableProps> = ({ data, metrics, racket
                 <Td>{row.feature}</Td>
                 {metrics.map((racket, ci) => {
                   const val = isPriceRow(row.feature)
-                    ? (getRacketPrice(racket, rackets) ?? findMatchingValue(row, racket.racketName))
-                    : findMatchingValue(row, racket.racketName);
+                    ? (getRacketPrice(racket, rackets) ??
+                      findMatchingValue(row, racket.racketName, ci))
+                    : findMatchingValue(row, racket.racketName, ci);
                   return <Td key={ci}>{val ?? <EmptyMark />}</Td>;
                 })}
               </Tr>
@@ -266,8 +274,8 @@ const ComparisonTable: React.FC<ComparisonTableProps> = ({ data, metrics, racket
             <FeatureHeader>{row.feature}</FeatureHeader>
             {metrics.map((racket, ci) => {
               const val = isPriceRow(row.feature)
-                ? (getRacketPrice(racket, rackets) ?? findMatchingValue(row, racket.racketName))
-                : findMatchingValue(row, racket.racketName);
+                ? (getRacketPrice(racket, rackets) ?? findMatchingValue(row, racket.racketName, ci))
+                : findMatchingValue(row, racket.racketName, ci);
               return (
                 <RacketRow key={ci}>
                   <RacketDot $color={RACKET_COLORS[ci] ?? 'var(--text-muted)'} />

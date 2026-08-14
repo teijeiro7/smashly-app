@@ -685,7 +685,7 @@ const HomePage: React.FC = () => {
               <StepNumber>3</StepNumber>
               <StepTitle>Compara y elige</StepTitle>
               <StepDescription>
-                Compara especificaciones, precios y reseñas para tomar la mejor decisión.
+                Compara especificaciones, precios y análisis técnico para tomar la mejor decisión.
               </StepDescription>
             </StepCard>
           </StepsContainer>
