@@ -317,7 +317,7 @@ test('signUp succeeds without upserting user_profiles — the row is created ser
         >
           Register
         </button>
-        <div data-testid='signup-error'>{error === undefined ? '' : error ?? 'null'}</div>
+        <div data-testid='signup-error'>{error === undefined ? '' : (error ?? 'null')}</div>
       </div>
     );
   };
