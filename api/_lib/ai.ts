@@ -8,10 +8,16 @@ export async function generateContent(prompt: string): Promise<string> {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 120_000);
 
+  const apiKey = process.env.FREE_AI_API_KEY;
+  if (!apiKey) throw new Error('FREE_AI_API_KEY not set — free-ai-api gateway requires auth');
+
   try {
     const res = await fetch(`${FREE_AI_BASE.replace(/\/+$/, '')}/chat`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`,
+      },
       body: JSON.stringify({
         messages: [{ role: 'user', content: prompt }],
         max_tokens: 6000,

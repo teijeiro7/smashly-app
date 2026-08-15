@@ -24,11 +24,13 @@ const mock = vi.hoisted(() => {
   const profile = { id: 'u1', email: 'user@test.com', nickname: 'user', role: 'player' };
   return {
     signInResult: { data: { user, session }, error: null },
+    signUpResult: { data: { user, session }, error: null },
     sessionResult: { data: { session } },
     signOutError: null as any,
     signOutScope: null as string | null,
     profileData: [profile] as any[],
     onAuthCallbacks: [] as Array<(event: string, session: any) => void>,
+    fromCalls: [] as string[],
   };
 });
 
@@ -51,6 +53,7 @@ vi.mock('../../lib/supabase', () => ({
   supabase: {
     auth: {
       signInWithPassword: vi.fn(() => Promise.resolve(mock.signInResult)),
+      signUp: vi.fn(() => Promise.resolve(mock.signUpResult)),
       signOut: vi.fn((options?: { scope?: string }) => {
         mock.signOutScope = options?.scope ?? null;
         return Promise.resolve({ error: mock.signOutError });
@@ -61,13 +64,16 @@ vi.mock('../../lib/supabase', () => ({
         return { data: { subscription: { unsubscribe: vi.fn() } } };
       }),
     },
-    from: vi.fn(() => ({
-      select: vi.fn(() => ({
-        eq: vi.fn(() => ({
-          single: vi.fn(() => qb(mock.profileData[0] ?? null)),
+    from: vi.fn((table: string) => {
+      mock.fromCalls.push(table);
+      return {
+        select: vi.fn(() => ({
+          eq: vi.fn(() => ({
+            single: vi.fn(() => qb(mock.profileData[0] ?? null)),
+          })),
         })),
-      })),
-    })),
+      };
+    }),
   },
 }));
 
@@ -94,8 +100,10 @@ beforeEach(() => {
   mock.signOutError = null;
   mock.signOutScope = null;
   mock.signInResult = { data: { user: mockUser, session: mockSession }, error: null };
+  mock.signUpResult = { data: { user: mockUser, session: mockSession }, error: null };
   mock.profileData = [mockProfile];
   mock.sessionResult = { data: { session: mockSession } };
+  mock.fromCalls.length = 0;
   localStorage.clear();
 });
 
@@ -287,4 +295,56 @@ test('ready resolves even when the provider re-renders before the session settle
   ]);
 
   expect(outcome).toBe('resolved');
+});
+
+test('signUp succeeds without upserting user_profiles — the row is created server-side by the handle_new_user trigger', async () => {
+  // Regression for hallazgo P0 #3 (docs/qa/main-2026-08-13.md): the client
+  // used to upsert `id`/`email` into user_profiles after signUp, columns
+  // outside the GRANT UPDATE (...) from
+  // supabase/migrations/20260728000001_fix_role_privilege_escalation.sql,
+  // producing a 403 on every registration.
+  const ProbeWithSignUp: React.FC = () => {
+    const { signUp } = useAuth();
+    const [error, setError] = React.useState<string | null | undefined>(undefined);
+    return (
+      <div>
+        <button
+          data-testid='register'
+          onClick={async () => {
+            const result = await signUp('new@test.com', 'secret', 'newnick', 'New User');
+            setError(result.error);
+          }}
+        >
+          Register
+        </button>
+        <div data-testid='signup-error'>{error === undefined ? '' : (error ?? 'null')}</div>
+      </div>
+    );
+  };
+
+  render(
+    <AuthProvider>
+      <ProbeWithSignUp />
+    </AuthProvider>
+  );
+
+  // Mount already loads a profile for the default mock session before we
+  // even register — drain that first, unrelated `from('user_profiles')` call
+  // so the count below reflects only what `signUp` itself triggers.
+  await waitFor(() => expect(mock.fromCalls).toHaveLength(1));
+  mock.fromCalls.length = 0;
+
+  await act(async () => {
+    await userEvent.click(screen.getByTestId('register'));
+  });
+
+  await waitFor(() => {
+    expect(screen.getByTestId('signup-error').textContent).toBe('null');
+  });
+
+  // Exactly one call to from('user_profiles') — the profile load, not an
+  // extra upsert. (The mock's `from()` doesn't even expose `.upsert`, so a
+  // reintroduced upsert call would also throw synchronously and fail this
+  // test via the assertion above.)
+  expect(mock.fromCalls.filter(table => table === 'user_profiles')).toHaveLength(1);
 });

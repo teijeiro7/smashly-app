@@ -159,7 +159,7 @@ export const catalogItemListSchema = (rackets: Racket[], catalogUrl: string) => 
     '@id': `${catalogUrl}#itemlist`,
     name: 'Catálogo de palas de pádel',
     description:
-      'Lista de las mejores palas de pádel analizadas por Smashly. Compara especificaciones, precios y reseñas.',
+      'Lista de las mejores palas de pádel analizadas por Smashly. Compara especificaciones, precios y análisis técnico.',
     numberOfItems: list.length,
     itemListOrder: 'https://schema.org/ItemListOrderAscending',
     itemListElement: list,

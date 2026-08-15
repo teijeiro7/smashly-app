@@ -264,6 +264,10 @@ interface WizardFormProps {
   onSubmit: (data: BasicFormData | AdvancedFormData) => void;
   isLoading?: boolean;
   initialData?: Partial<BasicFormData & AdvancedFormData>;
+  /** Question index to resume at (e.g. after a failed submit) instead of starting over at 0. */
+  initialStep?: number;
+  /** Called whenever the current question changes, so the parent can resume here on remount. */
+  onStepChange?: (index: number) => void;
 }
 
 type Question = {
@@ -328,6 +332,7 @@ const BASIC_QUESTIONS: Question[] = [
     options: [
       { value: 'masculino', label: 'Masculino' },
       { value: 'femenino', label: 'Femenino' },
+      { value: 'no_especifica', label: 'Prefiero no decirlo' },
     ],
   },
   {
@@ -443,6 +448,7 @@ const ADVANCED_QUESTIONS: Question[] = [
     options: [
       { value: 'masculino', label: 'Masculino' },
       { value: 'femenino', label: 'Femenino' },
+      { value: 'no_especifica', label: 'Prefiero no decirlo' },
     ],
   },
   {
@@ -565,9 +571,11 @@ export const WizardForm: React.FC<WizardFormProps> = ({
   onSubmit,
   isLoading,
   initialData,
+  initialStep,
+  onStepChange,
 }) => {
   const questions = mode === 'basic' ? BASIC_QUESTIONS : ADVANCED_QUESTIONS;
-  const [currentIndex, setCurrentIndex] = useState(0);
+  const [currentIndex, setCurrentIndex] = useState(initialStep ?? 0);
 
   const getInitialData = () => {
     if (mode === 'basic') {
@@ -611,9 +619,14 @@ export const WizardForm: React.FC<WizardFormProps> = ({
 
   useEffect(() => {
     setFormData(getInitialData());
-    setCurrentIndex(0);
+    setCurrentIndex(initialStep ?? 0);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialData]);
+
+  useEffect(() => {
+    onStepChange?.(currentIndex);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentIndex]);
 
   const currentQuestion = questions[currentIndex];
   const isFirstQuestion = currentIndex === 0;

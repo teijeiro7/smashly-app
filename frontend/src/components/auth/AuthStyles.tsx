@@ -42,7 +42,11 @@ export const Tab = styled(Link)<{ $active?: boolean }>`
   }
 `;
 
-export const Form = styled.form`
+// noValidate: the browser's native validation tooltip (English, browser
+// chrome) would otherwise fire before the Zod validators below and show an
+// inconsistent, untranslated error — see hallazgo P1 #4 in
+// docs/qa/main-2026-08-13.md.
+export const Form = styled.form.attrs({ noValidate: true })`
   display: flex;
   flex-direction: column;
   gap: 20px;

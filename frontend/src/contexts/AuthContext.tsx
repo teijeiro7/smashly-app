@@ -309,24 +309,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         return { data: null, error: 'No se pudo crear el usuario' };
       }
 
-      // `role` is intentionally NOT sent here: it's set server-side by the
-      // handle_new_user trigger (always 'Player') and, for store accounts,
-      // promoted to 'Store' via service-role once the store request is
-      // approved (api/_v1/stores/index.ts). `authenticated` no longer has
-      // UPDATE privilege on this column — sending it here would make this
-      // upsert fail outright.
-      const { error: upsertError } = await supabase.from('user_profiles').upsert({
-        id: data.user.id,
-        email: data.user.email,
-        nickname,
-        full_name: fullName ?? null,
-      });
-
-      if (upsertError) {
-        logger.error('Could not upsert profile after signup:', upsertError.message);
-        return { data: null, error: 'No se pudo completar el registro. Inténtalo de nuevo.' };
-      }
-
+      // The `user_profiles` row is created server-side by the handle_new_user
+      // trigger from `raw_user_meta_data` (nickname/full_name above, role
+      // always 'Player') — the client never inserts/upserts it. See
+      // docs/adr/0001-user-profiles-creado-solo-server-side.md.
       if (!data.session) {
         return { data: null, error: null };
       }

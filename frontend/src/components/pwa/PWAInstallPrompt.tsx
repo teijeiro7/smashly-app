@@ -149,15 +149,20 @@ export const PWAInstallPrompt: React.FC = () => {
     if (isIOS) setPlatform('ios');
     else if (isAndroid) setPlatform('android');
 
-    // 3. Listen for Chrome/Android install prompt
+    // 3. Listen for Chrome/Android install prompt. Capture it immediately
+    // (the browser only fires it once and expects preventDefault() right
+    // away), but delay actually *showing* the banner — firing it the instant
+    // the page loads covers the first interactive content (e.g. the first
+    // question of the recommendation wizard) before the user has done
+    // anything, which is the worst possible moment to interrupt them.
+    let showTimer: ReturnType<typeof setTimeout> | undefined;
     const handler = (e: Event) => {
       e.preventDefault();
       setDeferredPrompt(e as BeforeInstallPromptEvent);
 
-      // Only show if not dismissed recently
       const dismissedUntil = localStorage.getItem('pwa-prompt-dismissed-until');
       if (!dismissedUntil || new Date().getTime() > parseInt(dismissedUntil)) {
-        setIsVisible(true);
+        showTimer = setTimeout(() => setIsVisible(true), 10000); // Wait 10s to not be annoying
       }
     };
 
@@ -167,12 +172,14 @@ export const PWAInstallPrompt: React.FC = () => {
     if (isIOS) {
       const dismissedUntil = localStorage.getItem('pwa-prompt-dismissed-until');
       if (!dismissedUntil || new Date().getTime() > parseInt(dismissedUntil)) {
-        const timer = setTimeout(() => setIsVisible(true), 10000); // Wait 10s to not be annoying
-        return () => clearTimeout(timer);
+        showTimer = setTimeout(() => setIsVisible(true), 10000); // Wait 10s to not be annoying
       }
     }
 
-    return () => window.removeEventListener('beforeinstallprompt', handler);
+    return () => {
+      window.removeEventListener('beforeinstallprompt', handler);
+      if (showTimer) clearTimeout(showTimer);
+    };
   }, []);
 
   const handleInstall = async () => {

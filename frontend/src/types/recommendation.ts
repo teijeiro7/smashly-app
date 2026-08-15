@@ -6,7 +6,7 @@ export interface BasicFormData {
   current_racket?: string;
 
   // Strategic fields (Perfil Biomecánico)
-  gender?: 'masculino' | 'femenino';
+  gender?: 'masculino' | 'femenino' | 'no_especifica';
   physical_condition?: 'asiduo' | 'ocasional';
 
   // Strategic fields (Preferencias)

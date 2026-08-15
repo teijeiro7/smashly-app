@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import styled from 'styled-components';
 import { useAuth } from '../contexts/AuthContext';
 import { useNotifications } from '../contexts/NotificationContext';
@@ -167,6 +167,23 @@ export const BestRacketPage: React.FC = () => {
   // State for form data persistence
   const [basicData, setBasicData] = useState<Partial<BasicFormData>>({});
   const [advancedData, setAdvancedData] = useState<Partial<AdvancedFormData>>({});
+  // Question the wizard is on — survives a failed submit (which unmounts/remounts
+  // WizardForm while the page swaps to the loading screen), so a retry resumes
+  // where the user left off instead of bouncing back to question 1.
+  const [wizardStep, setWizardStep] = useState(0);
+
+  // Memoized so identity only changes when the underlying data actually does —
+  // WizardForm re-seeds its local state whenever this object's reference changes,
+  // so an inline object literal here would wipe in-progress answers on every
+  // unrelated re-render (e.g. the wizardStep update after each "Siguiente" click).
+  const basicInitialData = useMemo(
+    () => ({ ...buildInitialData(user), ...basicData }),
+    [user, basicData]
+  );
+  const advancedInitialData = useMemo(
+    () => ({ ...buildInitialData(user), ...advancedData }),
+    [user, advancedData]
+  );
 
   // State for last recommendation reuse
   const [lastRecommendation, setLastRecommendation] = useState<any>(null);
@@ -262,6 +279,7 @@ export const BestRacketPage: React.FC = () => {
       setFormType('advanced');
     }
 
+    setWizardStep(0);
     setShowReusePrompt(false);
     sileo.success({ title: 'Éxito', description: 'Datos cargados correctamente' });
   };
@@ -378,6 +396,7 @@ export const BestRacketPage: React.FC = () => {
     setResult(null);
     setBasicData({});
     setAdvancedData({});
+    setWizardStep(0);
     // Clear sessionStorage when explicitly resetting
     sessionStorage.removeItem('bestRacketPageState');
     sessionStorage.removeItem('smashly_last_recommendation');
@@ -441,7 +460,10 @@ export const BestRacketPage: React.FC = () => {
             <ModeButton
               $active={formType === 'basic'}
               aria-pressed={formType === 'basic'}
-              onClick={() => setFormType('basic')}
+              onClick={() => {
+                setFormType('basic');
+                setWizardStep(0);
+              }}
             >
               Básico
             </ModeButton>
@@ -457,6 +479,7 @@ export const BestRacketPage: React.FC = () => {
                   return;
                 }
                 setFormType('advanced');
+                setWizardStep(0);
               }}
             >
               Avanzado {user ? '' : '🔒'}
@@ -468,14 +491,18 @@ export const BestRacketPage: React.FC = () => {
               mode='basic'
               onSubmit={data => handleBasicSubmit(data as BasicFormData)}
               isLoading={false}
-              initialData={buildInitialData(user)}
+              initialData={basicInitialData}
+              initialStep={wizardStep}
+              onStepChange={setWizardStep}
             />
           ) : (
             <WizardForm
               mode='advanced'
               onSubmit={data => handleAdvancedSubmit(data as AdvancedFormData)}
               isLoading={false}
-              initialData={buildInitialData(user)}
+              initialData={advancedInitialData}
+              initialStep={wizardStep}
+              onStepChange={setWizardStep}
             />
           )}
         </>
