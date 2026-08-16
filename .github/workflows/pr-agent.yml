@@ -34,6 +34,9 @@ jobs:
           # Automático en PR nuevo/actualizado: describe + review.
           # El resto (improve, /ask, /review) bajo demanda por comentario.
           PR_ACTIONS: '["describe", "review"]'
+          # Por defecto la action solo actúa en opened/reopened/ready_for_review/review_requested
+          # e ignora "synchronize" (nuevos commits) — lo añadimos para que cada push re-dispare describe+review.
+          GITHUB_ACTION_CONFIG.PR_ACTIONS: '["opened", "reopened", "ready_for_review", "review_requested", "synchronize"]'
           CONFIG.MODEL: pr-agent
           CONFIG.MODEL_TURBO: pr-agent
           CONFIG.FALLBACK_MODELS: '["pr-agent"]'
