@@ -18,7 +18,7 @@ permissions:
   checks: write
 
 concurrency:
-  group: ${{ github.repository }}-pr-agent
+  group: ${{ github.repository }}-pr-agent-${{ github.event.pull_request.number || github.event.issue.number }}
   cancel-in-progress: true
 
 jobs:
