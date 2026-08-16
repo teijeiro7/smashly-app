@@ -40,5 +40,8 @@ jobs:
           CONFIG.MODEL: pr-agent
           CONFIG.MODEL_TURBO: pr-agent
           CONFIG.FALLBACK_MODELS: '["pr-agent"]'
+          # "pr-agent" no está en la tabla interna de MAX_TOKENS de pr-agent (default -1 = error
+          # "Model pr-agent is not defined in MAX_TOKENS ... prediction failed" en las 3 tools).
+          CONFIG.CUSTOM_MODEL_MAX_TOKENS: 32000
           CONFIG.MAX_APPROVAL_COMMENTS: 1
           CONFIG.PR_DESCRIPTION.ENABLE_SEMANTIC_FILES: "true"
