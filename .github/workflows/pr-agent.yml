@@ -37,9 +37,12 @@ jobs:
           # Por defecto la action solo actúa en opened/reopened/ready_for_review/review_requested
           # e ignora "synchronize" (nuevos commits) — lo añadimos para que cada push re-dispare describe+review.
           GITHUB_ACTION_CONFIG.PR_ACTIONS: '["opened", "reopened", "ready_for_review", "review_requested", "synchronize"]'
-          CONFIG.MODEL: pr-agent
-          CONFIG.MODEL_TURBO: pr-agent
-          CONFIG.FALLBACK_MODELS: '["pr-agent"]'
+          # Prefijo "openai/" obligatorio: litellm rechaza el nombre de modelo con
+          # "LLM Provider NOT provided" si no sabe qué provider usar contra un
+          # OPENAI_BASE_URL custom, aunque el resto de config sea correcto.
+          CONFIG.MODEL: openai/pr-agent
+          CONFIG.MODEL_TURBO: openai/pr-agent
+          CONFIG.FALLBACK_MODELS: '["openai/pr-agent"]'
           # "pr-agent" no está en la tabla interna de MAX_TOKENS de pr-agent (default -1 = error
           # "Model pr-agent is not defined in MAX_TOKENS ... prediction failed" en las 3 tools).
           CONFIG.CUSTOM_MODEL_MAX_TOKENS: 32000
