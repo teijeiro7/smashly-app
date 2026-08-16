@@ -1,0 +1,57 @@
+name: Error Triage
+
+on:
+  schedule:
+    - cron: '*/15 * * * *'
+  workflow_dispatch:
+
+env:
+  SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+  SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+  MISTRAL_API_KEY: ${{ secrets.MISTRAL_API_KEY }}
+  NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+  NOTION_TODO_DATA_SOURCE_ID: ${{ vars.NOTION_TODO_DATA_SOURCE_ID }}
+
+permissions:
+  contents: read
+
+concurrency:
+  group: error-triage
+  cancel-in-progress: false
+
+jobs:
+  check-secrets:
+    runs-on: ubuntu-latest
+    timeout-minutes: 1
+    steps:
+      - name: Verify required secrets/vars are present
+        run: |
+          missing=""
+          [ -z "$SUPABASE_URL" ] && missing="$missing SUPABASE_URL"
+          [ -z "$SUPABASE_SERVICE_ROLE_KEY" ] && missing="$missing SUPABASE_SERVICE_ROLE_KEY"
+          [ -z "$MISTRAL_API_KEY" ] && missing="$missing MISTRAL_API_KEY"
+          [ -z "$NOTION_TOKEN" ] && missing="$missing NOTION_TOKEN"
+          [ -z "$NOTION_TODO_DATA_SOURCE_ID" ] && missing="$missing NOTION_TODO_DATA_SOURCE_ID"
+          if [ -n "$missing" ]; then
+            echo "::error::Missing:$missing. Configure secrets under Settings > Secrets and variables > Actions (NOTION_TODO_DATA_SOURCE_ID goes under the Variables tab, it's not sensitive)."
+            exit 1
+          fi
+          echo "Secrets and vars present."
+
+  triage:
+    needs: check-secrets
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout repository (full history)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Triage pending error incidents
+        run: node scripts/error-triage.mjs

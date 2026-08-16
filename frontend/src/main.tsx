@@ -9,6 +9,7 @@ import { HelmetProvider } from 'react-helmet-async';
 import { registerSW } from 'virtual:pwa-register';
 import * as Sentry from '@sentry/react';
 import ErrorBoundary from './components/ErrorBoundary';
+import { reportError } from './utils/errorReporter';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { AuthModalProvider } from './contexts/AuthModalContext';
 import { BackgroundTasksProvider } from './contexts/BackgroundTasksContext';
@@ -55,6 +56,16 @@ Sentry.init({
 if (!import.meta.env.DEV) {
   registerSW({ immediate: true });
 }
+
+// Errors that never reach a React render path — a broken event handler, a
+// rejected promise nobody awaited — would otherwise vanish silently (see
+// errorReporter.ts for why the ErrorBoundary alone isn't enough).
+window.addEventListener('error', event => {
+  reportError(event.error ?? event.message, { errorType: 'window.onerror' });
+});
+window.addEventListener('unhandledrejection', event => {
+  reportError(event.reason, { errorType: 'UnhandledRejection' });
+});
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
