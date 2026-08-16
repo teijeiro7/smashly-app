@@ -47,19 +47,19 @@ function log(msg) {
 // ---------------------------------------------------------------------------
 // Supabase (PostgREST)
 // ---------------------------------------------------------------------------
-async function supabaseFetch(path, options = {}) {
+async function supabaseFetch(path, { prefer, headers: extraHeaders, ...restOptions } = {}) {
   const res = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
-    ...options,
+    ...restOptions,
     headers: {
       apikey: SUPABASE_SERVICE_ROLE_KEY,
       Authorization: `Bearer ${SUPABASE_SERVICE_ROLE_KEY}`,
       'Content-Type': 'application/json',
-      Prefer: options.prefer ?? 'return=representation',
-      ...options.headers,
+      Prefer: prefer ?? 'return=representation',
+      ...extraHeaders,
     },
   });
   if (!res.ok) {
-    throw new Error(`Supabase ${options.method ?? 'GET'} ${path} failed: ${res.status} ${await res.text()}`);
+    throw new Error(`Supabase ${restOptions.method ?? 'GET'} ${path} failed: ${res.status} ${await res.text()}`);
   }
   return res.status === 204 ? null : res.json();
 }

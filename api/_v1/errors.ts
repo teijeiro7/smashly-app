@@ -47,6 +47,19 @@ function isNonEmptyString(v: unknown): v is string {
   return typeof v === 'string' && v.length > 0;
 }
 
+// This is the only trust boundary for first_frame_file: error-triage.mjs later
+// does `git show <sha>:<first_frame_file>` on it. Without this, an anonymous
+// caller (source: 'manual') could point it at any tracked repo file and get
+// its content forwarded to Mistral. Real client-supplied values only ever
+// look like this (frontend/src, no sourcemaps in prod means non-matching
+// values are useless anyway — see resolveSnippet's comment in error-triage.mjs).
+const SAFE_FRAME_FILE_RE = /^frontend\/src\/[\w./-]+\.(?:tsx?|jsx?)$/;
+
+function sanitizeFrameFile(v: string): string | undefined {
+  if (v.includes('..') || !SAFE_FRAME_FILE_RE.test(v)) return undefined;
+  return v;
+}
+
 function validate(body: any): ErrorReportBody | null {
   if (!body || typeof body !== 'object') return null;
   if (!VALID_SOURCES.includes(body.source)) return null;
@@ -59,7 +72,9 @@ function validate(body: any): ErrorReportBody | null {
     error_type: isNonEmptyString(body.error_type) ? body.error_type.slice(0, 200) : undefined,
     stack: isNonEmptyString(body.stack) ? body.stack.slice(0, 8000) : undefined,
     component_stack: isNonEmptyString(body.component_stack) ? body.component_stack.slice(0, 4000) : undefined,
-    first_frame_file: isNonEmptyString(body.first_frame_file) ? body.first_frame_file.slice(0, 500) : undefined,
+    first_frame_file: isNonEmptyString(body.first_frame_file)
+      ? sanitizeFrameFile(body.first_frame_file.slice(0, 500))
+      : undefined,
     first_frame_line: typeof body.first_frame_line === 'number' ? body.first_frame_line : undefined,
     url_path: isNonEmptyString(body.url_path) ? body.url_path.slice(0, 500) : undefined,
     environment: body.environment,
@@ -159,13 +174,13 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
     // error_incidents (bumped atomically above) stays the source of truth
     // for "how many times has this actually happened" regardless of the cap.
     const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
-    const { count } = await supabaseAdmin
+    const { count, error: countError } = await supabaseAdmin
       .from('error_occurrences')
       .select('id', { count: 'exact', head: true })
       .eq('incident_id', incidentId)
       .gte('occurred_at', oneHourAgo);
 
-    if ((count ?? 0) < OCCURRENCES_PER_HOUR_CAP) {
+    if (!countError && (count ?? 0) < OCCURRENCES_PER_HOUR_CAP) {
       const { error: occError } = await supabaseAdmin.from('error_occurrences').insert({
         incident_id: incidentId,
         url_path: body.url_path ?? null,

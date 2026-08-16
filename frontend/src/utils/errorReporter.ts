@@ -103,12 +103,19 @@ export function firstOwnFrame(stack: string): StackFrame | null {
 // ---------------------------------------------------------------------------
 const THROTTLE_WINDOW_MS = 60_000;
 const THROTTLE_MAX_PER_WINDOW = 3;
+// Cap on distinct throttle keys — without it, a tab producing many distinct
+// error messages over a long session would grow this map forever.
+const THROTTLE_MAX_KEYS = 200;
 const recentSends = new Map<string, number[]>();
 
 function isThrottled(key: string): boolean {
   const now = Date.now();
   const timestamps = (recentSends.get(key) ?? []).filter(t => now - t < THROTTLE_WINDOW_MS);
   timestamps.push(now);
+  if (!recentSends.has(key) && recentSends.size >= THROTTLE_MAX_KEYS) {
+    const oldestKey = recentSends.keys().next().value;
+    if (oldestKey !== undefined) recentSends.delete(oldestKey);
+  }
   recentSends.set(key, timestamps);
   return timestamps.length > THROTTLE_MAX_PER_WINDOW;
 }
