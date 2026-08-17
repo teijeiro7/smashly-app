@@ -1,6 +1,5 @@
 import React, { memo, useState, useEffect } from 'react';
 import {
-  Eye,
   Tag,
   Heart,
   Lightning,
@@ -309,18 +308,11 @@ const RacketCardComponent: React.FC<RacketCardProps> = memo(
             })()}
             alt={racket.modelo}
             onError={handleImageError}
-            loading={index < 4 ? 'eager' : 'lazy'}
-            fetchPriority={index === 0 ? 'high' : 'auto'}
-            decoding={index < 4 ? 'sync' : 'async'}
+            loading='lazy'
+            decoding='async'
             width='200'
             height='200'
           />
-          {racket.view_count !== undefined && racket.view_count > 10 && (
-            <RacketBadge $variant='bestseller'>
-              <Eye size={12} />
-              Popular
-            </RacketBadge>
-          )}
           {racket.en_oferta && !racket.solo_comparacion && (
             <RacketBadge $variant='offer'>
               <Tag size={12} />
@@ -366,7 +358,7 @@ const RacketCardComponent: React.FC<RacketCardProps> = memo(
                     : undefined
                 }
               >
-                {racket.precio_actual > 0 ? `${racket.precio_actual}€` : 'Solo comparación'}
+                {racket.precio_actual > 0 ? `${racket.precio_actual}€` : 'Sin precio disponible'}
               </CurrentPrice>
             )}
           </PriceContainer>

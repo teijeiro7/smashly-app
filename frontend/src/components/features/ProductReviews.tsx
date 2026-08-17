@@ -90,7 +90,7 @@ export const ProductReviews: React.FC<ProductReviewsProps> = ({ racketId }) => {
 
   return (
     <SectionContainer>
-      <SectionTitle>Reviews & Valoraciones</SectionTitle>
+      <SectionTitle>Reseñas y valoraciones</SectionTitle>
 
       {hasReviews && totalReviews > 0 ? (
         <ContentGrid>

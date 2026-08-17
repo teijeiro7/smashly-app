@@ -191,7 +191,7 @@ const MobileBottomNav = React.memo(() => {
 
   const items = [
     { to: homePath, label: 'Inicio', icon: <House /> },
-    { to: '/catalog', label: 'Catalogo', icon: <Compass /> },
+    { to: '/catalog', label: 'Catálogo', icon: <Compass /> },
     { to: '/compare', label: 'Comparar', icon: <Stack /> },
     { to: '/faq', label: 'FAQ', icon: <Question /> },
     { to: '/profile', label: 'Perfil', icon: <User />, onClick: handleProfileClick },

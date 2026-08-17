@@ -140,6 +140,14 @@ function pickString<K extends string>(
   return typeof value === 'string' ? ({ [key]: value } as Partial<Record<K, string>>) : {};
 }
 
+function pickBoolean<K extends string>(
+  obj: Record<string, unknown>,
+  key: K
+): Partial<Record<K, boolean>> {
+  const value = obj[key];
+  return typeof value === 'boolean' ? ({ [key]: value } as Partial<Record<K, boolean>>) : {};
+}
+
 // ──────────────────────────────────────────────────────────────────────────────
 // Auth helpers for beforeLoad guards
 //
@@ -401,10 +409,10 @@ const catalogRoute = createRoute({
     ...pickString(search, 'level'),
     ...pickString(search, 'gameType'),
     ...pickString(search, 'hardness'),
-    ...pickString(search, 'offers'),
-    ...pickString(search, 'mostViewed'),
+    ...pickBoolean(search, 'offers'),
+    ...pickBoolean(search, 'mostViewed'),
     ...pickString(search, 'sort'),
-    ...pickString(search, 'availableOnly'),
+    ...pickBoolean(search, 'availableOnly'),
   }),
   component: () => (
     <LazyRoute fallback={<CatalogSkeleton />}>

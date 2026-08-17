@@ -92,6 +92,25 @@ function deriveSuggestedNickname(session: any): string {
   return name.split('@')[0].replace(/\s+/g, '_').toLowerCase().slice(0, 20);
 }
 
+function mapSignUpError(message: string): string {
+  const lower = message.toLowerCase();
+  if (/nickname|already exists|duplicate|unique/i.test(lower)) {
+    return 'Ese apodo ya está en uso. Prueba con otro.';
+  }
+  if (/e-mail|email|already registered|already exists|duplicate|unique/i.test(lower)) {
+    return 'Ese correo ya está registrado. Inicia sesión o usa otro.';
+  }
+  if (/database error|unexpected_failure|500/i.test(lower)) {
+    return 'No se ha podido crear la cuenta. Prueba de nuevo en unos minutos.';
+  }
+  if (/rate limit|too many requests|only request this after/i.test(lower)) {
+    return 'Demasiados intentos. Espera un momento antes de volver a intentarlo.';
+  }
+  // Fallback genérico: Supabase puede devolver mensajes internos en inglés
+  // (captcha, signups deshabilitados, etc.) que no debemos mostrar tal cual.
+  return 'No se ha podido crear la cuenta. Revisa tus datos e inténtalo de nuevo.';
+}
+
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<UserProfile | null>(null);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
@@ -302,7 +321,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       });
 
       if (error) {
-        return { data: null, error: error.message };
+        return { data: null, error: mapSignUpError(error.message) };
       }
 
       if (!data.user) {
