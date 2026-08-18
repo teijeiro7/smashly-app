@@ -1576,17 +1576,17 @@ const RacketDetailPage: React.FC = () => {
           >
             Pala no encontrada
           </h1>
-<p
-              style={{
-                color: 'var(--text-muted)',
-                lineHeight: 1.6,
-                marginBottom: '2rem',
-                fontSize: '1rem',
-              }}
-            >
-              No hemos podido encontrar la pala que buscas. Es posible que el
-              enlace sea incorrecto o que la pala ya no esté disponible.
-            </p>
+          <p
+            style={{
+              color: 'var(--text-muted)',
+              lineHeight: 1.6,
+              marginBottom: '2rem',
+              fontSize: '1rem',
+            }}
+          >
+            No hemos podido encontrar la pala que buscas. Es posible que el enlace sea incorrecto o
+            que la pala ya no esté disponible.
+          </p>
           <div
             style={{
               display: 'flex',
@@ -1676,10 +1676,7 @@ const RacketDetailPage: React.FC = () => {
       <MainGrid>
         {/* Left: Gallery */}
         <GallerySection onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
-          <WishlistButton
-            onClick={handleOpenAddToList}
-            aria-label='Guardar en mis listas'
-          >
+          <WishlistButton onClick={handleOpenAddToList} aria-label='Guardar en mis listas'>
             <FiHeart fill={showAddToListModal ? 'currentColor' : 'none'} />
           </WishlistButton>
           <MainImage
@@ -1775,8 +1772,7 @@ const RacketDetailPage: React.FC = () => {
               <>
                 <StarRating rating={reviewStats.averageRating} size={20} />
                 <span className='rating-count'>
-                  {reviewStats.totalReviews}{' '}
-                  {reviewStats.totalReviews === 1 ? 'reseña' : 'reseñas'}
+                  {reviewStats.totalReviews} {reviewStats.totalReviews === 1 ? 'reseña' : 'reseñas'}
                 </span>
               </>
             ) : (
@@ -1946,7 +1942,9 @@ const RacketDetailPage: React.FC = () => {
                 <SpecLabel>Forma</SpecLabel>
                 <SpecValue>
                   {toTitleCase(
-                    racket.caracteristicas_forma || racket.especificaciones?.forma || 'No especificada'
+                    racket.caracteristicas_forma ||
+                      racket.especificaciones?.forma ||
+                      'No especificada'
                   )}
                 </SpecValue>
               </SpecContent>
@@ -1959,7 +1957,9 @@ const RacketDetailPage: React.FC = () => {
                 <SpecLabel>Balance</SpecLabel>
                 <SpecValue>
                   {toTitleCase(
-                    racket.caracteristicas_balance || racket.especificaciones?.balance || 'No especificado'
+                    racket.caracteristicas_balance ||
+                      racket.especificaciones?.balance ||
+                      'No especificado'
                   )}
                 </SpecValue>
               </SpecContent>
@@ -1981,7 +1981,9 @@ const RacketDetailPage: React.FC = () => {
                 <SpecLabel>Núcleo</SpecLabel>
                 <SpecValue>
                   {toTitleCase(
-                    racket.caracteristicas_nucleo || racket.especificaciones?.nucleo || 'No especificado'
+                    racket.caracteristicas_nucleo ||
+                      racket.especificaciones?.nucleo ||
+                      'No especificado'
                   )}
                 </SpecValue>
               </SpecContent>
@@ -1994,7 +1996,9 @@ const RacketDetailPage: React.FC = () => {
                 <SpecLabel>Caras</SpecLabel>
                 <SpecValue>
                   {toTitleCase(
-                    racket.caracteristicas_cara || racket.especificaciones?.cara || 'No especificado'
+                    racket.caracteristicas_cara ||
+                      racket.especificaciones?.cara ||
+                      'No especificado'
                   )}
                 </SpecValue>
               </SpecContent>
@@ -2169,14 +2173,14 @@ const RacketDetailPage: React.FC = () => {
       {/* Sticky Price Bar for Mobile */}
       <StickyPriceBar $show={showStickyBar}>
         <StickyPriceInfo>
-          <StickyPrice>
-            {lowestPrice ? `${lowestPrice.price.toFixed(2)}€` : '—'}
-          </StickyPrice>
+          <StickyPrice>{lowestPrice ? `${lowestPrice.price.toFixed(2)}€` : '—'}</StickyPrice>
           <StickyStore>en {lowestPrice?.store || 'Tienda'}</StickyStore>
         </StickyPriceInfo>
         <StickyCTA href={lowestPrice?.link || '#'} target='_blank' rel='noopener noreferrer'>
           {lowestPrice?.link ? (
-            <>Ver Oferta <FiExternalLink size={16} /></>
+            <>
+              Ver Oferta <FiExternalLink size={16} />
+            </>
           ) : (
             'Sin precio disponible'
           )}

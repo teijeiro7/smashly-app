@@ -603,8 +603,12 @@ const CatalogPage: React.FC = () => {
   const [selectedCore, setSelectedCore] = useState(() => searchParams['core'] || 'Todos');
   const [selectedFace, setSelectedFace] = useState(() => searchParams['face'] || 'Todas');
   const [selectedLevel, setSelectedLevel] = useState(() => searchParams['level'] || 'Todos');
-  const [selectedGameType, setSelectedGameType] = useState(() => searchParams['gameType'] || 'Todos');
-  const [selectedHardness, setSelectedHardness] = useState(() => searchParams['hardness'] || 'Todas');
+  const [selectedGameType, setSelectedGameType] = useState(
+    () => searchParams['gameType'] || 'Todos'
+  );
+  const [selectedHardness, setSelectedHardness] = useState(
+    () => searchParams['hardness'] || 'Todas'
+  );
   const [showAvailableOnly, setShowAvailableOnly] = useState(
     () => searchParams['availableOnly'] === true
   );
