@@ -24,6 +24,7 @@ import adminRacketResolve from '../_v1/admin/rackets/[id]/resolve';
 import adminRecentActivity from '../_v1/admin/recent-activity';
 import analyticsStore from '../_v1/analytics/store';
 import analyticsStoreTimeline from '../_v1/analytics/store/[id]/timeline';
+import errors from '../_v1/errors';
 import messagingConversations from '../_v1/messaging/conversations';
 import messagingMessages from '../_v1/messaging/messages';
 import priceWatchIndex from '../_v1/price-watch/index';
@@ -109,6 +110,11 @@ export default async function handler(req: Req, res: ServerResponse): Promise<vo
   // users/me/activity
   if (segments.length === 3 && a === 'users' && b === 'me' && c === 'activity') {
     return usersMeActivity(req, res);
+  }
+
+  // errors — public error-reporting ingestion (see api/_v1/errors.ts)
+  if (segments.length === 1 && a === 'errors') {
+    return errors(req, res);
   }
 
   res.writeHead(404, { 'Content-Type': 'application/json' });

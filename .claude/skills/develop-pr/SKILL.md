@@ -1,23 +1,23 @@
 ---
 name: develop-pr
-description: Abre un PR de la rama actual hacia `main` con el formato estándar del repo (Summary + Test plan) y decide si activar la review automática de PR-Agent según si el diff toca lógica de negocio o es solo frontend/visual. Úsalo cuando el usuario pida abrir/crear un PR, subir una feature o un fix.
+description: Abre un PR de la rama actual hacia `dev` con el formato estándar del repo (Summary + Test plan) y decide si activar la review automática de PR-Agent según si el diff toca lógica de negocio o es solo frontend/visual. Úsalo cuando el usuario pida abrir/crear un PR, subir una feature o un fix.
 model: sonnet
 ---
 
 # Skill: develop-pr
 
-Crea un PR de la rama actual (feature/fix/chore) hacia `main`. Este repo no tiene rama `develop`, sigue el formato ya usado en el histórico (`## Summary` + `## Test plan`, footer de Claude Code).
+Crea un PR de la rama actual (feature/fix/chore) hacia `dev`. Estructura de ramas: `main` = producción (solo recibe merges desde `dev` en release), `dev` = integración. Ver `CLAUDE.md` en la raíz del repo. Formato ya usado en el histórico (`## Summary` + `## Test plan`, footer de Claude Code).
 
 ## Paso 1 — Contexto de la rama
 
 ```bash
-git fetch origin main --quiet
+git fetch origin dev --quiet
 BRANCH=$(git rev-parse --abbrev-ref HEAD)
-git log origin/main..HEAD --pretty=format:"%h %s"   # commits que entran
-git diff origin/main...HEAD --stat                   # ficheros tocados
+git log origin/dev..HEAD --pretty=format:"%h %s"   # commits que entran
+git diff origin/dev...HEAD --stat                   # ficheros tocados
 ```
 
-- Si `BRANCH` es `main`, **parar y avisar**: esta skill es para ramas de trabajo, no para promocionar directamente.
+- Si `BRANCH` es `main` o `dev`, **parar y avisar**: esta skill es para ramas de trabajo, no para promocionar directamente.
 - Si no hay commits sobre `origin/main`, avisar de que no hay nada que abrir.
 - Si hay cambios sin commitear, pregunta antes de continuar (no asumas que hay que commitearlos).
 - Asegúrate de que la rama está pusheada: `git push -u origin "$BRANCH"` si hace falta.
@@ -87,7 +87,7 @@ Muestra al usuario título y cuerpo completos, pide confirmación antes de `gh p
 
 ```bash
 gh pr create \
-  --base main \
+  --base dev \
   --head "$BRANCH" \
   --title "tipo(scope): resumen" \
   --body "$(cat <<'EOF'
@@ -121,7 +121,7 @@ Si aplicaste la label `pr-agent-review`, espera a que las dos runs de "PR Agent"
 
 ## Anti-patrones (no hacer)
 
-- ❌ Usar esta skill para `main` o estando ya en `main`.
+- ❌ Usar esta skill para `main`/`dev` o estando ya en esas ramas (release `dev`→`main` no lleva PR-Agent, se promociona directo).
 - ❌ Abrir el PR sin confirmar título y cuerpo con el usuario.
 - ❌ Rellenar `## Test plan` con tests que no has corrido.
 - ❌ Añadir la label `pr-agent-review` sin razonar el diff ni preguntar al usuario (Paso 4).

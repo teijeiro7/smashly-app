@@ -5,6 +5,7 @@ import { getRacketsByIds } from './_lib/racket-service';
 import { getDbRadarValues } from './_lib/testea-metrics';
 import { parseAiJson } from './_lib/json-parse';
 import { checkRateLimit, tooManyRequests } from './_lib/rate-limit';
+import { reportApiError } from './_lib/report-error';
 
 function buildComparisonPrompt(rackets: any[], userProfile?: any): string {
   const racketsInfo = rackets
@@ -203,6 +204,10 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
     res.end(JSON.stringify({ comparison }));
   } catch (err: any) {
     console.error('Error generating comparison:', err?.message);
+    // Awaited: Vercel tears down the function's execution context once the
+    // response is sent, so a fire-and-forget call here could get cut off
+    // before the Supabase write lands.
+    await reportApiError(err, { urlPath: '/api/comparison', sourceFile: 'api/comparison.ts' });
     res.writeHead(500, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify({ error: 'Error al generar la comparación' }));
   }

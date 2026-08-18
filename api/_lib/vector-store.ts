@@ -1,4 +1,5 @@
 import { supabaseAdmin } from './supabase';
+import { reportApiError } from './report-error';
 
 export async function searchSimilarRackets(
   queryEmbedding: number[],
@@ -40,6 +41,10 @@ export async function searchRelevantReviews(
 
   if (error) {
     console.error('Review vector search error:', error);
+    await reportApiError(new Error(error.message), {
+      urlPath: 'searchRelevantReviews',
+      sourceFile: 'api/_lib/vector-store.ts',
+    });
     return [];
   }
 
@@ -71,6 +76,10 @@ export async function searchKnowledge(
 
   if (error) {
     console.error('Knowledge vector search error:', error);
+    await reportApiError(new Error(error.message), {
+      urlPath: 'searchKnowledge',
+      sourceFile: 'api/_lib/vector-store.ts',
+    });
     return [];
   }
 

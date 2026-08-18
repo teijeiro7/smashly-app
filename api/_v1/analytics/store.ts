@@ -1,6 +1,7 @@
 import type { IncomingMessage, ServerResponse } from 'http';
 import { supabaseAdmin } from '../../_lib/supabase';
 import { getAuthUser, readBody, setCorsHeaders, handleOptions, badRequest } from '../../_lib/auth';
+import { reportApiError } from '../../_lib/report-error';
 
 export default async function handler(req: IncomingMessage, res: ServerResponse): Promise<void> {
   setCorsHeaders(req, res);
@@ -47,6 +48,10 @@ async function handleTrack(req: IncomingMessage, res: ServerResponse): Promise<v
   });
 
   if (rpcError) {
+    await reportApiError(new Error(rpcError.message), {
+      urlPath: '/api/v1/analytics/store',
+      sourceFile: 'api/_v1/analytics/store.ts',
+    });
     res.writeHead(500, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify({ error: rpcError.message }));
     return;

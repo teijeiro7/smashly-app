@@ -1,6 +1,7 @@
 import type { IncomingMessage, ServerResponse } from 'http';
 import { supabaseAdmin } from '../_lib/supabase';
 import { getAuthUser, isAdmin, unauthorized, forbidden, setCorsHeaders, handleOptions } from '../_lib/auth';
+import { reportApiError } from '../_lib/report-error';
 
 interface DashboardMetrics {
   totalUsers: number;
@@ -66,6 +67,7 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
     );
   } catch (err: any) {
     console.error('Error fetching metrics:', err?.message);
+    await reportApiError(err, { urlPath: '/api/admin/metrics', sourceFile: 'api/admin/metrics.ts' });
     res.writeHead(500, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify({ error: 'Error fetching metrics' }));
   }

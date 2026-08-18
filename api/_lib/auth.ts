@@ -99,7 +99,7 @@ export async function isAdmin(userId: string): Promise<boolean> {
  * Allowed CORS origins. Read from FRONTEND_URL (comma-separated).
  * Default: local dev ports.
  */
-function getAllowedOrigins(): string[] {
+export function getAllowedOrigins(): string[] {
   const raw = process.env.FRONTEND_URL;
   if (!raw) {
     return ['http://localhost:4000', 'http://localhost:5173', 'http://localhost:3000'];

@@ -1,11 +1,42 @@
-import { defineConfig } from 'vitest/config';
+import { defineConfig, type Plugin } from 'vitest/config';
 import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
 import { ViteImageOptimizer } from 'vite-plugin-image-optimizer';
 import viteCompression from 'vite-plugin-compression';
+import { transform as esbuildTransform } from 'esbuild';
 import path from 'path';
 
+/**
+ * Preserves function/component `.name` through minification — but ONLY for
+ * our own src/, never for node_modules. The global `esbuild.keepNames`
+ * config option runs across the whole bundle including vendor chunks
+ * (React, Recharts, framer-motion, html2canvas...), which measured 6-17%
+ * larger output for zero benefit (nobody reads "at useState" in a Notion
+ * ticket). Running esbuild's own keepNames transform per-module, filtered to
+ * first-party source, gets "at ComparisonTable" in componentStack for the
+ * ~1-2% cost that was actually intended — the vendor chunks are untouched.
+ */
+function keepOwnComponentNames(): Plugin {
+  return {
+    name: 'keep-own-component-names',
+    enforce: 'post',
+    apply: 'build',
+    transform(code, id) {
+      if (id.includes('node_modules') || !/\.(t|j)sx?$/.test(id.split('?')[0])) return null;
+      return esbuildTransform(code, { loader: 'jsx', keepNames: true, minify: false, sourcemap: false }).then(
+        (result) => ({ code: result.code, map: null })
+      );
+    },
+  };
+}
+
 export default defineConfig(({ mode }) => ({
+  // Stamped into import.meta.env.VITE_COMMIT_SHA — lets error reports name the
+  // exact commit that was live when they fired, so scripts/error-triage.mjs
+  // can `git show <sha>:<file>` the real code instead of guessing from HEAD.
+  define: {
+    'import.meta.env.VITE_COMMIT_SHA': JSON.stringify(process.env.VERCEL_GIT_COMMIT_SHA || 'local'),
+  },
   esbuild: {
     drop: mode === 'production' ? ['debugger'] : [],
     minifyIdentifiers: mode === 'production',
@@ -13,6 +44,7 @@ export default defineConfig(({ mode }) => ({
     minifyWhitespace: mode === 'production',
   },
   plugins: [
+    keepOwnComponentNames(),
     react({
       // React compiler for better optimization
       babel: {
@@ -190,6 +222,14 @@ export default defineConfig(({ mode }) => ({
         drop_console: mode === 'production', // Drops console.log, console.error, console.warn, console.info
         drop_debugger: mode === 'production',
       },
+      // No keep_fnames/keep_classnames here on purpose: unlike the
+      // keepOwnComponentNames() plugin above, terser has no per-module
+      // filter — it operates on the already-bundled chunk text, so a
+      // mangle-level keep_fnames would apply to vendor code too (measured
+      // 6-17% larger vendor-* chunks). Not needed anyway: keepOwnComponentNames()
+      // injects an explicit esbuild `__name()` call after each of our own
+      // function/class declarations, which restores `.name` after terser
+      // renames the binding — the name string is a literal, immune to mangling.
     },
     // No sourcemaps in production
     sourcemap: false,

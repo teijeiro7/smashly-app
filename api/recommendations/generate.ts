@@ -8,6 +8,7 @@ import { buildCompactSelectionPrompt } from '../_lib/prompt-compression';
 import { cacheGet, cacheSet, generateProfileHash } from '../_lib/cache';
 import { parseAiJson } from '../_lib/json-parse';
 import { checkRateLimit, tooManyRequests } from '../_lib/rate-limit';
+import { reportApiError } from '../_lib/report-error';
 
 function normalizeFormData(data: any): any {
   if (!data || typeof data !== 'object') return data;
@@ -242,6 +243,10 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
       res.end(JSON.stringify({ error: message }));
       return;
     }
+    await reportApiError(err, {
+      urlPath: '/api/recommendations/generate',
+      sourceFile: 'api/recommendations/generate.ts',
+    });
     res.writeHead(500, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify({ error: 'Internal server error' }));
   }

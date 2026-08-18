@@ -1,6 +1,7 @@
 import { Component, ErrorInfo, ReactNode } from 'react';
 import * as Sentry from '@sentry/react';
 import { logger } from '../utils/logger';
+import { reportError } from '../utils/errorReporter';
 
 interface Props {
   children: ReactNode;
@@ -24,6 +25,7 @@ class ErrorBoundary extends Component<Props, State> {
     Sentry.captureException(error, {
       contexts: { react: { componentStack: errorInfo.componentStack } },
     });
+    reportError(error, { componentStack: errorInfo.componentStack ?? undefined });
   }
 
   private handleGoToError = () => {

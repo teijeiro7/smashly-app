@@ -561,7 +561,21 @@ const ClearFiltersIconButton = styled(FilterButton)`
 // eslint-disable-next-line max-lines-per-function -- ya estaba cerca del límite antes de añadir aria-pressed/aria-selected/aria-current a los controles $active; dividir el componente es un refactor aparte, fuera del alcance de este fix de a11y.
 const CatalogPage: React.FC = () => {
   const navigate = useNavigate();
-  const searchParams = useSearch({ strict: false }) as Record<string, string>;
+  const searchParams = useSearch({ strict: false }) as {
+    search?: string;
+    brand?: string;
+    shape?: string;
+    balance?: string;
+    core?: string;
+    face?: string;
+    level?: string;
+    gameType?: string;
+    hardness?: string;
+    sort?: string;
+    offers?: boolean;
+    mostViewed?: boolean;
+    availableOnly?: boolean;
+  };
   const { rackets, loading } = useRackets();
   const { count } = useComparison();
   const { isAuthenticated } = useAuth();
@@ -570,11 +584,11 @@ const CatalogPage: React.FC = () => {
   const [filteredRackets, setFilteredRackets] = useState<Racket[]>([]);
   const [displayedRackets, setDisplayedRackets] = useState<Racket[]>([]);
   const [serverTotal, setServerTotal] = useState<number | null>(null);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedBrand, setSelectedBrand] = useState('Todas');
-  const [showMostViewed, setShowMostViewed] = useState(false);
-  const [showOffers, setShowOffers] = useState(false);
-  const [sortBy, setSortBy] = useState('name');
+  const [searchQuery, setSearchQuery] = useState(() => searchParams['search'] || '');
+  const [selectedBrand, setSelectedBrand] = useState(() => searchParams['brand'] || 'Todas');
+  const [showMostViewed, setShowMostViewed] = useState(() => searchParams['mostViewed'] === true);
+  const [showOffers, setShowOffers] = useState(() => searchParams['offers'] === true);
+  const [sortBy, setSortBy] = useState(() => searchParams['sort'] || 'name');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [displayCount, setDisplayCount] = useState(9);
   const [loadingMore, setLoadingMore] = useState(false);
@@ -584,14 +598,20 @@ const CatalogPage: React.FC = () => {
 
   // Advanced filters state
   const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
-  const [selectedShape, setSelectedShape] = useState('Todas');
-  const [selectedBalance, setSelectedBalance] = useState('Todos');
-  const [selectedCore, setSelectedCore] = useState('Todos');
-  const [selectedFace, setSelectedFace] = useState('Todas');
-  const [selectedLevel, setSelectedLevel] = useState('Todos');
-  const [selectedGameType, setSelectedGameType] = useState('Todos');
-  const [selectedHardness, setSelectedHardness] = useState('Todas');
-  const [showAvailableOnly, setShowAvailableOnly] = useState(false);
+  const [selectedShape, setSelectedShape] = useState(() => searchParams['shape'] || 'Todas');
+  const [selectedBalance, setSelectedBalance] = useState(() => searchParams['balance'] || 'Todos');
+  const [selectedCore, setSelectedCore] = useState(() => searchParams['core'] || 'Todos');
+  const [selectedFace, setSelectedFace] = useState(() => searchParams['face'] || 'Todas');
+  const [selectedLevel, setSelectedLevel] = useState(() => searchParams['level'] || 'Todos');
+  const [selectedGameType, setSelectedGameType] = useState(
+    () => searchParams['gameType'] || 'Todos'
+  );
+  const [selectedHardness, setSelectedHardness] = useState(
+    () => searchParams['hardness'] || 'Todas'
+  );
+  const [showAvailableOnly, setShowAvailableOnly] = useState(
+    () => searchParams['availableOnly'] === true
+  );
 
   const observerTarget = useRef<HTMLDivElement>(null);
 
@@ -610,8 +630,6 @@ const CatalogPage: React.FC = () => {
     const levelParam = searchParams['level'] || 'Todos';
     const gameTypeParam = searchParams['gameType'] || 'Todos';
     const hardnessParam = searchParams['hardness'] || 'Todas';
-    const offersParam = searchParams['offers'];
-    const mostViewedParam = searchParams['mostViewed'];
     const sortParam = searchParams['sort'] || 'name';
 
     setSearchQuery(queryParam);
@@ -623,31 +641,29 @@ const CatalogPage: React.FC = () => {
     setSelectedLevel(levelParam);
     setSelectedGameType(gameTypeParam);
     setSelectedHardness(hardnessParam);
-    setShowOffers(offersParam === 'true');
-    setShowMostViewed(mostViewedParam === 'true');
-    setShowAvailableOnly(searchParams['availableOnly'] === 'true');
+    setShowOffers(searchParams['offers'] === true);
+    setShowMostViewed(searchParams['mostViewed'] === true);
+    setShowAvailableOnly(searchParams['availableOnly'] === true);
     setSortBy(sortParam);
   }, [searchParams]);
 
   // Update URL when filters change (guarded to prevent infinite re-render loops)
   useEffect(() => {
-    const params = new URLSearchParams();
-
-    if (debouncedSearchQuery) params.set('search', debouncedSearchQuery);
-    if (selectedBrand !== 'Todas') params.set('brand', selectedBrand);
-    if (selectedShape !== 'Todas') params.set('shape', selectedShape);
-    if (selectedBalance !== 'Todos') params.set('balance', selectedBalance);
-    if (selectedCore !== 'Todos') params.set('core', selectedCore);
-    if (selectedFace !== 'Todas') params.set('face', selectedFace);
-    if (selectedLevel !== 'Todos') params.set('level', selectedLevel);
-    if (selectedGameType !== 'Todos') params.set('gameType', selectedGameType);
-    if (selectedHardness !== 'Todas') params.set('hardness', selectedHardness);
-    if (showOffers) params.set('offers', 'true');
-    if (showMostViewed) params.set('mostViewed', 'true');
-    if (showAvailableOnly) params.set('availableOnly', 'true');
-    if (sortBy !== 'name') params.set('sort', sortBy);
-
-    const searchObj = Object.fromEntries(params.entries());
+    const searchObj: Record<string, string | boolean> = {
+      ...(debouncedSearchQuery ? { search: debouncedSearchQuery } : {}),
+      ...(selectedBrand !== 'Todas' ? { brand: selectedBrand } : {}),
+      ...(selectedShape !== 'Todas' ? { shape: selectedShape } : {}),
+      ...(selectedBalance !== 'Todos' ? { balance: selectedBalance } : {}),
+      ...(selectedCore !== 'Todos' ? { core: selectedCore } : {}),
+      ...(selectedFace !== 'Todas' ? { face: selectedFace } : {}),
+      ...(selectedLevel !== 'Todos' ? { level: selectedLevel } : {}),
+      ...(selectedGameType !== 'Todos' ? { gameType: selectedGameType } : {}),
+      ...(selectedHardness !== 'Todas' ? { hardness: selectedHardness } : {}),
+      ...(showOffers ? { offers: true } : {}),
+      ...(showMostViewed ? { mostViewed: true } : {}),
+      ...(showAvailableOnly ? { availableOnly: true } : {}),
+      ...(sortBy !== 'name' ? { sort: sortBy } : {}),
+    };
     const currentStr = JSON.stringify(searchParams);
     const newStr = JSON.stringify(searchObj);
 
@@ -702,7 +718,6 @@ const CatalogPage: React.FC = () => {
           if (selectedHardness !== 'Todas') filters.hardness = selectedHardness;
           if (showOffers) filters.on_sale = 'true';
           if (showAvailableOnly) filters.available_only = 'true';
-          if (showMostViewed) filters.most_viewed = 'true';
 
           const result = await racketService.searchRackets(debouncedSearchQuery, filters);
 
@@ -711,6 +726,8 @@ const CatalogPage: React.FC = () => {
             const sorted = [...result.data];
             try {
               sorted.sort((a, b) => {
+                const buyable = (a.solo_comparacion ? 1 : 0) - (b.solo_comparacion ? 1 : 0);
+                if (buyable !== 0) return buyable;
                 switch (sortBy) {
                   case 'price-low': {
                     const aComp = a.solo_comparacion ? 1 : 0;
@@ -770,16 +787,6 @@ const CatalogPage: React.FC = () => {
       // Apply brand filter
       if (selectedBrand !== 'Todas') {
         filtered = filtered.filter(racket => racket.marca === selectedBrand);
-      }
-
-      // Apply most viewed filter (top 20% by view count)
-      if (showMostViewed) {
-        const sortedByViews = [...filtered].sort(
-          (a, b) => (b.view_count || 0) - (a.view_count || 0)
-        );
-        const topCount = Math.ceil(sortedByViews.length * 0.2);
-        const topViewedIds = new Set(sortedByViews.slice(0, topCount).map(r => r.id));
-        filtered = filtered.filter(racket => topViewedIds.has(racket.id));
       }
 
       // Apply offers filter
@@ -842,6 +849,8 @@ const CatalogPage: React.FC = () => {
       // Apply sorting
       try {
         filtered.sort((a, b) => {
+          const buyable = (a.solo_comparacion ? 1 : 0) - (b.solo_comparacion ? 1 : 0);
+          if (buyable !== 0) return buyable;
           switch (sortBy) {
             case 'price-low': {
               const aIsComparison = a.solo_comparacion ? 1 : 0;
@@ -1116,7 +1125,7 @@ const CatalogPage: React.FC = () => {
   return (
     <Container>
       <SEO
-        title='Catálogo de Palas de Pádel | Compara +800 Modelos'
+        title={`Catálogo de Palas de Pádel | Compara ${totalRackets || 1200} Modelos`}
         description={`Catálogo de palas de pádel con ${totalRackets} modelos de ${uniqueBrands.length - 1} marcas. Compara peso, balance, forma y precio en PadelNuestro, PadelMarket y PadelProShop.`}
         canonical={buildUrl('/catalog')}
         keywords={allKeywords}
@@ -1217,6 +1226,18 @@ const CatalogPage: React.FC = () => {
               </QuickSearchChip>
             ))}
           </QuickSearchChipsRow>
+
+          {searchQuery.trim().length === 1 && (
+            <div
+              style={{
+                fontSize: '0.75rem',
+                color: 'var(--text-subtle)',
+                marginTop: '0.5rem',
+              }}
+            >
+              Escribe al menos 2 caracteres para buscar palas.
+            </div>
+          )}
 
           {/* Advanced Filters Toggle */}
           <AdvancedFiltersToggle

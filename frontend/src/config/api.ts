@@ -58,6 +58,9 @@ export const API_ENDPOINTS = {
   // Price Watch
   PRICE_WATCH: '/api/v1/price-watch',
   PRICE_WATCH_BY_ID: (id: string) => `/api/v1/price-watch/${id}`,
+
+  // Error reporting
+  ERRORS: '/api/v1/errors',
 } as const;
 
 // Feature Flags

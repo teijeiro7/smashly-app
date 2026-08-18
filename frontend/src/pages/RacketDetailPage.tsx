@@ -10,7 +10,6 @@ import {
   FiBarChart2,
   FiChevronLeft,
   FiChevronRight,
-  FiTruck,
   FiLock,
   FiHome,
   FiSearch,
@@ -1126,22 +1125,6 @@ const BestPriceBadge = styled.span`
   }
 `;
 
-const ShippingInfo = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  color: var(--color-gray-600);
-  font-size: 0.9rem;
-  svg {
-    color: var(--color-primary);
-  }
-
-  @media (max-width: 768px) {
-    grid-column: 1 / -1;
-    grid-row: 3;
-  }
-`;
-
 const PriceText = styled.div<{ $isBestPrice?: boolean }>`
   font-weight: 700;
   font-size: ${props => (props.$isBestPrice ? '1.5rem' : '1.25rem')};
@@ -1398,6 +1381,14 @@ const RacketDetailPage: React.FC = () => {
     [queryClient, slug]
   );
 
+  const handleOpenAddToList = () => {
+    if (isAuthenticated) {
+      setShowAddToListModal(true);
+    } else {
+      openLogin();
+    }
+  };
+
   // Obtener estadísticas de reviews
   const { stats: reviewStats, loading: reviewStatsLoading } = useReviewStats(racket?.id);
 
@@ -1409,7 +1400,12 @@ const RacketDetailPage: React.FC = () => {
 
   useEffect(() => {
     if (racket?.id && isAuthenticated) {
-      priceWatchService.listWatches(racket.id).then(setWatches).catch(console.error);
+      priceWatchService
+        .listWatches(racket.id)
+        .then(setWatches)
+        .catch(() => {
+          // No bloquear el resto de la página si el listado de alertas falla
+        });
     }
   }, [racket, isAuthenticated]);
 
@@ -1429,7 +1425,7 @@ const RacketDetailPage: React.FC = () => {
       setTargetPriceInput('');
       setWatchSaveMessage('Alerta creada. Te avisaremos cuando baje de precio.');
     } catch (err: any) {
-      setWatchError(err.message);
+      setWatchError('No se ha podido guardar la alerta. Inténtalo de nuevo más tarde.');
     } finally {
       setCreatingWatch(false);
     }
@@ -1588,7 +1584,8 @@ const RacketDetailPage: React.FC = () => {
               fontSize: '1rem',
             }}
           >
-            {queryError?.message || 'No hemos podido encontrar la pala que buscas.'}
+            No hemos podido encontrar la pala que buscas. Es posible que el enlace sea incorrecto o
+            que la pala ya no esté disponible.
           </p>
           <div
             style={{
@@ -1679,10 +1676,7 @@ const RacketDetailPage: React.FC = () => {
       <MainGrid>
         {/* Left: Gallery */}
         <GallerySection onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
-          <WishlistButton
-            onClick={() => setShowAddToListModal(true)}
-            aria-label='Guardar en mis listas'
-          >
+          <WishlistButton onClick={handleOpenAddToList} aria-label='Guardar en mis listas'>
             <FiHeart fill={showAddToListModal ? 'currentColor' : 'none'} />
           </WishlistButton>
           <MainImage
@@ -1700,7 +1694,6 @@ const RacketDetailPage: React.FC = () => {
             onClick={() => setShowLightbox(true)}
             onKeyDown={onActivationKeyDown(() => setShowLightbox(true))}
             loading='eager'
-            fetchPriority='high'
             width={450}
             height={450}
           />
@@ -1779,13 +1772,13 @@ const RacketDetailPage: React.FC = () => {
               <>
                 <StarRating rating={reviewStats.averageRating} size={20} />
                 <span className='rating-count'>
-                  {reviewStats.totalReviews} {reviewStats.totalReviews === 1 ? 'review' : 'reviews'}
+                  {reviewStats.totalReviews} {reviewStats.totalReviews === 1 ? 'reseña' : 'reseñas'}
                 </span>
               </>
             ) : (
               <>
                 <StarRating rating={0} size={20} />
-                <span className='no-rating-text'>No reviews yet</span>
+                <span className='no-rating-text'>Sin reseñas todavía</span>
               </>
             )}
           </RatingRow>
@@ -1799,7 +1792,7 @@ const RacketDetailPage: React.FC = () => {
                 Sin embargo, puedes seguir consultando sus características y compararla con otros
                 modelos.
               </ComparisonOnlyText>
-              <AlertButton onClick={() => setShowAddToListModal(true)}>
+              <AlertButton onClick={handleOpenAddToList}>
                 <FiHeart /> Guardar en mis listas
               </AlertButton>
               <AlertButton
@@ -1822,7 +1815,11 @@ const RacketDetailPage: React.FC = () => {
               <BestPriceLabel>Mejor Precio del Mercado</BestPriceLabel>
               <PriceRow>
                 <BigPrice>
-                  {lowestPrice ? `${lowestPrice.price.toFixed(2)}€` : `${racket.precio_actual}€`}
+                  {lowestPrice
+                    ? `${lowestPrice.price.toFixed(2)}€`
+                    : racket.precio_actual && racket.precio_actual > 0
+                      ? `${racket.precio_actual}€`
+                      : 'Sin precio disponible'}
                 </BigPrice>
                 {lowestPrice && lowestPrice.originalPrice > lowestPrice.price && (
                   <OldPrice>{lowestPrice.originalPrice.toFixed(2)}€</OldPrice>
@@ -1839,17 +1836,15 @@ const RacketDetailPage: React.FC = () => {
                       month: 'long',
                       year: 'numeric',
                     })
-                  : 'hace un momento'}
+                  : 'en revisión'}
               </UpdatedTime>
 
-              <PrimaryButton
-                href={lowestPrice?.link || '#'}
-                target='_blank'
-                rel='noopener noreferrer'
-              >
-                Ver en {lowestPrice?.store || 'Tienda'}
-                <FiExternalLink />
-              </PrimaryButton>
+              {lowestPrice?.link && (
+                <PrimaryButton href={lowestPrice.link} target='_blank' rel='noopener noreferrer'>
+                  Ver en {lowestPrice.store || 'Tienda'}
+                  <FiExternalLink />
+                </PrimaryButton>
+              )}
 
               <AlertButton
                 onClick={() => racket && addRacket(racket)}
@@ -1909,6 +1904,31 @@ const RacketDetailPage: React.FC = () => {
         </InfoSection>
       </MainGrid>
 
+      {/* Auth Banner - Show right after the price/CTA area for non-authenticated users */}
+      {!isAuthenticated && (
+        <AuthBanner>
+          <AuthCard>
+            <AuthTitleWrapper>
+              <AuthLockIcon>
+                <FiLock />
+              </AuthLockIcon>
+              <AuthTitle>Accede a todas las funcionalidades</AuthTitle>
+            </AuthTitleWrapper>
+            <AuthDescription>
+              Historial de precios, comparativas de tiendas, reseñas de jugadores y mucho más.
+            </AuthDescription>
+            <AuthActions>
+              <Button variant='primary' onClick={openLogin}>
+                Iniciar sesión
+              </Button>
+              <Button variant='secondary' onClick={openRegister}>
+                Crear cuenta
+              </Button>
+            </AuthActions>
+          </AuthCard>
+        </AuthBanner>
+      )}
+
       <LowerGrid $fullWidth={!isAuthenticated}>
         {/* Lower Left: Specs */}
         <div>
@@ -1922,7 +1942,9 @@ const RacketDetailPage: React.FC = () => {
                 <SpecLabel>Forma</SpecLabel>
                 <SpecValue>
                   {toTitleCase(
-                    racket.caracteristicas_forma || racket.especificaciones?.forma || 'N/A'
+                    racket.caracteristicas_forma ||
+                      racket.especificaciones?.forma ||
+                      'No especificada'
                   )}
                 </SpecValue>
               </SpecContent>
@@ -1935,7 +1957,9 @@ const RacketDetailPage: React.FC = () => {
                 <SpecLabel>Balance</SpecLabel>
                 <SpecValue>
                   {toTitleCase(
-                    racket.caracteristicas_balance || racket.especificaciones?.balance || 'Media'
+                    racket.caracteristicas_balance ||
+                      racket.especificaciones?.balance ||
+                      'No especificado'
                   )}
                 </SpecValue>
               </SpecContent>
@@ -1946,7 +1970,7 @@ const RacketDetailPage: React.FC = () => {
               </SpecIconWrapper>
               <SpecContent>
                 <SpecLabel>Peso</SpecLabel>
-                <SpecValue>{racket.peso ? `${racket.peso}g` : '360-375g'}</SpecValue>
+                <SpecValue>{racket.peso ? `${racket.peso}g` : 'No especificado'}</SpecValue>
               </SpecContent>
             </SpecCard>
             <SpecCard>
@@ -1957,7 +1981,9 @@ const RacketDetailPage: React.FC = () => {
                 <SpecLabel>Núcleo</SpecLabel>
                 <SpecValue>
                   {toTitleCase(
-                    racket.caracteristicas_nucleo || racket.especificaciones?.nucleo || 'EVA'
+                    racket.caracteristicas_nucleo ||
+                      racket.especificaciones?.nucleo ||
+                      'No especificado'
                   )}
                 </SpecValue>
               </SpecContent>
@@ -1970,7 +1996,9 @@ const RacketDetailPage: React.FC = () => {
                 <SpecLabel>Caras</SpecLabel>
                 <SpecValue>
                   {toTitleCase(
-                    racket.caracteristicas_cara || racket.especificaciones?.cara || 'Carbon'
+                    racket.caracteristicas_cara ||
+                      racket.especificaciones?.cara ||
+                      'No especificado'
                   )}
                 </SpecValue>
               </SpecContent>
@@ -1985,7 +2013,7 @@ const RacketDetailPage: React.FC = () => {
                   {toTitleCase(
                     racket.caracteristicas_nivel_de_juego ||
                       racket.especificaciones?.nivel_de_juego ||
-                      'Avanzado'
+                      'No especificado'
                   )}
                 </SpecValue>
               </SpecContent>
@@ -2089,18 +2117,6 @@ const RacketDetailPage: React.FC = () => {
                 <CompareRow key={index} $isBestPrice={isBestPrice}>
                   {isBestPrice && <BestPriceBadge>⚡ Mejor Precio</BestPriceBadge>}
                   <StoreLabel storeName={store.store} variant='compact' />
-                  <ShippingInfo>
-                    <FiTruck /> Envío Gratis
-                    <span
-                      style={{
-                        fontSize: '0.8rem',
-                        color: 'var(--color-gray-400)',
-                        fontWeight: 400,
-                      }}
-                    >
-                      • En Stock
-                    </span>
-                  </ShippingInfo>
                   <PriceText $isBestPrice={isBestPrice}>{store.price?.toFixed(2)}€</PriceText>
                   <ShopButton href={store.link || '#'} target='_blank' rel='noopener noreferrer'>
                     Ir a la tienda <FiExternalLink size={14} />
@@ -2121,40 +2137,17 @@ const RacketDetailPage: React.FC = () => {
         </div>
       )}
 
-      {/* Auth Banner - Show at the bottom for non-authenticated users */}
-      {!isAuthenticated && (
-        <AuthBanner>
-          <AuthCard>
-            <AuthTitleWrapper>
-              <AuthLockIcon>
-                <FiLock />
-              </AuthLockIcon>
-              <AuthTitle>Accede a todas las funcionalidades</AuthTitle>
-            </AuthTitleWrapper>
-            <AuthDescription>
-              Historial de precios, comparativas de tiendas, reseñas de jugadores y mucho más.
-            </AuthDescription>
-            <AuthActions>
-              <Button variant='primary' onClick={openLogin}>
-                Iniciar sesión
-              </Button>
-              <Button variant='secondary' onClick={openRegister}>
-                Crear cuenta
-              </Button>
-            </AuthActions>
-          </AuthCard>
-        </AuthBanner>
-      )}
-
       {/* Modals */}
-      <Suspense fallback={null}>
-        <AddToListModal
-          isOpen={showAddToListModal}
-          onClose={() => setShowAddToListModal(false)}
-          racketId={racket.id || 0}
-          racketName={`${racket.marca} ${racket.modelo}`}
-        />
-      </Suspense>
+      {isAuthenticated && (
+        <Suspense fallback={null}>
+          <AddToListModal
+            isOpen={showAddToListModal}
+            onClose={() => setShowAddToListModal(false)}
+            racketId={racket.id || 0}
+            racketName={`${racket.marca} ${racket.modelo}`}
+          />
+        </Suspense>
+      )}
       {showEditModal && (
         <Suspense fallback={null}>
           <EditRacketModal
@@ -2180,11 +2173,17 @@ const RacketDetailPage: React.FC = () => {
       {/* Sticky Price Bar for Mobile */}
       <StickyPriceBar $show={showStickyBar}>
         <StickyPriceInfo>
-          <StickyPrice>{lowestPrice?.price?.toFixed(2)}€</StickyPrice>
+          <StickyPrice>{lowestPrice ? `${lowestPrice.price.toFixed(2)}€` : '—'}</StickyPrice>
           <StickyStore>en {lowestPrice?.store || 'Tienda'}</StickyStore>
         </StickyPriceInfo>
         <StickyCTA href={lowestPrice?.link || '#'} target='_blank' rel='noopener noreferrer'>
-          Ver Oferta <FiExternalLink size={16} />
+          {lowestPrice?.link ? (
+            <>
+              Ver Oferta <FiExternalLink size={16} />
+            </>
+          ) : (
+            'Sin precio disponible'
+          )}
         </StickyCTA>
       </StickyPriceBar>
     </PageContainer>

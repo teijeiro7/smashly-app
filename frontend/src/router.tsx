@@ -24,6 +24,10 @@ import { PWAInstallPrompt } from './components/pwa/PWAInstallPrompt';
 import { BackgroundTaskPopup } from './components/common/BackgroundTaskPopup';
 import LoadingSpinner from './components/common/LoadingSpinner';
 import ErrorBoundary from './components/ErrorBoundary';
+// Eager, not lazy like every other page below: this is the fallback screen
+// users land on after something has already gone wrong (including a chunk
+// load failure) — it must not depend on a chunk fetch of its own.
+import ErrorPage from './pages/ErrorPage';
 import { logger } from './utils/logger';
 import { sileo } from 'sileo';
 
@@ -73,7 +77,6 @@ const UpdatePasswordPage = lazy(() => import('./pages/UpdatePasswordPage'));
 const PublicStorePage = lazy(() => import('./pages/PublicStorePage'));
 const MessagingPage = lazy(() => import('./pages/MessagingPage'));
 const NotFoundPage = lazy(() => import('./pages/NotFoundPage'));
-const ErrorPage = lazy(() => import('./pages/ErrorPage'));
 
 // ──────────────────────────────────────────────────────────────────────────────
 // Chunk error boundary (retry on chunk load failure)
@@ -135,6 +138,14 @@ function pickString<K extends string>(
 ): Partial<Record<K, string>> {
   const value = obj[key];
   return typeof value === 'string' ? ({ [key]: value } as Partial<Record<K, string>>) : {};
+}
+
+function pickBoolean<K extends string>(
+  obj: Record<string, unknown>,
+  key: K
+): Partial<Record<K, boolean>> {
+  const value = obj[key];
+  return typeof value === 'boolean' ? ({ [key]: value } as Partial<Record<K, boolean>>) : {};
 }
 
 // ──────────────────────────────────────────────────────────────────────────────
@@ -398,10 +409,10 @@ const catalogRoute = createRoute({
     ...pickString(search, 'level'),
     ...pickString(search, 'gameType'),
     ...pickString(search, 'hardness'),
-    ...pickString(search, 'offers'),
-    ...pickString(search, 'mostViewed'),
+    ...pickBoolean(search, 'offers'),
+    ...pickBoolean(search, 'mostViewed'),
     ...pickString(search, 'sort'),
-    ...pickString(search, 'availableOnly'),
+    ...pickBoolean(search, 'availableOnly'),
   }),
   component: () => (
     <LazyRoute fallback={<CatalogSkeleton />}>
